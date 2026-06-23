@@ -1,0 +1,83 @@
+.restaurant-auth__section {
+  margin: 0;
+  padding: 0;
+  border: none;
+
+  legend {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.75rem;
+    padding: 0;
+  }
+
+  & + & {
+    margin-top: 0.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.75rem 0.875rem;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+  }
+}
+
+.restaurant-auth__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #334155;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+
+  input {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.restaurant-auth__location {
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.restaurant-auth__add,
+.restaurant-auth__remove {
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0;
+}
+
+.restaurant-auth__add {
+  color: #2563eb;
+}
+
+.restaurant-auth__remove {
+  color: #b91c1c;
+}
+
+.restaurant-auth__hint {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.5;
+}

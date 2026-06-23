@@ -1,0 +1,53 @@
+.restaurant-admin {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.restaurant-admin__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+
+  h1 {
+    margin: 0;
+    font-size: 1.2rem;
+    flex: 1;
+    text-align: center;
+  }
+}
+
+.restaurant-admin__badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: #0d9488;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.restaurant-admin__back,
+.restaurant-admin__logout {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.restaurant-admin__main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  line-height: 1.6;
+  color: #475569;
+}

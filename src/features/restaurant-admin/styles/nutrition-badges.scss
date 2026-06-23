@@ -1,0 +1,70 @@
+.nutrition-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.nutrition-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
+  line-height: 1.2;
+
+  &__label {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__value {
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  &__unit {
+    margin-left: 0.125rem;
+    font-weight: 500;
+    color: #64748b;
+  }
+
+  &--calories {
+    background: #fff7ed;
+    border-color: #fed7aa;
+
+    .nutrition-badge__label {
+      color: #c2410c;
+    }
+  }
+
+  &--protein {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+
+    .nutrition-badge__label {
+      color: #1d4ed8;
+    }
+  }
+
+  &--fat {
+    background: #fefce8;
+    border-color: #fde047;
+
+    .nutrition-badge__label {
+      color: #a16207;
+    }
+  }
+
+  &--carbs {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+
+    .nutrition-badge__label {
+      color: #047857;
+    }
+  }
+}

@@ -1,0 +1,46 @@
+.restaurant-admin__body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 0;
+  min-height: calc(100vh - 65px);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.restaurant-admin__nav {
+  padding: 1rem;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.restaurant-admin__nav-link {
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.9rem;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+
+  &--active {
+    background: #ecfdf5;
+    color: #0f766e;
+  }
+}
+
+.restaurant-admin__content {
+  padding: 1.5rem;
+}
+
+.restaurant-admin__welcome {
+  margin: 0 0 1.25rem;
+  color: #64748b;
+}
