@@ -1,11 +1,12 @@
-import { apiRequest } from '../../../shared/api/api-client';
+import { apiRequest, assertApiResponseOk } from '../../../shared/api/api-client';
 import type {
   CreateMenuItemPayload,
   MenuCategory,
   MenuResponse,
+  UpdateMenuItemPayload,
 } from '../../../shared/types/menu';
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+import { resolveApiUrl } from '@/shared/config/env';
 
 export function fetchMenu(restaurantId: string): Promise<MenuResponse> {
   return apiRequest<MenuResponse>(`/restaurants/${restaurantId}/menu`);
@@ -43,18 +44,30 @@ export async function uploadMenuImage(
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(`${API_URL}/restaurants/${restaurantId}/menu/upload-image`, {
+  const response = await fetch(`${resolveApiUrl()}/restaurants/${restaurantId}/menu/upload-image`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { message?: string } | null;
-    throw new Error(body?.message ?? 'Не удалось загрузить фото');
+    await assertApiResponseOk(response, { authenticatedRequest: true });
   }
 
   return response.json() as Promise<{ imageUrl: string }>;
+}
+
+export function updateMenuItem(
+  restaurantId: string,
+  token: string,
+  itemId: string,
+  payload: UpdateMenuItemPayload,
+): Promise<unknown> {
+  return apiRequest(`/restaurants/${restaurantId}/menu/items/${itemId}`, {
+    method: 'PATCH',
+    token,
+    body: JSON.stringify(payload),
+  });
 }
 
 export function deleteMenuItem(

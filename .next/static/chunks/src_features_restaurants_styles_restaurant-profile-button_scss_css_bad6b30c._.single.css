@@ -1,0 +1,31 @@
+/* [project]/src/features/restaurants/styles/restaurant-profile-button.scss.css [app-client] (css) */
+.restaurant-profile-button {
+  color: #475569;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  display: inline-flex;
+  position: relative;
+}
+
+.restaurant-profile-button:hover {
+  background: rgba(241, 245, 249, .75);
+}
+
+.restaurant-profile-button--authenticated {
+  color: #0f766e;
+}
+
+.restaurant-profile-button__icon {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+/*# sourceMappingURL=src_features_restaurants_styles_restaurant-profile-button_scss_css_bad6b30c._.single.css.map*/

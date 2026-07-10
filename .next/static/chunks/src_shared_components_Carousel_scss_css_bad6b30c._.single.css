@@ -1,0 +1,127 @@
+/* [project]/src/shared/components/Carousel.scss.css [app-client] (css) */
+.carousel__viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel__container {
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  display: flex;
+}
+
+.carousel__container:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  margin-left: -.5rem;
+}
+
+.carousel__container:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  margin-left: -.5rem;
+}
+
+.carousel__container:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  margin-left: -.5rem;
+}
+
+.carousel__container:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  margin-right: -.5rem;
+}
+
+.carousel__container:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  margin-right: -.5rem;
+}
+
+.carousel__container:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  margin-right: -.5rem;
+}
+
+.carousel__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  position: relative;
+}
+
+.carousel__slide:not(:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: .5rem;
+}
+
+.carousel__slide:not(:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: .5rem;
+}
+
+.carousel__slide:not(:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi))) {
+  padding-left: .5rem;
+}
+
+.carousel__slide:-webkit-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: .5rem;
+}
+
+.carousel__slide:-moz-any(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: .5rem;
+}
+
+.carousel__slide:is(:lang(ae), :lang(ar), :lang(arc), :lang(bcc), :lang(bqi), :lang(ckb), :lang(dv), :lang(fa), :lang(glk), :lang(he), :lang(ku), :lang(mzn), :lang(nqo), :lang(pnb), :lang(ps), :lang(sd), :lang(ug), :lang(ur), :lang(yi)) {
+  padding-right: .5rem;
+}
+
+.carousel__arrow {
+  color: #fff;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  z-index: 2;
+  background: rgba(15, 23, 42, .45);
+  border: none;
+  border-radius: 999px;
+  justify-content: center;
+  align-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: background .18s, opacity .18s;
+  display: inline-flex;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel__arrow:hover {
+  background: rgba(15, 23, 42, .7);
+}
+
+.carousel__arrow--prev {
+  left: .5rem;
+}
+
+.carousel__arrow--next {
+  right: .5rem;
+}
+
+.carousel__dots {
+  justify-content: center;
+  gap: .4rem;
+  margin-top: .5rem;
+  display: flex;
+}
+
+.carousel__dot {
+  cursor: pointer;
+  background: rgba(15, 23, 42, .25);
+  border: none;
+  border-radius: 999px;
+  width: .5rem;
+  height: .5rem;
+  padding: 0;
+  transition: background .18s, transform .18s;
+}
+
+.carousel__dot--active {
+  background: var(--rs-primary, #2563eb);
+  transform: scale(1.25);
+}
+
+/*# sourceMappingURL=src_shared_components_Carousel_scss_css_bad6b30c._.single.css.map*/

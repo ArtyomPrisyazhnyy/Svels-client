@@ -1,0 +1,49 @@
+/* [project]/src/features/restaurants/styles/restaurant-cart-button.scss.css [app-client] (css) */
+.restaurant-cart-button {
+  color: #475569;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  display: inline-flex;
+  position: relative;
+}
+
+.restaurant-cart-button:hover {
+  background: rgba(241, 245, 249, .75);
+}
+
+.restaurant-cart-button__icon {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.restaurant-cart-button__badge {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  background: #0f766e;
+  border-radius: 999px;
+  justify-content: center;
+  align-items: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding: 0 .3rem;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  position: absolute;
+  top: -.35rem;
+  right: -.45rem;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/*# sourceMappingURL=src_features_restaurants_styles_restaurant-cart-button_scss_css_bad6b30c._.single.css.map*/

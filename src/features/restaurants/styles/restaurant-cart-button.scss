@@ -1,0 +1,46 @@
+.restaurant-cart-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(241, 245, 249, 0.75);
+  }
+}
+
+.restaurant-cart-button__icon {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.restaurant-cart-button__badge {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: #0f766e;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 0 0 2px #ffffff;
+}

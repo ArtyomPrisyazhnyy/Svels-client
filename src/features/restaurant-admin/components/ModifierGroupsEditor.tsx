@@ -1,4 +1,4 @@
-import { formatPriceDelta } from '../../../shared/types/menu';
+import { PriceDelta } from '../../../shared/components/CurrencyAmount';
 import type { MenuModifierGroup } from '../../../shared/types/menu';
 import { generateUuidV7 } from '../../../shared/utils/uuid.util';
 import '../styles/modifier-groups-editor.scss';
@@ -121,7 +121,7 @@ export function ModifierGroupsEditor({ groups, onChange }: ModifierGroupsEditorP
                 />
                 <span className="modifiers__preview">
                   {option.name}
-                  {formatPriceDelta(option.priceDelta)}
+                  <PriceDelta delta={option.priceDelta} />
                 </span>
                 <button
                   type="button"

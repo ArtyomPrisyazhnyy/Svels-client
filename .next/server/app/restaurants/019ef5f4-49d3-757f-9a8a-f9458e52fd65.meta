@@ -1,0 +1,7 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "0",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/restaurants/layout,_N_T_/restaurants/[id]/layout,_N_T_/restaurants/[id]/page,_N_T_/restaurants/019ef5f4-49d3-757f-9a8a-f9458e52fd65,restaurant-public:019ef5f4-49d3-757f-9a8a-f9458e52fd65"
+  }
+}

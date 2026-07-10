@@ -81,10 +81,15 @@
     color: #0f172a;
   }
 
-  span {
+  > span {
     color: #0f766e;
     font-weight: 600;
   }
+}
+
+.menu-admin__item-variant {
+  font-weight: 600;
+  color: #64748b;
 }
 
 .menu-admin__modifiers {
@@ -93,6 +98,32 @@
   color: #64748b;
   font-size: 0.8rem;
   line-height: 1.4;
+}
+
+.menu-admin__item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.menu-admin__edit {
+  border: 1px solid #99f6e4;
+  background: #fff;
+  color: #0d9488;
+  border-radius: 8px;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: #f0fdfa;
+  }
+}
+
+.menu-admin__item--editing {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
 }
 
 .menu-admin__delete {

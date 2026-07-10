@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/app/globals.css"],"sourcesContent":["*,\n*::before,\n*::after {\n  box-sizing: border-box;\n}\n\nhtml {\n  -webkit-tap-highlight-color: transparent;\n}\n\na,\nbutton,\ninput,\ntextarea,\nselect,\nlabel,\nsummary,\n[role='button'] {\n  -webkit-tap-highlight-color: transparent;\n}\n\n:focus:not(:focus-visible) {\n  outline: none;\n}\n\n:focus-visible {\n  outline: 2px solid #2563eb;\n  outline-offset: 2px;\n}\n\nbody {\n  margin: 0;\n  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;\n  -webkit-font-smoothing: antialiased;\n}\n\na {\n  color: inherit;\n}\n\n/* Turbopack/Lightning CSS вырезает backdrop-filter из SCSS — дублируем здесь */\n.glass-header::before,\n.landing__header::before {\n  -webkit-backdrop-filter: blur(24px) saturate(180%);\n  backdrop-filter: blur(24px) saturate(180%);\n}\n\n.glass-header--dark::before {\n  -webkit-backdrop-filter: blur(24px) saturate(180%);\n  backdrop-filter: blur(24px) saturate(180%);\n}\n"],"names":[],"mappings":"AAAA;;;;AAMA;;;;AAeA;;;;AAIA;;;;;AAKA;;;;;;AAMA;;;;AAKA"}}]
+}

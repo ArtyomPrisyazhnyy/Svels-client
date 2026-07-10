@@ -1,0 +1,14 @@
+User-Agent: *
+Allow: /
+Allow: /restaurants/
+Disallow: /admin
+Disallow: /restaurant-admin
+Disallow: /account
+Disallow: /auth
+Disallow: /booking
+Disallow: /pre-order
+Disallow: /restaurants/*/auth
+Disallow: /restaurants/*/account
+Disallow: /restaurants/*/booking
+Disallow: /restaurants/*/pre-order
+

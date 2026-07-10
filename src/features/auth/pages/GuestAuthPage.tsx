@@ -1,31 +1,35 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
-import { getPostAuthPath } from '../../../shared/routing/get-post-auth-path';
-import { useAuthStore } from '../../../store/auth.store';
+import { getPostAuthPath } from '@/shared/routing/get-post-auth-path';
+import { useAuthStore } from '@/store/auth.store';
 import '../styles/auth.scss';
 
 type AuthTab = 'login' | 'register';
 
-export function GuestAuthPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
+interface GuestAuthPageProps {
+  redirectFrom?: string;
+}
+
+export function GuestAuthPage({ redirectFrom }: GuestAuthPageProps) {
+  const router = useRouter();
   const [tab, setTab] = useState<AuthTab>('login');
   const [googleError, setGoogleError] = useState<string | null>(null);
 
-  const redirectFrom = (location.state as { from?: string } | null)?.from;
-
   function handleSuccess() {
     const role = useAuthStore.getState().user?.role ?? 'user';
-    navigate(getPostAuthPath(role, redirectFrom), { replace: true });
+    router.replace(getPostAuthPath(role, redirectFrom));
   }
 
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <Link to="/" className="auth-card__back">
+        <Link href="/" className="auth-card__back">
           ← На главную
         </Link>
         <h1 className="auth-card__title">Вход для гостей</h1>
@@ -69,8 +73,7 @@ export function GuestAuthPage() {
         <GoogleSignInButton onSuccess={handleSuccess} onError={setGoogleError} />
 
         <p className="auth-card__footer">
-          Владелец заведения?{' '}
-          <Link to="/auth/restaurant">Регистрация для ресторанов</Link>
+          Владелец заведения? <Link href="/auth/restaurant">Регистрация для ресторанов</Link>
         </p>
       </div>
     </div>

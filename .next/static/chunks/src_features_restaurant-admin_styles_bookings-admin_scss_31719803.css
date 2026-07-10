@@ -1,0 +1,109 @@
+/* [project]/src/features/restaurant-admin/styles/bookings-admin.scss.css [app-client] (css) */
+.bookings-admin__header {
+  margin-bottom: 1rem;
+}
+
+.bookings-admin__header h2 {
+  color: #0f172a;
+  margin: 0 0 .35rem;
+  font-size: 1.1rem;
+}
+
+.bookings-admin__intro, .bookings-admin__empty, .bookings-admin__notice {
+  color: #64748b;
+  margin: 0;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.bookings-admin__notice {
+  color: #92400e;
+  background: #fffbeb;
+  border-radius: 10px;
+  padding: .75rem 1rem;
+}
+
+.bookings-admin__error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-radius: 8px;
+  margin: 0 0 1rem;
+  padding: .75rem;
+  font-size: .875rem;
+}
+
+.bookings-admin__table-wrap {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow-x: auto;
+}
+
+.bookings-admin__table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: .875rem;
+}
+
+.bookings-admin__table th, .bookings-admin__table td {
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid #f1f5f9;
+  padding: .75rem .875rem;
+}
+
+.bookings-admin__table th {
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.bookings-admin__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.bookings-admin__notes {
+  text-overflow: ellipsis;
+  max-width: 220px;
+  overflow: hidden;
+}
+
+.bookings-admin__badge {
+  border-radius: 999px;
+  padding: .2rem .55rem;
+  font-size: .75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.bookings-admin__badge--pending {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.bookings-admin__badge--confirmed {
+  color: #047857;
+  background: #dcfce7;
+}
+
+.bookings-admin__badge--cancelled {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.bookings-admin__badge--completed {
+  color: #3730a3;
+  background: #e0e7ff;
+}
+
+.bookings-admin__select {
+  font: inherit;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: .35rem .5rem;
+}
+
+/*# sourceMappingURL=src_features_restaurant-admin_styles_bookings-admin_scss_31719803.css.map*/

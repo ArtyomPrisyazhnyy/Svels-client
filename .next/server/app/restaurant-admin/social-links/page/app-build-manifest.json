@@ -1,0 +1,26 @@
+{
+  "pages": {
+    "/restaurant-admin/social-links/page": [
+      "static/chunks/node_modules_d44db3e9._.js",
+      "static/chunks/_f66c8d20._.js",
+      "static/chunks/_22e604b1._.css",
+      "static/chunks/app_layout_tsx_0a548d63._.js",
+      "static/chunks/node_modules_next_dist_client_components_builtin_global-error_133b09fa.js",
+      "static/chunks/_0fcad53f._.js",
+      "static/chunks/src_features_restaurant-admin_styles_c77113d4._.css",
+      "static/chunks/app_restaurant-admin_layout_tsx_133b09fa._.js",
+      "static/chunks/_891c9973._.js",
+      "static/chunks/src_features_restaurant-admin_styles_social-links-admin_scss_b1a49deb.css",
+      "static/chunks/app_restaurant-admin_social-links_page_tsx_398893cd._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_57d40746._.js",
+      "static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js",
+      "static/chunks/node_modules_next_dist_compiled_next-devtools_index_a9cb0712.js",
+      "static/chunks/node_modules_next_dist_compiled_5150ccfd._.js",
+      "static/chunks/node_modules_next_dist_client_cf1d9188._.js",
+      "static/chunks/node_modules_next_dist_b0daae9a._.js",
+      "static/chunks/node_modules_@swc_helpers_cjs_b3dc30d6._.js",
+      "static/chunks/_a0ff3932._.js",
+      "static/chunks/turbopack-_cdba956c._.js"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "[project]/src/features/floor-plan/components/KonvaStage.tsx [app-client] (ecmascript, next/dynamic entry)": {
+    "id": "[project]/src/features/floor-plan/components/KonvaStage.tsx [app-client] (ecmascript, next/dynamic entry)",
+    "files": [
+      "static/chunks/node_modules_konva_lib_80de751c._.js",
+      "static/chunks/node_modules_react-reconciler_7392d85c._.js",
+      "static/chunks/node_modules_27f2ce37._.js",
+      "static/chunks/src_features_floor-plan_components_ffbc91c4._.js",
+      "static/chunks/src_features_floor-plan_components_KonvaStage_tsx_ee6dfa30._.js"
+    ]
+  }
+}

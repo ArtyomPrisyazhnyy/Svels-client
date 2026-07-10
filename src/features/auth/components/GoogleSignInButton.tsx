@@ -1,8 +1,11 @@
+'use client';
+
 import { useEffect, useRef } from 'react';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { loginWithGoogle } from '../api/auth.api';
-import { useAuthStore } from '../../../store/auth.store';
-import { ApiError } from '../../../shared/api/api-client';
+import { useAuthStore } from '@/store/auth.store';
+import { ApiError } from '@/shared/api/api-client';
+import { GOOGLE_CLIENT_ID } from '@/shared/config/env';
 
 interface GoogleSignInButtonProps {
   onSuccess: () => void;
@@ -34,7 +37,7 @@ function GoogleIcon() {
 
 export function GoogleSignInButton({ onSuccess, onError }: GoogleSignInButtonProps) {
   const setAuth = useAuthStore((s) => s.setAuth);
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
+  const clientId = GOOGLE_CLIENT_ID.trim();
   const googleButtonRef = useRef<HTMLDivElement>(null);
 
   async function handleGoogleSuccess(response: CredentialResponse) {
@@ -70,7 +73,7 @@ export function GoogleSignInButton({ onSuccess, onError }: GoogleSignInButtonPro
         type="button"
         className="auth-google-btn"
         onClick={() =>
-          onError('Добавьте VITE_GOOGLE_CLIENT_ID в файл Svelse-react/.env и перезапустите dev-сервер')
+          onError('Добавьте NEXT_PUBLIC_GOOGLE_CLIENT_ID в .env и перезапустите dev-сервер')
         }
       >
         <GoogleIcon />
@@ -94,9 +97,6 @@ export function GoogleSignInButton({ onSuccess, onError }: GoogleSignInButtonPro
           width="356"
           onSuccess={handleGoogleSuccess}
           onError={() => {
-            console.error(
-              '[Google Sign-In] Ошибка виджета Google. Частые причины: origin не добавлен в Google Cloud, аккаунт не в Test users, блокировка cookies.',
-            );
             onError(
               'Ошибка виджета Google. Откройте консоль браузера (F12 → Console) для подробностей.',
             );

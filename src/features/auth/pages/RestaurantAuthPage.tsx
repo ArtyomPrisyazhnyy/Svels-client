@@ -1,5 +1,8 @@
+'use client';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../api/auth.api';
 import { registerRestaurant } from '../api/restaurant.api';
 import { LoginForm } from '../components/LoginForm';
@@ -19,7 +22,7 @@ interface LocationField {
 }
 
 export function RestaurantAuthPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const setAuth = useAuthStore((s) => s.setAuth);
   const [tab, setTab] = useState<RestaurantTab>('register');
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +109,7 @@ export function RestaurantAuthPage() {
   return (
     <div className="auth-page">
       <div className="auth-card auth-card--wide">
-        <Link to="/" className="auth-card__back">
+        <Link href="/" className="auth-card__back">
           ← На главную
         </Link>
         <h1 className="auth-card__title">Для заведений</h1>
@@ -149,7 +152,7 @@ export function RestaurantAuthPage() {
             <LoginForm
               onSuccess={() => {
                 const role = useAuthStore.getState().user?.role ?? 'user';
-                navigate(getPostAuthPath(role), { replace: true });
+                router.replace(getPostAuthPath(role));
               }}
             />
           </div>
@@ -302,7 +305,7 @@ export function RestaurantAuthPage() {
         )}
 
         <p className="auth-card__footer">
-          Вы гость? <Link to="/auth/guest">Вход для посетителей</Link>
+          Уже подавали заявку на подключение? Перейдите на вкладку «Вход».
         </p>
       </div>
     </div>

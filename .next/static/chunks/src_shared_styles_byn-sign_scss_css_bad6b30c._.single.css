@@ -1,0 +1,33 @@
+/* [project]/src/shared/styles/byn-sign.scss.css [app-client] (css) */
+@font-face {
+  font-family: nbrb;
+  src: url("/fonts/nbrb/nbrb.woff2") format("woff2"), url("/fonts/nbrb/nbrb.woff") format("woff"), url("/fonts/nbrb/nbrb.ttf") format("truetype");
+  unicode-range: U+E901, U+42, U+59, U+4E;
+  font-display: swap;
+}
+
+.byn-sign {
+  vertical-align: -.08em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: nbrb, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  display: inline-block;
+}
+
+.byn-price {
+  white-space: nowrap;
+  align-items: baseline;
+  gap: .15em;
+  display: inline-flex;
+}
+
+.currency-text {
+  font-size: .92em;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/*# sourceMappingURL=src_shared_styles_byn-sign_scss_css_bad6b30c._.single.css.map*/

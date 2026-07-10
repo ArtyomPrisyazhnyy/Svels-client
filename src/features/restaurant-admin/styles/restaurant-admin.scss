@@ -1,24 +1,10 @@
 .restaurant-admin {
+  // Высота sticky glass-header + небольшой отступ для sticky-блоков в админке
+  --restaurant-admin-sticky-top: 5.25rem;
+
   min-height: 100vh;
   background: #f8fafc;
   color: #0f172a;
-}
-
-.restaurant-admin__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-
-  h1 {
-    margin: 0;
-    font-size: 1.2rem;
-    flex: 1;
-    text-align: center;
-  }
 }
 
 .restaurant-admin__badge {
@@ -31,17 +17,6 @@
   font-size: 0.7rem;
   font-weight: 700;
   vertical-align: middle;
-}
-
-.restaurant-admin__back,
-.restaurant-admin__logout {
-  border: none;
-  background: transparent;
-  color: #64748b;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
 }
 
 .restaurant-admin__main {

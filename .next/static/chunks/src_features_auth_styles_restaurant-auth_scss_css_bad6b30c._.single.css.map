@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///turbopack:///[project]/src/features/auth/styles/home/artyom/Документы/Svels/Svels-client/src/features/auth/styles/restaurant-auth.scss"],"sourcesContent":[".auth-card__back {\n  display: inline-block;\n  margin-bottom: 1rem;\n  color: #64748b;\n  font-size: 0.875rem;\n  font-weight: 600;\n  text-decoration: none;\n\n  &:hover {\n    color: #2563eb;\n  }\n}\n\n.auth-card__footer {\n  margin: 1.25rem 0 0;\n  text-align: center;\n  font-size: 0.875rem;\n  color: #64748b;\n\n  a {\n    color: #2563eb;\n    font-weight: 600;\n  }\n}\n\n.auth-success {\n  margin: 0;\n  padding: 0.75rem 0.875rem;\n  border-radius: 10px;\n  background: #f0fdf4;\n  color: #166534;\n  font-size: 0.875rem;\n}\n"],"names":[],"mappings":"AAAA;;;;;;;;;AAQE;;;;AAKF;;;;;;;AAME;;;;;AAMF"}}]
+}

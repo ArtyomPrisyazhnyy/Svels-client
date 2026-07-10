@@ -1,10 +1,14 @@
+'use client';
+
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+import { ClientFormattedDate } from '@/components/ClientFormattedDate';
 import {
   fetchPendingRegistrations,
   reviewRegistration,
   type PendingRegistration,
 } from '../api/admin.api';
+import { useRegistrationNotifications } from '../hooks/useRegistrationNotifications';
 import { ApiError } from '../../../shared/api/api-client';
 import { useAuthStore } from '../../../store/auth.store';
 import '../styles/admin.scss';
@@ -17,6 +21,7 @@ export default function SuperAdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [isLive, setIsLive] = useState(false);
 
   const loadRequests = useCallback(async () => {
     if (!accessToken) return;
@@ -37,6 +42,23 @@ export default function SuperAdminPage() {
   useEffect(() => {
     void loadRequests();
   }, [loadRequests]);
+
+  const handleSubmitted = useCallback((registration: PendingRegistration) => {
+    setIsLive(true);
+    setRequests((prev) => {
+      if (prev.some((item) => item.id === registration.id)) {
+        return prev;
+      }
+
+      return [registration, ...prev];
+    });
+  }, []);
+
+  const handleReviewed = useCallback((requestId: string) => {
+    setRequests((prev) => prev.filter((item) => item.id !== requestId));
+  }, []);
+
+  useRegistrationNotifications(accessToken, handleSubmitted, handleReviewed);
 
   async function handleReview(requestId: string, action: 'approve' | 'reject') {
     if (!accessToken) return;
@@ -63,15 +85,15 @@ export default function SuperAdminPage() {
 
   return (
     <div className="admin">
-      <header className="admin__header">
-        <Link to="/" className="admin__back">
+      <header className="glass-header glass-header--dark admin__header">
+        <Link href="/" className="glass-header__link glass-header__link--accent admin__back">
           ← На главную
         </Link>
         <h1>
           Svels
           <span className="admin__badge">Суперадмин</span>
         </h1>
-        <button type="button" className="admin__logout" onClick={logout}>
+        <button type="button" className="glass-header__link admin__logout" onClick={logout}>
           Выйти
         </button>
       </header>
@@ -80,6 +102,7 @@ export default function SuperAdminPage() {
         <p className="admin__intro">
           Здравствуйте, {user?.firstName}. Рассматривайте заявки заведений на подключение к
           платформе.
+          {isLive && <span className="admin__live"> · Live-обновления включены</span>}
         </p>
 
         {error && <p className="admin__error">{error}</p>}
@@ -97,7 +120,7 @@ export default function SuperAdminPage() {
                   УНП: {request.unp}
                   {request.isChain ? ' · Сеть' : ''}
                   <br />
-                  Подано: {new Date(request.createdAt).toLocaleString('ru-RU')}
+                  Подано: <ClientFormattedDate iso={request.createdAt} />
                 </p>
                 {request.description && (
                   <p className="admin__meta">{request.description}</p>

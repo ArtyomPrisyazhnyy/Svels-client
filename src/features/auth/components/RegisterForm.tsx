@@ -1,22 +1,28 @@
+'use client';
+
 import { useState, type FormEvent } from 'react';
 import { register } from '../api/auth.api';
-import { useAuthStore } from '../../../store/auth.store';
-import { ApiError } from '../../../shared/api/api-client';
+import { registerGuest } from '../api/restaurant-guest-auth.api';
+import { useAuthStore } from '@/store/auth.store';
+import { ApiError } from '@/shared/api/api-client';
 import { PasswordInput } from './PasswordInput';
 
 interface RegisterFormProps {
+  restaurantId?: string;
   onSuccess: () => void;
 }
 
-export function RegisterForm({ onSuccess }: RegisterFormProps) {
+export function RegisterForm({ restaurantId, onSuccess }: RegisterFormProps) {
   const setAuth = useAuthStore((s) => s.setAuth);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const isGuestAuth = Boolean(restaurantId);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -30,7 +36,9 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     setLoading(true);
 
     try {
-      const response = await register({ email, password, firstName, lastName });
+      const response = isGuestAuth
+        ? await registerGuest(restaurantId!, { phone, password, firstName, lastName })
+        : await register({ email, password, firstName, lastName });
       setAuth(response.accessToken, response.user);
       onSuccess();
     } catch (err) {
@@ -70,17 +78,33 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
         </div>
       </div>
 
-      <div className="auth-field">
-        <label htmlFor="register-email">Email</label>
-        <input
-          id="register-email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
+      {isGuestAuth ? (
+        <div className="auth-field">
+          <label htmlFor="register-phone">Телефон</label>
+          <input
+            id="register-phone"
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            placeholder="+375 29 123-45-67"
+            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+      ) : (
+        <div className="auth-field">
+          <label htmlFor="register-email">Email</label>
+          <input
+            id="register-email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+      )}
 
       <PasswordInput
         id="register-password"

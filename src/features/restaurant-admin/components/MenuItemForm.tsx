@@ -1,9 +1,16 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { ApiError } from '../../../shared/api/api-client';
-import type { MenuCategory, MenuModifierGroup, MenuItemNutrition } from '../../../shared/types/menu';
-import { resolveImageUrl } from '../../../shared/types/menu';
+import type {
+  MenuCategory,
+  MenuItem,
+  MenuModifierGroup,
+  MenuItemNutrition,
+} from '../../../shared/types/menu';
+import { MAX_MENU_ITEM_GALLERY_IMAGES, resolveImageUrl } from '../../../shared/types/menu';
+import { CurrencySign } from '../../../shared/components/CurrencySign';
 import {
   createMenuItem,
+  updateMenuItem,
   uploadMenuImage,
 } from '../api/menu.api';
 import { ModifierGroupsEditor } from './ModifierGroupsEditor';
@@ -15,9 +22,55 @@ interface MenuItemFormProps {
   categories: MenuCategory[];
   onCategoryCreate: (name: string) => Promise<string>;
   onSuccess: () => void;
+  editingItem?: MenuItem | null;
+  onCancelEdit?: () => void;
 }
 
 const emptyNutrition = (): MenuItemNutrition => ({});
+
+function handleEnterNavigation(event: KeyboardEvent<HTMLFormElement>) {
+  if (event.key !== 'Enter') {
+    return;
+  }
+
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  if (target.tagName === 'TEXTAREA') {
+    return;
+  }
+
+  if (target.tagName === 'BUTTON' || target.closest('button')) {
+    return;
+  }
+
+  if (target instanceof HTMLInputElement) {
+    if (target.type === 'file' || target.type === 'checkbox' || target.type === 'submit') {
+      return;
+    }
+  }
+
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const focusable = Array.from(
+    form.querySelectorAll<HTMLElement>(
+      'input:not([type="file"]):not([type="checkbox"]):not([type="hidden"]), select, textarea',
+    ),
+  ).filter((element) => !element.hasAttribute('disabled'));
+
+  const index = focusable.indexOf(target);
+  if (index >= 0 && index < focusable.length - 1) {
+    focusable[index + 1].focus();
+    return;
+  }
+
+  if (index === focusable.length - 1) {
+    form.querySelector<HTMLButtonElement>('.menu-item-form__submit')?.focus();
+  }
+}
 
 export function MenuItemForm({
   restaurantId,
@@ -25,10 +78,14 @@ export function MenuItemForm({
   categories,
   onCategoryCreate,
   onSuccess,
+  editingItem,
+  onCancelEdit,
 }: MenuItemFormProps) {
+  const isEditing = Boolean(editingItem);
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? '');
   const [newCategoryName, setNewCategoryName] = useState('');
   const [name, setName] = useState('');
+  const [variantLabel, setVariantLabel] = useState('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState('');
   const [price, setPrice] = useState('');
@@ -36,9 +93,52 @@ export function MenuItemForm({
   const [modifierGroups, setModifierGroups] = useState<MenuModifierGroup[]>([]);
   const [imageUrl, setImageUrl] = useState('');
   const [imagePreview, setImagePreview] = useState('');
+  const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
+  const [galleryUploading, setGalleryUploading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function resetForm() {
+    setCategoryId(categories[0]?.id ?? '');
+    setNewCategoryName('');
+    setName('');
+    setVariantLabel('');
+    setDescription('');
+    setIngredients('');
+    setPrice('');
+    setNutrition(emptyNutrition());
+    setModifierGroups([]);
+    setImageUrl('');
+    setImagePreview('');
+    setGalleryUrls([]);
+    setError(null);
+  }
+
+  useEffect(() => {
+    if (!editingItem) {
+      return;
+    }
+
+    setCategoryId(editingItem.categoryId);
+    setName(editingItem.name);
+    setVariantLabel(editingItem.variantLabel ?? '');
+    setDescription(editingItem.description ?? '');
+    setIngredients(editingItem.ingredients ?? '');
+    setPrice(String(editingItem.price));
+    setNutrition(editingItem.nutrition ?? emptyNutrition());
+    setModifierGroups(editingItem.modifierGroups ?? []);
+    setImageUrl(editingItem.imageUrl);
+    setImagePreview('');
+    setGalleryUrls(editingItem.galleryUrls ?? []);
+    setError(null);
+  }, [editingItem]);
+
+  useEffect(() => {
+    if (!isEditing && !categoryId && categories[0]?.id) {
+      setCategoryId(categories[0].id);
+    }
+  }, [categories, categoryId, isEditing]);
 
   async function handleImageChange(file: File | undefined) {
     if (!file) return;
@@ -57,6 +157,51 @@ export function MenuItemForm({
     } finally {
       setUploading(false);
     }
+  }
+
+  async function handleGalleryChange(files: FileList | null) {
+    if (!files || files.length === 0) return;
+
+    const remaining = MAX_MENU_ITEM_GALLERY_IMAGES - galleryUrls.length;
+    if (remaining <= 0) {
+      setError(`Максимум ${MAX_MENU_ITEM_GALLERY_IMAGES} дополнительных фото`);
+      return;
+    }
+
+    const toUpload = Array.from(files).slice(0, remaining);
+    setError(null);
+    setGalleryUploading(true);
+
+    try {
+      const uploaded: string[] = [];
+      for (const file of toUpload) {
+        const result = await uploadMenuImage(restaurantId, token, file);
+        uploaded.push(result.imageUrl);
+      }
+      setGalleryUrls((prev) => [...prev, ...uploaded]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось загрузить фото галереи');
+    } finally {
+      setGalleryUploading(false);
+    }
+  }
+
+  function handleRemoveGalleryImage(index: number) {
+    setGalleryUrls((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  // Продвигает фото из галереи в обложку: старая обложка уходит в галерею на его место.
+  function handleMakeCover(index: number) {
+    if (!imageUrl) return;
+    const newCover = galleryUrls[index];
+    if (!newCover) return;
+    setGalleryUrls((prev) => {
+      const next = [...prev];
+      next[index] = imageUrl;
+      return next;
+    });
+    setImageUrl(newCover);
+    setImagePreview('');
   }
 
   async function handleCreateCategory() {
@@ -99,46 +244,65 @@ export function MenuItemForm({
 
     setLoading(true);
 
+    const nutritionPayload =
+      nutrition.calories || nutrition.protein || nutrition.fat || nutrition.carbs
+        ? nutrition
+        : undefined;
+
+    const trimmedVariantLabel = variantLabel.trim();
+
+    const payload = {
+      categoryId,
+      name: name.trim(),
+      variantLabel: trimmedVariantLabel || undefined,
+      description: description.trim() || undefined,
+      ingredients: ingredients.trim() || undefined,
+      nutrition: nutritionPayload,
+      price: parsedPrice,
+      imageUrl,
+      galleryUrls,
+      modifierGroups: modifierGroups.length ? modifierGroups : undefined,
+    };
+
     try {
-      const nutritionPayload =
-        nutrition.calories || nutrition.protein || nutrition.fat || nutrition.carbs
-          ? nutrition
-          : undefined;
+      if (isEditing && editingItem) {
+        await updateMenuItem(restaurantId, token, editingItem.id, {
+          ...payload,
+          variantLabel: trimmedVariantLabel || null,
+        });
+        resetForm();
+        onCancelEdit?.();
+      } else {
+        await createMenuItem(restaurantId, token, payload);
+        resetForm();
+      }
 
-      await createMenuItem(restaurantId, token, {
-        categoryId,
-        name: name.trim(),
-        description: description.trim() || undefined,
-        ingredients: ingredients.trim() || undefined,
-        nutrition: nutritionPayload,
-        price: parsedPrice,
-        imageUrl,
-        modifierGroups: modifierGroups.length ? modifierGroups : undefined,
-      });
-
-      setName('');
-      setDescription('');
-      setIngredients('');
-      setPrice('');
-      setNutrition(emptyNutrition());
-      setModifierGroups([]);
-      setImageUrl('');
-      setImagePreview('');
       onSuccess();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось создать позицию');
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : isEditing
+            ? 'Не удалось сохранить изменения'
+            : 'Не удалось создать позицию',
+      );
     } finally {
       setLoading(false);
     }
   }
 
+  function handleCancelEdit() {
+    resetForm();
+    onCancelEdit?.();
+  }
+
   return (
-    <form className="menu-item-form" onSubmit={handleSubmit}>
-      <h2>Новая позиция меню</h2>
+    <form className="menu-item-form" onSubmit={handleSubmit} onKeyDown={handleEnterNavigation}>
+      <h2>{isEditing ? 'Редактирование позиции' : 'Новая позиция меню'}</h2>
       {error && <p className="menu-item-form__error">{error}</p>}
 
       <div className="menu-item-form__field">
-        <label>Фотография *</label>
+        <label>Фотография (обложка) *</label>
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp"
@@ -147,11 +311,59 @@ export function MenuItemForm({
         {uploading && <p className="menu-item-form__hint">Загрузка…</p>}
         {(imagePreview || imageUrl) && (
           <img
-            className="menu-item-form__preview"
+            className="menu-item-form__preview menu-item-form__preview--cover"
             src={imagePreview || resolveImageUrl(imageUrl)}
-            alt="Превью"
+            alt="Превью обложки"
           />
         )}
+        <p className="menu-item-form__hint">
+          Обложка отображается в карточке товара в меню.
+        </p>
+      </div>
+
+      <div className="menu-item-form__field">
+        <label>
+          Дополнительные фото (до {MAX_MENU_ITEM_GALLERY_IMAGES})
+        </label>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          disabled={galleryUrls.length >= MAX_MENU_ITEM_GALLERY_IMAGES || galleryUploading}
+          onChange={(e) => void handleGalleryChange(e.target.files)}
+        />
+        {galleryUploading && <p className="menu-item-form__hint">Загрузка галереи…</p>}
+        {galleryUrls.length > 0 && (
+          <div className="menu-item-form__gallery">
+            {galleryUrls.map((url, index) => (
+              <div className="menu-item-form__gallery-item" key={`${url}-${index}`}>
+                <img src={resolveImageUrl(url)} alt={`Доп. фото ${index + 1}`} />
+                <div className="menu-item-form__gallery-actions">
+                  <button
+                    type="button"
+                    className="menu-item-form__gallery-btn"
+                    onClick={() => handleMakeCover(index)}
+                    title="Сделать обложкой"
+                  >
+                    Обложка
+                  </button>
+                  <button
+                    type="button"
+                    className="menu-item-form__gallery-btn menu-item-form__gallery-btn--danger"
+                    onClick={() => handleRemoveGalleryImage(index)}
+                    title="Удалить"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="menu-item-form__hint">
+          Видны только в окне товара. Кнопкой «Обложка» можно выбрать, какое фото
+          показывать первым в меню.
+        </p>
       </div>
 
       <div className="menu-item-form__row">
@@ -195,7 +407,25 @@ export function MenuItemForm({
       </div>
 
       <div className="menu-item-form__field">
-        <label htmlFor="item-price">Базовая цена (₽) *</label>
+        <label htmlFor="item-variant-label">Уточнение к названию</label>
+        <input
+          id="item-variant-label"
+          maxLength={80}
+          value={variantLabel}
+          onChange={(e) => setVariantLabel(e.target.value)}
+          placeholder="325 г, 650 мл, 11 шт."
+        />
+        <p className="menu-item-form__hint">
+          Необязательно — объём, вес или количество: «650 мл», «11 роз» и т.п.
+        </p>
+      </div>
+
+      <div className="menu-item-form__field">
+        <label htmlFor="item-price">
+          Базовая цена (
+          <CurrencySign />
+          ) *
+        </label>
         <input
           id="item-price"
           type="number"
@@ -238,7 +468,8 @@ export function MenuItemForm({
               <input
                 type="number"
                 min="0"
-                inputMode="numeric"
+                step="0.1"
+                inputMode="decimal"
                 placeholder="0"
                 value={nutrition.calories ?? ''}
                 onChange={(e) =>
@@ -319,9 +550,25 @@ export function MenuItemForm({
 
       <ModifierGroupsEditor groups={modifierGroups} onChange={setModifierGroups} />
 
-      <button className="menu-item-form__submit" type="submit" disabled={loading || uploading}>
-        {loading ? 'Сохранение…' : 'Добавить в меню'}
-      </button>
+      <div className="menu-item-form__actions">
+        <button className="menu-item-form__submit" type="submit" disabled={loading || uploading || galleryUploading}>
+          {loading
+            ? 'Сохранение…'
+            : isEditing
+              ? 'Сохранить изменения'
+              : 'Добавить в меню'}
+        </button>
+        {isEditing && (
+          <button
+            className="menu-item-form__cancel"
+            type="button"
+            disabled={loading || uploading || galleryUploading}
+            onClick={handleCancelEdit}
+          >
+            Отмена
+          </button>
+        )}
+      </div>
     </form>
   );
 }

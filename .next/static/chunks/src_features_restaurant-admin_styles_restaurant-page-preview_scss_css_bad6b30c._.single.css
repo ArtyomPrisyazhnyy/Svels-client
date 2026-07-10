@@ -1,0 +1,73 @@
+/* [project]/src/features/restaurant-admin/styles/restaurant-page-preview.scss.css [app-client] (css) */
+.restaurant-page-preview__toolbar {
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+}
+
+@media (max-width: 640px) {
+  .restaurant-page-preview__toolbar {
+    flex-direction: column;
+  }
+}
+
+.restaurant-page-preview__title {
+  color: #0f172a;
+  margin: 0 0 .35rem;
+  font-size: 1.1rem;
+}
+
+.restaurant-page-preview__hint, .restaurant-page-preview__empty, .restaurant-page-preview__notice {
+  color: #64748b;
+  margin: 0;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.restaurant-page-preview__notice {
+  color: #92400e;
+  background: #fffbeb;
+  border-radius: 10px;
+  padding: .75rem 1rem;
+}
+
+.restaurant-page-preview__error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-radius: 8px;
+  margin: 0 0 1rem;
+  padding: .75rem;
+  font-size: .875rem;
+}
+
+.restaurant-page-preview__open {
+  color: #0f766e;
+  white-space: nowrap;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  flex-shrink: 0;
+  padding: .5rem .875rem;
+  font-size: .875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.restaurant-page-preview__open:hover {
+  background: #f0fdfa;
+  border-color: #99f6e4;
+}
+
+.restaurant-page-preview__frame {
+  overscroll-behavior: contain;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  max-height: min(80vh, 900px);
+  overflow: auto;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, .06);
+}
+
+/*# sourceMappingURL=src_features_restaurant-admin_styles_restaurant-page-preview_scss_css_bad6b30c._.single.css.map*/

@@ -1,0 +1,7 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "0",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/restaurant-admin/layout,_N_T_/restaurant-admin/menu/layout,_N_T_/restaurant-admin/menu/page,_N_T_/restaurant-admin/menu"
+  }
+}

@@ -1,0 +1,236 @@
+/* [project]/src/features/restaurant-admin/styles/social-links-admin.scss.css [app-client] (css) */
+.social-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--rs-text-muted, #64748b);
+  border: 1px solid var(--rs-border, #e2e8f0);
+  background: none;
+  border-radius: 12px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  transition: color .18s, border-color .18s, background .18s;
+  display: inline-flex;
+}
+
+.social-icon svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.social-icon:hover {
+  color: var(--rs-accent, #0f766e);
+  border-color: var(--rs-accent, #0f766e);
+}
+
+.social-icon--telegram svg, .social-icon--whatsapp svg, .social-icon--twitter svg, .social-icon--youtube svg {
+  transform-origin: center;
+  transform: scale(1.05);
+}
+
+.social-icon--instagram svg, .social-icon--tiktok svg {
+  transform-origin: center;
+  transform: scale(1.18);
+}
+
+.social-icon--facebook svg {
+  transform-origin: center;
+  transform: scale(1.3);
+}
+
+.social-icon--vk svg {
+  transform-origin: center;
+  transform: scale(1.6);
+}
+
+.social-icon--other svg {
+  transform-origin: center;
+  transform: scale(1.1);
+}
+
+.social-links-admin {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 1.5rem;
+  display: grid;
+}
+
+@media (max-width: 960px) {
+  .social-links-admin {
+    grid-template-columns: 1fr;
+  }
+}
+
+.social-links-admin h2 {
+  margin: 0 0 .75rem;
+  font-size: 1.1rem;
+}
+
+.social-links-admin__panel, .social-links-admin__list-panel {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.social-links-admin__hint, .social-links-admin__notice, .social-links-admin__empty, .social-links-admin__detected {
+  color: #64748b;
+  margin: 0 0 1rem;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.social-links-admin__error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-radius: 8px;
+  margin: 0 0 1rem;
+  padding: .75rem;
+  font-size: .875rem;
+}
+
+.social-links-admin__notice {
+  color: #92400e;
+  background: #fffbeb;
+  border-radius: 10px;
+  padding: .75rem 1rem;
+}
+
+.social-links-admin__form {
+  flex-direction: column;
+  gap: .75rem;
+  display: flex;
+}
+
+.social-links-admin__field {
+  flex-direction: column;
+  gap: .375rem;
+  display: flex;
+}
+
+.social-links-admin__field label {
+  color: #334155;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.social-links-admin__field input {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: .75rem;
+}
+
+.social-links-admin__input-row {
+  align-items: center;
+  gap: .75rem;
+  display: flex;
+}
+
+.social-links-admin__input-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.social-links-admin__actions {
+  gap: .75rem;
+  display: flex;
+}
+
+.social-links-admin__submit, .social-links-admin__cancel {
+  cursor: pointer;
+  border-radius: 10px;
+  padding: .75rem 1rem;
+  font-weight: 600;
+}
+
+.social-links-admin__submit {
+  color: #fff;
+  background: #0d9488;
+  border: none;
+}
+
+.social-links-admin__submit:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.social-links-admin__cancel {
+  color: #64748b;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+
+.social-links-admin__list {
+  flex-direction: column;
+  gap: .75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+
+.social-links-admin__item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .75rem;
+  padding: .875rem;
+  display: grid;
+}
+
+.social-links-admin__item--editing {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, .12);
+}
+
+.social-links-admin__item-body {
+  flex-direction: column;
+  gap: .25rem;
+  min-width: 0;
+  display: flex;
+}
+
+.social-links-admin__item-body strong {
+  color: #0f172a;
+  font-size: .9rem;
+}
+
+.social-links-admin__item-body a {
+  color: #0d9488;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .85rem;
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.social-links-admin__item-body a:hover {
+  text-decoration: underline;
+}
+
+.social-links-admin__item-actions {
+  flex-direction: column;
+  gap: .375rem;
+  display: flex;
+}
+
+.social-links-admin__item-actions button {
+  cursor: pointer;
+  white-space: nowrap;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: .35rem .625rem;
+  font-size: .8rem;
+}
+
+.social-links-admin__delete {
+  color: #b91c1c !important;
+  border-color: #fecaca !important;
+}
+
+/*# sourceMappingURL=src_features_restaurant-admin_styles_social-links-admin_scss_b1a49deb.css.map*/

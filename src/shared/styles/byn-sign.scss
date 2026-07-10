@@ -1,0 +1,37 @@
+/**
+ * Официальный иконочный шрифт графического знака белорусского рубля (Нацбанк).
+ * @see https://www.nbrb.by/coinsbanknotes/byn-ico/nbrb-font
+ */
+@font-face {
+  font-family: 'nbrb';
+  src:
+    url('/fonts/nbrb/nbrb.woff2') format('woff2'),
+    url('/fonts/nbrb/nbrb.woff') format('woff'),
+    url('/fonts/nbrb/nbrb.ttf') format('truetype');
+  unicode-range: U+E901, U+0042, U+0059, U+004E;
+  font-display: swap;
+}
+
+.byn-sign {
+  font-family: 'nbrb', sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: -0.08em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.byn-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15em;
+  white-space: nowrap;
+}
+
+.currency-text {
+  font-size: 0.92em;
+  font-weight: 600;
+  line-height: 1;
+}

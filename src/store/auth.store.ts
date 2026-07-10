@@ -19,6 +19,9 @@ export const useAuthStore = create<AuthState>()(
       updateUser: (user) => set({ user }),
       logout: () => set({ accessToken: null, user: null }),
     }),
-    { name: 'svels-auth' },
+    {
+      name: 'svels-auth',
+      skipHydration: true,
+    },
   ),
 );

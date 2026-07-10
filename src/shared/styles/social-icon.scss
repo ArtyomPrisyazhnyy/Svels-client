@@ -1,0 +1,57 @@
+/* Минималистичные тема-адаптивные иконки соцсетей.
+   Контейнер — «сквиркл» с тонкой рамкой, цвет наследуется от темы.
+   Без фирменных заливок: иконка монохромная, цвет = currentColor. */
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  flex-shrink: 0;
+  color: var(--rs-text-muted, #64748b);
+  background: transparent;
+  border: 1px solid var(--rs-border, #e2e8f0);
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+
+  svg {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  &:hover {
+    color: var(--rs-accent, #0f766e);
+    border-color: var(--rs-accent, #0f766e);
+  }
+
+  /* Нормализация визуального размера: исходные пути имеют разный бокс,
+     поэтому масштабируаем каждую платформу к единому воспринимаемому размеру. */
+  &--telegram svg,
+  &--whatsapp svg,
+  &--twitter svg,
+  &--youtube svg {
+    transform: scale(1.05);
+    transform-origin: center center;
+  }
+
+  &--instagram svg,
+  &--tiktok svg {
+    transform: scale(1.18);
+    transform-origin: center center;
+  }
+
+  &--facebook svg {
+    transform: scale(1.3);
+    transform-origin: center center;
+  }
+
+  &--vk svg {
+    transform: scale(1.6);
+    transform-origin: center center;
+  }
+
+  &--other svg {
+    transform: scale(1.1);
+    transform-origin: center center;
+  }
+}

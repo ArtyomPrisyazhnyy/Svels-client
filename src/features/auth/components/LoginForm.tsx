@@ -1,19 +1,25 @@
+'use client';
+
 import { useState, type FormEvent } from 'react';
 import { login } from '../api/auth.api';
-import { useAuthStore } from '../../../store/auth.store';
-import { ApiError } from '../../../shared/api/api-client';
+import { loginGuest } from '../api/restaurant-guest-auth.api';
+import { useAuthStore } from '@/store/auth.store';
+import { ApiError } from '@/shared/api/api-client';
 import { PasswordInput } from './PasswordInput';
 
 interface LoginFormProps {
+  restaurantId?: string;
   onSuccess: () => void;
 }
 
-export function LoginForm({ onSuccess }: LoginFormProps) {
+export function LoginForm({ restaurantId, onSuccess }: LoginFormProps) {
   const setAuth = useAuthStore((s) => s.setAuth);
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const isGuestAuth = Boolean(restaurantId);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -21,7 +27,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setLoading(true);
 
     try {
-      const response = await login({ email, password });
+      const response = isGuestAuth
+        ? await loginGuest(restaurantId!, { phone, password })
+        : await login({ email, password });
       setAuth(response.accessToken, response.user);
       onSuccess();
     } catch (err) {
@@ -35,17 +43,33 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     <form className="auth-form" onSubmit={handleSubmit}>
       {error && <p className="auth-error">{error}</p>}
 
-      <div className="auth-field">
-        <label htmlFor="login-email">Email</label>
-        <input
-          id="login-email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
+      {isGuestAuth ? (
+        <div className="auth-field">
+          <label htmlFor="login-phone">Телефон</label>
+          <input
+            id="login-phone"
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            placeholder="+375 29 123-45-67"
+            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </div>
+      ) : (
+        <div className="auth-field">
+          <label htmlFor="login-email">Email</label>
+          <input
+            id="login-email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+      )}
 
       <PasswordInput
         id="login-password"

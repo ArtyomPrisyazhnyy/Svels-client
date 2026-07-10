@@ -5,6 +5,7 @@ export type UserRole = 'user' | 'restaurant_admin' | 'super_admin';
 export interface AuthUser {
   id: string;
   email: string;
+  phone?: string;
   firstName: string;
   lastName: string;
   role: UserRole;
@@ -26,5 +27,17 @@ export interface RegisterPayload {
 
 export interface LoginPayload {
   email: string;
+  password: string;
+}
+
+export interface GuestRegisterPayload {
+  phone: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface GuestLoginPayload {
+  phone: string;
   password: string;
 }

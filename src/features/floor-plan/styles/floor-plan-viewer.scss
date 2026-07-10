@@ -1,0 +1,116 @@
+.fp-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    color: #374151;
+    input { padding: 7px 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; }
+  }
+
+  &__zones {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+
+  &__zone {
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #374151;
+    &--active { background: #2563eb; color: #fff; border-color: #2563eb; }
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    color: #374151;
+    padding: 8px 4px;
+
+    span { display: inline-flex; align-items: center; gap: 6px; }
+  }
+
+  &__dot {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    &--free { background: #22c55e; }
+    &--busy { background: #ef4444; }
+    &--selected { background: #f97316; }
+  }
+
+  &__status, &__error {
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+  }
+  &__status { background: #e5e7eb; color: #374151; }
+  &__error { background: #fee2e2; color: #b91c1c; }
+
+  &__canvas-wrap {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__confirm {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+  }
+
+  &__confirm-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    strong { font-size: 15px; color: #9a3412; }
+    span { font-size: 13px; color: #c2410c; }
+  }
+
+  &__confirm-btn {
+    padding: 10px 22px;
+    background: #f97316;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    &:hover { background: #ea580c; }
+  }
+}

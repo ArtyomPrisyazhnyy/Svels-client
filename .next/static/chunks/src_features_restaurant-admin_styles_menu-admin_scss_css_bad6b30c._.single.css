@@ -1,0 +1,141 @@
+/* [project]/src/features/restaurant-admin/styles/menu-admin.scss.css [app-client] (css) */
+.menu-admin__grid {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  align-items: start;
+  gap: 1.5rem;
+  display: grid;
+}
+
+@media (max-width: 960px) {
+  .menu-admin__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.menu-admin__error, .menu-admin__notice {
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  padding: .75rem 1rem;
+}
+
+.menu-admin__error {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.menu-admin__notice {
+  color: #92400e;
+  background: #fffbeb;
+}
+
+.menu-admin__list-panel h2 {
+  margin: 0 0 1rem;
+}
+
+.menu-admin__empty {
+  color: #94a3b8;
+  font-size: .9rem;
+}
+
+.menu-admin__category {
+  margin-bottom: 1.25rem;
+}
+
+.menu-admin__category h3 {
+  margin: 0 0 .75rem;
+  font-size: 1rem;
+}
+
+.menu-admin__items {
+  flex-direction: column;
+  gap: .75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+
+.menu-admin__item {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  grid-template-columns: 72px 1fr auto;
+  align-items: start;
+  gap: .75rem;
+  padding: .75rem;
+  display: grid;
+}
+
+.menu-admin__item img {
+  object-fit: cover;
+  border-radius: 8px;
+  width: 72px;
+  height: 72px;
+}
+
+.menu-admin__item-body {
+  flex-direction: column;
+  gap: .25rem;
+  font-size: .9rem;
+  display: flex;
+}
+
+.menu-admin__item-body strong {
+  color: #0f172a;
+}
+
+.menu-admin__item-body > span {
+  color: #0f766e;
+  font-weight: 600;
+}
+
+.menu-admin__item-variant {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.menu-admin__modifiers {
+  color: #64748b;
+  margin: .25rem 0 0;
+  padding-left: 1rem;
+  font-size: .8rem;
+  line-height: 1.4;
+}
+
+.menu-admin__item-actions {
+  flex-direction: column;
+  gap: .375rem;
+  display: flex;
+}
+
+.menu-admin__edit {
+  color: #0d9488;
+  cursor: pointer;
+  white-space: nowrap;
+  background: #fff;
+  border: 1px solid #99f6e4;
+  border-radius: 8px;
+  padding: .375rem .625rem;
+  font-size: .8rem;
+}
+
+.menu-admin__edit:hover {
+  background: #f0fdfa;
+}
+
+.menu-admin__item--editing {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, .15);
+}
+
+.menu-admin__delete {
+  color: #b91c1c;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: .375rem .625rem;
+  font-size: .8rem;
+}
+
+/*# sourceMappingURL=src_features_restaurant-admin_styles_menu-admin_scss_css_bad6b30c._.single.css.map*/
