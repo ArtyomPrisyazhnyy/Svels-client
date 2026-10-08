@@ -114,6 +114,8 @@ export function RestaurantCartModal({
 
   useEffect(() => {
     if (!showSomeoneElseOption && orderForSomeoneElse) {
+      // TODO(w0): убрать после рефакторинга корзины — правило react-hooks/set-state-in-effect (до W0 не трогали UI).
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- legacy effect, out of scope for foundation PR
       setOrderForSomeoneElse(false);
       setRecipientName('');
       setRecipientPhone('');

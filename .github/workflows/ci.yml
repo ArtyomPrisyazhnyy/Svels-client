@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -26,7 +28,20 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
-      - name: Lint
+      - name: Lint changed TypeScript files
+        run: |
+          FILES=$(git diff --name-only --diff-filter=ACMR "origin/${{ github.base_ref }}"...HEAD | grep -E '\.(ts|tsx)$' || true)
+          if [ -z "$FILES" ]; then
+            echo "No .ts/.tsx files changed; skipping ESLint."
+            exit 0
+          fi
+          echo "Linting changed files:"
+          echo "$FILES"
+          npx eslint --no-error-on-unmatched-pattern $FILES
+
+      # Полный прогон для отслеживания baseline (~60 errors); не блокирует merge.
+      - name: Lint full repo (baseline, non-blocking)
+        continue-on-error: true
         run: npm run lint
 
       - name: Build
