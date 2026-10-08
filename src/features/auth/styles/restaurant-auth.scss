@@ -6,8 +6,10 @@
   font-weight: 600;
   text-decoration: none;
 
-  &:hover {
-    color: #2563eb;
+  @media (hover: hover) {
+    &:hover {
+      color: #2563eb;
+    }
   }
 }
 

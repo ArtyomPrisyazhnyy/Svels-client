@@ -55,23 +55,42 @@ export default function FloorPlanAdminPage() {
 
   if (!restaurantId) {
     return (
-      <p className="floor-plan-admin__notice">
+      <p className="floor-plan-admin__notice" data-testid="floor-plan-admin">
         Заявка ещё на модерации или ресторан не привязан к аккаунту.
       </p>
     );
   }
 
   if (loading) {
-    return <p className="floor-plan-admin__notice">Загрузка конструктора планировки…</p>;
+    return (
+      <p className="floor-plan-admin__notice" data-testid="floor-plan-admin">
+        Загрузка конструктора планировки…
+      </p>
+    );
   }
 
   if (error) {
-    return <p className="floor-plan-admin__notice floor-plan-admin__notice--error">{error}</p>;
+    return (
+      <p
+        className="floor-plan-admin__notice floor-plan-admin__notice--error"
+        data-testid="floor-plan-admin"
+      >
+        {error}
+      </p>
+    );
   }
 
   if (!accessToken) {
-    return <p className="floor-plan-admin__notice">Требуется авторизация.</p>;
+    return (
+      <p className="floor-plan-admin__notice" data-testid="floor-plan-admin">
+        Требуется авторизация.
+      </p>
+    );
   }
 
-  return <FloorPlanEditor restaurantId={restaurantId} token={accessToken} />;
+  return (
+    <div data-testid="floor-plan-admin">
+      <FloorPlanEditor restaurantId={restaurantId} token={accessToken} />
+    </div>
+  );
 }

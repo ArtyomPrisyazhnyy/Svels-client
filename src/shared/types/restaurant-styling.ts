@@ -8,7 +8,9 @@ export type RestaurantFontFamily =
   | 'marmelad'
   | 'comfortaa'
   | 'comicRelief'
-  | 'roboto';
+  | 'roboto'
+  | 'tektur'
+  | 'play';
 
 export type RestaurantColorTheme =
   | 'classic'
@@ -65,6 +67,7 @@ export interface RestaurantStyling {
   cardStyle: RestaurantCardStyle;
   magazineCardLayout: MagazineCardLayout;
   menuCategoryNavEnabled: boolean;
+  favoritesEnabled: boolean;
   headerStyle: RestaurantHeaderStyle;
   footerLayout: RestaurantFooterLayout;
   footerAccent: RestaurantFooterAccent;
@@ -83,6 +86,7 @@ export type UpdateRestaurantStylingPayload = Partial<
     | 'cardStyle'
     | 'magazineCardLayout'
     | 'menuCategoryNavEnabled'
+    | 'favoritesEnabled'
     | 'headerStyle'
     | 'footerLayout'
     | 'footerAccent'
@@ -118,6 +122,7 @@ export const DEFAULT_RESTAURANT_STYLING = {
   cardStyle: 'classic' as const,
   magazineCardLayout: 'content_left' as const,
   menuCategoryNavEnabled: false,
+  favoritesEnabled: true,
   headerStyle: 'glass' as const,
   footerLayout: 'columns' as const,
   footerAccent: 'flat' as const,
@@ -134,6 +139,8 @@ export const RESTAURANT_FONT_OPTIONS: RestaurantFontOption[] = [
   { value: 'comfortaa', label: 'Comfortaa', sample: 'Aa Бb 123' },
   { value: 'comicRelief', label: 'Comic Relief', sample: 'Aa Бb 123' },
   { value: 'roboto', label: 'Roboto', sample: 'Aa Бb 123' },
+  { value: 'tektur', label: 'Tektur', sample: 'Aa Бb 123' },
+  { value: 'play', label: 'Play', sample: 'Aa Бb 123' },
 ];
 
 export const RESTAURANT_COLOR_THEME_OPTIONS: RestaurantColorThemeOption[] = [

@@ -1,8 +1,0 @@
-{
-  "app": {
-    "[project]/app/restaurants/[id]/page": []
-  },
-  "appUsingSizeAdjust": true,
-  "pages": {},
-  "pagesUsingSizeAdjust": false
-}

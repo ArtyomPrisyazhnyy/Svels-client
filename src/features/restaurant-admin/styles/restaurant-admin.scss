@@ -7,6 +7,11 @@
   color: #0f172a;
 }
 
+/* Шапка админки Svels изолирована от стилей шапки заведения. */
+.restaurant-admin__header.glass-header {
+  z-index: 20;
+}
+
 .restaurant-admin__badge {
   display: inline-block;
   margin-left: 0.5rem;

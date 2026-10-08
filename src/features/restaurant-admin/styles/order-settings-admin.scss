@@ -92,6 +92,16 @@
   .order-settings-admin__hint {
     margin-bottom: 1rem;
   }
+
+  &--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.order-settings-admin__hint--warn {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  color: #b45309;
 }
 
 .order-settings-admin__options {

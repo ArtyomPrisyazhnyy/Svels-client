@@ -5,7 +5,8 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-width: 0;
-  overflow-x: clip;
+  /* Не ставить overflow-x: clip — ось Y станет auto, sticky-шапка окажется
+     под системным scrollbar и padding справа «съестся». Горизонтальный clip — на html. */
 
   &--embedded {
     min-height: auto;
@@ -28,8 +29,10 @@
   color: var(--rs-text-muted, #64748b);
   font-size: 0.95rem;
 
-  &:hover {
-    color: var(--rs-text, #0f172a);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--rs-text, #0f172a);
+    }
   }
 }
 
@@ -151,9 +154,11 @@
   text-decoration: none;
   transition: color 0.15s ease, transform 0.15s ease;
 
-  &:hover {
-    color: var(--rs-accent, #0f766e);
-    transform: translateX(2px);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--rs-accent, #0f766e);
+      transform: translateX(2px);
+    }
   }
 }
 
@@ -279,8 +284,10 @@
   font-weight: 500;
   border: 1px solid transparent;
 
-  &:hover {
-    background: var(--rs-primary-hover, #1d4ed8);
+  @media (hover: hover) {
+    &:hover {
+      background: var(--rs-primary-hover, #1d4ed8);
+    }
   }
 
   &--secondary {
@@ -288,8 +295,10 @@
     color: var(--rs-primary, #2563eb);
     border-color: var(--rs-primary, #2563eb);
 
-    &:hover {
-      background: var(--rs-primary-soft, #eff6ff);
+    @media (hover: hover) {
+      &:hover {
+        background: var(--rs-primary-soft, #eff6ff);
+      }
     }
   }
 }

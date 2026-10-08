@@ -84,7 +84,7 @@ export default function SuperAdminPage() {
   }
 
   return (
-    <div className="admin">
+    <div className="admin" data-testid="super-admin-page">
       <header className="glass-header glass-header--dark admin__header">
         <Link href="/" className="glass-header__link glass-header__link--accent admin__back">
           ← На главную
@@ -93,7 +93,12 @@ export default function SuperAdminPage() {
           Svels
           <span className="admin__badge">Суперадмин</span>
         </h1>
-        <button type="button" className="glass-header__link admin__logout" onClick={logout}>
+        <button
+          type="button"
+          className="glass-header__link admin__logout"
+          onClick={logout}
+          data-testid="super-admin-logout"
+        >
           Выйти
         </button>
       </header>
@@ -114,7 +119,11 @@ export default function SuperAdminPage() {
         ) : (
           <div className="admin__list">
             {requests.map((request) => (
-              <article key={request.id} className="admin__card">
+              <article
+                key={request.id}
+                className="admin__card"
+                data-testid={`registration-card-${request.id}`}
+              >
                 <h2 className="admin__card-title">{request.name}</h2>
                 <p className="admin__meta">
                   УНП: {request.unp}
@@ -129,6 +138,7 @@ export default function SuperAdminPage() {
                   {request.locations.map((loc, index) => (
                     <li key={`${request.id}-${index}`}>
                       {loc.label ? `${loc.label}: ` : ''}
+                      {loc.city ? `${loc.city}, ` : ''}
                       {loc.address}
                     </li>
                   ))}
@@ -139,6 +149,7 @@ export default function SuperAdminPage() {
                     className="admin__btn admin__btn--approve"
                     disabled={processingId === request.id}
                     onClick={() => void handleReview(request.id, 'approve')}
+                    data-testid={`registration-approve-${request.id}`}
                   >
                     Одобрить
                   </button>
@@ -147,6 +158,7 @@ export default function SuperAdminPage() {
                     className="admin__btn admin__btn--reject"
                     disabled={processingId === request.id}
                     onClick={() => void handleReview(request.id, 'reject')}
+                    data-testid={`registration-reject-${request.id}`}
                   >
                     Отклонить
                   </button>

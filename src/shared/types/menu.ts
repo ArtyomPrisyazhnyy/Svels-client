@@ -30,9 +30,13 @@ export interface MenuItem {
   ingredients: string | null;
   nutrition: MenuItemNutrition | null;
   price: number;
+  /** Перечёркнутая «старая» цена; null — без скидки. */
+  oldPrice: number | null;
   isAvailable: boolean;
   imageUrl: string;
+  imageWebpUrl?: string | null;
   galleryUrls: string[];
+  galleryWebpUrls?: string[];
   modifierGroups: MenuModifierGroup[];
 }
 
@@ -55,8 +59,11 @@ export interface CreateMenuItemPayload {
   ingredients?: string;
   nutrition?: MenuItemNutrition;
   price: number;
+  oldPrice?: number | null;
   imageUrl: string;
+  imageWebpUrl?: string | null;
   galleryUrls?: string[];
+  galleryWebpUrls?: string[];
   modifierGroups?: MenuModifierGroup[];
 }
 
@@ -68,22 +75,45 @@ export interface UpdateMenuItemPayload {
   ingredients?: string;
   nutrition?: MenuItemNutrition | null;
   price?: number;
+  oldPrice?: number | null;
   imageUrl?: string;
+  imageWebpUrl?: string | null;
   galleryUrls?: string[];
+  galleryWebpUrls?: string[];
   modifierGroups?: MenuModifierGroup[];
+}
+
+export interface MenuImageSource {
+  url: string;
+  webpUrl?: string | null;
 }
 
 /** Максимум дополнительных фото галереи (обложка imageUrl не в счёт). */
 export const MAX_MENU_ITEM_GALLERY_IMAGES = 9;
 
 /** Все изображения позиции в порядке показа: обложка + галерея. */
-export function getMenuItemImages(item: Pick<MenuItem, 'imageUrl' | 'galleryUrls'>): string[] {
-  return [item.imageUrl, ...(item.galleryUrls ?? [])].filter((url) => url.length > 0);
+export function getMenuItemImages(
+  item: Pick<MenuItem, 'imageUrl' | 'imageWebpUrl' | 'galleryUrls' | 'galleryWebpUrls'>,
+): MenuImageSource[] {
+  const gallery = item.galleryUrls ?? [];
+  const galleryWebp = item.galleryWebpUrls ?? [];
+  const images: MenuImageSource[] = [
+    { url: item.imageUrl, webpUrl: item.imageWebpUrl },
+    ...gallery.map((url, index) => ({
+      url,
+      webpUrl: galleryWebp[index] || null,
+    })),
+  ];
+  return images.filter((image) => image.url.length > 0);
 }
 
 export { formatPrice, formatPriceDelta } from '@/shared/utils/currency.util';
 
-/** Относительный URL — одинаков на SSR и клиенте; Next.js проксирует /uploads на backend. */
+/**
+ * Нормализует URL картинки.
+ * /uploads/... остаётся same-origin (прокси Next → API).
+ * Абсолютные URL (Yandex Object Storage и т.п.) отдаются как есть.
+ */
 export function resolveImageUrl(imageUrl: string): string {
   if (imageUrl.startsWith('data:')) {
     return imageUrl;

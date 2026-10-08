@@ -4,8 +4,10 @@ import {
   Inter,
   Marmelad,
   Montserrat,
+  Play,
   Playfair_Display,
   Roboto,
+  Tektur,
 } from 'next/font/google';
 
 /**
@@ -66,6 +68,21 @@ export const restaurantRoboto = Roboto({
   preload: false,
 });
 
+export const restaurantTektur = Tektur({
+  subsets: ['cyrillic', 'latin'],
+  variable: '--font-rs-tektur',
+  display: 'swap',
+  preload: false,
+});
+
+export const restaurantPlay = Play({
+  weight: ['400', '700'],
+  subsets: ['cyrillic', 'latin'],
+  variable: '--font-rs-play',
+  display: 'swap',
+  preload: false,
+});
+
 /** Классы, определяющие все CSS-переменные шрифтов на корне стилизации. */
 export const RESTAURANT_FONT_CLASSES = [
   restaurantInter.variable,
@@ -75,4 +92,6 @@ export const RESTAURANT_FONT_CLASSES = [
   restaurantComfortaa.variable,
   restaurantComicRelief.variable,
   restaurantRoboto.variable,
+  restaurantTektur.variable,
+  restaurantPlay.variable,
 ].filter(Boolean).join(' ');

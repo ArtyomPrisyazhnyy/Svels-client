@@ -1,0 +1,93 @@
+import dotenv from 'dotenv';
+import path from 'path';
+import { apiClient } from './helpers/api';
+import { getSuperAdminCredentials, writeSeed, type E2eSeed } from './helpers/env';
+
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../Svels-backend/.env') });
+
+function randomDigits(length: number): string {
+  let out = '';
+  for (let i = 0; i < length; i += 1) {
+    out += String(Math.floor(Math.random() * 10));
+  }
+  return out;
+}
+
+async function waitForApi(maxAttempts = 30): Promise<void> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await apiClient.listRestaurants();
+      return;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+  throw new Error(`Backend API недоступен: ${String(lastError)}`);
+}
+
+export default async function globalSetup(): Promise<void> {
+  await waitForApi();
+
+  const superCreds = getSuperAdminCredentials();
+  const superAuth = await apiClient.login(superCreds.email, superCreds.password);
+
+  const stamp = Date.now().toString(36);
+  const email = `e2e.admin.${stamp}@svels.test`;
+  const password = `E2ePass!${stamp}`;
+  const restaurantName = `E2E Cafe ${stamp}`;
+  const unp = randomDigits(9);
+
+  const registered = await apiClient.register({
+    email,
+    password,
+    firstName: 'E2E',
+    lastName: 'Admin',
+  });
+
+  const request = await apiClient.registerRestaurant(registered.accessToken, {
+    name: restaurantName,
+    unp,
+    description: 'Playwright e2e restaurant',
+    isChain: false,
+    locations: [{ address: 'ул. Тестовая 1' }],
+  });
+
+  await apiClient.reviewRegistration(superAuth.accessToken, request.id, 'approve');
+
+  const adminAuth = await apiClient.login(email, password);
+  if (adminAuth.user.role !== 'restaurant_admin' || !adminAuth.user.restaurantId) {
+    throw new Error(
+      `Expected restaurant_admin with restaurantId, got role=${adminAuth.user.role} restaurantId=${adminAuth.user.restaurantId}`,
+    );
+  }
+
+  const { auth: guest } = await apiClient.createGuest(
+    adminAuth.user.restaurantId,
+    'Seed',
+    'Guest',
+  );
+
+  const seed: E2eSeed = {
+    restaurantId: adminAuth.user.restaurantId,
+    restaurantName,
+    restaurantAdmin: {
+      email,
+      password,
+      auth: adminAuth,
+    },
+    superAdmin: {
+      email: superCreds.email,
+      password: superCreds.password,
+      auth: superAuth,
+    },
+    guest,
+    createdAt: new Date().toISOString(),
+  };
+
+  writeSeed(seed);
+  // eslint-disable-next-line no-console
+  console.log(`[e2e] Seeded restaurant ${seed.restaurantId} (${restaurantName}) as ${email}`);
+}

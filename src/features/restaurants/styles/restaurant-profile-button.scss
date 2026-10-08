@@ -13,8 +13,10 @@
   cursor: pointer;
   flex-shrink: 0;
 
-  &:hover {
-    background: rgba(241, 245, 249, 0.75);
+  @media (hover: hover) {
+    &:hover {
+      background: rgba(241, 245, 249, 0.75);
+    }
   }
 
   &--authenticated {

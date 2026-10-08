@@ -6,20 +6,16 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   inset: 0;
   z-index: 130;
   border: none;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(0);
-  -webkit-backdrop-filter: blur(0);
+  // Без backdrop-filter: на Linux/Intel анимация blur часто вешает вкладку/GPU.
+  background: rgba(15, 23, 42, 0.5);
   cursor: pointer;
   opacity: 0;
-  transition:
-    opacity $modal-duration $modal-easing,
-    backdrop-filter $modal-duration $modal-easing,
-    -webkit-backdrop-filter $modal-duration $modal-easing;
+  pointer-events: none;
+  transition: opacity $modal-duration $modal-easing;
 
   &.restaurant-cart-modal--active {
     opacity: 1;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    pointer-events: auto;
   }
 }
 
@@ -93,6 +89,7 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
 .restaurant-cart-modal__body {
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0 1.25rem 1rem;
   scrollbar-width: thin;
   scrollbar-color: #94a3b8 #eef2f7;
@@ -113,8 +110,10 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
     border-radius: 999px;
   }
 
-  &::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
+  @media (hover: hover) {
+    &::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
   }
 }
 
@@ -155,10 +154,14 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   background: #e2e8f0;
   flex-shrink: 0;
 
+  picture,
   img {
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  img {
     object-fit: cover;
   }
 }
@@ -193,10 +196,6 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   font-size: 1.3rem;
   font-weight: 700;
   color: #0f766e;
-
-  .byn-sign {
-    font-size: 1em;
-  }
 }
 
 .restaurant-cart-modal__item-actions {
@@ -273,9 +272,12 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
 .restaurant-cart-modal__fulfillment {
   display: flex;
   justify-content: center;
+  width: 100%;
+  min-width: 0;
 
   .fulfillment-selector {
     margin-bottom: 0;
+    width: fit-content;
     max-width: 100%;
   }
 }
@@ -302,8 +304,10 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   color: var(--rs-accent, #0f766e);
   text-decoration: none;
 
-  &:hover {
-    text-decoration: underline;
+  @media (hover: hover) {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 
@@ -313,17 +317,85 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   gap: 0.35rem;
   margin-bottom: 0.75rem;
 
-  span {
+  > span,
+  > label {
     font-size: 0.875rem;
+    font-weight: 400;
     color: #475569;
   }
 
-  input {
+  input:not(.phone-input__control),
+  textarea {
     padding: 0.65rem 0.75rem;
     border: 1px solid #cbd5e1;
     border-radius: 10px;
     font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--rs-focus-border, #3b82f6);
+      box-shadow: 0 0 0 3px var(--rs-focus-ring, rgba(59, 130, 246, 0.15));
+    }
   }
+
+  textarea {
+    min-height: 6.5rem;
+    resize: vertical;
+    line-height: 1.45;
+  }
+}
+
+.restaurant-cart-modal__field-hint {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+.restaurant-cart-modal__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  input {
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: #0f766e;
+    cursor: pointer;
+  }
+
+  &:focus,
+  &:focus-within,
+  &:active {
+    outline: none;
+  }
+}
+
+.restaurant-cart-modal__recipient {
+  padding: 0.75rem 0.875rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.restaurant-cart-modal__recipient-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #64748b;
+}
+
+.restaurant-cart-modal__recipient .restaurant-cart-modal__field:last-child {
+  margin-bottom: 0;
 }
 
 .restaurant-cart-modal__error,
@@ -359,10 +431,6 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   font-size: 1.3rem;
   font-weight: 700;
   color: #0f172a;
-
-  .byn-sign {
-    font-size: 1em;
-  }
 }
 
 .restaurant-cart-modal__submit {
@@ -398,6 +466,22 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .restaurant-cart-modal__counter {
+    padding: 0.2rem;
+  }
+
+  .restaurant-cart-modal__counter-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.375rem;
+  }
+
+  .restaurant-cart-modal__counter-value {
+    min-width: 2.25rem;
+    height: 2.75rem;
+    font-size: 1.0625rem;
   }
 
   .restaurant-cart-modal__footer {

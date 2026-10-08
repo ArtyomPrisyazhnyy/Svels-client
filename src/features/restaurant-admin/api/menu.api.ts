@@ -40,7 +40,7 @@ export async function uploadMenuImage(
   restaurantId: string,
   token: string,
   file: File,
-): Promise<{ imageUrl: string }> {
+): Promise<{ imageUrl: string; imageWebpUrl: string }> {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -54,7 +54,7 @@ export async function uploadMenuImage(
     await assertApiResponseOk(response, { authenticatedRequest: true });
   }
 
-  return response.json() as Promise<{ imageUrl: string }>;
+  return response.json() as Promise<{ imageUrl: string; imageWebpUrl: string }>;
 }
 
 export function updateMenuItem(

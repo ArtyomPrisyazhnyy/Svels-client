@@ -38,18 +38,38 @@
   gap: 0.5rem;
   max-width: 100%;
   overflow-x: auto;
-  padding: 0.25rem 0;
+  overflow-y: hidden;
+  padding: 0.25rem 0 0.4rem;
   scroll-padding-inline: 0.25rem;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  // На тач-устройствах полоску не показываем — свайп и так очевиден.
   scrollbar-width: none;
   -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
-
-  .restaurant-menu__category-nav--header & {
-    width: 100%;
-  }
 
   &::-webkit-scrollbar {
     display: none;
+    height: 0;
+  }
+
+  // На ПК — тонкий scrollbar, иначе не понять, что категории можно листать.
+  @media (hover: hover) and (pointer: fine) {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+
+    &::-webkit-scrollbar {
+      display: block;
+      height: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
   }
 }
 
@@ -83,13 +103,14 @@
     padding: 0.4375rem 0.875rem;
   }
 
-  &:hover:not(.restaurant-menu__category-nav-btn--active) {
-    border-color: #cbd5e1;
-    color: #0f172a;
+  @media (hover: hover) {
+    &:hover:not(.restaurant-menu__category-nav-btn--active) {
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
   }
 
-  &--active,
-  &--active:hover {
+  &--active {
     border-color: #0d9488;
     background: #0d9488;
     color: #ffffff;
@@ -119,14 +140,8 @@
 
 .restaurant-menu__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.875rem;
-}
-
-@media (min-width: 480px) {
-  .restaurant-menu__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
 }
 
 @media (min-width: 768px) {

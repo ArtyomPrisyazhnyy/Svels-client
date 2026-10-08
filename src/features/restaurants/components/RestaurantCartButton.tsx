@@ -46,6 +46,7 @@ export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartBut
       className="restaurant-cart-button"
       onClick={onOpen}
       aria-label={hasItems ? `Корзина, ${itemCount} поз.` : 'Корзина'}
+      data-testid="cart-button"
     >
       <CartIcon />
       {hasItems && <span className="restaurant-cart-button__badge">{itemCount}</span>}

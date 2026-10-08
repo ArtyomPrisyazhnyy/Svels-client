@@ -170,6 +170,12 @@
   border-radius: 14px;
   padding: 1rem;
   background: var(--rs-bg);
+
+  /* Не даём sticky-шапке превью «прилипать» к viewport поверх шапки админки Svels. */
+  .glass-header {
+    position: relative;
+    top: auto;
+  }
 }
 
 /* Специфичность выше themed-правил card-style, чтобы в превью всегда была одна карточка на всю ширину. */

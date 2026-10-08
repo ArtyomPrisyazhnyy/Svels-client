@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { RoleProtectedRoute } from '@/components/RoleProtectedRoute';
 import RestaurantAdminLayout from '@/features/restaurant-admin/pages/RestaurantAdminLayout';
+import { RESTAURANT_STAFF_ROLES } from '@/shared/auth/restaurant-staff';
 
 export const metadata: Metadata = {
   robots: {
@@ -26,7 +27,7 @@ export default function RestaurantAdminLayoutRoute({
   children: React.ReactNode;
 }) {
   return (
-    <RoleProtectedRoute roles={['restaurant_admin']}>
+    <RoleProtectedRoute roles={[...RESTAURANT_STAFF_ROLES]}>
       <Suspense fallback={<PageLoader />}>
         <RestaurantAdminLayout>{children}</RestaurantAdminLayout>
       </Suspense>

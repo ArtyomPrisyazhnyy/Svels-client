@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { isPlatformHost } from '@/shared/tenant/platform-hosts';
 
-export type RestaurantGuestSegment = 'home' | 'booking' | 'pre-order' | 'account' | 'auth';
+export type RestaurantGuestSegment = 'home' | 'booking' | 'pre-order' | 'account' | 'auth' | 'favorites';
 
 export function buildRestaurantGuestPath(
   restaurantId: string,
@@ -52,6 +52,7 @@ export function useRestaurantGuestPaths(restaurantId: string, forcePlatformPaths
         tenantMode: useTenantPaths,
       }),
       account: buildRestaurantGuestPath(restaurantId, 'account', { tenantMode: useTenantPaths }),
+      favorites: buildRestaurantGuestPath(restaurantId, 'favorites', { tenantMode: useTenantPaths }),
       auth: (from?: string) =>
         buildRestaurantGuestPath(restaurantId, 'auth', {
           tenantMode: useTenantPaths,

@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { NutritionBadges } from '@/features/restaurant-admin/components/NutritionBadges';
-import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
+import { MenuItemPriceDisplay } from '@/shared/components/MenuItemPriceDisplay';
 import { Carousel } from '@/shared/components/Carousel';
-import { useScrollLock } from '@/hooks/useScrollLock';
-import { resolveImageUrl, getMenuItemImages, type MenuItem } from '@/shared/types/menu';
+import { useModalPresence } from '@/hooks/useModalPresence';
+import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import { getMenuItemImages, type MenuItem } from '@/shared/types/menu';
 import { MenuProductModifiers } from './MenuProductModifiers';
 import {
   calculateModifierUnitPrice,
@@ -16,8 +17,13 @@ import {
   type ModifierSelections,
 } from '../utils/menu-modifiers.util';
 import { buildCartLineItem } from '../utils/cart.util';
-import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
+import {
+  RestaurantStylingPortalRoot,
+  useRestaurantStylingOptional,
+} from '../context/RestaurantStylingContext';
 import { useCartStore } from '@/store/cart.store';
+import { useFavoritesStore } from '@/store/favorites.store';
+import { FavoriteHeartButton } from './FavoriteHeartButton';
 import '../styles/menu-product-modal.scss';
 
 const MODAL_ANIMATION_MS = 200;
@@ -33,11 +39,16 @@ export function MenuProductDetailModal({
   restaurantId,
   onClose,
 }: MenuProductDetailModalProps) {
-  const [mounted, setMounted] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+  const { mounted, isActive, handleClose } = useModalPresence(onClose, MODAL_ANIMATION_MS);
   const [quantity, setQuantity] = useState(1);
   const [modifierSelections, setModifierSelections] = useState<ModifierSelections>({});
   const addLine = useCartStore((s) => s.addLine);
+  const { styling } = useRestaurantStylingOptional();
+  const favoritesEnabled = styling.favoritesEnabled !== false;
+  const isFavorite = useFavoritesStore((s) =>
+    favoritesEnabled ? s.menuItemIds.includes(item.id) : false,
+  );
+  const toggleFavorite = useFavoritesStore((s) => s.toggle);
 
   const modifierGroups = useMemo(
     () => getValidModifierGroups(item.modifierGroups ?? []),
@@ -52,16 +63,19 @@ export function MenuProductDetailModal({
     [item.price, modifierGroups, modifierSelections],
   );
 
+  const oldUnitPrice = useMemo(() => {
+    if (item.oldPrice == null) {
+      return null;
+    }
+
+    const modifierExtra = unitPrice - Number(item.price);
+    return Number(item.oldPrice) + modifierExtra;
+  }, [item.oldPrice, item.price, unitPrice]);
+
   const canAdd = useMemo(
     () => isModifierSelectionComplete(modifierGroups, modifierSelections),
     [modifierGroups, modifierSelections],
   );
-
-  useScrollLock(mounted);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     setQuantity(1);
@@ -69,23 +83,6 @@ export function MenuProductDetailModal({
       createEmptyModifierSelections(getValidModifierGroups(item.modifierGroups ?? [])),
     );
   }, [item.id, item.modifierGroups]);
-
-  useEffect(() => {
-    if (!mounted) {
-      return;
-    }
-
-    const frame = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setIsActive(true));
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [mounted]);
-
-  const handleClose = useCallback(() => {
-    setIsActive(false);
-    window.setTimeout(onClose, MODAL_ANIMATION_MS);
-  }, [onClose]);
 
   const handleAdd = useCallback(() => {
     if (!canAdd) {
@@ -150,14 +147,16 @@ export function MenuProductDetailModal({
             ×
           </button>
 
-          {images.length > 0 && (
-            <div className="menu-product-modal__media">
-              {hasGallery ? (
+          <div className="menu-product-modal__media">
+            {images.length > 0 ? (
+              hasGallery ? (
                 <Carousel
                   className="menu-product-modal__carousel"
-                  slides={images.map((url, index) => (
-                    <img
-                      src={resolveImageUrl(url)}
+                  slides={images.map((image, index) => (
+                    <ResponsiveImage
+                      key={`${image.url}-${index}`}
+                      src={image.url}
+                      webpSrc={image.webpUrl}
                       alt={`${item.name}${index > 0 ? ` — фото ${index + 1}` : ''}`}
                       loading={index === 0 ? 'eager' : 'lazy'}
                     />
@@ -167,10 +166,26 @@ export function MenuProductDetailModal({
                   showDots
                 />
               ) : (
-                <img src={resolveImageUrl(images[0])} alt={item.name} />
-              )}
-            </div>
-          )}
+                <ResponsiveImage
+                  src={images[0].url}
+                  webpSrc={images[0].webpUrl}
+                  alt={item.name}
+                />
+              )
+            ) : null}
+            {favoritesEnabled ? (
+              <FavoriteHeartButton
+                active={isFavorite}
+                variant="overlay"
+                className="menu-product-modal__favorite"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  void toggleFavorite(restaurantId, item.id);
+                }}
+              />
+            ) : null}
+          </div>
 
           <div className="menu-product-modal__body">
             <h2 id="menu-product-modal-title" className="menu-product-modal__title">
@@ -206,7 +221,11 @@ export function MenuProductDetailModal({
 
           <footer className="menu-product-modal__footer">
             <p className="menu-product-modal__price">
-              <CurrencyAmount amount={unitPrice * quantity} />
+              <MenuItemPriceDisplay
+                price={unitPrice}
+                oldPrice={oldUnitPrice}
+                quantity={quantity}
+              />
             </p>
 
             <div className="menu-product-modal__actions">
@@ -238,6 +257,7 @@ export function MenuProductDetailModal({
                 className="menu-product-modal__add"
                 disabled={!canAdd}
                 onClick={handleAdd}
+                data-testid="menu-add-to-cart"
               >
                 Добавить
               </button>

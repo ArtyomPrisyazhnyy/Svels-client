@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError } from '../../../shared/api/api-client';
 import type { MenuCategory, MenuItem } from '../../../shared/types/menu';
-import { CurrencyAmount, PriceDelta } from '../../../shared/components/CurrencyAmount';
-import { resolveImageUrl } from '../../../shared/types/menu';
+import { PriceDelta } from '../../../shared/components/CurrencyAmount';
+import { MenuItemPriceDisplay } from '../../../shared/components/MenuItemPriceDisplay';
+import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useAuthStore } from '../../../store/auth.store';
 import {
   createCategory,
@@ -129,7 +130,11 @@ export default function MenuAdminPage() {
                         key={item.id}
                         className={`menu-admin__item${editingItem?.id === item.id ? ' menu-admin__item--editing' : ''}`}
                       >
-                        <img src={resolveImageUrl(item.imageUrl)} alt={item.name} />
+                        <ResponsiveImage
+                          src={item.imageUrl}
+                          webpSrc={item.imageWebpUrl}
+                          alt={item.name}
+                        />
                         <div className="menu-admin__item-body">
                           <strong>
                             {item.name}
@@ -137,7 +142,13 @@ export default function MenuAdminPage() {
                               <span className="menu-admin__item-variant"> {item.variantLabel}</span>
                             )}
                           </strong>
-                          <span><CurrencyAmount amount={item.price} fractionDigits={2} /></span>
+                          <span>
+                            <MenuItemPriceDisplay
+                              price={item.price}
+                              oldPrice={item.oldPrice}
+                              fractionDigits={2}
+                            />
+                          </span>
                           {item.nutrition && <NutritionBadges nutrition={item.nutrition} />}
                           {item.modifierGroups?.length > 0 && (
                             <ul className="menu-admin__modifiers">

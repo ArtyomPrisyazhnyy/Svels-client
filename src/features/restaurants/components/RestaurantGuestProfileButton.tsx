@@ -37,6 +37,7 @@ export function RestaurantGuestProfileButton({
       }`}
       onClick={onClick}
       aria-label={authenticated ? 'Личный кабинет' : 'Войти'}
+      data-testid="guest-profile-button"
     >
       <ProfileIcon />
     </button>

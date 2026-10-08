@@ -1,4 +1,5 @@
 import type { UserRole } from '../types/auth';
+import { getRestaurantAdminHomePath, isRestaurantStaffRole } from '../auth/restaurant-staff';
 import { buildRestaurantGuestPath } from './restaurant-guest-path';
 
 export function getPostAuthPath(
@@ -10,9 +11,10 @@ export function getPostAuthPath(
   switch (role) {
     case 'super_admin':
       return '/admin';
-    case 'restaurant_admin':
-      return '/restaurant-admin/menu';
     default:
+      if (isRestaurantStaffRole(role)) {
+        return getRestaurantAdminHomePath(role);
+      }
       if (redirectFrom) {
         return redirectFrom;
       }

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useActiveItems, useLayoutStore, resolveTableDeposit } from '@/store/layout-store';
 import { fetchPublicLayout, fetchTablesAvailability } from '@/features/restaurant-admin/api/floor-plans.api';
 import type { PublicFloorPlanLayoutResponse, PublicFloorPlanTable, TablesAvailabilityResponse } from '@/shared/types/floor-plan';
+import { CurrencySign } from '@/shared/components/CurrencySign';
 import { STAGE_HEIGHT, STAGE_WIDTH, todayIso } from './constants';
 import '../styles/floor-plan-viewer.scss';
 
@@ -155,7 +156,10 @@ export function FloorPlanViewer({
         <div className="fp-viewer__confirm">
           <div className="fp-viewer__confirm-info">
             <strong>Стол {selectedTable.label}</strong>
-            <span>{selectedTable.capacity} мест · депозит {selectedDeposit} BYN</span>
+            <span>
+              {selectedTable.capacity} мест · депозит {selectedDeposit}
+              <CurrencySign />
+            </span>
           </div>
           <button type="button" className="fp-viewer__confirm-btn" onClick={handleConfirm}>
             Забронировать

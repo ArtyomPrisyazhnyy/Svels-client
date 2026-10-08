@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///turbopack:///[project]/src/shared/styles/home/artyom/Документы/Svels/Svels-client/src/shared/styles/byn-sign.scss"],"sourcesContent":["/**\n * Официальный иконочный шрифт графического знака белорусского рубля (Нацбанк).\n * @see https://www.nbrb.by/coinsbanknotes/byn-ico/nbrb-font\n */\n@font-face {\n  font-family: 'nbrb';\n  src:\n    url('/fonts/nbrb/nbrb.woff2') format('woff2'),\n    url('/fonts/nbrb/nbrb.woff') format('woff'),\n    url('/fonts/nbrb/nbrb.ttf') format('truetype');\n  unicode-range: U+E901, U+0042, U+0059, U+004E;\n  font-display: swap;\n}\n\n.byn-sign {\n  font-family: 'nbrb', sans-serif;\n  font-style: normal;\n  font-weight: normal;\n  line-height: 1;\n  display: inline-block;\n  vertical-align: -0.08em;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n\n.byn-price {\n  display: inline-flex;\n  align-items: baseline;\n  gap: 0.15em;\n  white-space: nowrap;\n}\n\n.currency-text {\n  font-size: 0.92em;\n  font-weight: 600;\n  line-height: 1;\n}\n"],"names":[],"mappings":"AAIA;;;;;;;AAUA;;;;;;;;;;;AAWA;;;;;;;AAOA"}}]
-}

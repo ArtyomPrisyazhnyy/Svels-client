@@ -2,6 +2,7 @@ import { apiRequest } from '../../../shared/api/api-client';
 
 export interface RegistrationLocation {
   label?: string;
+  city?: string;
   address: string;
 }
 

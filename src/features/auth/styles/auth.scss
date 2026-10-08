@@ -80,7 +80,7 @@
     color: #334155;
   }
 
-  input {
+  input:not(.phone-input__control) {
     width: 100%;
     box-sizing: border-box;
     border: 1px solid #e2e8f0;
@@ -92,8 +92,18 @@
 
     &:focus {
       outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      border-color: var(--rs-focus-border, #3b82f6);
+      box-shadow: 0 0 0 3px var(--rs-focus-ring, rgba(59, 130, 246, 0.15));
+    }
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      -webkit-text-fill-color: #0f172a !important;
+      caret-color: #0f172a;
+      -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+      box-shadow: 0 0 0 1000px #ffffff inset !important;
     }
   }
 }
@@ -135,9 +145,11 @@
   cursor: pointer;
   transition: color 0.15s, background 0.15s;
 
-  &:hover {
-    color: #334155;
-    background: #f1f5f9;
+  @media (hover: hover) {
+    &:hover {
+      color: #334155;
+      background: #f1f5f9;
+    }
   }
 }
 
@@ -153,8 +165,10 @@
   cursor: pointer;
   transition: background 0.15s;
 
-  &:hover:not(:disabled) {
-    background: #1d4ed8;
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
   }
 
   &:disabled {
@@ -201,9 +215,11 @@
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 
-  &:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+  @media (hover: hover) {
+    &:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
   }
 }
 
@@ -235,4 +251,34 @@
   background: #fef2f2;
   color: #b91c1c;
   font-size: 0.875rem;
+}
+
+.auth-hint {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.auth-link-btn {
+  border: none;
+  background: transparent;
+  padding: 0.25rem;
+  color: #2563eb;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      text-decoration: underline;
+    }
+  }
+
+  &:disabled {
+    color: #94a3b8;
+    cursor: not-allowed;
+    text-decoration: none;
+  }
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { MenuCategory, MenuItem, MenuResponse } from '@/shared/types/menu';
+import type { MenuItem, MenuResponse } from '@/shared/types/menu';
+import { useHydrateFavorites } from '@/hooks/useHydrateFavorites';
 import { useRestaurantStylingOptional } from '../context/RestaurantStylingContext';
 import { useMenuCategoryNavOptional } from '../context/MenuCategoryNavContext';
 import { getAvailableMenuCategories } from '../utils/menu-catalog.util';
@@ -22,7 +23,9 @@ export function RestaurantMenuCatalog({
 }: RestaurantMenuCatalogProps) {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const { styling } = useRestaurantStylingOptional();
+  const favoritesEnabled = styling.favoritesEnabled !== false;
   const navContext = useMenuCategoryNavOptional();
+  useHydrateFavorites(restaurantId, favoritesEnabled);
 
   const categories = useMemo(
     () => getAvailableMenuCategories(menu.categories),
@@ -34,14 +37,16 @@ export function RestaurantMenuCatalog({
 
   if (categories.length === 0) {
     return (
-      <section className="restaurant-menu">
-        <p className="restaurant-menu__empty">Меню пока пусто</p>
+      <section className="restaurant-menu" data-testid="restaurant-menu">
+        <p className="restaurant-menu__empty" data-testid="menu-empty">
+          Меню пока пусто
+        </p>
       </section>
     );
   }
 
   return (
-    <section className="restaurant-menu" aria-label="Меню">
+    <section className="restaurant-menu" aria-label="Меню" data-testid="restaurant-menu">
       {navContext && <RestaurantMenuInlineCategoryNav />}
 
       {showStandaloneNav && (
@@ -62,7 +67,12 @@ export function RestaurantMenuCatalog({
           <h2 className="restaurant-menu__category-title">{category.name}</h2>
           <div className="restaurant-menu__grid">
             {category.items.map((item) => (
-              <MenuProductCard key={item.id} item={item} onSelect={setSelectedItem} />
+              <MenuProductCard
+                key={item.id}
+                restaurantId={restaurantId}
+                item={item}
+                onSelect={setSelectedItem}
+              />
             ))}
           </div>
         </div>

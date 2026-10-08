@@ -6,6 +6,18 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  /* Иначе горизонтальный вылет контента. clip на html не создаёт внутренний скролл. */
+  overflow-x: clip;
+}
+
+/*
+  Десктоп: классический/оверлейный scrollbar не должен съедать padding шапки
+  (иначе корзина прилипает к правому краю).
+*/
+@media (hover: hover) and (pointer: fine) {
+  html {
+    scrollbar-gutter: stable;
+  }
 }
 
 a,

@@ -2,6 +2,7 @@ import { apiRequest } from '../../../shared/api/api-client';
 
 export interface RestaurantLocationPayload {
   label?: string;
+  city?: string;
   address: string;
 }
 

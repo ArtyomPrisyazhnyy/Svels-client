@@ -9,8 +9,12 @@
     "ports:free": "bash ../scripts/free-ports.sh 3001",
     "clean": "rm -rf .next",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint ."
+    "start": "next start -p 3001",
+    "lint": "eslint .",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report e2e/playwright-report"
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
@@ -29,9 +33,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.62.0",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "dotenv": "^17.4.2",
     "eslint": "^9.39.1",
     "eslint-config-next": "^15.5.4",
     "eslint-plugin-react-hooks": "^7.1.1",

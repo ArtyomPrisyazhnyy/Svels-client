@@ -15,7 +15,7 @@ export function CurrencyAmount({
 }: CurrencyAmountProps) {
   return (
     <span className={className ? `byn-price ${className}` : 'byn-price'}>
-      {Number(amount).toFixed(fractionDigits)}
+      <span className="byn-price__amount">{Number(amount).toFixed(fractionDigits)}</span>
       <CurrencySign />
     </span>
   );
@@ -34,11 +34,13 @@ export function PriceDelta({ delta }: PriceDeltaProps) {
 
   return (
     <span className="byn-price">
-      {' ('}
-      {sign}
-      {Math.abs(delta).toFixed(0)}
+      <span className="byn-price__amount">
+        {' ('}
+        {sign}
+        {Math.abs(delta).toFixed(0)}
+      </span>
       <CurrencySign />
-      {')'}
+      <span className="byn-price__amount">{')'}</span>
     </span>
   );
 }

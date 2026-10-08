@@ -1,6 +1,5 @@
 'use client';
 
-import { CURRENCY_GLYPH } from '@/shared/config/currency';
 import { useRestaurantStylingOptional } from '@/features/restaurants/context/RestaurantStylingContext';
 import type { RestaurantCurrencyDisplay } from '@/shared/types/restaurant-styling';
 
@@ -17,21 +16,22 @@ function renderCurrencyText(display: RestaurantCurrencyDisplay): string {
     case 'rub':
       return ' руб';
     default:
-      return CURRENCY_GLYPH;
+      return 'BYN';
   }
 }
 
+/**
+ * Графический знак BYN по инструкции НБРБ: лигатура текста «BYN» в шрифте nbrb.
+ * @see https://www.nbrb.by/coinsbanknotes/byn-ico/nbrb-font
+ */
 export function CurrencySign({ className }: CurrencySignProps) {
   const { currencyDisplay } = useRestaurantStylingOptional();
 
   if (currencyDisplay === 'byn_glyph') {
+    const classes = ['nbrb-icon', 'byn-sign', className].filter(Boolean).join(' ');
     return (
-      <span
-        className={className ? `byn-sign ${className}` : 'byn-sign'}
-        role="img"
-        aria-label="белорусский рубль"
-      >
-        {CURRENCY_GLYPH}
+      <span className={classes} role="img" aria-label="белорусский рубль">
+        BYN
       </span>
     );
   }

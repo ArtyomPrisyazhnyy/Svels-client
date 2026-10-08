@@ -19,6 +19,7 @@ import type {
   BookingAvailability,
 } from '@/shared/types/booking';
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
+import { CurrencySign } from '@/shared/components/CurrencySign';
 import '@/views/restaurant-guest-booking.scss';
 
 interface RestaurantGuestBookingPageProps {
@@ -132,7 +133,7 @@ export function RestaurantGuestBookingPage({
   return (
     <RestaurantStylingShell styling={styling}>
       <div className="guest-booking">
-        <header className="glass-header glass-header--stacked guest-booking__header">
+        <header className="glass-header glass-header--tenant glass-header--stacked guest-booking__header">
           <Link
             href={paths.home}
             className="glass-header__link glass-header__link--accent guest-booking__back"
@@ -185,6 +186,7 @@ export function RestaurantGuestBookingPage({
                       min={minDate}
                       max={maxDate}
                       onChange={(e) => setDate(e.target.value)}
+                      data-testid="booking-date"
                     />
                   </label>
                   <label className="guest-booking__field">
@@ -195,6 +197,7 @@ export function RestaurantGuestBookingPage({
                       max={bookingSettings.maxGuests}
                       value={guests}
                       onChange={(e) => setGuests(Number(e.target.value))}
+                      data-testid="booking-guests"
                     />
                   </label>
                 </div>
@@ -206,7 +209,11 @@ export function RestaurantGuestBookingPage({
                   <p className="guest-booking__muted">
                     Выберите дату, время и свободный стол на интерактивной схеме зала.
                     {selectedTableDeposit > 0 && (
-                      <strong> Депозит: {selectedTableDeposit} BYN.</strong>
+                      <strong>
+                        {' '}
+                        Депозит: {selectedTableDeposit}
+                        <CurrencySign />.
+                      </strong>
                     )}
                   </p>
                   <FloorPlanViewer
@@ -268,12 +275,18 @@ export function RestaurantGuestBookingPage({
                 className="guest-booking__btn"
                 disabled={submitting || !selectedSlot || (bookingSettings.mode === 'specific_table' && !selectedTableId)}
                 onClick={() => void handleSubmit()}
+                data-testid="booking-submit"
               >
-                {submitting
-                  ? 'Бронирование…'
-                  : selectedTableDeposit > 0
-                    ? `Забронировать стол (депозит ${selectedTableDeposit} BYN)`
-                    : 'Забронировать стол'}
+                {submitting ? (
+                  'Бронирование…'
+                ) : selectedTableDeposit > 0 ? (
+                  <>
+                    Забронировать стол (депозит {selectedTableDeposit}
+                    <CurrencySign />)
+                  </>
+                ) : (
+                  'Забронировать стол'
+                )}
               </button>
             </>
           )}

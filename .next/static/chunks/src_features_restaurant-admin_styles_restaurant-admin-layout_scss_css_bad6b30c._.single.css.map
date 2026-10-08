@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///turbopack:///[project]/src/features/restaurant-admin/styles/home/artyom/Документы/Svels/Svels-client/src/features/restaurant-admin/styles/restaurant-admin-layout.scss"],"sourcesContent":[".restaurant-admin__body {\n  display: grid;\n  grid-template-columns: 200px 1fr;\n  gap: 0;\n  min-height: calc(100vh - 65px);\n\n  @media (max-width: 768px) {\n    grid-template-columns: 1fr;\n  }\n}\n\n.restaurant-admin__nav {\n  padding: 1rem;\n  background: #ffffff;\n  border-right: 1px solid #e2e8f0;\n  display: flex;\n  flex-direction: column;\n  gap: 0.25rem;\n}\n\n.restaurant-admin__nav-link {\n  padding: 0.625rem 0.875rem;\n  border-radius: 8px;\n  text-decoration: none;\n  color: #475569;\n  font-weight: 600;\n  font-size: 0.9rem;\n\n  &:hover {\n    background: #f1f5f9;\n  }\n\n  &--active {\n    background: #ecfdf5;\n    color: #0f766e;\n  }\n}\n\n.restaurant-admin__content {\n  padding: 1.5rem;\n}\n\n.restaurant-admin__welcome {\n  margin: 0 0 1.25rem;\n  color: #64748b;\n}\n"],"names":[],"mappings":"AAAA;;;;;;;AAME;EANF;;;;;AAWA;;;;;;;;;AASA;;;;;;;;;AAQE;;;;AAIA;;;;;AAMF;;;;AAIA"}}]
-}

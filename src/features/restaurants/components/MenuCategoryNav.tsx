@@ -33,13 +33,57 @@ function MenuCategoryNavView({
   innerRef,
   enableActiveButtonScroll = true,
 }: MenuCategoryNavViewProps) {
+  const localInnerRef = useRef<HTMLDivElement>(null);
+  const resolvedInnerRef = innerRef ?? localInnerRef;
+
   useEffect(() => {
-    if (!enableActiveButtonScroll || !innerRef?.current || !activeId) {
+    if (!enableActiveButtonScroll || !resolvedInnerRef.current || !activeId) {
       return;
     }
 
-    scrollMenuCategoryNavButtonIntoView(innerRef.current, activeId);
-  }, [activeId, enableActiveButtonScroll, innerRef]);
+    scrollMenuCategoryNavButtonIntoView(resolvedInnerRef.current, activeId);
+  }, [activeId, enableActiveButtonScroll, resolvedInnerRef]);
+
+  // На ПК колёсико обычно скроллит страницу вертикально — перенаправляем в горизонтальный скролл полоски.
+  useEffect(() => {
+    const element = resolvedInnerRef.current;
+    if (!element) {
+      return;
+    }
+
+    const onWheel = (event: WheelEvent) => {
+      if (element.scrollWidth <= element.clientWidth + 1) {
+        return;
+      }
+
+      // Трекпад уже отдаёт горизонтальный deltaX — не мешаем.
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+        return;
+      }
+
+      if (event.deltaY === 0) {
+        return;
+      }
+
+      const maxScrollLeft = element.scrollWidth - element.clientWidth;
+      const nextLeft = Math.min(
+        maxScrollLeft,
+        Math.max(0, element.scrollLeft + event.deltaY),
+      );
+
+      if (nextLeft === element.scrollLeft) {
+        return;
+      }
+
+      event.preventDefault();
+      element.scrollLeft = nextLeft;
+    };
+
+    element.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      element.removeEventListener('wheel', onWheel);
+    };
+  }, [categories.length, resolvedInnerRef]);
 
   if (categories.length <= 1) {
     return null;
@@ -52,7 +96,11 @@ function MenuCategoryNavView({
       }`}
       aria-label="Навигация по категориям меню"
     >
-      <div ref={innerRef} className="restaurant-menu__category-nav-inner">
+      <div
+        ref={resolvedInnerRef}
+        className="restaurant-menu__category-nav-inner"
+        data-testid="menu-category-nav-scroll"
+      >
         {categories.map((category) => (
           <button
             key={category.id}

@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
+const platformHosts = (process.env.NEXT_PUBLIC_PLATFORM_HOSTS ?? '')
+  .split(',')
+  .map((host) => host.trim())
+  .filter(Boolean);
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -14,15 +17,7 @@ const nextConfig: NextConfig = {
     },
   },
   // Доступ к dev-серверу с телефона/другого ПК в локальной сети
-  allowedDevOrigins: ['192.168.0.238', 'localhost', '127.0.0.1'],
-  async rewrites() {
-    return [
-      {
-        source: '/uploads/:path*',
-        destination: `${API_URL}/uploads/:path*`,
-      },
-    ];
-  },
+  allowedDevOrigins: [...new Set(['localhost', '127.0.0.1', ...platformHosts])],
 };
 
 export default nextConfig;

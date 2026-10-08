@@ -1,6 +1,14 @@
 export type AuthProvider = 'local' | 'google';
 
-export type UserRole = 'user' | 'restaurant_admin' | 'super_admin';
+export type UserRole =
+  | 'user'
+  | 'restaurant_admin'
+  | 'restaurant_manager'
+  | 'restaurant_hall'
+  | 'restaurant_production'
+  | 'super_admin';
+
+export type OtpDeliveryChannel = 'telegram' | 'sms' | 'dev';
 
 export interface AuthUser {
   id: string;
@@ -30,14 +38,36 @@ export interface LoginPayload {
   password: string;
 }
 
-export interface GuestRegisterPayload {
+export interface GuestOtpSendPayload {
   phone: string;
-  password: string;
-  firstName: string;
-  lastName: string;
 }
 
-export interface GuestLoginPayload {
+export interface GuestOtpSendResponse {
+  maskedPhone: string;
+  channel: OtpDeliveryChannel;
+  resendAvailableAt: string;
+  expiresAt: string;
+}
+
+export interface GuestOtpVerifyPayload {
   phone: string;
-  password: string;
+  code: string;
+}
+
+export type GuestOtpVerifyResponse =
+  | {
+      status: 'authenticated';
+      accessToken: string;
+      user: AuthUser;
+    }
+  | {
+      status: 'registration_required';
+      registrationToken: string;
+      maskedPhone: string;
+    };
+
+export interface GuestOtpRegisterPayload {
+  registrationToken: string;
+  firstName: string;
+  lastName: string;
 }

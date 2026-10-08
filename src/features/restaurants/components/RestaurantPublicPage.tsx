@@ -7,16 +7,18 @@ import type { MenuResponse } from '@/shared/types/menu';
 import type { RestaurantOrderSettings } from '@/shared/types/order-settings';
 import type { RestaurantStyling } from '@/shared/types/restaurant-styling';
 import type { BookingSettings } from '@/shared/types/booking-settings';
+import type { LoyaltySettings } from '@/shared/types/loyalty-settings';
+import type { PromoBanner } from '@/shared/types/promo-banner';
 import type { SocialLink } from '@/shared/types/social-link';
-import { resolveImageUrl } from '@/shared/types/menu';
+import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { RestaurantStylingShell } from '../context/RestaurantStylingContext';
 import { MenuCategoryNavProvider } from '../context/MenuCategoryNavContext';
 import {
   getAvailableMenuCategories,
-  tempExpandMenuCategoryNavItems,
   toMenuCategoryNavItems,
 } from '../utils/menu-catalog.util';
+import { PromoBannersHost } from './PromoBanners';
 import { RestaurantCartModal } from './RestaurantCartModal';
 import { RestaurantGuestAuthModal } from './RestaurantGuestAuthModal';
 import { RestaurantMenuCatalog } from './RestaurantMenuCatalog';
@@ -32,6 +34,8 @@ interface RestaurantPublicPageProps {
   styling: RestaurantStyling;
   bookingSettings?: BookingSettings;
   socialLinks?: SocialLink[];
+  promoBanners?: PromoBanner[];
+  loyaltySettings?: LoyaltySettings;
   embedded?: boolean;
 }
 
@@ -39,8 +43,11 @@ function RestaurantPublicPageBody({
   restaurant,
   menu,
   orderSettings,
+  styling,
   bookingSettings,
   socialLinks = [],
+  promoBanners = [],
+  loyaltySettings,
   embedded = false,
   categoryNavEnabled,
 }: RestaurantPublicPageProps & { categoryNavEnabled: boolean }) {
@@ -48,17 +55,24 @@ function RestaurantPublicPageBody({
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const bookingEnabled = bookingSettings?.bookingEnabled ?? false;
+  const favoritesEnabled = styling.favoritesEnabled !== false;
 
   const headerProps = {
     restaurantId: restaurant.id,
     restaurantName: restaurant.name,
     logoUrl: restaurant.logoUrl,
+    logoWebpUrl: restaurant.logoWebpUrl,
     onOpenCart: embedded ? undefined : () => setCartOpen(true),
     onOpenAuth: embedded ? undefined : () => setAuthOpen(true),
+    flameDisplayEnabled: loyaltySettings?.flameDisplayEnabled ?? false,
+    favoritesEnabled: embedded ? false : favoritesEnabled,
   };
 
   return (
-    <div className={`restaurant-public${embedded ? ' restaurant-public--embedded' : ''}`}>
+    <div
+      className={`restaurant-public${embedded ? ' restaurant-public--embedded' : ''}`}
+      data-testid="restaurant-public-page"
+    >
       {categoryNavEnabled ? (
         <RestaurantPublicHeaderStack {...headerProps} />
       ) : (
@@ -73,30 +87,31 @@ function RestaurantPublicPageBody({
           <p className="restaurant-public__description">{restaurant.description}</p>
         )}
 
+        <PromoBannersHost banners={promoBanners} persistSeen={!embedded} />
+
         <RestaurantMenuCatalog restaurantId={restaurant.id} menu={menu} />
 
-        <div className="restaurant-public__actions">
-          {bookingEnabled && (
-            <Link href={paths.booking} className="restaurant-public__btn">
+        {bookingEnabled && (
+          <div className="restaurant-public__actions">
+            <Link
+              href={paths.booking}
+              className="restaurant-public__btn"
+              data-testid="cta-booking"
+            >
               Забронировать стол
             </Link>
-          )}
-          <Link
-            href={paths.preOrder}
-            className={`restaurant-public__btn${bookingEnabled ? ' restaurant-public__btn--secondary' : ''}`}
-          >
-            Сделать предзаказ
-          </Link>
-        </div>
+          </div>
+        )}
       </main>
 
       <footer className="restaurant-public__footer">
         <div className="restaurant-public__footer-inner">
           <div className="restaurant-public__footer-brand">
             {restaurant.logoUrl && (
-              <img
+              <ResponsiveImage
                 className="restaurant-public__footer-logo"
-                src={resolveImageUrl(restaurant.logoUrl)}
+                src={restaurant.logoUrl}
+                webpSrc={restaurant.logoWebpUrl}
                 alt=""
               />
             )}
@@ -113,6 +128,11 @@ function RestaurantPublicPageBody({
             {bookingEnabled && (
               <Link href={paths.booking} className="restaurant-public__footer-link">
                 Бронирование стола
+              </Link>
+            )}
+            {favoritesEnabled && (
+              <Link href={paths.favorites} className="restaurant-public__footer-link">
+                Избранное
               </Link>
             )}
             <Link href={paths.preOrder} className="restaurant-public__footer-link">
@@ -152,6 +172,10 @@ function RestaurantPublicPageBody({
           orderSettings={orderSettings}
           bookingEnabled={bookingEnabled}
           onClose={() => setCartOpen(false)}
+          onOpenAuth={() => {
+            setCartOpen(false);
+            setAuthOpen(true);
+          }}
         />
       )}
     </div>
@@ -165,13 +189,12 @@ export function RestaurantPublicPage({
   styling,
   bookingSettings,
   socialLinks,
+  promoBanners,
+  loyaltySettings,
   embedded,
 }: RestaurantPublicPageProps) {
   const navCategories = useMemo(
-    () =>
-      tempExpandMenuCategoryNavItems(
-        toMenuCategoryNavItems(getAvailableMenuCategories(menu.categories)),
-      ),
+    () => toMenuCategoryNavItems(getAvailableMenuCategories(menu.categories)),
     [menu.categories],
   );
 
@@ -189,6 +212,8 @@ export function RestaurantPublicPage({
             styling={styling}
             bookingSettings={bookingSettings}
             socialLinks={socialLinks}
+            promoBanners={promoBanners}
+            loyaltySettings={loyaltySettings}
             embedded={embedded}
             categoryNavEnabled
           />
@@ -201,6 +226,8 @@ export function RestaurantPublicPage({
           styling={styling}
           bookingSettings={bookingSettings}
           socialLinks={socialLinks}
+          promoBanners={promoBanners}
+          loyaltySettings={loyaltySettings}
           embedded={embedded}
           categoryNavEnabled={false}
         />

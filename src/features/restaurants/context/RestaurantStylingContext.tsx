@@ -11,6 +11,7 @@ import {
   getRestaurantStylingDomProps,
 } from '@/features/restaurants/utils/restaurant-styling.util';
 import { RESTAURANT_FONT_CLASSES } from '@/features/restaurants/fonts/restaurant-fonts';
+import { RestaurantStylingScrollToTop } from '@/features/restaurants/components/RestaurantStylingScrollToTop';
 import '@/features/restaurants/styles/restaurant-styling-fonts.scss';
 import '@/features/restaurants/styles/restaurant-styling-theme.scss';
 
@@ -25,6 +26,8 @@ interface RestaurantStylingShellProps {
   styling: RestaurantStyling;
   children: ReactNode;
   className?: string;
+  /** false — для встроенного превью в админке (кнопка не уходит в body). */
+  enableScrollToTop?: boolean;
 }
 
 function RestaurantStylingRoot({
@@ -53,6 +56,7 @@ export function RestaurantStylingShell({
   styling,
   children,
   className,
+  enableScrollToTop = true,
 }: RestaurantStylingShellProps) {
   return (
     <RestaurantStylingContext.Provider
@@ -63,6 +67,7 @@ export function RestaurantStylingShell({
     >
       <RestaurantStylingRoot styling={styling} className={className}>
         {children}
+        {enableScrollToTop ? <RestaurantStylingScrollToTop /> : null}
       </RestaurantStylingRoot>
     </RestaurantStylingContext.Provider>
   );

@@ -1,12 +1,17 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { ApiError } from '@/shared/api/api-client';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
-import { useScrollLock } from '@/hooks/useScrollLock';
-import { resolveImageUrl } from '@/shared/types/menu';
+import { PhoneInput } from '@/shared/components/PhoneInput';
+import { useModalPresence } from '@/hooks/useModalPresence';
+import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useCartStore } from '@/store/cart.store';
+import { fetchRestaurantLocations } from '../api/locations.api';
+import type { RestaurantLocation } from '@/shared/types/restaurant-location';
 import { FulfillmentSelector } from './FulfillmentSelector';
+import { CartLocationPicker } from './CartLocationPicker';
 import { PaymentSelector } from './PaymentSelector';
 import type { CartLineItem } from '@/shared/types/cart';
 import {
@@ -20,6 +25,9 @@ import {
 } from '@/shared/types/order-settings';
 import { useAuthStore } from '@/store/auth.store';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
+import { isCompleteBelarusPhone } from '@/shared/utils/phone.util';
+import { createPreOrder } from '../api/pre-orders.api';
+import { toPreOrderPaymentMethod } from '../utils/payment-method.util';
 import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
 import '../styles/restaurant-cart-modal.scss';
 
@@ -30,10 +38,7 @@ interface RestaurantCartModalProps {
   orderSettings: RestaurantOrderSettings;
   bookingEnabled?: boolean;
   onClose: () => void;
-}
-
-function normalizePhone(value: string): string {
-  return value.replace(/\D/g, '');
+  onOpenAuth?: () => void;
 }
 
 const EMPTY_CART_ITEMS: CartLineItem[] = [];
@@ -43,8 +48,10 @@ export function RestaurantCartModal({
   orderSettings,
   bookingEnabled = false,
   onClose,
+  onOpenAuth,
 }: RestaurantCartModalProps) {
   const user = useAuthStore((s) => s.user);
+  const accessToken = useAuthStore((s) => s.accessToken);
   const paths = useRestaurantGuestPaths(restaurantId);
   const items = useCartStore((s) =>
     s.restaurantId === restaurantId ? s.items : EMPTY_CART_ITEMS,
@@ -53,8 +60,7 @@ export function RestaurantCartModal({
   const updateLineQuantity = useCartStore((s) => s.updateLineQuantity);
   const clearCart = useCartStore((s) => s.clearCart);
 
-  const [mounted, setMounted] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+  const { mounted, isActive, handleClose } = useModalPresence(onClose, MODAL_ANIMATION_MS);
   const [fulfillment, setFulfillment] = useState<FulfillmentKey>(() =>
     getDefaultFulfillment(orderSettings),
   );
@@ -63,8 +69,15 @@ export function RestaurantCartModal({
   );
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
+  const [orderForSomeoneElse, setOrderForSomeoneElse] = useState(false);
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState('');
+  const [comment, setComment] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [locations, setLocations] = useState<RestaurantLocation[]>([]);
+  const [locationId, setLocationId] = useState<string | null>(null);
 
   const isGuestOfRestaurant =
     user?.role === 'user' && user.restaurantId === restaurantId;
@@ -84,28 +97,38 @@ export function RestaurantCartModal({
     [orderSettings],
   );
 
-  useScrollLock(mounted);
+  const showSomeoneElseOption =
+    orderSettings.deliveryForSomeoneElse && fulfillment === 'fulfillmentDelivery';
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) {
-      return;
+    if (!showSomeoneElseOption && orderForSomeoneElse) {
+      setOrderForSomeoneElse(false);
+      setRecipientName('');
+      setRecipientPhone('');
     }
+  }, [showSomeoneElseOption, orderForSomeoneElse]);
 
-    const frame = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setIsActive(true));
-    });
+  const needsVenue =
+    fulfillment === 'fulfillmentTakeaway' || fulfillment === 'fulfillmentDineIn';
 
-    return () => cancelAnimationFrame(frame);
-  }, [mounted]);
-
-  const handleClose = useCallback(() => {
-    setIsActive(false);
-    window.setTimeout(onClose, MODAL_ANIMATION_MS);
-  }, [onClose]);
+  useEffect(() => {
+    let cancelled = false;
+    void fetchRestaurantLocations(restaurantId)
+      .then((rows) => {
+        if (!cancelled) {
+          setLocations(rows);
+          setLocationId((current) => current ?? rows[0]?.id ?? null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLocations([]);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [restaurantId]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -121,7 +144,7 @@ export function RestaurantCartModal({
     };
   }, [handleClose]);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     setError(null);
 
     if (items.length === 0) {
@@ -134,27 +157,74 @@ export function RestaurantCartModal({
       return;
     }
 
+    if (needsVenue && locations.length > 0 && !locationId) {
+      setError('Выберите точку заведения');
+      return;
+    }
+
     if (enabledPayments.length > 0 && !payment) {
       setError('Выберите способ оплаты');
       return;
     }
 
-    if (!isGuestOfRestaurant) {
-      if (!customerName.trim()) {
-        setError('Укажите имя');
+    if (!isGuestOfRestaurant || !accessToken) {
+      setError('Войдите в аккаунт, чтобы оформить заказ');
+      onOpenAuth?.();
+      return;
+    }
+
+    if (showSomeoneElseOption && orderForSomeoneElse) {
+      if (!recipientName.trim()) {
+        setError('Укажите имя получателя');
         return;
       }
 
-      const normalizedPhone = normalizePhone(phone);
-      if (normalizedPhone.length < 9) {
-        setError('Укажите корректный номер телефона');
+      if (!isCompleteBelarusPhone(recipientPhone)) {
+        setError('Укажите корректный телефон получателя');
         return;
       }
     }
 
-    setSuccess('Заказ принят. Мы свяжемся с вами для подтверждения.');
-    clearCart();
-    window.setTimeout(handleClose, 1200);
+    if (comment.trim().length > 4000) {
+      setError('Комментарий слишком длинный (максимум 4000 символов)');
+      return;
+    }
+
+    if (!payment) {
+      setError('Выберите способ оплаты');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const order = await createPreOrder(restaurantId, accessToken, {
+        paymentMethod: toPreOrderPaymentMethod(payment),
+        items: items.map((line) => ({
+          menuItemId: line.menuItemId,
+          quantity: line.quantity,
+          unitPrice: line.unitPrice,
+          name: line.name,
+        })),
+        comment: comment.trim() || undefined,
+        customerName: user.firstName,
+        customerPhone: user.phone ?? undefined,
+      });
+
+      if (order.paymentRedirectUrl) {
+        clearCart();
+        window.location.href = order.paymentRedirectUrl;
+        return;
+      }
+
+      setSuccess('Заказ принят. Мы свяжемся с вами для подтверждения.');
+      clearCart();
+      window.setTimeout(handleClose, 1200);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Не удалось оформить заказ');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (!mounted) {
@@ -212,17 +282,14 @@ export function RestaurantCartModal({
                     placeholder="Как к вам обращаться"
                   />
                 </label>
-                <label className="restaurant-cart-modal__field">
-                  <span>Телефон</span>
-                  <input
-                    type="tel"
-                    autoComplete="tel"
-                    inputMode="tel"
+                <div className="restaurant-cart-modal__field">
+                  <label htmlFor="cart-customer-phone">Телефон</label>
+                  <PhoneInput
+                    id="cart-customer-phone"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+375 XX XXX-XX-XX"
+                    onChange={setPhone}
                   />
-                </label>
+                </div>
               </section>
             )}
 
@@ -248,6 +315,17 @@ export function RestaurantCartModal({
               </section>
             )}
 
+            {needsVenue && locations.length > 0 && (
+              <section className="restaurant-cart-modal__section">
+                <h3 className="restaurant-cart-modal__section-title">Точка заведения</h3>
+                <CartLocationPicker
+                  locations={locations}
+                  selectedId={locationId}
+                  onSelect={setLocationId}
+                />
+              </section>
+            )}
+
             {fulfillment === 'fulfillmentDineIn' && bookingEnabled && (
               <p className="restaurant-cart-modal__cross-sell">
                 Планируете прийти?{' '}
@@ -255,6 +333,52 @@ export function RestaurantCartModal({
                   Забронировать стол
                 </a>
               </p>
+            )}
+
+            {showSomeoneElseOption && (
+              <section className="restaurant-cart-modal__section">
+                <h3 className="restaurant-cart-modal__section-title">Получатель</h3>
+                <label className="restaurant-cart-modal__checkbox">
+                  <input
+                    type="checkbox"
+                    checked={orderForSomeoneElse}
+                    onChange={(e) => {
+                      setOrderForSomeoneElse(e.target.checked);
+                      if (!e.target.checked) {
+                        setRecipientName('');
+                        setRecipientPhone('');
+                      }
+                    }}
+                  />
+                  <span>Доставка другому человеку</span>
+                </label>
+                {orderForSomeoneElse && (
+                  <div className="restaurant-cart-modal__recipient">
+                    <p className="restaurant-cart-modal__recipient-hint">
+                      Укажите, кому доставить заказ — мы свяжемся с получателем по этому номеру.
+                    </p>
+                    <label className="restaurant-cart-modal__field">
+                      <span>Имя получателя</span>
+                      <input
+                        type="text"
+                        autoComplete="off"
+                        value={recipientName}
+                        onChange={(e) => setRecipientName(e.target.value)}
+                        placeholder="Имя получателя"
+                      />
+                    </label>
+                    <div className="restaurant-cart-modal__field">
+                      <label htmlFor="cart-recipient-phone">Телефон получателя</label>
+                      <PhoneInput
+                        id="cart-recipient-phone"
+                        value={recipientPhone}
+                        onChange={setRecipientPhone}
+                        autoComplete="off"
+                      />
+                    </div>
+                  </div>
+                )}
+              </section>
             )}
 
             {enabledPayments.length > 1 && (
@@ -280,6 +404,20 @@ export function RestaurantCartModal({
             )}
 
             <section className="restaurant-cart-modal__section">
+              <h3 className="restaurant-cart-modal__section-title">Комментарии к заказу</h3>
+              <label className="restaurant-cart-modal__field">
+                <span className="restaurant-cart-modal__field-hint">Необязательно</span>
+                <textarea
+                  rows={4}
+                  maxLength={4000}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Пожелания к заказу"
+                />
+              </label>
+            </section>
+
+            <section className="restaurant-cart-modal__section">
               <h3 className="restaurant-cart-modal__section-title">Ваш заказ</h3>
               {items.length === 0 ? (
                 <p className="restaurant-cart-modal__empty">Корзина пуста</p>
@@ -294,7 +432,11 @@ export function RestaurantCartModal({
                     >
                       {line.imageUrl && (
                         <div className="restaurant-cart-modal__item-media">
-                          <img src={resolveImageUrl(line.imageUrl)} alt="" />
+                          <ResponsiveImage
+                            src={line.imageUrl}
+                            webpSrc={line.imageWebpUrl}
+                            alt=""
+                          />
                         </div>
                       )}
 
@@ -370,10 +512,14 @@ export function RestaurantCartModal({
             <button
               type="button"
               className="restaurant-cart-modal__submit"
-              disabled={items.length === 0 || Boolean(success)}
-              onClick={handleSubmit}
+              disabled={items.length === 0 || Boolean(success) || submitting}
+              onClick={() => void handleSubmit()}
             >
-              Оформить заказ
+              {submitting
+                ? 'Оформление…'
+                : payment === 'paymentOnline'
+                  ? 'Перейти к оплате'
+                  : 'Оформить заказ'}
             </button>
           </footer>
         </div>

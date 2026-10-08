@@ -9,7 +9,7 @@ export function fetchRestaurant(restaurantId: string): Promise<PublicRestaurant>
 export function updateRestaurant(
   restaurantId: string,
   token: string,
-  payload: { logoUrl?: string | null },
+  payload: { logoUrl?: string | null; logoWebpUrl?: string | null },
 ): Promise<PublicRestaurant> {
   return apiRequest<PublicRestaurant>(`/restaurants/${restaurantId}`, {
     method: 'PATCH',
@@ -22,7 +22,7 @@ export async function uploadRestaurantLogo(
   restaurantId: string,
   token: string,
   file: File,
-): Promise<{ logoUrl: string }> {
+): Promise<{ logoUrl: string; logoWebpUrl: string }> {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -39,5 +39,5 @@ export async function uploadRestaurantLogo(
     await assertApiResponseOk(response, { authenticatedRequest: true });
   }
 
-  return response.json() as Promise<{ logoUrl: string }>;
+  return response.json() as Promise<{ logoUrl: string; logoWebpUrl: string }>;
 }

@@ -59,6 +59,7 @@ export function buildCartLineItem(
     name: item.name,
     variantLabel: item.variantLabel,
     imageUrl: item.imageUrl,
+    imageWebpUrl: item.imageWebpUrl,
     quantity,
     unitPrice: calculateModifierUnitPrice(item.price, modifierGroups, modifierSelections),
     modifiers,

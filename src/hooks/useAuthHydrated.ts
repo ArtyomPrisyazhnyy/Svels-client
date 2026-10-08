@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 
 export function useAuthHydrated(): boolean {
-  const [hydrated, setHydrated] = useState(false);
+  const [hydrated, setHydrated] = useState<boolean>(false);
 
   useEffect(() => {
     const { persist } = useAuthStore;
@@ -19,9 +19,11 @@ export function useAuthHydrated(): boolean {
       return;
     }
 
-    return persist.onFinishHydration(() => {
+    const unsubscribe = persist.onFinishHydration(() => {
       setHydrated(true);
     });
+    void persist.rehydrate();
+    return unsubscribe;
   }, []);
 
   return hydrated;

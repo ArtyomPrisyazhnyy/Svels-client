@@ -1,0 +1,28 @@
+$privacy-primary: #0f766e;
+$privacy-accent: #14b8a6;
+$privacy-ink: #0b1a18;
+$privacy-line: #e3e8e6;
+$privacy-surface: #f8faf9;
+
+.privacy-policy {
+  min-height: 100vh;
+  background: $privacy-surface;
+  color: $privacy-ink;
+}
+
+.privacy-policy__container {
+  width: min(100% - 2rem, 720px);
+  margin-inline: auto;
+}
+
+.privacy-policy__main {
+  padding-block: 2.5rem 4rem;
+}
+
+.privacy-policy__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}

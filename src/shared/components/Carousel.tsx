@@ -7,6 +7,27 @@ import './Carousel.scss';
 
 type CarouselOptions = NonNullable<Parameters<typeof useEmblaCarousel>[0]>;
 
+function ChevronIcon({ direction }: { direction: 'prev' | 'next' }) {
+  return (
+    <svg
+      className="carousel__arrow-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      {direction === 'prev' ? (
+        <path d="M15 6 9 12l6 6" />
+      ) : (
+        <path d="M9 6l6 6-6 6" />
+      )}
+    </svg>
+  );
+}
+
 interface CarouselProps {
   slides: ReactNode[];
   options?: CarouselOptions;
@@ -81,10 +102,10 @@ export function Carousel({
       {showArrows && slides.length > 1 && (
         <>
           <button type="button" className="carousel__arrow carousel__arrow--prev" onClick={scrollPrev} aria-label="Предыдущий слайд">
-            ‹
+            <ChevronIcon direction="prev" />
           </button>
           <button type="button" className="carousel__arrow carousel__arrow--next" onClick={scrollNext} aria-label="Следующий слайд">
-            ›
+            <ChevronIcon direction="next" />
           </button>
         </>
       )}

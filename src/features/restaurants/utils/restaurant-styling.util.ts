@@ -17,6 +17,8 @@ const FONT_STACKS: Record<RestaurantFontFamily, string> = {
   comfortaa: 'var(--font-rs-comfortaa), system-ui, sans-serif',
   comicRelief: 'var(--font-rs-comic-relief), "Comic Sans MS", system-ui, sans-serif',
   roboto: 'var(--font-rs-roboto), system-ui, sans-serif',
+  tektur: 'var(--font-rs-tektur), system-ui, sans-serif',
+  play: 'var(--font-rs-play), system-ui, sans-serif',
 };
 
 interface ThemeVars {

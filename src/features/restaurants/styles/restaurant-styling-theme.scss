@@ -1,10 +1,19 @@
 .restaurant-styled {
   --rs-btn-radius: 0.625rem;
+  /* Скругление фото в карточках — отдельно от формы кнопок (капсула не влияет). */
+  --rs-media-radius: 0.875rem;
+  /* Единый фокус для input / phone-input / textarea. */
+  --rs-focus-border: var(--rs-accent);
+  --rs-focus-ring: color-mix(in srgb, var(--rs-accent) 15%, transparent);
 
   font-family: var(--rs-font);
   color: var(--rs-text);
   background: var(--rs-bg);
-  overflow-x: clip;
+
+  .phone-input {
+    --phone-input-autofill-bg: var(--rs-bg);
+    --phone-input-autofill-text: var(--rs-text);
+  }
 
   &[data-rs-button-shape='pill'] {
     --rs-btn-radius: 999px;
@@ -21,10 +30,10 @@
 
   .restaurant-public__main h1,
   .restaurant-menu__category-title,
-  .glass-header__brand-name,
+  .glass-header--tenant .glass-header__brand-name,
+  .glass-header--tenant .glass-header__title,
   .menu-product-card__title,
   .menu-product-modal__title,
-  .menu-product-modal__section-title,
   .restaurant-cart-modal__header h2,
   .restaurant-auth-modal__header h2,
   .restaurant-cart-modal__section-title,
@@ -34,9 +43,13 @@
     color: var(--rs-text);
   }
 
-  .menu-product-modal__ingredients,
+  .menu-product-modal__section-title,
   .menu-product-modifiers__title {
-    color: var(--rs-text-muted);
+    color: var(--rs-accent);
+  }
+
+  .menu-product-modal__ingredients {
+    color: var(--rs-text);
   }
 
   .restaurant-public__address,
@@ -61,12 +74,22 @@
     color: var(--rs-accent);
   }
 
+  .menu-item-price__old {
+    color: var(--rs-text-soft);
+  }
+
+  .currency-text {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      'Helvetica Neue', Arial, sans-serif !important;
+  }
+
   .restaurant-public__btn,
   .menu-product-modal__add,
   .restaurant-cart-modal__submit,
   .restaurant-auth-modal .auth-submit {
     border-radius: var(--rs-btn-radius);
     border: 1px solid transparent;
+    font-family: inherit;
     font-weight: 600;
     transition:
       background-color 0.15s ease,
@@ -78,8 +101,10 @@
     background: var(--rs-primary);
     color: var(--rs-on-primary, #ffffff);
 
-    &:hover {
-      background: var(--rs-primary-hover);
+    @media (hover: hover) {
+      &:hover {
+        background: var(--rs-primary-hover);
+      }
     }
 
     &--secondary {
@@ -87,8 +112,10 @@
       color: var(--rs-primary);
       border-color: var(--rs-primary);
 
-      &:hover {
-        background: var(--rs-primary-soft);
+      @media (hover: hover) {
+        &:hover {
+          background: var(--rs-primary-soft);
+        }
       }
     }
   }
@@ -99,9 +126,11 @@
     background: var(--rs-accent);
     color: var(--rs-on-accent, #ffffff);
 
-    &:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--rs-accent) 88%, #000000);
-      color: var(--rs-on-accent, #ffffff);
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--rs-accent) 88%, #000000);
+        color: var(--rs-on-accent, #ffffff);
+      }
     }
 
     &:active:not(:disabled) {
@@ -121,8 +150,10 @@
       color: var(--rs-primary);
       border-color: var(--rs-primary);
 
-      &:hover {
-        background: var(--rs-primary-soft);
+      @media (hover: hover) {
+        &:hover {
+          background: var(--rs-primary-soft);
+        }
       }
     }
 
@@ -131,8 +162,10 @@
       color: var(--rs-text);
       border-color: var(--rs-border);
 
-      &:hover {
-        background: var(--rs-bg);
+      @media (hover: hover) {
+        &:hover {
+          background: var(--rs-bg);
+        }
       }
     }
 
@@ -143,10 +176,12 @@
       color: var(--rs-accent);
       border-color: var(--rs-accent);
 
-      &:hover:not(:disabled) {
-        background: color-mix(in srgb, var(--rs-accent) 12%, var(--rs-surface));
-        color: var(--rs-accent);
-        border-color: var(--rs-accent);
+      @media (hover: hover) {
+        &:hover:not(:disabled) {
+          background: color-mix(in srgb, var(--rs-accent) 12%, var(--rs-surface));
+          color: var(--rs-accent);
+          border-color: var(--rs-accent);
+        }
       }
     }
   }
@@ -157,8 +192,10 @@
       color: var(--rs-primary);
       border-color: transparent;
 
-      &:hover {
-        filter: brightness(0.97);
+      @media (hover: hover) {
+        &:hover {
+          filter: brightness(0.97);
+        }
       }
     }
 
@@ -167,8 +204,10 @@
       color: var(--rs-text-muted);
       border-color: var(--rs-border);
 
-      &:hover {
-        color: var(--rs-text);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--rs-text);
+        }
       }
     }
 
@@ -179,8 +218,10 @@
       color: var(--rs-accent);
       border-color: transparent;
 
-      &:hover {
-        background: color-mix(in srgb, var(--rs-accent) 26%, var(--rs-surface));
+      @media (hover: hover) {
+        &:hover {
+          background: color-mix(in srgb, var(--rs-accent) 26%, var(--rs-surface));
+        }
       }
     }
   }
@@ -217,9 +258,11 @@
     }
   }
 
-  .menu-product-modifiers__option:hover .menu-product-modifiers__option-label {
-    border-color: color-mix(in srgb, var(--rs-text) 14%, var(--rs-border));
-    background: color-mix(in srgb, var(--rs-text) 6%, var(--rs-surface));
+  @media (hover: hover) {
+    .menu-product-modifiers__option:hover .menu-product-modifiers__option-label {
+      border-color: color-mix(in srgb, var(--rs-text) 14%, var(--rs-border));
+      background: color-mix(in srgb, var(--rs-text) 6%, var(--rs-surface));
+    }
   }
 
   .menu-product-modifiers__option--selected .menu-product-modifiers__option-label {
@@ -232,9 +275,11 @@
     }
   }
 
-  .menu-product-modifiers__option--selected:hover .menu-product-modifiers__option-label {
-    border-color: var(--rs-accent);
-    background: color-mix(in srgb, var(--rs-accent) 22%, var(--rs-surface));
+  @media (hover: hover) {
+    .menu-product-modifiers__option--selected:hover .menu-product-modifiers__option-label {
+      border-color: var(--rs-accent);
+      background: color-mix(in srgb, var(--rs-accent) 22%, var(--rs-surface));
+    }
   }
 
   .menu-product-modifiers__option:focus-visible .menu-product-modifiers__option-label {
@@ -244,6 +289,27 @@
   .menu-product-modifiers__required {
     color: var(--rs-accent);
     background: color-mix(in srgb, var(--rs-accent) 14%, var(--rs-surface));
+  }
+
+  .nutrition-badge,
+  .nutrition-badge--calories,
+  .nutrition-badge--protein,
+  .nutrition-badge--fat,
+  .nutrition-badge--carbs {
+    background: color-mix(in srgb, var(--rs-text) 8%, var(--rs-bg));
+    border-color: var(--rs-border);
+
+    .nutrition-badge__label {
+      color: var(--rs-accent);
+    }
+  }
+
+  .nutrition-badge__value {
+    color: var(--rs-text);
+  }
+
+  .nutrition-badge__unit {
+    color: var(--rs-text-muted);
   }
 
   .fulfillment-selector__option {
@@ -256,16 +322,47 @@
     color: var(--rs-on-accent, #ffffff);
   }
 
-  .restaurant-cart-button__icon {
+  .restaurant-cart-button__icon,
+  .restaurant-favorites-header-button__icon {
     color: var(--rs-accent);
+  }
+
+  .restaurant-favorites-header-button {
+    color: var(--rs-text-muted);
+
+    @media (hover: hover) {
+      &:hover {
+        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+        color: var(--rs-text);
+      }
+    }
+  }
+
+  .restaurant-favorites-page {
+    background: var(--rs-bg);
+    color: var(--rs-text);
+  }
+
+  .restaurant-favorites-page__empty {
+    color: var(--rs-text-muted);
+
+    h2 {
+      color: var(--rs-text);
+    }
+
+    svg {
+      color: var(--rs-text-muted);
+    }
   }
 
   .restaurant-profile-button {
     color: var(--rs-text-muted);
 
-    &:hover {
-      background: color-mix(in srgb, var(--rs-text) 8%, transparent);
-      color: var(--rs-text);
+    @media (hover: hover) {
+      &:hover {
+        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+        color: var(--rs-text);
+      }
     }
   }
 
@@ -273,7 +370,7 @@
     color: var(--rs-accent);
   }
 
-  .glass-header {
+  .glass-header--tenant {
     border-bottom-color: color-mix(in srgb, var(--rs-border) 80%, transparent);
 
     &::before {
@@ -281,30 +378,35 @@
       border-bottom-color: color-mix(in srgb, var(--rs-border) 70%, transparent);
       box-shadow: inset 0 1px 0 color-mix(in srgb, var(--rs-text) 8%, transparent);
     }
-  }
 
-  .glass-header__brand {
-    color: var(--rs-text);
-  }
-
-  .glass-header__logo {
-    background: color-mix(in srgb, var(--rs-surface) 60%, transparent);
-  }
-
-  .glass-header__link {
-    color: var(--rs-text-muted);
-
-    &:hover {
-      background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+    .glass-header__brand,
+    .glass-header__title {
       color: var(--rs-text);
     }
 
-    &.glass-header__link--accent {
-      color: var(--rs-accent);
+    .glass-header__logo {
+      background: color-mix(in srgb, var(--rs-surface) 60%, transparent);
+    }
 
-      &:hover {
-        background: color-mix(in srgb, var(--rs-accent) 14%, transparent);
+    .glass-header__link {
+      color: var(--rs-text-muted);
+
+      @media (hover: hover) {
+        &:hover {
+          background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+          color: var(--rs-text);
+        }
+      }
+
+      &.glass-header__link--accent {
         color: var(--rs-accent);
+
+        @media (hover: hover) {
+          &:hover {
+            background: color-mix(in srgb, var(--rs-accent) 14%, transparent);
+            color: var(--rs-accent);
+          }
+        }
       }
     }
   }
@@ -312,9 +414,11 @@
   .restaurant-cart-button {
     color: var(--rs-text-muted);
 
-    &:hover {
-      background: color-mix(in srgb, var(--rs-text) 8%, transparent);
-      color: var(--rs-text);
+    @media (hover: hover) {
+      &:hover {
+        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+        color: var(--rs-text);
+      }
     }
 
     &__badge {
@@ -333,10 +437,12 @@
     border-color: color-mix(in srgb, var(--rs-border) 90%, transparent);
     background: transparent;
 
-    &:hover {
-      color: var(--rs-accent);
-      border-color: var(--rs-accent);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--rs-accent) 14%, transparent);
+    @media (hover: hover) {
+      &:hover {
+        color: var(--rs-accent);
+        border-color: var(--rs-accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--rs-accent) 14%, transparent);
+      }
     }
   }
 
@@ -349,9 +455,11 @@
     color: var(--rs-text-muted);
     box-shadow: 0 2px 8px color-mix(in srgb, var(--rs-text) 14%, transparent);
 
-    &:hover {
-      background: var(--rs-surface);
-      color: var(--rs-text);
+    @media (hover: hover) {
+      &:hover {
+        background: var(--rs-surface);
+        color: var(--rs-text);
+      }
     }
   }
 
@@ -362,13 +470,16 @@
 
   .menu-product-modal__counter {
     background: color-mix(in srgb, var(--rs-text) 8%, var(--rs-bg));
+    border: 1px solid var(--rs-border);
   }
 
   .menu-product-modal__counter-btn {
     color: var(--rs-text);
 
-    &:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--rs-text) 10%, transparent);
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--rs-text) 10%, transparent);
+      }
     }
 
     &:disabled {
@@ -410,9 +521,11 @@
     background: color-mix(in srgb, var(--rs-surface) 92%, transparent);
     color: var(--rs-text-muted);
 
-    &:hover {
-      background: var(--rs-surface);
-      color: var(--rs-text);
+    @media (hover: hover) {
+      &:hover {
+        background: var(--rs-surface);
+        color: var(--rs-text);
+      }
     }
   }
 
@@ -420,9 +533,11 @@
     background: color-mix(in srgb, var(--rs-surface) 92%, transparent);
     color: var(--rs-text-muted);
 
-    &:hover {
-      background: var(--rs-surface);
-      color: var(--rs-text);
+    @media (hover: hover) {
+      &:hover {
+        background: var(--rs-surface);
+        color: var(--rs-text);
+      }
     }
   }
 
@@ -445,15 +560,49 @@
         color: var(--rs-text-muted);
       }
 
-      input {
+      input:not(.phone-input__control),
+      .phone-input {
         background: var(--rs-bg);
         border-color: var(--rs-border);
         color: var(--rs-text);
+      }
 
-        &:focus {
-          outline: none;
-          border-color: var(--rs-accent);
-          box-shadow: 0 0 0 3px color-mix(in srgb, var(--rs-accent) 15%, transparent);
+      .phone-input {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        font-weight: 400;
+      }
+
+      input:not(.phone-input__control):focus,
+      .phone-input:focus-within {
+        outline: none;
+        border-color: var(--rs-focus-border);
+        box-shadow: 0 0 0 3px var(--rs-focus-ring);
+      }
+
+      .phone-input__prefix {
+        color: var(--rs-text);
+        font-family: inherit;
+        font-weight: inherit;
+      }
+
+      .phone-input__control {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        color: var(--rs-text);
+        font-family: inherit !important;
+        font-size: inherit !important;
+        font-weight: inherit !important;
+
+        &::placeholder {
+          color: var(--rs-text-soft);
+        }
+
+        &:focus,
+        &:focus-visible {
+          border: none;
+          box-shadow: none;
         }
       }
     }
@@ -461,9 +610,11 @@
     .auth-password__toggle {
       color: var(--rs-text-muted);
 
-      &:hover {
-        color: var(--rs-text);
-        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--rs-text);
+          background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+        }
       }
     }
 
@@ -485,8 +636,10 @@
   .restaurant-cart-modal__counter-btn {
     color: var(--rs-text);
 
-    &:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--rs-text) 10%, transparent);
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--rs-text) 10%, transparent);
+      }
     }
   }
 
@@ -495,15 +648,76 @@
   }
 
   .restaurant-cart-modal__field {
-    span {
+    > span,
+    > label {
       color: var(--rs-text-muted);
     }
 
-    input {
+    input:not(.phone-input__control),
+    textarea,
+    .phone-input {
       background: var(--rs-bg);
       border-color: var(--rs-border);
       color: var(--rs-text);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
+
+    .phone-input {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, sans-serif;
+      font-weight: 400;
+    }
+
+    .phone-input__prefix {
+      color: var(--rs-text);
+      font-family: inherit;
+      font-weight: inherit;
+    }
+
+    .phone-input__control {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      color: var(--rs-text);
+      font-family: inherit !important;
+      font-size: 1em !important;
+      font-weight: 400 !important;
+      line-height: 1.25 !important;
+
+      &::placeholder {
+        color: var(--rs-text-soft);
+      }
+
+      &:focus,
+      &:focus-visible {
+        border: none;
+        box-shadow: none;
+      }
+    }
+
+    input:not(.phone-input__control):focus,
+    .phone-input:focus-within {
+      outline: none;
+      border-color: var(--rs-focus-border);
+      box-shadow: 0 0 0 3px var(--rs-focus-ring);
+    }
+  }
+
+  .restaurant-cart-modal__checkbox {
+    color: var(--rs-text);
+
+    input {
+      accent-color: var(--rs-accent);
+    }
+  }
+
+  .restaurant-cart-modal__recipient {
+    background: color-mix(in srgb, var(--rs-text) 5%, var(--rs-bg));
+    border-color: var(--rs-border);
+  }
+
+  .restaurant-cart-modal__recipient-hint {
+    color: var(--rs-text-muted);
   }
 
   .restaurant-cart-modal__footer {
@@ -526,9 +740,11 @@
   }
 
   .menu-product-card {
-    &:hover {
-      border-color: color-mix(in srgb, var(--rs-text) 12%, var(--rs-border));
-      box-shadow: 0 8px 24px color-mix(in srgb, var(--rs-text) 12%, transparent);
+    @media (hover: hover) {
+      &:hover {
+        border-color: color-mix(in srgb, var(--rs-text) 12%, var(--rs-border));
+        box-shadow: 0 8px 24px color-mix(in srgb, var(--rs-text) 12%, transparent);
+      }
     }
   }
 
@@ -541,15 +757,23 @@
         box-shadow 0.18s ease,
         transform 0.18s ease;
 
-      &:hover {
-        box-shadow: 0 14px 34px color-mix(in srgb, var(--rs-text) 18%, transparent);
-        transform: translateY(-3px);
+      @media (hover: hover) {
+        &:hover {
+          box-shadow: 0 14px 34px color-mix(in srgb, var(--rs-text) 18%, transparent);
+          transform: translateY(-3px);
+        }
       }
     }
 
     .menu-product-card__media {
-      margin: 0.5rem;
-      border-radius: calc(var(--rs-btn-radius) + 0.5rem);
+      /* Вложенный радиус = радиус карточки − inset, иначе кривые «ломаются». */
+      --rs-elevated-media-inset: 0.5rem;
+      margin: var(--rs-elevated-media-inset);
+      border-radius: max(
+        0px,
+        calc(var(--rs-card-radius, 16px) - var(--rs-elevated-media-inset))
+      );
+      overflow: hidden;
     }
 
     .menu-product-card__body {
@@ -571,6 +795,8 @@
         content: '';
         position: absolute;
         inset: 0;
+        z-index: 1;
+        pointer-events: none;
         background: linear-gradient(
           to top,
           color-mix(in srgb, var(--rs-bg) 94%, transparent) 6%,
@@ -605,23 +831,25 @@
       box-shadow: none;
       padding-bottom: 1rem;
 
-      &:hover {
-        box-shadow: none;
+      @media (hover: hover) {
+        &:hover {
+          box-shadow: none;
 
-        .menu-product-card__media img {
-          filter: brightness(0.96);
-        }
+          .menu-product-card__media img {
+            filter: brightness(0.96);
+          }
 
-        .menu-product-card__price {
-          text-decoration: underline;
-          text-underline-offset: 0.3rem;
-          text-decoration-color: var(--rs-accent);
+          .menu-product-card__price {
+            text-decoration: underline;
+            text-underline-offset: 0.3rem;
+            text-decoration-color: var(--rs-accent);
+          }
         }
       }
     }
 
     .menu-product-card__media {
-      border-radius: calc(var(--rs-btn-radius) + 0.5rem);
+      border-radius: calc(var(--rs-media-radius) + 0.25rem);
     }
 
     .menu-product-card__body {
@@ -637,9 +865,11 @@
       backdrop-filter: blur(12px) saturate(140%);
       -webkit-backdrop-filter: blur(12px) saturate(140%);
 
-      &:hover {
-        border-color: var(--rs-accent);
-        box-shadow: 0 10px 28px color-mix(in srgb, var(--rs-text) 16%, transparent);
+      @media (hover: hover) {
+        &:hover {
+          border-color: var(--rs-accent);
+          box-shadow: 0 10px 28px color-mix(in srgb, var(--rs-text) 16%, transparent);
+        }
       }
     }
 
@@ -649,15 +879,17 @@
   }
 
   &[data-rs-card-style='magazine'] {
+    /* Журнальные карточки компактны по высоте — оставляем по одной в ряд на мобиле. */
     .restaurant-menu__grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem;
 
       @media (min-width: 720px) {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
       }
 
       @media (min-width: 1024px) {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
       }
     }
 
@@ -673,7 +905,12 @@
       width: 96px;
       height: 96px;
       aspect-ratio: auto;
-      border-radius: calc(var(--rs-btn-radius) + 0.25rem);
+      border-radius: var(--rs-media-radius);
+
+      /* Маленькое превью — лайк не на фото. */
+      .menu-product-card__favorite {
+        display: none;
+      }
     }
 
     .menu-product-card__body {
@@ -681,11 +918,20 @@
       min-width: 0;
       padding: 0;
       gap: 0.25rem;
+      position: relative;
     }
 
     .menu-product-card__title {
       font-size: 1.125rem;
       line-height: 1.3;
+      padding-right: 2.25rem;
+    }
+
+    .menu-product-card__favorite--magazine {
+      display: inline-flex;
+      position: absolute;
+      top: 0;
+      right: 0;
     }
 
     .menu-product-card__price {
@@ -715,24 +961,18 @@
       }
     }
 
+    /* На узких экранах оставляем горизонтальную журнальную компоновку,
+       только чуть уменьшаем превью и типографику. */
     @media (max-width: 639px) {
       .menu-product-card {
-        flex-direction: column;
-        align-items: stretch;
         gap: 0.75rem;
-        padding: 0.875rem;
-      }
-
-      .menu-product-card__media,
-      .menu-product-card__body {
-        order: unset !important;
+        padding: 0.75rem;
       }
 
       .menu-product-card__media {
-        flex: none;
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16 / 9;
+        flex-basis: 80px;
+        width: 80px;
+        height: 80px;
       }
 
       .menu-product-card__title {
@@ -750,8 +990,10 @@
       .menu-product-card {
         overflow: hidden;
 
-        &:hover {
-          transform: none;
+        @media (hover: hover) {
+          &:hover {
+            transform: none;
+          }
         }
       }
     }
@@ -866,16 +1108,31 @@
       background: var(--rs-surface);
       color: var(--rs-text-muted);
 
-      &:hover:not(.restaurant-menu__category-nav-btn--active) {
-        border-color: color-mix(in srgb, var(--rs-accent) 45%, var(--rs-border));
-        color: var(--rs-text);
+      @media (hover: hover) {
+        &:hover:not(.restaurant-menu__category-nav-btn--active) {
+          border-color: color-mix(in srgb, var(--rs-accent) 45%, var(--rs-border));
+          color: var(--rs-text);
+        }
       }
 
-      &--active,
-      &--active:hover {
+      &--active {
         border-color: var(--rs-accent);
         background: var(--rs-accent);
         color: var(--rs-on-accent, #ffffff);
+      }
+    }
+  }
+
+  .scroll-to-top {
+    border-color: color-mix(in srgb, var(--rs-accent) 32%, var(--rs-border));
+    background: var(--rs-surface);
+    color: var(--rs-accent);
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--rs-text) 12%, transparent);
+
+    @media (hover: hover) {
+      &:hover {
+        background: color-mix(in srgb, var(--rs-accent) 14%, var(--rs-surface));
+        border-color: var(--rs-accent);
       }
     }
   }

@@ -1,8 +1,12 @@
-/** Белорусский рубль (BYN) — официальный графический знак с 2026 года */
+/** Белорусский рубль (BYN) — официальный графический знак (Нацбанк РБ, 2026). */
 export const CURRENCY_CODE = 'BYN';
 
-/** Глиф знака в иконочном шрифте Нацбанка (U+E901) */
+/**
+ * PUA-глиф знака в иконочном шрифте nbrb (U+E901).
+ * В UI предпочтительнее лигатура текста «BYN» через класс `.nbrb-icon`.
+ * @see https://www.nbrb.by/coinsbanknotes/byn-ico/nbrb-font
+ */
 export const CURRENCY_GLYPH = '\uE901';
 
-/** Для подписи в формах — буква «Б» в разметке, отображение через шрифт nbrb */
-export const CURRENCY_MARKUP_CHAR = 'Б';
+/** Текст для лигатуры nbrb (официальный способ вставки). */
+export const CURRENCY_LIGATURE = 'BYN';

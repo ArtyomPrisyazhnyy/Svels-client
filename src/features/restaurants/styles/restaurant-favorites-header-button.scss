@@ -1,0 +1,27 @@
+.restaurant-favorites-header-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+  flex-shrink: 0;
+  text-decoration: none;
+
+  @media (hover: hover) {
+    &:hover {
+      background: rgba(241, 245, 249, 0.75);
+    }
+  }
+}
+
+.restaurant-favorites-header-button__icon {
+  width: 1.35rem;
+  height: 1.35rem;
+}

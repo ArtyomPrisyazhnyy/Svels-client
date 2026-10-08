@@ -18,6 +18,7 @@ type RestaurantTab = 'register' | 'login';
 
 interface LocationField {
   label: string;
+  city: string;
   address: string;
 }
 
@@ -40,7 +41,7 @@ export function RestaurantAuthPage() {
   const [isChain, setIsChain] = useState(false);
   const [description, setDescription] = useState('');
   const [locations, setLocations] = useState<LocationField[]>([
-    { label: '', address: '' },
+    { label: '', city: '', address: '' },
   ]);
 
   function updateLocation(index: number, field: keyof LocationField, value: string) {
@@ -50,7 +51,7 @@ export function RestaurantAuthPage() {
   }
 
   function addLocation() {
-    setLocations((prev) => [...prev, { label: '', address: '' }]);
+    setLocations((prev) => [...prev, { label: '', city: '', address: '' }]);
   }
 
   function removeLocation(index: number) {
@@ -73,9 +74,9 @@ export function RestaurantAuthPage() {
       return;
     }
 
-    const filledLocations = locations.filter((l) => l.address.trim());
+    const filledLocations = locations.filter((l) => l.address.trim() && l.city.trim());
     if (!filledLocations.length) {
-      setError('Укажите хотя бы один адрес');
+      setError('Укажите город и адрес хотя бы одной точки');
       return;
     }
 
@@ -92,6 +93,7 @@ export function RestaurantAuthPage() {
         isChain,
         locations: filledLocations.map((l) => ({
           label: l.label.trim() || undefined,
+          city: l.city.trim(),
           address: l.address.trim(),
         })),
       });
@@ -107,7 +109,7 @@ export function RestaurantAuthPage() {
   }
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" data-testid="restaurant-auth-page">
       <div className="auth-card auth-card--wide">
         <Link href="/" className="auth-card__back">
           ← На главную
@@ -121,6 +123,7 @@ export function RestaurantAuthPage() {
           <button
             type="button"
             className={`auth-tabs__btn ${tab === 'register' ? 'auth-tabs__btn--active' : ''}`}
+            data-testid="auth-tab-register"
             onClick={() => {
               setTab('register');
               setError(null);
@@ -132,6 +135,7 @@ export function RestaurantAuthPage() {
           <button
             type="button"
             className={`auth-tabs__btn ${tab === 'login' ? 'auth-tabs__btn--active' : ''}`}
+            data-testid="auth-tab-login"
             onClick={() => {
               setTab('login');
               setError(null);
@@ -158,8 +162,16 @@ export function RestaurantAuthPage() {
           </div>
         ) : (
           <form className="auth-form restaurant-auth" onSubmit={handleRegisterSubmit}>
-            {error && <p className="auth-error">{error}</p>}
-            {success && <p className="auth-success">{success}</p>}
+            {error && (
+              <p className="auth-error" data-testid="auth-error">
+                {error}
+              </p>
+            )}
+            {success && (
+              <p className="auth-success" data-testid="auth-success">
+                {success}
+              </p>
+            )}
 
             <fieldset className="restaurant-auth__section">
               <legend>Контактное лицо</legend>
@@ -270,6 +282,17 @@ export function RestaurantAuthPage() {
                       />
                     </div>
                   )}
+                  <div className="auth-field">
+                    <label htmlFor={`loc-city-${index}`}>Город</label>
+                    <input
+                      id={`loc-city-${index}`}
+                      required={index === 0}
+                      minLength={2}
+                      placeholder="Минск"
+                      value={loc.city}
+                      onChange={(e) => updateLocation(index, 'city', e.target.value)}
+                    />
+                  </div>
                   <div className="auth-field">
                     <label htmlFor={`loc-address-${index}`}>Адрес</label>
                     <input

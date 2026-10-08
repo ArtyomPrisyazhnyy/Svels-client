@@ -1,0 +1,148 @@
+.locations-admin__title {
+  grid-column: 1 / -1;
+  margin: 0 0 0.25rem;
+  font-size: 1.35rem;
+}
+
+.locations-admin {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+
+  h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.1rem;
+  }
+}
+
+.locations-admin__panel,
+.locations-admin__list-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.locations-admin__hint,
+.locations-admin__notice,
+.locations-admin__empty {
+  margin: 0 0 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.locations-admin__error {
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.locations-admin__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.locations-admin__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  input {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+    font: inherit;
+  }
+}
+
+.locations-admin__map-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: #64748b;
+
+  button {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    border-radius: 999px;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+  }
+}
+
+.locations-admin__actions {
+  display: flex;
+  gap: 0.75rem;
+
+  button {
+    border: none;
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  button[type='submit'] {
+    background: #0f766e;
+    color: #ffffff;
+  }
+
+  button[type='button'] {
+    background: #f1f5f9;
+  }
+}
+
+.locations-admin__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.locations-admin__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  p {
+    margin: 0.25rem 0 0;
+    color: #475569;
+    font-size: 0.9rem;
+  }
+}
+
+.locations-admin__item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  button {
+    border: none;
+    background: transparent;
+    color: #0f766e;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: right;
+  }
+}

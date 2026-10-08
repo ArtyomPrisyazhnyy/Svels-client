@@ -6,8 +6,9 @@ import type {
   MenuModifierGroup,
   MenuItemNutrition,
 } from '../../../shared/types/menu';
-import { MAX_MENU_ITEM_GALLERY_IMAGES, resolveImageUrl } from '../../../shared/types/menu';
+import { MAX_MENU_ITEM_GALLERY_IMAGES } from '../../../shared/types/menu';
 import { CurrencySign } from '../../../shared/components/CurrencySign';
+import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import {
   createMenuItem,
   updateMenuItem,
@@ -89,11 +90,14 @@ export function MenuItemForm({
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState('');
   const [price, setPrice] = useState('');
+  const [oldPrice, setOldPrice] = useState('');
   const [nutrition, setNutrition] = useState<MenuItemNutrition>(emptyNutrition());
   const [modifierGroups, setModifierGroups] = useState<MenuModifierGroup[]>([]);
   const [imageUrl, setImageUrl] = useState('');
+  const [imageWebpUrl, setImageWebpUrl] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState('');
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
+  const [galleryWebpUrls, setGalleryWebpUrls] = useState<string[]>([]);
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -107,11 +111,14 @@ export function MenuItemForm({
     setDescription('');
     setIngredients('');
     setPrice('');
+    setOldPrice('');
     setNutrition(emptyNutrition());
     setModifierGroups([]);
     setImageUrl('');
+    setImageWebpUrl(null);
     setImagePreview('');
     setGalleryUrls([]);
+    setGalleryWebpUrls([]);
     setError(null);
   }
 
@@ -126,11 +133,18 @@ export function MenuItemForm({
     setDescription(editingItem.description ?? '');
     setIngredients(editingItem.ingredients ?? '');
     setPrice(String(editingItem.price));
+    setOldPrice(
+      editingItem.oldPrice != null && Number(editingItem.oldPrice) > 0
+        ? String(editingItem.oldPrice)
+        : '',
+    );
     setNutrition(editingItem.nutrition ?? emptyNutrition());
     setModifierGroups(editingItem.modifierGroups ?? []);
     setImageUrl(editingItem.imageUrl);
+    setImageWebpUrl(editingItem.imageWebpUrl ?? null);
     setImagePreview('');
     setGalleryUrls(editingItem.galleryUrls ?? []);
+    setGalleryWebpUrls(editingItem.galleryWebpUrls ?? []);
     setError(null);
   }, [editingItem]);
 
@@ -150,9 +164,11 @@ export function MenuItemForm({
     try {
       const result = await uploadMenuImage(restaurantId, token, file);
       setImageUrl(result.imageUrl);
+      setImageWebpUrl(result.imageWebpUrl);
     } catch (err) {
       setImagePreview('');
       setImageUrl('');
+      setImageWebpUrl(null);
       setError(err instanceof Error ? err.message : 'Не удалось загрузить фото');
     } finally {
       setUploading(false);
@@ -173,12 +189,15 @@ export function MenuItemForm({
     setGalleryUploading(true);
 
     try {
-      const uploaded: string[] = [];
+      const uploadedUrls: string[] = [];
+      const uploadedWebpUrls: string[] = [];
       for (const file of toUpload) {
         const result = await uploadMenuImage(restaurantId, token, file);
-        uploaded.push(result.imageUrl);
+        uploadedUrls.push(result.imageUrl);
+        uploadedWebpUrls.push(result.imageWebpUrl);
       }
-      setGalleryUrls((prev) => [...prev, ...uploaded]);
+      setGalleryUrls((prev) => [...prev, ...uploadedUrls]);
+      setGalleryWebpUrls((prev) => [...prev, ...uploadedWebpUrls]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось загрузить фото галереи');
     } finally {
@@ -188,19 +207,27 @@ export function MenuItemForm({
 
   function handleRemoveGalleryImage(index: number) {
     setGalleryUrls((prev) => prev.filter((_, i) => i !== index));
+    setGalleryWebpUrls((prev) => prev.filter((_, i) => i !== index));
   }
 
   // Продвигает фото из галереи в обложку: старая обложка уходит в галерею на его место.
   function handleMakeCover(index: number) {
     if (!imageUrl) return;
     const newCover = galleryUrls[index];
+    const newCoverWebp = galleryWebpUrls[index] ?? null;
     if (!newCover) return;
     setGalleryUrls((prev) => {
       const next = [...prev];
       next[index] = imageUrl;
       return next;
     });
+    setGalleryWebpUrls((prev) => {
+      const next = [...prev];
+      next[index] = imageWebpUrl ?? '';
+      return next;
+    });
     setImageUrl(newCover);
+    setImageWebpUrl(newCoverWebp);
     setImagePreview('');
   }
 
@@ -231,6 +258,20 @@ export function MenuItemForm({
       return;
     }
 
+    const trimmedOldPrice = oldPrice.trim();
+    let parsedOldPrice: number | null = null;
+    if (trimmedOldPrice) {
+      parsedOldPrice = Number(trimmedOldPrice);
+      if (Number.isNaN(parsedOldPrice) || parsedOldPrice < 0) {
+        setError('Укажите корректную старую цену или оставьте поле пустым');
+        return;
+      }
+      if (parsedOldPrice <= parsedPrice) {
+        setError('Старая цена должна быть больше актуальной');
+        return;
+      }
+    }
+
     for (const group of modifierGroups) {
       if (!group.name.trim()) {
         setError('У каждой группы модификаторов должно быть название');
@@ -259,8 +300,11 @@ export function MenuItemForm({
       ingredients: ingredients.trim() || undefined,
       nutrition: nutritionPayload,
       price: parsedPrice,
+      oldPrice: parsedOldPrice,
       imageUrl,
+      imageWebpUrl,
       galleryUrls,
+      galleryWebpUrls,
       modifierGroups: modifierGroups.length ? modifierGroups : undefined,
     };
 
@@ -309,15 +353,24 @@ export function MenuItemForm({
           onChange={(e) => void handleImageChange(e.target.files?.[0])}
         />
         {uploading && <p className="menu-item-form__hint">Загрузка…</p>}
-        {(imagePreview || imageUrl) && (
+        {imagePreview ? (
           <img
             className="menu-item-form__preview menu-item-form__preview--cover"
-            src={imagePreview || resolveImageUrl(imageUrl)}
+            src={imagePreview}
             alt="Превью обложки"
           />
+        ) : (
+          imageUrl && (
+            <ResponsiveImage
+              className="menu-item-form__preview menu-item-form__preview--cover"
+              src={imageUrl}
+              webpSrc={imageWebpUrl}
+              alt="Превью обложки"
+            />
+          )
         )}
         <p className="menu-item-form__hint">
-          Обложка отображается в карточке товара в меню.
+          Обложка отображается в карточке товара в меню. Сервер сохраняет WebP и JPEG/PNG.
         </p>
       </div>
 
@@ -337,7 +390,11 @@ export function MenuItemForm({
           <div className="menu-item-form__gallery">
             {galleryUrls.map((url, index) => (
               <div className="menu-item-form__gallery-item" key={`${url}-${index}`}>
-                <img src={resolveImageUrl(url)} alt={`Доп. фото ${index + 1}`} />
+                <ResponsiveImage
+                  src={url}
+                  webpSrc={galleryWebpUrls[index]}
+                  alt={`Доп. фото ${index + 1}`}
+                />
                 <div className="menu-item-form__gallery-actions">
                   <button
                     type="button"
@@ -420,21 +477,42 @@ export function MenuItemForm({
         </p>
       </div>
 
-      <div className="menu-item-form__field">
-        <label htmlFor="item-price">
-          Базовая цена (
-          <CurrencySign />
-          ) *
-        </label>
-        <input
-          id="item-price"
-          type="number"
-          min="0"
-          step="0.01"
-          required
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
+      <div className="menu-item-form__row">
+        <div className="menu-item-form__field">
+          <label htmlFor="item-price">
+            Актуальная цена (
+            <CurrencySign />
+            ) *
+          </label>
+          <input
+            id="item-price"
+            type="number"
+            min="0"
+            step="0.01"
+            required
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
+        </div>
+        <div className="menu-item-form__field">
+          <label htmlFor="item-old-price">
+            Старая цена (
+            <CurrencySign />
+            )
+          </label>
+          <input
+            id="item-old-price"
+            type="number"
+            min="0"
+            step="0.01"
+            value={oldPrice}
+            onChange={(e) => setOldPrice(e.target.value)}
+            placeholder="Необязательно"
+          />
+          <p className="menu-item-form__hint">
+            Если указана — показывается перечёркнутой рядом с актуальной (скидка).
+          </p>
+        </div>
       </div>
 
       <div className="menu-item-form__field">

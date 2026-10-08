@@ -78,6 +78,7 @@ export default function OrderSettingsAdminPage() {
         paymentCash: data.paymentCash,
         paymentCardOnSite: data.paymentCardOnSite,
         paymentOnline: data.paymentOnline,
+        deliveryForSomeoneElse: data.deliveryForSomeoneElse,
       });
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Не удалось загрузить настройки');
@@ -92,7 +93,13 @@ export default function OrderSettingsAdminPage() {
 
   function handleToggle(key: SettingsKey, value: boolean) {
     setSuccess(null);
-    setDraft((prev) => ({ ...prev, [key]: value }));
+    setDraft((prev) => {
+      const next = { ...prev, [key]: value };
+      if (key === 'fulfillmentDelivery' && !value) {
+        next.deliveryForSomeoneElse = false;
+      }
+      return next;
+    });
   }
 
   async function handleSave() {
@@ -112,6 +119,7 @@ export default function OrderSettingsAdminPage() {
         paymentCash: updated.paymentCash,
         paymentCardOnSite: updated.paymentCardOnSite,
         paymentOnline: updated.paymentOnline,
+        deliveryForSomeoneElse: updated.deliveryForSomeoneElse,
       });
       setSuccess('Настройки сохранены');
       await revalidateRestaurantPublicPage(restaurantId);
@@ -129,7 +137,8 @@ export default function OrderSettingsAdminPage() {
       settings.fulfillmentDineIn !== draft.fulfillmentDineIn ||
       settings.paymentCash !== draft.paymentCash ||
       settings.paymentCardOnSite !== draft.paymentCardOnSite ||
-      settings.paymentOnline !== draft.paymentOnline);
+      settings.paymentOnline !== draft.paymentOnline ||
+      settings.deliveryForSomeoneElse !== draft.deliveryForSomeoneElse);
 
   if (!restaurantId) {
     return (
@@ -201,6 +210,28 @@ export default function OrderSettingsAdminPage() {
                 />
               ))}
             </div>
+          </section>
+
+          <section className="order-settings-admin__panel order-settings-admin__panel--wide">
+            <h3>Доставка другому человеку</h3>
+            <p className="order-settings-admin__hint">
+              Если включено, в корзине при выборе доставки появится опция указать имя и телефон
+              получателя — например, когда гость заказывает цветы или подарок другому человеку.
+            </p>
+            <div className="order-settings-admin__options">
+              <SettingsToggle
+                title="Разрешить заказ для другого человека"
+                description="Гость сможет отметить «Доставка другому человеку» и заполнить контакты получателя."
+                checked={Boolean(draft.deliveryForSomeoneElse)}
+                disabled={saving || !draft.fulfillmentDelivery}
+                onChange={(value) => handleToggle('deliveryForSomeoneElse', value)}
+              />
+            </div>
+            {!draft.fulfillmentDelivery && (
+              <p className="order-settings-admin__hint order-settings-admin__hint--warn">
+                Сначала включите способ получения «Доставка».
+              </p>
+            )}
           </section>
         </div>
       )}

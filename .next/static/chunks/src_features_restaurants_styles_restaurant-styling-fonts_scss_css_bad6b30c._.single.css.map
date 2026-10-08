@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///turbopack:///[project]/src/features/restaurants/styles/home/artyom/%D0%94%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D1%8B/Svels/Svels-client/src/features/restaurants/styles/restaurant-styling-fonts.scss","turbopack:///turbopack:///[project]/src/features/restaurants/styles/home/artyom/Документы/Svels/Svels-client/src/features/restaurants/styles/restaurant-styling-fonts.scss"],"sourcesContent":["@font-face{font-family:\"Gothic №60\";src:url(\"/fonts/gothic-60/Gothic60-Regular.otf\") format(\"opentype\");font-weight:400;font-style:normal;font-display:swap}","@font-face {\n  font-family: \"Gothic №60\";\n  src: url('/fonts/gothic-60/Gothic60-Regular.otf') format('opentype');\n  font-weight: 400;\n  font-style: normal;\n  font-display: swap;\n}\n"],"names":[],"mappings":"AAAA"}}]
-}

@@ -13,6 +13,8 @@ export interface RestaurantOrderSettings {
   paymentCash: boolean;
   paymentCardOnSite: boolean;
   paymentOnline: boolean;
+  /** Гость может указать получателя доставки (другое имя и телефон). */
+  deliveryForSomeoneElse: boolean;
   updatedAt: string;
 }
 
@@ -25,6 +27,7 @@ export type UpdateRestaurantOrderSettingsPayload = Partial<
     | 'paymentCash'
     | 'paymentCardOnSite'
     | 'paymentOnline'
+    | 'deliveryForSomeoneElse'
   >
 >;
 

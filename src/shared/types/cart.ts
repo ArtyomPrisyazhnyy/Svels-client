@@ -13,6 +13,7 @@ export interface CartLineItem {
   name: string;
   variantLabel: string | null;
   imageUrl: string;
+  imageWebpUrl?: string | null;
   quantity: number;
   unitPrice: number;
   modifiers: CartModifierLine[];
@@ -25,4 +26,9 @@ export interface CartCheckoutDraft {
   customerName: string;
   phone: string;
   fulfillment: FulfillmentMethod;
+  orderForSomeoneElse?: boolean;
+  recipientName?: string;
+  recipientPhone?: string;
+  /** Комментарий к заказу (опционально). */
+  comment?: string;
 }

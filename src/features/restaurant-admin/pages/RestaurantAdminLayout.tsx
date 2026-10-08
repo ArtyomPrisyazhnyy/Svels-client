@@ -1,7 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import {
+  canAccessRestaurantAdminPath,
+  getRestaurantAdminHomePath,
+  isRestaurantStaffRole,
+  RESTAURANT_ADMIN_NAV,
+  RESTAURANT_STAFF_LABELS,
+  staffHasPermission,
+} from '../../../shared/auth/restaurant-staff';
 import { useAuthStore } from '../../../store/auth.store';
 import '../styles/restaurant-admin.scss';
 import '../styles/restaurant-admin-layout.scss';
@@ -10,37 +19,47 @@ export default function RestaurantAdminLayout({ children }: { children: React.Re
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const pathname = usePathname();
+  const router = useRouter();
+  const role = user?.role;
+  const badge =
+    role && isRestaurantStaffRole(role) ? RESTAURANT_STAFF_LABELS[role] : 'Админ заведения';
 
-  const navItems = [
-    { to: '/restaurant-admin/preview', label: 'Страница заведения' },
-    { to: '/restaurant-admin/branding', label: 'Брендинг' },
-    { to: '/restaurant-admin/styling', label: 'Стилизация' },
-    { to: '/restaurant-admin/menu', label: 'Меню' },
-    { to: '/restaurant-admin/order-settings', label: 'Условия заказа' },
-    { to: '/restaurant-admin/booking-settings', label: 'Бронирование' },
-    { to: '/restaurant-admin/floor-plan', label: 'Планировка' },
-    { to: '/restaurant-admin/bookings', label: 'Брони' },
-    { to: '/restaurant-admin/social-links', label: 'Соцсети' },
-    { to: '/restaurant-admin/account', label: 'Аккаунт' },
-  ];
+  const navItems = RESTAURANT_ADMIN_NAV.filter(
+    (item) => item.permission === null || staffHasPermission(role, item.permission),
+  );
+
+  useEffect(() => {
+    if (!role || !pathname) {
+      return;
+    }
+
+    if (!canAccessRestaurantAdminPath(role, pathname)) {
+      router.replace(getRestaurantAdminHomePath(role));
+    }
+  }, [role, pathname, router]);
 
   return (
-    <div className="restaurant-admin">
+    <div className="restaurant-admin" data-testid="restaurant-admin-layout">
       <header className="glass-header restaurant-admin__header">
         <Link href="/" className="glass-header__link glass-header__link--accent restaurant-admin__back">
           ← На главную
         </Link>
         <h1 className="glass-header__title">
           Svels
-          <span className="restaurant-admin__badge">Админ заведения</span>
+          <span className="restaurant-admin__badge">{badge}</span>
         </h1>
-        <button type="button" className="glass-header__link restaurant-admin__logout" onClick={logout}>
+        <button
+          type="button"
+          className="glass-header__link restaurant-admin__logout"
+          onClick={logout}
+          data-testid="restaurant-admin-logout"
+        >
           Выйти
         </button>
       </header>
 
       <div className="restaurant-admin__body">
-        <nav className="restaurant-admin__nav">
+        <nav className="restaurant-admin__nav" data-testid="restaurant-admin-nav">
           {navItems.map((item) => (
             <Link
               key={item.to}
@@ -48,6 +67,7 @@ export default function RestaurantAdminLayout({ children }: { children: React.Re
               className={`restaurant-admin__nav-link${
                 pathname.startsWith(item.to) ? ' restaurant-admin__nav-link--active' : ''
               }`}
+              data-testid={`nav-${item.to.replace('/restaurant-admin/', '')}`}
             >
               {item.label}
             </Link>

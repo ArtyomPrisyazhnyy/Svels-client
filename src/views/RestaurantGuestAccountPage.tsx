@@ -72,7 +72,7 @@ export function RestaurantGuestAccountPage({
   }
 
   return (
-    <div className="home">
+    <div className="home" data-testid="guest-account-page">
       <header className="glass-header home__header">
         <Link
           href={paths.home}

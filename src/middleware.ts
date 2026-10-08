@@ -3,7 +3,7 @@ import { buildRestaurantGuestPath } from '@/shared/routing/restaurant-guest-path
 import { isPlatformHost, normalizeHost } from '@/shared/tenant/platform-hosts';
 import { resolveRestaurantByDomain } from '@/shared/tenant/resolve-restaurant';
 
-const TENANT_GUEST_SEGMENTS = new Set(['booking', 'pre-order', 'account', 'auth']);
+const TENANT_GUEST_SEGMENTS = new Set(['booking', 'pre-order', 'account', 'auth', 'favorites']);
 const TENANT_BLOCKED_PREFIXES = ['/admin', '/restaurant-admin'];
 
 function mapTenantPath(pathname: string, restaurantId: string): string {
@@ -15,10 +15,15 @@ function mapTenantPath(pathname: string, restaurantId: string): string {
     return buildRestaurantGuestPath(restaurantId, 'home');
   }
 
+  // bePaid return URL на custom domain: /payment/result?...
+  if (normalizedPath === '/payment/result' || normalizedPath.startsWith('/payment/result/')) {
+    return `/restaurants/${restaurantId}/payment/result`;
+  }
+
   const segment = normalizedPath.slice(1).split('/')[0];
 
   if (segment && TENANT_GUEST_SEGMENTS.has(segment)) {
-    return buildRestaurantGuestPath(restaurantId, segment as 'booking' | 'pre-order' | 'account' | 'auth');
+    return buildRestaurantGuestPath(restaurantId, segment as 'booking' | 'pre-order' | 'account' | 'auth' | 'favorites');
   }
 
   return buildRestaurantGuestPath(restaurantId, 'home');
@@ -54,8 +59,10 @@ export async function middleware(request: NextRequest) {
     pathname !== '/' && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
 
   if (normalizedPath !== '/') {
+    const isPaymentResult =
+      normalizedPath === '/payment/result' || normalizedPath.startsWith('/payment/result/');
     const segment = normalizedPath.slice(1).split('/')[0];
-    if (!segment || !TENANT_GUEST_SEGMENTS.has(segment)) {
+    if (!isPaymentResult && (!segment || !TENANT_GUEST_SEGMENTS.has(segment))) {
       return new NextResponse('Страница не найдена', { status: 404 });
     }
   }

@@ -8,6 +8,11 @@ import type { RestaurantStyling } from '@/shared/types/restaurant-styling';
 import type { BookingSettings } from '@/shared/types/booking-settings';
 import { DEFAULT_BOOKING_SETTINGS } from '@/shared/types/booking-settings';
 import type { SocialLink } from '@/shared/types/social-link';
+import type { PromoBanner } from '@/shared/types/promo-banner';
+import {
+  DEFAULT_LOYALTY_SETTINGS,
+  type LoyaltySettings,
+} from '@/shared/types/loyalty-settings';
 import { createDefaultRestaurantStyling } from '@/shared/types/restaurant-styling';
 import { serverFetch, type ServerFetchOptions } from '@/shared/api/server-api';
 import {
@@ -32,6 +37,7 @@ const DEFAULT_ORDER_SETTINGS = (restaurantId: string): RestaurantOrderSettings =
   paymentCash: true,
   paymentCardOnSite: true,
   paymentOnline: true,
+  deliveryForSomeoneElse: false,
   updatedAt: new Date().toISOString(),
 });
 
@@ -134,6 +140,18 @@ async function fetchSocialLinks(restaurantId: string): Promise<SocialLink[]> {
   }
 }
 
+async function fetchPromoBanners(restaurantId: string): Promise<PromoBanner[]> {
+  try {
+    return await serverFetch<PromoBanner[]>(
+      `/restaurants/${restaurantId}/promo-banners/active`,
+      undefined,
+      publicPageFetchOptions(restaurantId),
+    );
+  } catch {
+    return [];
+  }
+}
+
 async function fetchBookingSettings(restaurantId: string): Promise<BookingSettings> {
   try {
     return await serverFetch<BookingSettings>(
@@ -146,15 +164,42 @@ async function fetchBookingSettings(restaurantId: string): Promise<BookingSettin
   }
 }
 
+async function fetchLoyaltySettings(restaurantId: string): Promise<LoyaltySettings> {
+  try {
+    return await serverFetch<LoyaltySettings>(
+      `/restaurants/${restaurantId}/loyalty-settings`,
+      undefined,
+      publicPageFetchOptions(restaurantId),
+    );
+  } catch {
+    return {
+      restaurantId,
+      ...DEFAULT_LOYALTY_SETTINGS,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+}
+
 export default async function RestaurantPage({ params }: RestaurantPageProps) {
   const { id } = await params;
-  const [restaurant, socialLinks, menu, orderSettings, styling, bookingSettings] = await Promise.all([
+  const [
+    restaurant,
+    socialLinks,
+    promoBanners,
+    menu,
+    orderSettings,
+    styling,
+    bookingSettings,
+    loyaltySettings,
+  ] = await Promise.all([
     fetchRestaurant(id),
     fetchSocialLinks(id),
+    fetchPromoBanners(id),
     fetchMenu(id),
     fetchOrderSettings(id),
     fetchStyling(id),
     fetchBookingSettings(id),
+    fetchLoyaltySettings(id),
   ]);
 
   if (!restaurant) {
@@ -169,6 +214,8 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
       styling={styling}
       bookingSettings={bookingSettings}
       socialLinks={socialLinks}
+      promoBanners={promoBanners}
+      loyaltySettings={loyaltySettings}
     />
   );
 }

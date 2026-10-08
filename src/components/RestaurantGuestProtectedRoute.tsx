@@ -6,6 +6,7 @@ import { ClientOnly } from '@/components/ClientOnly';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { getPostAuthPath } from '@/shared/routing/get-post-auth-path';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
+import { isRestaurantStaffRole } from '@/shared/auth/restaurant-staff';
 import type { AuthUser } from '@/shared/types/auth';
 import { useAuthStore } from '@/store/auth.store';
 
@@ -26,11 +27,7 @@ function AuthCheckingFallback() {
 }
 
 function canAccessRestaurantGuestArea(user: AuthUser, restaurantId: string): boolean {
-  if (user.role === 'user') {
-    return user.restaurantId === restaurantId;
-  }
-
-  if (user.role === 'restaurant_admin') {
+  if (user.role === 'user' || isRestaurantStaffRole(user.role)) {
     return user.restaurantId === restaurantId;
   }
 
@@ -66,7 +63,7 @@ function RestaurantGuestProtectedRouteInner({
       return;
     }
 
-    if (user.role === 'restaurant_admin' && user.restaurantId !== restaurantId) {
+    if (isRestaurantStaffRole(user.role) && user.restaurantId !== restaurantId) {
       router.replace(getPostAuthPath(user.role, undefined, user.restaurantId));
       return;
     }

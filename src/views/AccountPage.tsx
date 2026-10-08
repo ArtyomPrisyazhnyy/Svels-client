@@ -7,6 +7,7 @@ import { fetchMyRegistration } from '@/features/auth/api/restaurant-registration
 import type { MyRegistrationStatus } from '@/features/auth/api/restaurant-registration.api';
 import { useAuthProfileSync } from '@/hooks/useAuthProfileSync';
 import { getPostAuthPath } from '@/shared/routing/get-post-auth-path';
+import { isRestaurantStaffRole } from '@/shared/auth/restaurant-staff';
 import { useAuthStore } from '@/store/auth.store';
 import './home.scss';
 
@@ -27,7 +28,7 @@ export function AccountPage() {
       return;
     }
 
-    if (user.role === 'super_admin' || user.role === 'restaurant_admin') {
+    if (user.role === 'super_admin' || isRestaurantStaffRole(user.role)) {
       router.replace(getPostAuthPath(user.role));
     }
   }, [user, router]);

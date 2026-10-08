@@ -1,0 +1,420 @@
+$contact-modal-duration: 0.22s;
+$contact-modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
+$contact-primary: #0f766e;
+$contact-primary-strong: #0d5d57;
+$contact-accent: #14b8a6;
+$contact-ink: #0b1a18;
+$contact-ink-muted: #54635f;
+$contact-line: #e3e8e6;
+$contact-surface: #ffffff;
+$contact-error: #dc2626;
+
+.contact-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  border: none;
+  background: rgba(11, 18, 32, 0.55);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $contact-modal-duration $contact-modal-easing;
+
+  &.contact-modal--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.contact-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.contact-modal__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 460px;
+  max-height: min(92vh, 720px);
+  overflow: hidden;
+  background: $contact-surface;
+  border-radius: 22px;
+  box-shadow: 0 28px 60px rgba(11, 18, 32, 0.28);
+  pointer-events: auto;
+  opacity: 0;
+  transform: scale(0.96) translateY(12px);
+  transition:
+    opacity $contact-modal-duration $contact-modal-easing,
+    transform $contact-modal-duration $contact-modal-easing;
+
+  &.contact-modal--active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.contact-modal__close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(241, 245, 249, 0.95);
+  color: #475569;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+
+  &:hover {
+    background: #e2e8f0;
+    color: #0b1220;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.contact-modal__header {
+  padding: 1.6rem 1.5rem 0.5rem;
+}
+
+.contact-modal__title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: $contact-ink;
+}
+
+.contact-modal__subtitle {
+  margin: 0.5rem 0 0;
+  color: $contact-ink-muted;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.contact-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.1rem 1.5rem 1.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.contact-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+}
+
+.contact-modal__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $contact-ink;
+}
+
+.contact-modal__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.8rem 0.95rem;
+  border-radius: 12px;
+  border: 1px solid $contact-line;
+  background: #ffffff;
+  font-size: 1rem;
+  color: $contact-ink;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+  &::placeholder {
+    color: #9aa6a2;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $contact-accent;
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.16);
+  }
+
+  &:disabled {
+    background: #f4f7f6;
+    cursor: not-allowed;
+  }
+}
+
+.contact-modal__radios {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.contact-modal__radio {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid $contact-line;
+  background: #ffffff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    border-color: rgba(20, 184, 166, 0.5);
+    background: #f2fbf8;
+  }
+
+  &:has(.contact-modal__radio-input:disabled) {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &--checked {
+    border-color: $contact-accent;
+    background: #effbf8;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.14);
+  }
+
+}
+
+.contact-modal__radio-control {
+  position: relative;
+  flex: 0 0 1.25rem;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1.6px solid #b7c0bd;
+  background: #ffffff;
+  pointer-events: none;
+  transition: border-color 0.18s ease;
+}
+
+.contact-modal__radio-dot {
+  width: 0.58rem;
+  height: 0.58rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $contact-primary 0%, $contact-accent 100%);
+  transform: scale(0);
+  transition: transform 0.18s ease;
+}
+
+.contact-modal__radio--checked .contact-modal__radio-control {
+  border-color: $contact-primary;
+}
+
+.contact-modal__radio--checked .contact-modal__radio-dot {
+  transform: scale(1);
+}
+
+.contact-modal__radio-input {
+  position: absolute;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+
+  &:focus-visible + .contact-modal__radio-control {
+    outline: 2px solid $contact-primary;
+    outline-offset: 2px;
+  }
+}
+
+.contact-modal__radio-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.contact-modal__radio-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $contact-ink;
+}
+
+.contact-modal__radio-hint {
+  font-size: 0.8rem;
+  color: $contact-ink-muted;
+}
+
+.contact-modal__error {
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: $contact-error;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.contact-modal__submit {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.9rem 1.4rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, $contact-primary 0%, $contact-accent 100%);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.28);
+  transition: transform 0.18s ease, box-shadow 0.2s ease, opacity 0.18s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(15, 118, 110, 0.36);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.contact-modal__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0;
+  cursor: pointer;
+}
+
+.contact-modal__consent-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+
+  &:focus-visible + .contact-modal__consent-box {
+    outline: 2px solid $contact-accent;
+    outline-offset: 2px;
+  }
+
+  &:checked + .contact-modal__consent-box {
+    border-color: $contact-primary;
+    background: $contact-primary;
+
+    &::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+.contact-modal__consent-box {
+  flex-shrink: 0;
+  position: relative;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.1rem;
+  border: 2px solid $contact-line;
+  border-radius: 4px;
+  background: #ffffff;
+  transition: border-color 0.18s ease, background 0.18s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0.15rem 0.2rem 0.25rem;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M1 5l3 3 7-7'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+}
+
+.contact-modal__consent-text {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: $contact-ink-muted;
+}
+
+.contact-modal__consent-link {
+  color: $contact-primary;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover {
+    color: $contact-primary-strong;
+  }
+}
+
+/* ===== Состояние успеха ===== */
+.contact-modal__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+}
+
+.contact-modal__success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $contact-primary 0%, $contact-accent 100%);
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 700;
+  box-shadow: 0 12px 28px rgba(15, 118, 110, 0.32);
+  animation: contact-success-pop 0.45s $contact-modal-easing both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes contact-success-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.contact-modal__success .contact-modal__submit {
+  margin-top: 1.5rem;
+  width: auto;
+  min-width: 10rem;
+}

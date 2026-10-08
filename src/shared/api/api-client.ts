@@ -58,26 +58,42 @@ export async function apiRequest<T>(
   options: RequestInit & { token?: string } = {},
 ): Promise<T> {
   const { token, headers, body, ...rest } = options;
+  const url = `${resolveApiUrl()}${path}`;
 
-  const response = await fetch(`${resolveApiUrl()}${path}`, {
-    ...rest,
-    body,
-    headers: {
-      // Fastify отклоняет запросы без тела, если указан application/json,
-      // поэтому заголовок ставим только при наличии body.
-      ...(body != null ? { 'Content-Type': 'application/json' } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...rest,
+      body,
+      headers: {
+        // Fastify отклоняет запросы без тела, если указан application/json,
+        // поэтому заголовок ставим только при наличии body.
+        ...(body != null ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+    });
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : 'network error';
+    throw new ApiError(
+      0,
+      `Не удалось связаться с API (${url}). Проверьте, что backend запущен на порту 3000. ${detail}`,
+    );
+  }
 
   if (!response.ok) {
     await assertApiResponseOk(response, { authenticatedRequest: Boolean(token) });
   }
 
-  if (response.status === 204) {
+  // Nest/Fastify на void часто отдают 200 с пустым телом (не только 204).
+  if (response.status === 204 || response.status === 205) {
     return undefined as T;
   }
 
-  return response.json() as Promise<T>;
+  const text = await response.text();
+  if (!text) {
+    return undefined as T;
+  }
+
+  return JSON.parse(text) as T;
 }

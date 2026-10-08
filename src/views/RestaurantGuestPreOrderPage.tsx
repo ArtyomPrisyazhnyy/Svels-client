@@ -18,7 +18,7 @@ export function RestaurantGuestPreOrderPage({
   const paths = useRestaurantGuestPaths(restaurantId);
 
   return (
-    <div className="placeholder-page">
+    <div className="placeholder-page" data-testid="preorder-page">
       <header className="glass-header glass-header--stacked placeholder-page__header">
         <Link
           href={paths.home}

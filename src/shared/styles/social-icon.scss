@@ -19,9 +19,11 @@
     height: 1.35rem;
   }
 
-  &:hover {
-    color: var(--rs-accent, #0f766e);
-    border-color: var(--rs-accent, #0f766e);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--rs-accent, #0f766e);
+      border-color: var(--rs-accent, #0f766e);
+    }
   }
 
   /* Нормализация визуального размера: исходные пути имеют разный бокс,

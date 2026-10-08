@@ -6,20 +6,16 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   inset: 0;
   z-index: 130;
   border: none;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(0);
-  -webkit-backdrop-filter: blur(0);
+  // Без backdrop-filter: на Linux/Intel анимация blur часто вешает вкладку/GPU.
+  background: rgba(15, 23, 42, 0.5);
   cursor: pointer;
   opacity: 0;
-  transition:
-    opacity $modal-duration $modal-easing,
-    backdrop-filter $modal-duration $modal-easing,
-    -webkit-backdrop-filter $modal-duration $modal-easing;
+  pointer-events: none;
+  transition: opacity $modal-duration $modal-easing;
 
   &.restaurant-auth-modal--active {
     opacity: 1;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    pointer-events: auto;
   }
 }
 
@@ -95,6 +91,7 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
 .restaurant-auth-modal__body {
   padding: 0.75rem 1.25rem 1.25rem;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .restaurant-auth-modal__switcher {

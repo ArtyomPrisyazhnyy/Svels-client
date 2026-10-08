@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
 import { ApiError } from '@/shared/api/api-client';
-import { resolveImageUrl } from '@/shared/types/menu';
+import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useAuthStore } from '@/store/auth.store';
 import {
   fetchRestaurant,
@@ -18,6 +18,7 @@ export default function BrandingAdminPage() {
   const restaurantId = user?.restaurantId;
 
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoWebpUrl, setLogoWebpUrl] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -37,6 +38,7 @@ export default function BrandingAdminPage() {
     try {
       const restaurant = await fetchRestaurant(restaurantId);
       setLogoUrl(restaurant.logoUrl ?? null);
+      setLogoWebpUrl(restaurant.logoWebpUrl ?? null);
       setPreviewUrl('');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Не удалось загрузить данные заведения');
@@ -59,8 +61,12 @@ export default function BrandingAdminPage() {
 
     try {
       const result = await uploadRestaurantLogo(restaurantId, accessToken, file);
-      await updateRestaurant(restaurantId, accessToken, { logoUrl: result.logoUrl });
+      await updateRestaurant(restaurantId, accessToken, {
+        logoUrl: result.logoUrl,
+        logoWebpUrl: result.logoWebpUrl,
+      });
       setLogoUrl(result.logoUrl);
+      setLogoWebpUrl(result.logoWebpUrl);
       await revalidateRestaurantPublicPage(restaurantId);
       setSuccess('Логотип сохранён');
     } catch (err) {
@@ -80,8 +86,12 @@ export default function BrandingAdminPage() {
     setSuccess(null);
 
     try {
-      await updateRestaurant(restaurantId, accessToken, { logoUrl: null });
+      await updateRestaurant(restaurantId, accessToken, {
+        logoUrl: null,
+        logoWebpUrl: null,
+      });
       setLogoUrl(null);
+      setLogoWebpUrl(null);
       setPreviewUrl('');
       await revalidateRestaurantPublicPage(restaurantId);
       setSuccess('Логотип удалён');
@@ -100,15 +110,14 @@ export default function BrandingAdminPage() {
     );
   }
 
-  const displayUrl = previewUrl || (logoUrl ? resolveImageUrl(logoUrl) : '');
-
   return (
     <div className="branding-admin">
       <section className="branding-admin__panel">
         <h2>Логотип заведения</h2>
         <p className="branding-admin__hint">
           Загрузите квадратное или горизонтальное изображение в формате JPG, PNG или WebP до 5 МБ.
-          Логотип отображается в шапке страницы заведения для гостей.
+          Логотип отображается в шапке страницы заведения для гостей. На сервере автоматически
+          создаётся WebP и оптимизированный JPEG/PNG.
         </p>
 
         {error && <p className="branding-admin__error">{error}</p>}
@@ -119,10 +128,17 @@ export default function BrandingAdminPage() {
         ) : (
           <>
             <div className="branding-admin__preview-wrap">
-              {displayUrl ? (
+              {previewUrl ? (
                 <img
                   className="branding-admin__preview"
-                  src={displayUrl}
+                  src={previewUrl}
+                  alt="Логотип заведения"
+                />
+              ) : logoUrl ? (
+                <ResponsiveImage
+                  className="branding-admin__preview"
+                  src={logoUrl}
+                  webpSrc={logoWebpUrl}
                   alt="Логотип заведения"
                 />
               ) : (
@@ -153,6 +169,7 @@ export default function BrandingAdminPage() {
                 </button>
               )}
             </div>
+
           </>
         )}
       </section>

@@ -6,5 +6,6 @@ export interface PublicRestaurant {
   status: string;
   customDomain?: string | null;
   logoUrl?: string | null;
+  logoWebpUrl?: string | null;
   createdAt: string;
 }

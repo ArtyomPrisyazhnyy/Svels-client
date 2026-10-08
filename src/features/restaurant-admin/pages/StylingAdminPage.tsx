@@ -41,6 +41,7 @@ const PREVIEW_ORDER_SETTINGS: RestaurantOrderSettings = {
   paymentCash: true,
   paymentCardOnSite: true,
   paymentOnline: true,
+  deliveryForSomeoneElse: false,
   updatedAt: new Date().toISOString(),
 };
 
@@ -57,6 +58,7 @@ const PREVIEW_MENU_ITEM: MenuItem = {
   ingredients: null,
   nutrition: null,
   price: 7.5,
+  oldPrice: 9.5,
   isAvailable: true,
   imageUrl: PREVIEW_MENU_ITEM_IMAGE,
   galleryUrls: [],
@@ -104,6 +106,7 @@ export default function StylingAdminPage() {
         cardStyle: data.cardStyle,
         magazineCardLayout: data.magazineCardLayout,
         menuCategoryNavEnabled: data.menuCategoryNavEnabled,
+        favoritesEnabled: data.favoritesEnabled !== false,
         headerStyle: data.headerStyle,
         footerLayout: data.footerLayout,
         footerAccent: data.footerAccent,
@@ -135,6 +138,7 @@ export default function StylingAdminPage() {
       cardStyle: draft.cardStyle ?? settings.cardStyle,
       magazineCardLayout: draft.magazineCardLayout ?? settings.magazineCardLayout,
       menuCategoryNavEnabled: draft.menuCategoryNavEnabled ?? settings.menuCategoryNavEnabled,
+      favoritesEnabled: draft.favoritesEnabled ?? settings.favoritesEnabled ?? true,
       headerStyle: draft.headerStyle ?? settings.headerStyle,
       footerLayout: draft.footerLayout ?? settings.footerLayout,
       footerAccent: draft.footerAccent ?? settings.footerAccent,
@@ -152,6 +156,7 @@ export default function StylingAdminPage() {
       settings.cardStyle !== draft.cardStyle ||
       settings.magazineCardLayout !== draft.magazineCardLayout ||
       settings.menuCategoryNavEnabled !== draft.menuCategoryNavEnabled ||
+      (settings.favoritesEnabled !== false) !== (draft.favoritesEnabled !== false) ||
       settings.headerStyle !== draft.headerStyle ||
       settings.footerLayout !== draft.footerLayout ||
       settings.footerAccent !== draft.footerAccent);
@@ -181,6 +186,7 @@ export default function StylingAdminPage() {
         cardStyle: updated.cardStyle,
         magazineCardLayout: updated.magazineCardLayout,
         menuCategoryNavEnabled: updated.menuCategoryNavEnabled,
+        favoritesEnabled: updated.favoritesEnabled !== false,
         headerStyle: updated.headerStyle,
         footerLayout: updated.footerLayout,
         footerAccent: updated.footerAccent,
@@ -444,6 +450,30 @@ export default function StylingAdminPage() {
             </section>
 
             <section className="styling-admin__panel">
+              <h3>Избранное</h3>
+              <p className="styling-admin__hint">
+                Сердечки на карточках и в карточке позиции, вкладка «Избранное» в мобильном
+                приложении. После выключения нужна пересборка white-label приложения, чтобы
+                экран избранного не попал в бандл.
+              </p>
+              <label className="styling-admin__toggle-option">
+                <span className="styling-admin__toggle-copy">
+                  <strong>Показывать избранное</strong>
+                  <span>
+                    Гости смогут сохранять позиции без входа и видеть их во вкладке «Избранное».
+                  </span>
+                </span>
+                <input
+                  type="checkbox"
+                  className="styling-admin__toggle"
+                  checked={draft.favoritesEnabled !== false}
+                  disabled={saving}
+                  onChange={(e) => updateDraft({ favoritesEnabled: e.target.checked })}
+                />
+              </label>
+            </section>
+
+            <section className="styling-admin__panel">
               <h3>Шапка — стиль фона</h3>
               <div className="styling-admin__options">
                 {RESTAURANT_HEADER_STYLE_OPTIONS.map((option) => (
@@ -543,8 +573,8 @@ export default function StylingAdminPage() {
           {previewStyling && (
             <section className="styling-admin__preview-panel">
               <h3>Предпросмотр</h3>
-              <RestaurantStylingShell styling={previewStyling} className="styling-admin__preview">
-                <header className="glass-header">
+              <RestaurantStylingShell styling={previewStyling} className="styling-admin__preview" enableScrollToTop={false}>
+                <header className="glass-header glass-header--tenant">
                   <div className="glass-header__brand">
                     <span className="glass-header__brand-name">Moontea</span>
                   </div>

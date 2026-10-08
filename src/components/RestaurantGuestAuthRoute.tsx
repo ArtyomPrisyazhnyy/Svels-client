@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { RestaurantGuestAuthPage } from '@/features/auth/pages/RestaurantGuestAuthPage';
 import { getPostAuthPath } from '@/shared/routing/get-post-auth-path';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
+import { isRestaurantStaffRole } from '@/shared/auth/restaurant-staff';
 import { useAuthStore } from '@/store/auth.store';
 
 interface RestaurantGuestAuthRouteProps {
@@ -28,7 +29,7 @@ export function RestaurantGuestAuthRoute({
       return;
     }
 
-    if (user.role === 'super_admin' || user.role === 'restaurant_admin') {
+    if (user.role === 'super_admin' || isRestaurantStaffRole(user.role)) {
       router.replace(getPostAuthPath(user.role));
       return;
     }
