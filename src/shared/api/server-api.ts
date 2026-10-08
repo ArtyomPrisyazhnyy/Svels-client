@@ -23,14 +23,20 @@ export async function serverFetch<T>(
           },
         };
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...init?.headers,
-    },
-    ...cacheConfig,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        ...init?.headers,
+      },
+      ...cacheConfig,
+    });
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : 'network error';
+    throw new Error(`API unreachable (${path}): ${detail}`);
+  }
 
   if (!response.ok) {
     throw new Error(`API ${response.status}: ${path}`);

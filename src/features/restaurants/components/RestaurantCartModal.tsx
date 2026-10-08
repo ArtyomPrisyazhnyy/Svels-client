@@ -27,6 +27,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { isCompleteBelarusPhone } from '@/shared/utils/phone.util';
 import { createPreOrder } from '../api/pre-orders.api';
+import type { FulfillmentType } from '@/shared/types/pre-order';
 import { toPreOrderPaymentMethod } from '../utils/payment-method.util';
 import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
 import '../styles/restaurant-cart-modal.scss';
@@ -42,6 +43,17 @@ interface RestaurantCartModalProps {
 }
 
 const EMPTY_CART_ITEMS: CartLineItem[] = [];
+
+function toFulfillmentType(key: FulfillmentKey): FulfillmentType {
+  switch (key) {
+    case 'fulfillmentDelivery':
+      return 'delivery';
+    case 'fulfillmentTakeaway':
+      return 'takeaway';
+    case 'fulfillmentDineIn':
+      return 'dine_in';
+  }
+}
 
 export function RestaurantCartModal({
   restaurantId,
@@ -102,6 +114,8 @@ export function RestaurantCartModal({
 
   useEffect(() => {
     if (!showSomeoneElseOption && orderForSomeoneElse) {
+      // TODO(w0): убрать после рефакторинга корзины — правило react-hooks/set-state-in-effect (до W0 не трогали UI).
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- legacy effect, out of scope for foundation PR
       setOrderForSomeoneElse(false);
       setRecipientName('');
       setRecipientPhone('');
@@ -198,17 +212,32 @@ export function RestaurantCartModal({
     setSubmitting(true);
 
     try {
+      const resolvedCustomerName = customerName.trim() || user.firstName;
+      const resolvedCustomerPhone = phone.trim() || user.phone || '';
+
       const order = await createPreOrder(restaurantId, accessToken, {
+        fulfillmentType: toFulfillmentType(fulfillment),
         paymentMethod: toPreOrderPaymentMethod(payment),
-        items: items.map((line) => ({
-          menuItemId: line.menuItemId,
-          quantity: line.quantity,
-          unitPrice: line.unitPrice,
-          name: line.name,
-        })),
+        items: items.map((line) => {
+          const hasModifiers = Object.values(line.modifierSelections).some(
+            (ids) => ids.length > 0,
+          );
+          return {
+            menuItemId: line.menuItemId,
+            quantity: line.quantity,
+            ...(hasModifiers ? { modifierSelections: line.modifierSelections } : {}),
+          };
+        }),
+        customerName: resolvedCustomerName,
+        customerPhone: resolvedCustomerPhone,
         comment: comment.trim() || undefined,
-        customerName: user.firstName,
-        customerPhone: user.phone ?? undefined,
+        ...(needsVenue && locationId ? { locationId } : {}),
+        ...(showSomeoneElseOption && orderForSomeoneElse
+          ? {
+              recipientName: recipientName.trim(),
+              recipientPhone: recipientPhone.trim(),
+            }
+          : {}),
       });
 
       if (order.paymentRedirectUrl) {

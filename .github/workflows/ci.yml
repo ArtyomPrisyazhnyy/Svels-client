@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Mock API for Next static generation
+        run: |
+          node -e "require('http').createServer((q,r)=>{r.setHeader('Content-Type','application/json');if(q.url==='/restaurants'){r.end('[]');return;}r.writeHead(404);r.end('{}');}).listen(3000,'127.0.0.1')" &
+          sleep 2
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint changed TypeScript files
+        run: |
+          FILES=$(git diff --name-only --diff-filter=ACMR "origin/${{ github.base_ref }}"...HEAD | grep -E '\.(ts|tsx)$' || true)
+          if [ -z "$FILES" ]; then
+            echo "No .ts/.tsx files changed; skipping ESLint."
+            exit 0
+          fi
+          echo "Linting changed files:"
+          echo "$FILES"
+          npx eslint --no-error-on-unmatched-pattern $FILES
+
+      # Полный прогон для отслеживания baseline (~60 errors); не блокирует merge.
+      - name: Lint full repo (baseline, non-blocking)
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Build
+        run: npm run build

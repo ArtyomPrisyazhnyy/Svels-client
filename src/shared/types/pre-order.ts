@@ -1,30 +1,100 @@
-import type { PaymentStatus } from './payment';
+export type FulfillmentType = 'delivery' | 'takeaway' | 'dine_in';
 
 export type PreOrderPaymentMethod = 'cash' | 'card' | 'online';
 
-export type PreOrderStatus = 'pending' | 'confirmed' | 'paid' | 'cancelled';
+export type PreOrderStatus =
+  | 'new'
+  | 'accepted'
+  | 'preparing'
+  | 'ready'
+  | 'completed'
+  | 'cancelled';
 
-export interface PreOrderItemPayload {
+export type OrderPaymentStatus =
+  | 'not_required'
+  | 'pending'
+  | 'authorized'
+  | 'paid'
+  | 'voided'
+  | 'failed';
+
+export interface DeliveryAddress {
+  street: string;
+  house: string;
+  apartment?: string;
+  entrance?: string;
+  floor?: string;
+  intercom?: string;
+  comment?: string;
+}
+
+export interface CreatePreOrderItemPayload {
   menuItemId: string;
   quantity: number;
-  unitPrice: number;
-  name?: string;
+  modifierSelections?: Record<string, string[]>;
 }
 
 export interface CreatePreOrderPayload {
+  fulfillmentType: FulfillmentType;
   paymentMethod: PreOrderPaymentMethod;
-  items: PreOrderItemPayload[];
+  items: CreatePreOrderItemPayload[];
+  customerName: string;
+  customerPhone: string;
+  locationId?: string;
+  deliveryAddress?: DeliveryAddress;
+  requestedAt?: string | null;
+  recipientName?: string;
+  recipientPhone?: string;
   comment?: string;
   bookingId?: string;
-  customerName?: string;
-  customerPhone?: string;
+}
+
+export interface OrderItemModifierDto {
+  groupName: string;
+  optionName: string;
+  priceDelta: number;
+}
+
+export interface OrderItemDto {
+  id: string;
+  menuItemId: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  modifiers: OrderItemModifierDto[];
+  lineTotal: number;
+}
+
+export interface OrderDto {
+  id: string;
+  restaurantId: string;
+  orderNumber: number;
+  status: PreOrderStatus;
+  paymentMethod: PreOrderPaymentMethod;
+  paymentStatus: OrderPaymentStatus;
+  fulfillmentType: FulfillmentType;
+  customerName: string;
+  customerPhone: string;
+  recipientName: string | null;
+  recipientPhone: string | null;
+  deliveryAddress: DeliveryAddress | null;
+  locationId: string | null;
+  requestedAt: string | null;
+  comment: string | null;
+  cancelReason: string | null;
+  totalAmount: number;
+  items: OrderItemDto[];
+  bookingId: string | null;
+  statusChangedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaymentInfo {
   id: string;
   restaurantId: string;
   preOrderId: string;
-  status: PaymentStatus;
+  status: import('./payment').PaymentStatus;
   amount: number;
   amountMinor: number;
   currency: string;
@@ -39,24 +109,7 @@ export interface PaymentInfo {
   updatedAt: string;
 }
 
-export interface PreOrderResponse {
-  id: string;
-  restaurantId: string;
-  userId: string;
-  bookingId: string | null;
-  status: PreOrderStatus;
-  paymentMethod: PreOrderPaymentMethod;
-  totalAmount: number;
-  comment: string | null;
-  items: Array<{
-    id: string;
-    menuItemId: string;
-    name: string;
-    quantity: number;
-    unitPrice: number;
-  }>;
+export interface PreOrderResponse extends OrderDto {
   payment: PaymentInfo | null;
   paymentRedirectUrl: string | null;
-  createdAt: string;
-  updatedAt: string;
 }

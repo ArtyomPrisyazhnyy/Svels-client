@@ -5,27 +5,39 @@ export const SESSION_EXPIRED_MESSAGE = 'Сессия истекла. Войди�
 
 export class ApiError extends Error {
   readonly status: number;
+  readonly code?: string;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, code?: string) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
+    this.code = code;
   }
 }
 
-async function parseErrorMessage(response: Response): Promise<string> {
+async function parseErrorBody(
+  response: Response,
+): Promise<{ message: string; code?: string }> {
   try {
-    const body = (await response.json()) as { message?: string | string[] };
+    const body = (await response.json()) as {
+      message?: string | string[];
+      code?: string;
+    };
+    let message: string | undefined;
     if (Array.isArray(body.message)) {
-      return body.message.join(', ');
+      message = body.message.join(', ');
+    } else if (typeof body.message === 'string') {
+      message = body.message;
     }
-    if (typeof body.message === 'string') {
-      return body.message;
-    }
+    const code = typeof body.code === 'string' ? body.code : undefined;
+    return {
+      message: message ?? response.statusText ?? 'Ошибка запроса',
+      code,
+    };
   } catch {
     // ignore JSON parse errors
   }
-  return response.statusText || 'Ошибка запроса';
+  return { message: response.statusText || 'Ошибка запроса' };
 }
 
 export function clearAuthSessionOnUnauthorized(): void {
@@ -50,7 +62,8 @@ export async function assertApiResponseOk(
     throw new ApiError(401, SESSION_EXPIRED_MESSAGE);
   }
 
-  throw new ApiError(response.status, await parseErrorMessage(response));
+  const { message, code } = await parseErrorBody(response);
+  throw new ApiError(response.status, message, code);
 }
 
 export async function apiRequest<T>(

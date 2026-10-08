@@ -15,7 +15,13 @@ export interface RestaurantOrderSettings {
   paymentOnline: boolean;
   /** Гость может указать получателя доставки (другое имя и телефон). */
   deliveryForSomeoneElse: boolean;
+  /** Пауза приёма заказов (API отдаёт всегда; в локальных моках поле может отсутствовать). */
+  ordersPaused?: boolean;
   updatedAt: string;
+}
+
+export interface SetOrdersPausedPayload {
+  ordersPaused: boolean;
 }
 
 export type UpdateRestaurantOrderSettingsPayload = Partial<
