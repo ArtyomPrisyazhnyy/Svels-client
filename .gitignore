@@ -41,3 +41,5 @@ blob-report/
 # Next.js build output
 /.next/
 /out/
+next-env.d.ts
+tsconfig.tsbuildinfo

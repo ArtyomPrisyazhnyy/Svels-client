@@ -1,4 +1,10 @@
 import { apiRequest } from '../../../shared/api/api-client';
+import type {
+  AdminCreateRestaurantPayload,
+  AdminCreateRestaurantResponse,
+  AdminOwnerInviteResponse,
+  AdminRestaurantListItem,
+} from '@/shared/types/admin-restaurants';
 
 export interface RegistrationLocation {
   label?: string;
@@ -40,4 +46,38 @@ export function reviewRegistration(
     token,
     body: JSON.stringify(payload),
   });
+}
+
+export function fetchAllRestaurants(
+  token: string,
+  search?: string,
+): Promise<AdminRestaurantListItem[]> {
+  const query = search ? `?search=${encodeURIComponent(search)}` : '';
+  return apiRequest<AdminRestaurantListItem[]>(`/restaurants/admin/all${query}`, {
+    token,
+  });
+}
+
+export function createRestaurantByAdmin(
+  token: string,
+  payload: AdminCreateRestaurantPayload,
+): Promise<AdminCreateRestaurantResponse> {
+  return apiRequest<AdminCreateRestaurantResponse>('/restaurants/admin/create', {
+    method: 'POST',
+    token,
+    body: JSON.stringify(payload),
+  });
+}
+
+export function createOwnerInvite(
+  token: string,
+  restaurantId: string,
+): Promise<AdminOwnerInviteResponse> {
+  return apiRequest<AdminOwnerInviteResponse>(
+    `/restaurants/admin/${restaurantId}/owner-invite`,
+    {
+      method: 'POST',
+      token,
+    },
+  );
 }

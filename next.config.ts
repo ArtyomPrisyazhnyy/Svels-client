@@ -6,6 +6,7 @@ const platformHosts = (process.env.NEXT_PUBLIC_PLATFORM_HOSTS ?? '')
   .filter(Boolean);
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,

@@ -1,6 +1,10 @@
 import { apiRequest } from '@/shared/api/api-client';
-import type { CreatePreOrderPayload, PreOrderResponse } from '@/shared/types/pre-order';
-import type { PaymentInfo } from '@/shared/types/pre-order';
+import type {
+  CreatePreOrderPayload,
+  OrderDto,
+  PaymentInfo,
+  PreOrderResponse,
+} from '@/shared/types/pre-order';
 
 export function createPreOrder(
   restaurantId: string,
@@ -11,6 +15,20 @@ export function createPreOrder(
     method: 'POST',
     token,
     body: JSON.stringify(payload),
+  });
+}
+
+export function fetchMyOrders(token: string): Promise<OrderDto[]> {
+  return apiRequest<OrderDto[]>('/users/me/pre-orders', {
+    method: 'GET',
+    token,
+  });
+}
+
+export function fetchMyOrder(token: string, orderId: string): Promise<OrderDto> {
+  return apiRequest<OrderDto>(`/users/me/pre-orders/${orderId}`, {
+    method: 'GET',
+    token,
   });
 }
 

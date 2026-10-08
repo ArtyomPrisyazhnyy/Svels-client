@@ -24,6 +24,45 @@ export function createCategory(
   });
 }
 
+export function updateCategory(
+  restaurantId: string,
+  token: string,
+  categoryId: string,
+  payload: { name?: string; sortOrder?: number },
+): Promise<MenuCategory> {
+  return apiRequest<MenuCategory>(
+    `/restaurants/${restaurantId}/menu/categories/${categoryId}`,
+    {
+      method: 'PATCH',
+      token,
+      body: JSON.stringify(payload),
+    },
+  );
+}
+
+export function deleteCategory(
+  restaurantId: string,
+  token: string,
+  categoryId: string,
+): Promise<void> {
+  return apiRequest<void>(`/restaurants/${restaurantId}/menu/categories/${categoryId}`, {
+    method: 'DELETE',
+    token,
+  });
+}
+
+export function reorderCategories(
+  restaurantId: string,
+  token: string,
+  ids: string[],
+): Promise<void> {
+  return apiRequest<void>(`/restaurants/${restaurantId}/menu/categories/order`, {
+    method: 'PUT',
+    token,
+    body: JSON.stringify({ ids }),
+  });
+}
+
 export function createMenuItem(
   restaurantId: string,
   token: string,

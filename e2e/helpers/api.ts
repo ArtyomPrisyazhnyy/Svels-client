@@ -1,20 +1,15 @@
+export type { AuthResponse, AuthUser } from '../../src/shared/types/auth';
+import type { AuthResponse, AuthUser } from '../../src/shared/types/auth';
+import type { CreateMenuItemPayload, MenuCategory } from '../../src/shared/types/menu';
+import type {
+  CreatePreOrderPayload,
+  PreOrderResponse,
+} from '../../src/shared/types/pre-order';
+import type {
+  RestaurantOrderSettings,
+  UpdateRestaurantOrderSettingsPayload,
+} from '../../src/shared/types/order-settings';
 import { getApiUrl } from './env';
-
-export interface AuthUser {
-  id: string;
-  email: string;
-  phone?: string;
-  firstName: string;
-  lastName: string;
-  role: 'user' | 'restaurant_admin' | 'restaurant_manager' | 'restaurant_hall' | 'restaurant_production' | 'super_admin';
-  authProvider: string;
-  restaurantId?: string;
-}
-
-export interface AuthResponse {
-  accessToken: string;
-  user: AuthUser;
-}
 
 export interface PublicRestaurant {
   id: string;
@@ -208,5 +203,67 @@ export const apiClient = {
       'GET',
       `/restaurants/${restaurantId}/booking-settings`,
     );
+  },
+
+  async guestOtpLogin(restaurantId: string, phone: string): Promise<AuthResponse> {
+    await this.sendGuestOtp(restaurantId, phone);
+    await sleep(200);
+    const otp = await this.getLastDevOtp(phone);
+    const verified = await this.verifyGuestOtp(restaurantId, phone, otp.code);
+    if (verified.status === 'authenticated') {
+      return {
+        accessToken: verified.accessToken,
+        user: verified.user,
+      };
+    }
+    return this.registerGuestWithOtp(restaurantId, {
+      registrationToken: verified.registrationToken,
+      firstName: 'E2E',
+      lastName: 'Guest',
+    });
+  },
+
+  createOrder(
+    restaurantId: string,
+    token: string,
+    payload: CreatePreOrderPayload,
+  ): Promise<PreOrderResponse> {
+    return api<PreOrderResponse>('POST', `/restaurants/${restaurantId}/pre-orders`, {
+      token,
+      body: payload,
+    });
+  },
+
+  setOrderSettings(
+    restaurantId: string,
+    token: string,
+    payload: UpdateRestaurantOrderSettingsPayload,
+  ): Promise<RestaurantOrderSettings> {
+    return api<RestaurantOrderSettings>('PATCH', `/restaurants/${restaurantId}/order-settings`, {
+      token,
+      body: payload,
+    });
+  },
+
+  createMenuCategory(
+    restaurantId: string,
+    token: string,
+    name: string,
+  ): Promise<MenuCategory> {
+    return api<MenuCategory>('POST', `/restaurants/${restaurantId}/menu/categories`, {
+      token,
+      body: { name },
+    });
+  },
+
+  createMenuItem(
+    restaurantId: string,
+    token: string,
+    payload: CreateMenuItemPayload,
+  ): Promise<unknown> {
+    return api('POST', `/restaurants/${restaurantId}/menu/items`, {
+      token,
+      body: payload,
+    });
   },
 };
