@@ -1,0 +1,19 @@
+.guest-orders-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.guest-orders-page__header {
+  padding: 1rem 1.25rem;
+
+  h1 {
+    margin: 0.5rem 0 0;
+    font-size: 1.5rem;
+  }
+}
+
+.guest-orders-page__main {
+  padding: 1rem 1.25rem 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}

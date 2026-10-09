@@ -1,0 +1,49 @@
+.delivery-address-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.delivery-address-fields__row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  &--triple {
+    @media (max-width: 480px) {
+      flex-direction: column;
+    }
+  }
+}
+
+.delivery-address-fields__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+
+  span {
+    font-size: 0.8125rem;
+    color: #64748b;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9375rem;
+    font-family: inherit;
+  }
+
+  &--grow {
+    flex: 2 1 12rem;
+  }
+
+  &--house {
+    flex: 0 1 5.5rem;
+    max-width: 6rem;
+  }
+}

@@ -1,4 +1,5 @@
 import type { ModifierSelections } from '@/features/restaurants/utils/menu-modifiers.util';
+import type { DeliveryAddress } from '@/shared/types/pre-order';
 
 export interface CartModifierLine {
   groupName: string;
@@ -22,13 +23,46 @@ export interface CartLineItem {
 
 export type FulfillmentMethod = 'fulfillmentDelivery' | 'fulfillmentTakeaway' | 'fulfillmentDineIn';
 
+export type RequestedAtMode = 'asap' | 'slot';
+
 export interface CartCheckoutDraft {
+  fulfillment: FulfillmentMethod;
   customerName: string;
   phone: string;
-  fulfillment: FulfillmentMethod;
-  orderForSomeoneElse?: boolean;
-  recipientName?: string;
-  recipientPhone?: string;
-  /** Комментарий к заказу (опционально). */
-  comment?: string;
+  deliveryAddress: DeliveryAddress;
+  locationId: string | null;
+  requestedAtMode: RequestedAtMode;
+  requestedAtSlotIso: string | null;
+  orderForSomeoneElse: boolean;
+  recipientName: string;
+  recipientPhone: string;
+  comment: string;
+}
+
+export const EMPTY_DELIVERY_ADDRESS: DeliveryAddress = {
+  street: '',
+  house: '',
+  apartment: '',
+  entrance: '',
+  floor: '',
+  intercom: '',
+  comment: '',
+};
+
+export function createDefaultCheckoutDraft(
+  fulfillment: FulfillmentMethod = 'fulfillmentTakeaway',
+): CartCheckoutDraft {
+  return {
+    fulfillment,
+    customerName: '',
+    phone: '',
+    deliveryAddress: { ...EMPTY_DELIVERY_ADDRESS },
+    locationId: null,
+    requestedAtMode: 'asap',
+    requestedAtSlotIso: null,
+    orderForSomeoneElse: false,
+    recipientName: '',
+    recipientPhone: '',
+    comment: '',
+  };
 }

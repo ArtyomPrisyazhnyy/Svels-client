@@ -1,24 +1,62 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CartLineItem } from '@/shared/types/cart';
+import type { CartCheckoutDraft, CartLineItem } from '@/shared/types/cart';
+import { createDefaultCheckoutDraft } from '@/shared/types/cart';
 import { getCartTotals } from '@/features/restaurants/utils/cart.util';
 
-interface CartState {
+const CART_PERSIST_VERSION = 1;
+
+interface CartPersistedV0 {
   restaurantId: string | null;
   items: CartLineItem[];
+}
+
+interface CartPersistedV1 extends CartPersistedV0 {
+  version: number;
+  checkoutByRestaurant: Record<string, CartCheckoutDraft>;
+}
+
+interface CartState extends CartPersistedV1 {
   addLine: (restaurantId: string, line: CartLineItem) => void;
   removeLine: (lineId: string) => void;
   updateLineQuantity: (lineId: string, quantity: number) => void;
   clearCart: () => void;
   getRestaurantItems: (restaurantId: string) => CartLineItem[];
   getRestaurantTotals: (restaurantId: string) => { itemCount: number; totalAmount: number };
+  getCheckoutDraft: (restaurantId: string, defaultFulfillment?: CartCheckoutDraft['fulfillment']) => CartCheckoutDraft;
+  patchCheckoutDraft: (restaurantId: string, patch: Partial<CartCheckoutDraft>) => void;
+}
+
+function migratePersistedState(persisted: unknown, version: number): CartPersistedV1 {
+  if (version >= CART_PERSIST_VERSION && persisted && typeof persisted === 'object') {
+    const state = persisted as Partial<CartPersistedV1>;
+    return {
+      version: CART_PERSIST_VERSION,
+      restaurantId: state.restaurantId ?? null,
+      items: Array.isArray(state.items) ? state.items : [],
+      checkoutByRestaurant:
+        state.checkoutByRestaurant && typeof state.checkoutByRestaurant === 'object'
+          ? state.checkoutByRestaurant
+          : {},
+    };
+  }
+
+  const legacy = (persisted ?? {}) as CartPersistedV0;
+  return {
+    version: CART_PERSIST_VERSION,
+    restaurantId: legacy.restaurantId ?? null,
+    items: Array.isArray(legacy.items) ? legacy.items : [],
+    checkoutByRestaurant: {},
+  };
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
+      version: CART_PERSIST_VERSION,
       restaurantId: null,
       items: [],
+      checkoutByRestaurant: {},
 
       addLine: (restaurantId, line) => {
         const state = get();
@@ -78,10 +116,39 @@ export const useCartStore = create<CartState>()(
       getRestaurantTotals: (restaurantId) => {
         return getCartTotals(get().getRestaurantItems(restaurantId));
       },
+
+      getCheckoutDraft: (restaurantId, defaultFulfillment = 'fulfillmentTakeaway') => {
+        const existing = get().checkoutByRestaurant[restaurantId];
+        if (existing) {
+          return existing;
+        }
+        return createDefaultCheckoutDraft(defaultFulfillment);
+      },
+
+      patchCheckoutDraft: (restaurantId, patch) => {
+        const state = get();
+        const current =
+          state.checkoutByRestaurant[restaurantId] ??
+          createDefaultCheckoutDraft(patch.fulfillment ?? 'fulfillmentTakeaway');
+        set({
+          checkoutByRestaurant: {
+            ...state.checkoutByRestaurant,
+            [restaurantId]: { ...current, ...patch },
+          },
+        });
+      },
     }),
     {
       name: 'svels-cart',
       skipHydration: true,
+      version: CART_PERSIST_VERSION,
+      migrate: migratePersistedState,
+      partialize: (state) => ({
+        version: state.version,
+        restaurantId: state.restaurantId,
+        items: state.items,
+        checkoutByRestaurant: state.checkoutByRestaurant,
+      }),
     },
   ),
 );

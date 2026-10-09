@@ -1,21 +1,135 @@
-import { test, expect } from '../fixtures/test';
+import { test, expect, apiClient } from '../fixtures/test';
+import { getApiUrl } from '../helpers/env';
+import type { OrderDto } from '../../src/shared/types/pre-order';
+import type { RestaurantOrderSettings } from '../../src/shared/types/order-settings';
+
+async function fetchMyOrders(token: string): Promise<OrderDto[]> {
+  const response = await fetch(`${getApiUrl()}/users/me/pre-orders`, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+  });
+  if (!response.ok) {
+    throw new Error(`GET /users/me/pre-orders → ${response.status}`);
+  }
+  return (await response.json()) as OrderDto[];
+}
+
+async function setOrdersPaused(
+  restaurantId: string,
+  token: string,
+  ordersPaused: boolean,
+): Promise<RestaurantOrderSettings> {
+  const response = await fetch(
+    `${getApiUrl()}/restaurants/${restaurantId}/order-settings/pause`,
+    {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ordersPaused }),
+    },
+  );
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`PATCH order-settings/pause → ${response.status}: ${text}`);
+  }
+  return (await response.json()) as RestaurantOrderSettings;
+}
+
+async function addFirstMenuItemToCart(page: import('@playwright/test').Page, restaurantId: string) {
+  const menu = await apiClient.getMenu(restaurantId);
+  const firstItem = menu.categories.flatMap((c) => c.items)[0];
+  test.skip(!firstItem, 'Need a menu item in seeded restaurant');
+
+  await page.getByTestId(`menu-item-${firstItem!.id}`).click();
+  await expect(page.getByTestId('menu-add-to-cart')).toBeVisible();
+  await page.getByTestId('menu-add-to-cart').click();
+  await page.getByTestId('cart-button').click();
+  await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
+}
 
 test.describe('Pre-order', () => {
-  test('placeholder-страница доступна авторизованному гостю', async ({
-    page,
-    seed,
-    asGuest,
-  }) => {
-    void asGuest;
-    await page.goto(`/restaurants/${seed.restaurantId}/pre-order`);
-
-    await expect(page.getByTestId('preorder-page')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Предзаказ' })).toBeVisible();
-    await expect(page.getByText(/в разработке/i)).toBeVisible();
-  });
-
   test('неавторизованный → редирект на auth', async ({ page, seed }) => {
     await page.goto(`/restaurants/${seed.restaurantId}/pre-order`);
     await expect(page).toHaveURL(new RegExp(`/restaurants/${seed.restaurantId}/auth`));
+  });
+
+  test('страница «Мои заказы» для авторизованного гостя', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    await page.goto(`/restaurants/${seed.restaurantId}/pre-order`);
+    await expect(page.getByTestId('preorder-page')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Мои заказы' })).toBeVisible();
+  });
+
+  test('самовывоз + наличные → заказ создан', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    const adminToken = seed.restaurantAdmin.auth.accessToken;
+
+    await apiClient.setOrderSettings(seed.restaurantId, adminToken, {
+      fulfillmentDelivery: false,
+      fulfillmentTakeaway: true,
+      fulfillmentDineIn: false,
+      paymentCash: true,
+      paymentCardOnSite: false,
+      paymentOnline: false,
+    });
+    await setOrdersPaused(seed.restaurantId, adminToken, false);
+
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    await addFirstMenuItemToCart(page, seed.restaurantId);
+
+    const phoneField = page.locator('#cart-customer-phone');
+    if ((await phoneField.inputValue()).replace(/\D/g, '').length < 9) {
+      await phoneField.fill('29 123 45 67');
+    }
+
+    await page.getByTestId('cart-submit').click();
+    await expect(page.getByTestId('cart-order-success')).toBeVisible({ timeout: 20_000 });
+
+    const orders = await fetchMyOrders(seed.guest.accessToken);
+    const latest = orders.find((o) => o.restaurantId === seed.restaurantId);
+    expect(latest).toBeTruthy();
+    expect(latest!.fulfillmentType).toBe('takeaway');
+    expect(latest!.customerPhone).toMatch(/^\+375/);
+  });
+
+  test('доставка без адреса → кнопка оформления неактивна', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    const adminToken = seed.restaurantAdmin.auth.accessToken;
+
+    await apiClient.setOrderSettings(seed.restaurantId, adminToken, {
+      fulfillmentDelivery: true,
+      fulfillmentTakeaway: false,
+      fulfillmentDineIn: false,
+      paymentCash: true,
+    });
+    await setOrdersPaused(seed.restaurantId, adminToken, false);
+
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    await addFirstMenuItemToCart(page, seed.restaurantId);
+
+    await expect(page.getByTestId('delivery-address-fields')).toBeVisible();
+    await page.getByTestId('delivery-street').fill('');
+    await page.getByTestId('delivery-house').fill('');
+    await expect(page.getByTestId('cart-submit')).toBeDisabled();
+  });
+
+  test('пауза приёма → сообщение и неактивная кнопка', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    const adminToken = seed.restaurantAdmin.auth.accessToken;
+
+    await setOrdersPaused(seed.restaurantId, adminToken, true);
+
+    try {
+      await page.goto(`/restaurants/${seed.restaurantId}`);
+      await addFirstMenuItemToCart(page, seed.restaurantId);
+      await expect(page.getByTestId('orders-paused-banner')).toHaveText(
+        /не принимает заказы/i,
+      );
+      await expect(page.getByTestId('cart-submit')).toBeDisabled();
+    } finally {
+      await setOrdersPaused(seed.restaurantId, adminToken, false);
+    }
   });
 });
