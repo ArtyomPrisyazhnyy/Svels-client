@@ -217,6 +217,8 @@ function killPorts() {
   }
 }
 
+execSync('node scripts/landing/prepare-demo-branding.mjs', { cwd: ROOT, stdio: 'inherit' });
+
 killPorts();
 await sleep(2000);
 await waitPortFree(3001);
@@ -254,8 +256,9 @@ await phone.screenshot({ path: path.join(RAW, 'phone-menu.png') });
 await addItemsToCart(phone, ['demo-cappuccino', 'demo-almond-croissant', 'demo-latte']);
 await phone.getByTestId('cart-button').click();
 await phone.getByTestId('restaurant-cart-modal').waitFor({ state: 'visible' });
+await phone.getByTestId('cart-modal-panel').waitFor({ state: 'visible' });
 await waitForImages(phone);
-await phone.screenshot({ path: path.join(RAW, 'phone-cart.png') });
+await phone.getByTestId('cart-modal-panel').screenshot({ path: path.join(RAW, 'phone-cart.png') });
 
 await openRestaurantMenu(desktop);
 await waitForImages(desktop);

@@ -329,7 +329,7 @@ html:has(.landing) {
   overflow: hidden;
 
   @media (min-width: 980px) {
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
+    grid-template-columns: minmax(0, 1fr) minmax(400px, 640px);
     padding-block: 6.25rem 4.5rem;
   }
 }
@@ -429,8 +429,22 @@ html:has(.landing) {
 
 .landing-hero-visual {
   position: relative;
-  width: min(100%, 560px);
+  width: 85vw;
+  max-width: 85vw;
   margin-inline: auto;
+
+  @media (min-width: 980px) {
+    width: min(108%, 640px);
+    max-width: none;
+    margin-right: -1.25rem;
+    margin-left: auto;
+  }
+}
+
+.landing-hero-visual .landing-picture__img {
+  width: 100%;
+  max-width: none;
+  height: auto;
 }
 
 .landing-hero-visual__desktop {
@@ -458,19 +472,14 @@ html:has(.landing) {
   width: 100%;
 
   .landing-picture__img {
-    width: auto;
+    width: 100%;
     max-width: 100%;
     margin-inline: auto;
-    max-height: 300px;
-    border-radius: 16px;
-    object-fit: cover;
-    object-position: top center;
+    max-height: none;
+    height: auto;
+    object-fit: contain;
+    object-position: center top;
   }
-}
-
-.landing__live-slide[data-testid='landing-live-admin'] .landing-picture__img {
-  max-height: 280px;
-  aspect-ratio: 16 / 10;
 }
 
 /* ===== Секции ===== */
@@ -747,7 +756,7 @@ html:has(.landing) {
 }
 
 .landing__live-slide {
-  flex: 0 0 min(78vw, 260px);
+  flex: 0 0 min(72vw, 240px);
   scroll-snap-align: start;
   margin: 0;
   display: flex;
@@ -756,20 +765,25 @@ html:has(.landing) {
 
   @media (min-width: 980px) {
     flex: 1 1 0;
-    max-width: 240px;
+    max-width: 280px;
   }
 }
 
 .landing__live-frame {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  min-height: 320px;
-  padding: 0.75rem;
+  min-height: 0;
+  padding: 0.35rem 0.25rem 0.5rem;
   border-radius: $landing-radius;
   background: $landing-surface;
   border: 1px solid rgba(15, 118, 110, 0.12);
   box-shadow: $landing-shadow-sm;
+
+  @media (min-width: 980px) {
+    min-height: 380px;
+    padding-bottom: 0.35rem;
+  }
 }
 
 .landing__live-shot {

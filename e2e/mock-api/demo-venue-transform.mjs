@@ -87,8 +87,8 @@ export function demoVenueRestaurant(pack, restaurantId, domain) {
 export function demoVenueStyling(restaurantId) {
   return {
     restaurantId,
-    fontFamily: 'playfair',
-    colorTheme: 'warm',
+    fontFamily: 'inter',
+    colorTheme: 'svelsGuest',
     currencyDisplay: 'byn_glyph',
     buttonShape: 'rounded',
     buttonVariant: 'filled',
@@ -97,9 +97,9 @@ export function demoVenueStyling(restaurantId) {
     magazineCardLayout: 'content_left',
     menuCategoryNavEnabled: true,
     favoritesEnabled: true,
-    headerStyle: 'glass',
+    headerStyle: 'solid',
     footerLayout: 'columns',
-    footerAccent: 'tinted',
+    footerAccent: 'flat',
     updatedAt: new Date().toISOString(),
   };
 }

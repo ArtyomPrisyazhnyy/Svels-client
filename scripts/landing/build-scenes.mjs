@@ -23,12 +23,27 @@ function fileUrl(p) {
   return `file://${p}`;
 }
 
+async function trimTransparentPng(filePath, padding = 10) {
+  const trimmed = await sharp(filePath).trim({ threshold: 12 }).toBuffer();
+  await sharp(trimmed)
+    .extend({
+      top: padding,
+      bottom: padding,
+      left: padding,
+      right: padding,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .png({ compressionLevel: 9 })
+    .toFile(filePath);
+}
+
 async function exportScene(page, sceneKey, query, masterPath) {
   const params = new URLSearchParams({ scene: sceneKey, ...query });
   await page.goto(`file://${STUDIO}?${params.toString()}`);
   await page.waitForSelector('[data-scene-ready="true"]', { timeout: 60000 });
   const box = page.locator('#export-root');
   await box.screenshot({ path: masterPath, omitBackground: true });
+  await trimTransparentPng(masterPath, sceneKey === 'hero' ? 8 : 6);
 }
 
 async function encodeVariants(sceneId, masterPath, widths, sizes, alt) {
@@ -113,13 +128,20 @@ const common = {
 };
 
 const sceneDefs = [
-  { id: 'hero', sceneKey: 'hero', query: common, widths: HERO_WIDTHS, sizes: '(max-width: 768px) 92vw, 560px', alt: '' },
+  {
+    id: 'hero',
+    sceneKey: 'hero',
+    query: common,
+    widths: HERO_WIDTHS,
+    sizes: '(max-width: 979px) 85vw, min(640px, 54vw)',
+    alt: '',
+  },
   {
     id: 'hero-mobile',
     sceneKey: 'hero-mobile',
     query: common,
     widths: [480, 768, 1080],
-    sizes: '(max-width: 768px) 92vw, 560px',
+    sizes: '85vw',
     alt: '',
   },
   {
@@ -127,7 +149,7 @@ const sceneDefs = [
     sceneKey: 'phone',
     query: { ...common, shot: 'menu' },
     widths: FEATURE_WIDTHS,
-    sizes: '(max-width: 768px) 80vw, 260px',
+    sizes: '(max-width: 768px) 72vw, 240px',
     alt: '',
   },
   {
@@ -135,7 +157,7 @@ const sceneDefs = [
     sceneKey: 'phone',
     query: { ...common, shot: 'cart' },
     widths: FEATURE_WIDTHS,
-    sizes: '(max-width: 768px) 80vw, 260px',
+    sizes: '(max-width: 768px) 72vw, 240px',
     alt: '',
   },
   {
@@ -143,7 +165,7 @@ const sceneDefs = [
     sceneKey: 'phone',
     query: { ...common, shot: 'telegram' },
     widths: FEATURE_WIDTHS,
-    sizes: '(max-width: 768px) 80vw, 260px',
+    sizes: '(max-width: 768px) 72vw, 240px',
     alt: '',
   },
   {
@@ -151,7 +173,7 @@ const sceneDefs = [
     sceneKey: 'phone',
     query: { ...common, shot: 'admin' },
     widths: FEATURE_WIDTHS,
-    sizes: '(max-width: 768px) 80vw, 260px',
+    sizes: '(max-width: 768px) 72vw, 240px',
     alt: '',
   },
 ];
