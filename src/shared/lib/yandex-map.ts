@@ -14,7 +14,7 @@ export function yandexMapsScriptUrl(apiKey?: string): string {
   return `https://api-maps.yandex.ru/2.1/?${params.toString()}`;
 }
 
-/** Официальный виджет — та же карта, что на FoodPicasso / bacongrodno.by. */
+/** Официальный виджет Яндекс.Карт для точек заведения. */
 export function yandexMapWidgetUrl(points: YandexMapPoint[]): string {
   const params = new URLSearchParams({ lang: 'ru_RU' });
   const focus = points.find((point) => point.selected) ?? points[0];

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import {
   registerGuestWithOtp,
@@ -53,9 +54,11 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
   const [registrationToken, setRegistrationToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [privacyConsent, setPrivacyConsent] = useState(false);
 
   useEffect(() => {
     if (!resendAvailableAt) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset countdown when resend window clears
       setResendSeconds(0);
       return;
     }
@@ -287,10 +290,26 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
         />
       </div>
 
+      <label className="auth-hint" style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+        <input
+          type="checkbox"
+          checked={privacyConsent}
+          onChange={(e) => setPrivacyConsent(e.target.checked)}
+          data-testid="guest-otp-privacy-consent"
+        />
+        <span>
+          Я согласен(на) с{' '}
+          <Link href="/privacypolicy" target="_blank" rel="noopener noreferrer">
+            политикой конфиденциальности
+          </Link>{' '}
+          и обработкой персональных данных
+        </span>
+      </label>
+
       <button
         className="auth-submit"
         type="submit"
-        disabled={loading}
+        disabled={loading || !privacyConsent}
         data-testid="otp-send-submit"
       >
         {loading ? 'Отправка…' : 'Получить код'}

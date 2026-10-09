@@ -256,6 +256,13 @@ export const apiClient = {
     });
   },
 
+  reorderMenuCategories(restaurantId: string, token: string, ids: string[]): Promise<void> {
+    return api<void>('PUT', `/restaurants/${restaurantId}/menu/categories/order`, {
+      token,
+      body: { ids },
+    });
+  },
+
   createMenuItem(
     restaurantId: string,
     token: string,

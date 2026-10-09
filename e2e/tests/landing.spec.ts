@@ -90,7 +90,7 @@ test.describe('Landing / platform home', () => {
     await second.click();
     await expect(second).toHaveAttribute('aria-expanded', 'true');
     await expect(first).toHaveAttribute('aria-expanded', 'false');
-    await expect(faq.getByText(/moontea.by/)).toBeVisible();
+    await expect(faq.getByText(/bistro-lotos\.by/)).toBeVisible();
   });
 
   test('тарифы показывают месяц и корректную годовую экономию', async ({ page }) => {
@@ -168,8 +168,9 @@ test.describe('Landing / platform home', () => {
     await expect(page).toHaveURL(/\/privacypolicy$/);
     await expect(page.getByTestId('privacy-policy-page')).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Политика конфиденциальности', exact: true }),
+      page.getByRole('heading', { name: /Политика конфиденциальности/ }),
     ).toBeVisible();
+    await expect(page.getByText(/ЧЕРНОВИК, требует проверки юристом/)).toBeVisible();
   });
 
   test('на странице политики шапка ведёт на главную к разделам', async ({ page }) => {

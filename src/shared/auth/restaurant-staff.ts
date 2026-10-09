@@ -74,6 +74,7 @@ export const RESTAURANT_ADMIN_NAV: Array<{
   { to: '/restaurant-admin/styling', label: 'Стилизация', permission: 'manage_branding' },
   { to: '/restaurant-admin/menu', label: 'Меню', permission: 'manage_menu' },
   { to: '/restaurant-admin/locations', label: 'Точки и адреса', permission: 'manage_restaurant' },
+  { to: '/restaurant-admin/legal', label: 'Реквизиты', permission: 'manage_restaurant' },
   { to: '/restaurant-admin/order-settings', label: 'Условия заказа', permission: 'manage_order_settings' },
   { to: '/restaurant-admin/payment-settings', label: 'Оплата / bePaid', permission: 'manage_payments' },
   { to: '/restaurant-admin/booking-settings', label: 'Бронирование', permission: 'manage_booking_settings' },
