@@ -56,7 +56,7 @@ async function encodeVariants(sceneId, masterPath, widths, sizes, alt) {
   await master
     .clone()
     .resize(pngW, pngH, { fit: 'inside' })
-    .png({ compressionLevel: 9, palette: true })
+    .png({ compressionLevel: 9 })
     .toFile(pngPath);
 
   return {
@@ -90,7 +90,7 @@ const raw = {
   phoneMenu: requireRaw('phone-menu.png'),
   phoneCart: requireRaw('phone-cart.png'),
   desktopMenu: requireRaw('desktop-menu.png'),
-  desktopAdmin: requireRaw('desktop-admin.png'),
+  phoneAdmin: requireRaw('phone-admin.png'),
 };
 
 const browser = await chromium.launch();
@@ -108,7 +108,7 @@ const common = {
   phoneMenu: fileUrl(raw.phoneMenu),
   phoneCart: fileUrl(raw.phoneCart),
   desktopMenu: fileUrl(raw.desktopMenu),
-  desktopAdmin: fileUrl(raw.desktopAdmin),
+  phoneAdmin: fileUrl(raw.phoneAdmin),
   logo,
 };
 
@@ -140,15 +140,15 @@ const sceneDefs = [
   },
   {
     id: 'feature-telegram',
-    sceneKey: 'telegram',
-    query: common,
+    sceneKey: 'phone',
+    query: { ...common, shot: 'telegram' },
     widths: FEATURE_WIDTHS,
     sizes: '(max-width: 768px) 80vw, 260px',
     alt: '',
   },
   {
     id: 'feature-admin',
-    sceneKey: 'browser',
+    sceneKey: 'phone',
     query: { ...common, shot: 'admin' },
     widths: FEATURE_WIDTHS,
     sizes: '(max-width: 768px) 80vw, 260px',

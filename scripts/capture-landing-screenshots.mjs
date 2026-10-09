@@ -13,7 +13,7 @@ import {
 } from '../e2e/mock-api/landing-demo-data.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ARTIFACTS = '/opt/cursor/artifacts/landing-v4';
+const ARTIFACTS = '/opt/cursor/artifacts/landing-v5';
 const RAW = path.join(ROOT, 'scripts/landing/raw');
 const BASE = 'http://127.0.0.1:3001';
 
@@ -259,14 +259,21 @@ await phone.screenshot({ path: path.join(RAW, 'phone-cart.png') });
 
 await openRestaurantMenu(desktop);
 await waitForImages(desktop);
-await desktop.screenshot({ path: path.join(RAW, 'desktop-menu.png') });
+await desktop.screenshot({
+  path: path.join(RAW, 'desktop-menu.png'),
+  clip: { x: 0, y: 0, width: 1440, height: 900 },
+});
 
-await loginDemoAdmin(desktop);
-await desktop.goto(`${BASE}/restaurant-admin/orders`);
-await desktop.getByTestId('orders-admin-list').waitFor({ state: 'visible', timeout: 20000 });
-await desktop.getByTestId('order-card-demo-order-1842').waitFor({ state: 'visible', timeout: 15000 });
-await waitForImages(desktop);
-await desktop.screenshot({ path: path.join(RAW, 'desktop-admin.png') });
+const phoneAdmin = await browser.newPage({
+  viewport: { width: 393, height: 852 },
+  deviceScaleFactor: 3,
+});
+await loginDemoAdmin(phoneAdmin);
+await phoneAdmin.goto(`${BASE}/restaurant-admin/orders`);
+await phoneAdmin.getByTestId('orders-admin-list').waitFor({ state: 'visible', timeout: 20000 });
+await phoneAdmin.getByTestId('order-card-demo-order-1842').waitFor({ state: 'visible', timeout: 15000 });
+await waitForImages(phoneAdmin);
+await phoneAdmin.screenshot({ path: path.join(RAW, 'phone-admin.png') });
 
 await browser.close();
 mockApi.kill();
