@@ -93,8 +93,8 @@ export function LegalMarkdownBody({ source }: { source: string }) {
         <table key={blockKey++} className="legal-doc__table">
           <thead>
             <tr>
-              {header.map((cell) => (
-                <th key={cell}>{renderInline(cell)}</th>
+              {header.map((cell, cellIndex) => (
+                <th key={`h-${cellIndex}`}>{renderInline(cell)}</th>
               ))}
             </tr>
           </thead>
