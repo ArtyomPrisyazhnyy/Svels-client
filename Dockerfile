@@ -25,7 +25,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Минимальный mock API для generateStaticParams / sitemap на этапе сборки (без бэкенда).
-RUN node -e "require('http').createServer((q,r)=>{r.setHeader('Content-Type','application/json');if(q.url==='/restaurants'){r.end('[]');return;}r.writeHead(404);r.end('{}');}).listen(3000,'127.0.0.1')" & \
+# Имя `api` резолвим на loopback, чтобы совпадало с дефолтным NEXT_PUBLIC_API_URL=http://api:3000 в compose.
+RUN echo '127.0.0.1 api' >> /etc/hosts && \
+    node -e "require('http').createServer((q,r)=>{r.setHeader('Content-Type','application/json');if(q.url==='/restaurants'){r.end('[]');return;}r.writeHead(404);r.end('{}');}).listen(3000,'0.0.0.0')" & \
     sleep 2 && \
     npm run build
 
