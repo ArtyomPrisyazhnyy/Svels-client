@@ -59,14 +59,10 @@ test.describe('Restaurant public page', () => {
     await page.getByTestId('menu-add-to-cart').click();
     await page.getByTestId('cart-button').click();
     await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
-    await page.waitForResponse(
-      (response) =>
-        response.url().includes(`/restaurants/${seed.restaurantId}/locations`) && response.ok(),
-      { timeout: 15_000 },
-    );
     await expect(page.getByTestId('restaurant-cart-modal').getByText(firstItem.name)).toBeVisible({
       timeout: 10_000,
     });
+    await page.getByRole('button', { name: 'Самовывоз' }).click();
     await expect(page.getByTestId('cart-location-picker')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('cart-location-address')).toBeVisible();
     await expect(page.getByTestId('location-map')).toBeVisible();

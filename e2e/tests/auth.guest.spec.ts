@@ -31,18 +31,37 @@ test.describe('Guest OTP auth', () => {
   });
 
   test('повторный вход существующего гостя по OTP', async ({ page, seed }) => {
+    test.setTimeout(120_000);
     const phone = `+37533${String(Date.now()).slice(-7)}`;
 
-    await apiClient.guestOtpLogin(seed.restaurantId, phone);
-
-    await page.waitForTimeout(15_000);
     await page.goto(`/restaurants/${seed.restaurantId}/auth`);
     await page.getByTestId('otp-phone').fill(phone);
     await page.getByTestId('guest-otp-privacy-consent').check();
     await page.getByTestId('otp-send-submit').click();
     await expect(page.getByTestId('guest-otp-code-form')).toBeVisible({ timeout: 15_000 });
 
-    const otp = await apiClient.getLastDevOtp(phone);
+    let otp = await apiClient.getLastDevOtp(phone);
+    await page.getByTestId('otp-code').fill(otp.code);
+    await page.getByTestId('otp-verify-submit').click();
+    await expect(page.getByLabel('Имя')).toBeVisible({ timeout: 10_000 });
+    await page.getByLabel('Имя').fill('Return');
+    await page.getByLabel('Фамилия').fill('Guest');
+    await page.getByRole('button', { name: 'Продолжить' }).click();
+    await expect(page.getByTestId('restaurant-public-page')).toBeVisible();
+
+    await page.context().clearCookies();
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+
+    await page.goto(`/restaurants/${seed.restaurantId}/auth`);
+    await page.getByTestId('otp-phone').fill(phone);
+    await page.getByTestId('guest-otp-privacy-consent').check();
+    await page.getByTestId('otp-send-submit').click();
+    await expect(page.getByTestId('guest-otp-code-form')).toBeVisible({ timeout: 15_000 });
+
+    otp = await apiClient.getLastDevOtp(phone);
     await page.getByTestId('otp-code').fill(otp.code);
     await page.getByTestId('otp-verify-submit').click();
 
