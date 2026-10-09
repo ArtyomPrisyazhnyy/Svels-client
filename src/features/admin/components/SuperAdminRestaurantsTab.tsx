@@ -1,11 +1,12 @@
 'use client';
 
+// TODO(W2+): удаление заведения суперадмином — отдельная задача; нужен новый эндпоинт в контракте (сейчас в 3.7 / W2-B-ONB его нет).
+
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { ClientFormattedDate } from '@/components/ClientFormattedDate';
 import {
   createOwnerInvite,
   createRestaurantByAdmin,
-  deleteRestaurantByAdmin,
   fetchAllRestaurants,
 } from '../api/admin.api';
 import type { AdminRestaurantListItem } from '@/shared/types/admin-restaurants';
@@ -32,7 +33,6 @@ export function SuperAdminRestaurantsTab({ accessToken }: SuperAdminRestaurantsT
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [creating, setCreating] = useState(false);
   const [inviteLoadingId, setInviteLoadingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [invite, setInvite] = useState<InviteState | null>(null);
 
   const [name, setName] = useState('');
@@ -72,11 +72,33 @@ export function SuperAdminRestaurantsTab({ accessToken }: SuperAdminRestaurantsT
     setCreating(true);
     setError(null);
 
+    const trimmedName = name.trim();
+    const trimmedAddress = address.trim();
+    const trimmedUnp = unp.trim();
+
+    if (trimmedName.length < 2) {
+      setError('Название должно содержать не менее 2 символов.');
+      setCreating(false);
+      return;
+    }
+
+    if (trimmedAddress.length < 5) {
+      setError('Адрес должен содержать не менее 5 символов.');
+      setCreating(false);
+      return;
+    }
+
+    if (trimmedUnp && !/^\d{9}$/.test(trimmedUnp)) {
+      setError('УНП должен содержать 9 цифр.');
+      setCreating(false);
+      return;
+    }
+
     try {
       const response = await createRestaurantByAdmin(accessToken, {
-        name: name.trim(),
-        address: address.trim(),
-        unp: unp.trim() || undefined,
+        name: trimmedName,
+        address: trimmedAddress,
+        unp: trimmedUnp || undefined,
         customDomain: customDomain.trim() || undefined,
         owner: {
           email: ownerEmail.trim(),
@@ -126,27 +148,6 @@ export function SuperAdminRestaurantsTab({ accessToken }: SuperAdminRestaurantsT
     }
   }
 
-  async function handleDeleteRestaurant(restaurant: AdminRestaurantListItem) {
-    const confirmed = window.confirm(
-      `Удалить заведение «${restaurant.name}»? Это действие необратимо.`,
-    );
-    if (!confirmed) return;
-
-    setDeletingId(restaurant.id);
-    setError(null);
-    try {
-      await deleteRestaurantByAdmin(accessToken, restaurant.id);
-      if (invite?.restaurantId === restaurant.id) {
-        setInvite(null);
-      }
-      await loadRestaurants();
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось удалить заведение');
-    } finally {
-      setDeletingId(null);
-    }
-  }
-
   return (
     <div data-testid="super-admin-restaurants-tab">
       {error && <p className="admin__error">{error}</p>}
@@ -155,7 +156,7 @@ export function SuperAdminRestaurantsTab({ accessToken }: SuperAdminRestaurantsT
         <input
           type="search"
           className="admin__search"
-          placeholder="Поиск по названию или email владельца"
+          placeholder="Поиск по названию заведения"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           data-testid="restaurants-search"
@@ -195,6 +196,7 @@ export function SuperAdminRestaurantsTab({ accessToken }: SuperAdminRestaurantsT
               <span>Название</span>
               <input
                 required
+                minLength={2}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 data-testid="create-restaurant-name"
@@ -204,6 +206,7 @@ export function SuperAdminRestaurantsTab({ accessToken }: SuperAdminRestaurantsT
               <span>Адрес</span>
               <input
                 required
+                minLength={5}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 data-testid="create-restaurant-address"
@@ -291,15 +294,6 @@ export function SuperAdminRestaurantsTab({ accessToken }: SuperAdminRestaurantsT
                   data-testid={`restaurant-invite-${restaurant.id}`}
                 >
                   {inviteLoadingId === restaurant.id ? 'Ссылка…' : 'Новая ссылка владельцу'}
-                </button>
-                <button
-                  type="button"
-                  className="admin__btn admin__btn--reject"
-                  disabled={deletingId === restaurant.id}
-                  onClick={() => void handleDeleteRestaurant(restaurant)}
-                  data-testid={`restaurant-delete-${restaurant.id}`}
-                >
-                  {deletingId === restaurant.id ? 'Удаление…' : 'Удалить'}
                 </button>
               </div>
             </article>

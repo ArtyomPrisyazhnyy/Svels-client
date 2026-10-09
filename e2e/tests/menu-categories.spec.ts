@@ -60,6 +60,6 @@ test.describe('Menu categories (прогон на интеграции)', () => 
 
     page.once('dialog', (dialog) => dialog.accept());
     await page.getByTestId(`category-delete-${category.id}`).click();
-    await expect(page.getByText(/позиции меню/i)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/с позициями меню/i)).toBeVisible({ timeout: 10_000 });
   });
 });

@@ -90,7 +90,7 @@ export default function MenuAdminPage() {
 
   function categoryDeleteErrorMessage(err: unknown): string {
     if (err instanceof ApiError && err.code === 'CATEGORY_NOT_EMPTY') {
-      return 'Нельзя удалить категорию, пока в ней есть позиции меню. Сначала удалите или перенесите блюда.';
+      return 'Нельзя удалить категорию с позициями меню. Сначала удалите или перенесите блюда.';
     }
     return err instanceof ApiError ? err.message : 'Не удалось удалить категорию';
   }
