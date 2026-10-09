@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { apiClient } from './helpers/api';
 import { getSuperAdminCredentials, writeSeed, type E2eSeed } from './helpers/env';
+import { ensureRestaurantProductionStaff } from './helpers/staff-seed';
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 dotenv.config({ path: path.resolve(__dirname, '../../Svels-backend/.env') });
@@ -51,8 +52,11 @@ export default async function globalSetup(): Promise<void> {
     name: restaurantName,
     unp,
     description: 'Playwright e2e restaurant',
-    isChain: false,
-    locations: [{ address: 'ул. Тестовая 1' }],
+    isChain: true,
+    locations: [
+      { label: 'Точка 1', city: 'Минск', address: 'ул. Тестовая 1' },
+      { label: 'Точка 2', city: 'Минск', address: 'ул. Тестовая 2' },
+    ],
   });
 
   await apiClient.reviewRegistration(superAuth.accessToken, request.id, 'approve');
@@ -68,7 +72,7 @@ export default async function globalSetup(): Promise<void> {
 
   const productionEmail = `e2e.production.${stamp}@svels.test`;
   const productionPassword = `E2ePass!${stamp}P`;
-  const productionAuth = await apiClient.createRestaurantStaffUser(
+  const productionAuth = await ensureRestaurantProductionStaff(
     restaurantId,
     adminAuth.accessToken,
     {
@@ -76,7 +80,6 @@ export default async function globalSetup(): Promise<void> {
       password: productionPassword,
       firstName: 'E2E',
       lastName: 'Production',
-      role: 'restaurant_production',
     },
   );
 
@@ -87,6 +90,17 @@ export default async function globalSetup(): Promise<void> {
   }
 
   const menu = await apiClient.seedDefaultMenu(restaurantId, adminAuth.accessToken);
+
+  const seededLocations = await apiClient.listRestaurantLocations(
+    restaurantId,
+    adminAuth.accessToken,
+  );
+  for (const [index, location] of seededLocations.entries()) {
+    await apiClient.updateRestaurantLocation(restaurantId, adminAuth.accessToken, location.id, {
+      lat: 53.9045 + index * 0.01,
+      lng: 27.5615 + index * 0.01,
+    });
+  }
 
   const { auth: guest } = await apiClient.createGuest(restaurantId, 'Seed', 'Guest');
 

@@ -58,7 +58,15 @@ test.describe('Restaurant public page', () => {
     await expect(page.getByTestId('menu-add-to-cart')).toBeVisible();
     await page.getByTestId('menu-add-to-cart').click();
     await page.getByTestId('cart-button').click();
-    await expect(page.getByText(firstItem.name)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
+    await expect(page.getByTestId('restaurant-cart-modal').getByText(firstItem.name)).toBeVisible({
+      timeout: 10_000,
+    });
+    const takeawayTab = page.getByRole('tab', { name: 'Самовывоз' });
+    if (await takeawayTab.isVisible()) {
+      await takeawayTab.click();
+    }
+    await expect(page.getByTestId('cart-location-picker')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('cart-location-address')).toBeVisible();
     await expect(page.getByTestId('location-map')).toBeVisible();
   });
@@ -82,11 +90,11 @@ test.describe('Restaurant public page', () => {
 
     await page.getByTestId(`menu-item-${firstItem!.id}`).click();
     await expect(page.getByTestId('menu-add-to-cart')).toBeVisible();
-    await expect(page.locator('.restaurant-public__header-stack')).toBeInViewport();
+    const headerStack = page.getByTestId('restaurant-public-header-stack');
+    await expect(headerStack).toBeAttached();
+    await expect(headerStack).toBeInViewport();
     await expect
-      .poll(async () =>
-        page.locator('.restaurant-public__header-stack').evaluate((el) => el.getBoundingClientRect().top),
-      )
+      .poll(async () => headerStack.evaluate((el) => el.getBoundingClientRect().top))
       .toBeGreaterThanOrEqual(-1);
   });
 

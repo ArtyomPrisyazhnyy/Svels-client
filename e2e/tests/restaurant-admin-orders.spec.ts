@@ -61,13 +61,24 @@ async function ensureOrderableMenu(restaurantId: string, adminToken: string): Pr
   return item.id;
 }
 
-function buildOrderPayload(menuItemId: string): CreatePreOrderPayload {
+async function buildOrderPayload(
+  restaurantId: string,
+  adminToken: string,
+  menuItemId: string,
+): Promise<CreatePreOrderPayload> {
+  const locations = await apiClient.listRestaurantLocations(restaurantId, adminToken);
+  const locationId = locations[0]?.id;
+  if (!locationId) {
+    throw new Error('E2E restaurant must have at least one location for pre-orders');
+  }
+
   return {
     fulfillmentType: 'takeaway',
     paymentMethod: 'cash',
     items: [{ menuItemId, quantity: 1 }],
     customerName: 'E2E Гость',
     customerPhone: '+375291234567',
+    locationId,
   };
 }
 
@@ -83,7 +94,7 @@ test.describe('Restaurant admin orders', () => {
     const created = await apiClient.createOrder(
       seed.restaurantId,
       guestAuth.accessToken,
-      buildOrderPayload(menuItemId),
+      await buildOrderPayload(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, menuItemId),
     );
 
     await page.goto('/restaurant-admin/orders');
@@ -116,7 +127,7 @@ test.describe('Restaurant admin orders', () => {
     const created = await apiClient.createOrder(
       seed.restaurantId,
       guestAuth.accessToken,
-      buildOrderPayload(menuItemId),
+      await buildOrderPayload(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, menuItemId),
     );
 
     await injectAuth(page, seed.restaurantProduction.auth);
@@ -142,7 +153,7 @@ test.describe('Restaurant admin orders', () => {
       await apiClient.createOrder(
         seed.restaurantId,
         guestAuth.accessToken,
-        buildOrderPayload(menuItemId),
+        await buildOrderPayload(seed.restaurantId, adminToken, menuItemId),
       );
     } catch (error) {
       caught = error as Error & { status?: number; code?: string };
