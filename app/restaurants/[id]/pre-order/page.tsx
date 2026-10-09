@@ -3,7 +3,17 @@ import { notFound } from 'next/navigation';
 import { RestaurantGuestProtectedRoute } from '@/components/RestaurantGuestProtectedRoute';
 import { RestaurantGuestPreOrderPage } from '@/views/RestaurantGuestPreOrderPage';
 import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
-import { serverFetch } from '@/shared/api/server-api';
+import type { RestaurantStyling } from '@/shared/types/restaurant-styling';
+import { createDefaultRestaurantStyling } from '@/shared/types/restaurant-styling';
+import { serverFetch, type ServerFetchOptions } from '@/shared/api/server-api';
+import {
+  RESTAURANT_PUBLIC_REVALIDATE_SECONDS,
+  restaurantPublicPageTag,
+} from '@/shared/cache/restaurant-public-cache';
+
+/** Fallback ISR (сек). Должен быть литералом — см. publicPageFetchOptions ниже. */
+export const revalidate = 3600;
+export const dynamicParams = true;
 
 interface RestaurantPreOrderPageProps {
   params: Promise<{ id: string }>;
@@ -17,17 +27,40 @@ function PageLoader() {
   );
 }
 
+function publicPageFetchOptions(restaurantId: string): ServerFetchOptions {
+  return {
+    revalidate: RESTAURANT_PUBLIC_REVALIDATE_SECONDS,
+    tags: [restaurantPublicPageTag(restaurantId)],
+  };
+}
+
 async function fetchRestaurant(id: string): Promise<PublicRestaurant | null> {
   try {
-    return await serverFetch<PublicRestaurant>(`/restaurants/${id}`);
+    return await serverFetch<PublicRestaurant>(
+      `/restaurants/${id}`,
+      undefined,
+      publicPageFetchOptions(id),
+    );
   } catch {
     return null;
   }
 }
 
+async function fetchStyling(restaurantId: string): Promise<RestaurantStyling> {
+  try {
+    return await serverFetch<RestaurantStyling>(
+      `/restaurants/${restaurantId}/styling`,
+      undefined,
+      publicPageFetchOptions(restaurantId),
+    );
+  } catch {
+    return createDefaultRestaurantStyling(restaurantId);
+  }
+}
+
 export default async function RestaurantPreOrderPageRoute({ params }: RestaurantPreOrderPageProps) {
   const { id } = await params;
-  const restaurant = await fetchRestaurant(id);
+  const [restaurant, styling] = await Promise.all([fetchRestaurant(id), fetchStyling(id)]);
 
   if (!restaurant) {
     notFound();
@@ -39,6 +72,7 @@ export default async function RestaurantPreOrderPageRoute({ params }: Restaurant
         <RestaurantGuestPreOrderPage
           restaurantId={restaurant.id}
           restaurantName={restaurant.name}
+          styling={styling}
         />
       </RestaurantGuestProtectedRoute>
     </Suspense>

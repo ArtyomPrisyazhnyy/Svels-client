@@ -22,6 +22,9 @@
   &--portal {
     position: static;
     background: transparent;
+    --rs-cart-surface: var(--rs-surface);
+    --rs-cart-canvas: var(--rs-surface);
+    --rs-cart-item-surface: color-mix(in srgb, var(--rs-text) 4%, var(--rs-surface));
   }
 
   .restaurant-public {
@@ -242,6 +245,44 @@
   .restaurant-auth-modal__panel,
   .restaurant-public__footer {
     background: var(--rs-surface);
+  }
+
+  .restaurant-cart-modal__panel,
+  .restaurant-cart-modal__header,
+  .restaurant-cart-modal__body,
+  .restaurant-cart-modal__footer {
+    background-color: var(--rs-cart-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .restaurant-cart-modal__item,
+  .restaurant-cart-modal__contacts-card,
+  .cart-detail-row,
+  .cart-detail-row--static {
+    background-color: var(--rs-cart-item-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  &[data-rs-card-style='glass'] {
+    .restaurant-cart-modal__panel,
+    .restaurant-cart-modal__header,
+    .restaurant-cart-modal__body,
+    .restaurant-cart-modal__footer,
+    .restaurant-cart-modal__item,
+    .restaurant-cart-modal__contacts-card,
+    .cart-detail-row,
+    .cart-detail-row--static {
+      background-color: var(--rs-cart-surface);
+    }
+
+    .restaurant-cart-modal__item,
+    .restaurant-cart-modal__contacts-card,
+    .cart-detail-row,
+    .cart-detail-row--static {
+      background-color: var(--rs-cart-item-surface);
+    }
   }
 
   .restaurant-cart-modal__item-media {
@@ -733,6 +774,65 @@
   .restaurant-cart-modal__success {
     background: color-mix(in srgb, #10b981 16%, var(--rs-surface));
     color: #6ee7b7;
+  }
+
+  .restaurant-cart-modal__icon-btn {
+    background: color-mix(in srgb, var(--rs-surface) 92%, transparent);
+    color: var(--rs-text-muted);
+  }
+
+  .restaurant-cart-modal__clear {
+    color: var(--rs-text-muted);
+  }
+
+  .restaurant-cart-modal__contacts-card,
+  .cart-detail-row,
+  .cart-detail-row--static {
+    background: color-mix(in srgb, var(--rs-text) 4%, var(--rs-bg));
+    border-color: var(--rs-border);
+  }
+
+  .cart-detail-row__label {
+    color: var(--rs-text-muted);
+  }
+
+  .cart-detail-row__value,
+  .cart-detail-row__trigger {
+    color: var(--rs-text);
+  }
+
+  .cart-detail-row__chevron {
+    color: var(--rs-text-soft);
+  }
+
+  .cart-detail-row__content {
+    border-top-color: var(--rs-border);
+  }
+
+  .cart-detail-row--expanded {
+    background: var(--rs-surface);
+  }
+
+  .requested-time-picker__mode {
+    border-color: var(--rs-border);
+    background: var(--rs-surface);
+    color: var(--rs-text);
+
+    &--active {
+      border-color: var(--rs-accent);
+      background: var(--rs-accent);
+      color: var(--rs-on-accent, #fff);
+    }
+  }
+
+  .requested-time-picker__select {
+    border-color: var(--rs-border);
+    background: var(--rs-surface);
+    color: var(--rs-text);
+  }
+
+  .delivery-address-fields__field span {
+    color: var(--rs-text-muted);
   }
 
   .menu-product-card__media {

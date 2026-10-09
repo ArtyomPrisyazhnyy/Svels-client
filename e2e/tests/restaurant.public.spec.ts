@@ -43,7 +43,8 @@ test.describe('Restaurant public page', () => {
     await expect(page.getByTestId('guest-otp-phone-form')).toBeVisible({ timeout: 10_000 });
   });
 
-  test('добавление блюда в корзину (если меню не пустое)', async ({ page, seed }) => {
+  test('добавление блюда в корзину (если меню не пустое)', async ({ page, seed, asGuest }) => {
+    void asGuest;
     const menu = await apiClient.getMenu(seed.restaurantId);
     const firstItem = menu.categories.flatMap((c) => c.items)[0];
 
@@ -65,6 +66,12 @@ test.describe('Restaurant public page', () => {
     const takeawayTab = page.getByRole('tab', { name: 'Самовывоз' });
     if (await takeawayTab.isVisible()) {
       await takeawayTab.click();
+    }
+    await page.getByTestId('cart-go-to-checkout').click();
+    await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
+    const locationRow = page.getByTestId('cart-location-row');
+    if (await locationRow.isVisible()) {
+      await locationRow.getByRole('button').click();
     }
     await expect(page.getByTestId('cart-location-picker')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('cart-location-address')).toBeVisible();
