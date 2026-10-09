@@ -8,6 +8,7 @@ import { getPostAuthPath } from '@/shared/routing/get-post-auth-path';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { isRestaurantStaffRole } from '@/shared/auth/restaurant-staff';
 import type { AuthUser } from '@/shared/types/auth';
+import { consumeGuestLogoutRedirectPending } from '@/shared/auth/guest-logout-redirect';
 import { useAuthStore } from '@/store/auth.store';
 
 interface RestaurantGuestProtectedRouteProps {
@@ -52,6 +53,10 @@ function RestaurantGuestProtectedRouteInner({
     }
 
     if (!user) {
+      if (consumeGuestLogoutRedirectPending()) {
+        router.replace(paths.home);
+        return;
+      }
       const query = searchParams.toString();
       const from = `${pathname}${query ? `?${query}` : ''}`;
       router.replace(paths.auth(from));

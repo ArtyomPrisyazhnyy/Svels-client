@@ -117,7 +117,8 @@ test.describe('Restaurant public page', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}/account`);
     await expect(page.getByTestId('guest-account-page')).toBeVisible();
-    await page.getByRole('button', { name: /выйти/i }).click();
+    await page.getByTestId('guest-logout-button').click();
+    await expect(page).toHaveURL(new RegExp(`/restaurants/${seed.restaurantId}/?$`));
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await expect(page.getByTestId('cart-button')).toHaveAttribute('aria-label', 'Корзина');
