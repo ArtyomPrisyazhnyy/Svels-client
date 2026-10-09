@@ -23,6 +23,22 @@ function orderCategoriesWithPairFirst(
   return [...rest, firstId, secondId];
 }
 
+async function expectCatBeforeCat(
+  page: Page,
+  beforeId: string,
+  afterId: string,
+): Promise<void> {
+  await expect
+    .poll(
+      async () => {
+        const ids = await getMenuCategoryIdsInDom(page);
+        return ids.indexOf(beforeId) < ids.indexOf(afterId);
+      },
+      { timeout: 10_000 },
+    )
+    .toBe(true);
+}
+
 test.describe('Menu categories', () => {
   test('переименование, сортировка и удаление пустой категории', async ({
     page,
@@ -48,25 +64,27 @@ test.describe('Menu categories', () => {
     await page.goto('/restaurant-admin/menu');
     await expect(page.getByTestId(`menu-category-${catA.id}`)).toBeVisible({ timeout: 15_000 });
 
-    let domOrder = await getMenuCategoryIdsInDom(page);
-    expect(domOrder.indexOf(catA.id)).toBeLessThan(domOrder.indexOf(catB.id));
+    await expectCatBeforeCat(page, catA.id, catB.id);
 
     page.once('dialog', (dialog) => dialog.accept(`Renamed ${stamp}`));
     await page.getByTestId(`category-rename-${catA.id}`).click();
     await expect(page.getByTestId(`menu-category-${catA.id}`)).toContainText(`Renamed ${stamp}`);
 
-    domOrder = await getMenuCategoryIdsInDom(page);
-    expect(domOrder.indexOf(catA.id)).toBeLessThan(domOrder.indexOf(catB.id));
+    await expectCatBeforeCat(page, catA.id, catB.id);
 
     await page.getByTestId(`category-move-up-${catB.id}`).click();
-    domOrder = await getMenuCategoryIdsInDom(page);
-    expect(domOrder.indexOf(catB.id)).toBeLessThan(domOrder.indexOf(catA.id));
+    await expectCatBeforeCat(page, catB.id, catA.id);
 
     const moveDown = page.getByTestId(`category-move-down-${catA.id}`);
-    if (await moveDown.isEnabled()) {
+    const idsAfterMoveUp = await getMenuCategoryIdsInDom(page);
+    const catAIsLast = idsAfterMoveUp.indexOf(catA.id) === idsAfterMoveUp.length - 1;
+
+    if (catAIsLast) {
+      await expect(moveDown).toBeDisabled();
+    } else {
+      await expect(moveDown).toBeEnabled();
       await moveDown.click();
-      domOrder = await getMenuCategoryIdsInDom(page);
-      expect(domOrder.indexOf(catA.id)).toBeGreaterThan(domOrder.indexOf(catB.id));
+      await expectCatBeforeCat(page, catB.id, catA.id);
     }
 
     page.once('dialog', (dialog) => dialog.accept());
