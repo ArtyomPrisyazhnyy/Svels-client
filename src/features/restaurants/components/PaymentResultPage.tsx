@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 import { ApiError } from '@/shared/api/api-client';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { PAYMENT_STATUS_LABELS, type PaymentStatus } from '@/shared/types/payment';
-import type { PaymentInfo } from '@/shared/types/pre-order';
+import type { OrderDto, PaymentInfo } from '@/shared/types/pre-order';
 import { useAuthStore } from '@/store/auth.store';
-import { syncPayment } from '../api/pre-orders.api';
+import { fetchMyOrder, syncPayment } from '../api/pre-orders.api';
+import { ORDER_PAYMENT_STATUS_LABELS } from '../utils/guest-order.util';
 import '../styles/payment-result.scss';
 
 interface PaymentResultPageProps {
@@ -26,17 +27,15 @@ export function PaymentResultPage({
   const accessToken = useAuthStore((s) => s.accessToken);
   const paths = useRestaurantGuestPaths(restaurantId);
   const [payment, setPayment] = useState<PaymentInfo | null>(null);
+  const [order, setOrder] = useState<OrderDto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!paymentId || !accessToken) {
+    if (!accessToken) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- auth gate before fetch
       setLoading(false);
-      if (!accessToken) {
-        setError('Войдите в аккаунт, чтобы увидеть статус оплаты');
-      } else if (!paymentId) {
-        setError('Не указан идентификатор платежа');
-      }
+      setError('Войдите в аккаунт, чтобы увидеть статус оплаты');
       return;
     }
 
@@ -46,9 +45,17 @@ export function PaymentResultPage({
       setLoading(true);
       setError(null);
       try {
-        const synced = await syncPayment(paymentId!, accessToken!);
-        if (!cancelled) {
-          setPayment(synced);
+        if (paymentId) {
+          const synced = await syncPayment(paymentId, accessToken!);
+          if (!cancelled) {
+            setPayment(synced);
+          }
+        }
+        if (preOrderId) {
+          const orderRow = await fetchMyOrder(accessToken!, preOrderId);
+          if (!cancelled) {
+            setOrder(orderRow);
+          }
         }
       } catch (err) {
         if (!cancelled) {
@@ -65,7 +72,7 @@ export function PaymentResultPage({
     return () => {
       cancelled = true;
     };
-  }, [paymentId, accessToken]);
+  }, [paymentId, preOrderId, accessToken]);
 
   const status = payment?.status;
   const isSuccess =
@@ -82,33 +89,42 @@ export function PaymentResultPage({
 
         {!loading && error && <p className="payment-result__error">{error}</p>}
 
-        {!loading && !error && payment && (
+        {!loading && !error && (payment || order) && (
           <>
-            <p
-              className={`payment-result__status${
-                isSuccess ? ' payment-result__status--ok' : ' payment-result__status--bad'
-              }`}
-            >
-              {PAYMENT_STATUS_LABELS[payment.status as PaymentStatus]}
-            </p>
-            {payment.test && (
+            {order && (
+              <p className="payment-result__meta" data-testid="payment-result-order-number">
+                Заказ №{order.orderNumber}
+              </p>
+            )}
+            {order && (
+              <p className="payment-result__hint" data-testid="payment-result-order-payment-status">
+                Статус оплаты заказа: {ORDER_PAYMENT_STATUS_LABELS[order.paymentStatus]}
+              </p>
+            )}
+            {payment && (
+              <p
+                className={`payment-result__status${
+                  isSuccess ? ' payment-result__status--ok' : ' payment-result__status--bad'
+                }`}
+              >
+                {PAYMENT_STATUS_LABELS[payment.status as PaymentStatus]}
+              </p>
+            )}
+            {payment?.test && (
               <p className="payment-result__hint">Тестовый платёж bePaid (песочница).</p>
             )}
-            {payment.lastMessage && (
+            {payment?.lastMessage && (
               <p className="payment-result__hint">{payment.lastMessage}</p>
-            )}
-            {preOrderId && (
-              <p className="payment-result__meta">Заказ: {preOrderId.slice(0, 8)}…</p>
             )}
           </>
         )}
 
         <div className="payment-result__actions">
-          <Link href={paths.home} className="payment-result__btn">
-            На страницу заведения
+          <Link href={paths.preOrder} className="payment-result__btn">
+            Мои заказы
           </Link>
-          <Link href={paths.account} className="payment-result__btn payment-result__btn--secondary">
-            Личный кабинет
+          <Link href={paths.home} className="payment-result__btn payment-result__btn--secondary">
+            На страницу заведения
           </Link>
         </div>
       </div>

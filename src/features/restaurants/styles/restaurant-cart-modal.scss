@@ -398,6 +398,16 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   margin-bottom: 0;
 }
 
+.restaurant-cart-modal__paused {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
 .restaurant-cart-modal__error,
 .restaurant-cart-modal__success {
   margin: 0.75rem 0 0;

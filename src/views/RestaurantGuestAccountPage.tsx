@@ -54,6 +54,7 @@ export function RestaurantGuestAccountPage({
   }, [accessToken]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadBookings();
   }, [loadBookings]);
 
@@ -99,7 +100,7 @@ export function RestaurantGuestAccountPage({
           <h2>Действия</h2>
           <div className="home__links">
             <Link href={paths.booking}>Бронирование</Link>
-            <Link href={paths.preOrder}>Предзаказ</Link>
+            <Link href={paths.preOrder}>Мои заказы</Link>
           </div>
         </section>
 

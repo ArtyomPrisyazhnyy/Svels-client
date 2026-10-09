@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ApiError } from '@/shared/api/api-client';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import { PhoneInput } from '@/shared/components/PhoneInput';
 import { useModalPresence } from '@/hooks/useModalPresence';
@@ -13,7 +12,10 @@ import type { RestaurantLocation } from '@/shared/types/restaurant-location';
 import { FulfillmentSelector } from './FulfillmentSelector';
 import { CartLocationPicker } from './CartLocationPicker';
 import { PaymentSelector } from './PaymentSelector';
-import type { CartLineItem } from '@/shared/types/cart';
+import { DeliveryAddressFields } from './DeliveryAddressFields';
+import { RequestedTimePicker } from './RequestedTimePicker';
+import { OrderSuccessView } from './OrderSuccessView';
+import type { CartCheckoutDraft, CartLineItem } from '@/shared/types/cart';
 import {
   getDefaultFulfillment,
   getDefaultPayment,
@@ -25,14 +27,21 @@ import {
 } from '@/shared/types/order-settings';
 import { useAuthStore } from '@/store/auth.store';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
-import { isCompleteBelarusPhone } from '@/shared/utils/phone.util';
+import {
+  extractBelarusNational,
+  isCompleteBelarusPhone,
+} from '@/shared/utils/phone.util';
 import { createPreOrder } from '../api/pre-orders.api';
-import type { FulfillmentType } from '@/shared/types/pre-order';
-import { toPreOrderPaymentMethod } from '../utils/payment-method.util';
 import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
+import {
+  buildCreatePreOrderPayload,
+  isDeliveryAddressComplete,
+} from '../utils/checkout-payload.util';
+import { getPreOrderErrorMessage, isItemUnavailableError } from '../utils/pre-order-error.util';
 import '../styles/restaurant-cart-modal.scss';
 
 const MODAL_ANIMATION_MS = 200;
+const COMMENT_MAX = 1000;
 
 interface RestaurantCartModalProps {
   restaurantId: string;
@@ -43,17 +52,6 @@ interface RestaurantCartModalProps {
 }
 
 const EMPTY_CART_ITEMS: CartLineItem[] = [];
-
-function toFulfillmentType(key: FulfillmentKey): FulfillmentType {
-  switch (key) {
-    case 'fulfillmentDelivery':
-      return 'delivery';
-    case 'fulfillmentTakeaway':
-      return 'takeaway';
-    case 'fulfillmentDineIn':
-      return 'dine_in';
-  }
-}
 
 export function RestaurantCartModal({
   restaurantId,
@@ -71,25 +69,30 @@ export function RestaurantCartModal({
   const removeLine = useCartStore((s) => s.removeLine);
   const updateLineQuantity = useCartStore((s) => s.updateLineQuantity);
   const clearCart = useCartStore((s) => s.clearCart);
+  const getCheckoutDraft = useCartStore((s) => s.getCheckoutDraft);
+  const patchCheckoutDraft = useCartStore((s) => s.patchCheckoutDraft);
+
+  const defaultFulfillment = useMemo(
+    () => getDefaultFulfillment(orderSettings),
+    [orderSettings],
+  );
 
   const { mounted, isActive, handleClose } = useModalPresence(onClose, MODAL_ANIMATION_MS);
-  const [fulfillment, setFulfillment] = useState<FulfillmentKey>(() =>
-    getDefaultFulfillment(orderSettings),
-  );
+
+  const [fulfillment, setFulfillment] = useState<FulfillmentKey>(defaultFulfillment);
   const [payment, setPayment] = useState<PaymentKey | null>(() =>
     getDefaultPayment(orderSettings),
   );
-  const [customerName, setCustomerName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [orderForSomeoneElse, setOrderForSomeoneElse] = useState(false);
-  const [recipientName, setRecipientName] = useState('');
-  const [recipientPhone, setRecipientPhone] = useState('');
-  const [comment, setComment] = useState('');
+  const [draft, setDraft] = useState<CartCheckoutDraft>(() =>
+    getCheckoutDraft(restaurantId, defaultFulfillment),
+  );
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [successOrderNumber, setSuccessOrderNumber] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [locations, setLocations] = useState<RestaurantLocation[]>([]);
-  const [locationId, setLocationId] = useState<string | null>(null);
+  const [locationId, setLocationId] = useState<string | null>(draft.locationId);
+
+  const ordersPaused = orderSettings.ordersPaused === true;
 
   const isGuestOfRestaurant =
     user?.role === 'user' && user.restaurantId === restaurantId;
@@ -112,18 +115,67 @@ export function RestaurantCartModal({
   const showSomeoneElseOption =
     orderSettings.deliveryForSomeoneElse && fulfillment === 'fulfillmentDelivery';
 
-  useEffect(() => {
-    if (!showSomeoneElseOption && orderForSomeoneElse) {
-      // TODO(w0): убрать после рефакторинга корзины — правило react-hooks/set-state-in-effect (до W0 не трогали UI).
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- legacy effect, out of scope for foundation PR
-      setOrderForSomeoneElse(false);
-      setRecipientName('');
-      setRecipientPhone('');
-    }
-  }, [showSomeoneElseOption, orderForSomeoneElse]);
-
   const needsVenue =
     fulfillment === 'fulfillmentTakeaway' || fulfillment === 'fulfillmentDineIn';
+
+  const multipleLocations = locations.length > 1;
+
+  const syncDraft = useCallback(
+    (patch: Partial<CartCheckoutDraft>) => {
+      setDraft((prev) => {
+        const next = { ...prev, ...patch };
+        patchCheckoutDraft(restaurantId, next);
+        return next;
+      });
+    },
+    [patchCheckoutDraft, restaurantId],
+  );
+
+  useEffect(() => {
+    const stored = getCheckoutDraft(restaurantId, defaultFulfillment);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate checkout draft from persist
+    setDraft(stored);
+    setFulfillment(
+      enabledFulfillment.some((o) => o.key === stored.fulfillment)
+        ? stored.fulfillment
+        : defaultFulfillment,
+    );
+    setLocationId(stored.locationId);
+  }, [restaurantId, defaultFulfillment, getCheckoutDraft, enabledFulfillment]);
+
+  useEffect(() => {
+    if (!user || !isGuestOfRestaurant) {
+      return;
+    }
+    const nameFromProfile = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+    const phoneFromProfile = user.phone ? extractBelarusNational(user.phone) : '';
+    if (!draft.customerName && nameFromProfile) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prefill from profile once
+      syncDraft({ customerName: nameFromProfile });
+    }
+    if (!draft.phone && phoneFromProfile) {
+      syncDraft({ phone: phoneFromProfile });
+    }
+  }, [user, isGuestOfRestaurant, draft.customerName, draft.phone, syncDraft]);
+
+  useEffect(() => {
+    if (!showSomeoneElseOption && draft.orderForSomeoneElse) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset recipient when option hidden
+      syncDraft({
+        orderForSomeoneElse: false,
+        recipientName: '',
+        recipientPhone: '',
+      });
+    }
+  }, [showSomeoneElseOption, draft.orderForSomeoneElse, syncDraft]);
+
+  useEffect(() => {
+    if (!enabledFulfillment.some((o) => o.key === fulfillment)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clamp to enabled fulfillment
+      setFulfillment(defaultFulfillment);
+      syncDraft({ fulfillment: defaultFulfillment });
+    }
+  }, [enabledFulfillment, fulfillment, defaultFulfillment, syncDraft]);
 
   useEffect(() => {
     let cancelled = false;
@@ -131,7 +183,11 @@ export function RestaurantCartModal({
       .then((rows) => {
         if (!cancelled) {
           setLocations(rows);
-          setLocationId((current) => current ?? rows[0]?.id ?? null);
+          const fallback = rows[0]?.id ?? null;
+          setLocationId((current) => current ?? fallback);
+          if (!draft.locationId && fallback) {
+            syncDraft({ locationId: fallback });
+          }
         }
       })
       .catch(() => {
@@ -142,7 +198,7 @@ export function RestaurantCartModal({
     return () => {
       cancelled = true;
     };
-  }, [restaurantId]);
+  }, [restaurantId, draft.locationId, syncDraft]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -158,87 +214,102 @@ export function RestaurantCartModal({
     };
   }, [handleClose]);
 
+  const requestedAtIso =
+    draft.requestedAtMode === 'slot' ? draft.requestedAtSlotIso : null;
+
+  const canSubmit = useMemo(() => {
+    if (items.length === 0 || ordersPaused || submitting || successOrderNumber !== null) {
+      return false;
+    }
+    if (!enabledFulfillment.some((option) => option.key === fulfillment)) {
+      return false;
+    }
+    if (enabledPayments.length > 0 && !payment) {
+      return false;
+    }
+    if (!isGuestOfRestaurant || !accessToken) {
+      return false;
+    }
+    const customerName = draft.customerName.trim();
+    if (!customerName) {
+      return false;
+    }
+    if (!isCompleteBelarusPhone(draft.phone)) {
+      return false;
+    }
+    if (fulfillment === 'fulfillmentDelivery' && !isDeliveryAddressComplete(draft.deliveryAddress)) {
+      return false;
+    }
+    if (needsVenue && multipleLocations && !locationId) {
+      return false;
+    }
+    if (showSomeoneElseOption && draft.orderForSomeoneElse) {
+      if (!draft.recipientName.trim()) {
+        return false;
+      }
+      if (!isCompleteBelarusPhone(draft.recipientPhone)) {
+        return false;
+      }
+    }
+    if (draft.comment.trim().length > COMMENT_MAX) {
+      return false;
+    }
+    if (draft.requestedAtMode === 'slot' && !draft.requestedAtSlotIso) {
+      return false;
+    }
+    return true;
+  }, [
+    items.length,
+    ordersPaused,
+    submitting,
+    successOrderNumber,
+    enabledFulfillment,
+    fulfillment,
+    enabledPayments,
+    payment,
+    isGuestOfRestaurant,
+    accessToken,
+    draft,
+    needsVenue,
+    multipleLocations,
+    locationId,
+    showSomeoneElseOption,
+  ]);
+
   async function handleSubmit() {
     setError(null);
 
-    if (items.length === 0) {
-      setError('Корзина пуста');
-      return;
-    }
-
-    if (!enabledFulfillment.some((option) => option.key === fulfillment)) {
-      setError('Выберите способ получения заказа');
-      return;
-    }
-
-    if (needsVenue && locations.length > 0 && !locationId) {
-      setError('Выберите точку заведения');
-      return;
-    }
-
-    if (enabledPayments.length > 0 && !payment) {
-      setError('Выберите способ оплаты');
-      return;
-    }
-
-    if (!isGuestOfRestaurant || !accessToken) {
-      setError('Войдите в аккаунт, чтобы оформить заказ');
-      onOpenAuth?.();
-      return;
-    }
-
-    if (showSomeoneElseOption && orderForSomeoneElse) {
-      if (!recipientName.trim()) {
-        setError('Укажите имя получателя');
-        return;
+    if (!canSubmit || !payment || !accessToken) {
+      if (!isGuestOfRestaurant || !accessToken) {
+        setError('Войдите в аккаунт, чтобы оформить заказ');
+        onOpenAuth?.();
       }
-
-      if (!isCompleteBelarusPhone(recipientPhone)) {
-        setError('Укажите корректный телефон получателя');
-        return;
-      }
-    }
-
-    if (comment.trim().length > 4000) {
-      setError('Комментарий слишком длинный (максимум 4000 символов)');
-      return;
-    }
-
-    if (!payment) {
-      setError('Выберите способ оплаты');
       return;
     }
 
     setSubmitting(true);
 
     try {
-      const resolvedCustomerName = customerName.trim() || user.firstName;
-      const resolvedCustomerPhone = phone.trim() || user.phone || '';
-
-      const order = await createPreOrder(restaurantId, accessToken, {
-        fulfillmentType: toFulfillmentType(fulfillment),
-        paymentMethod: toPreOrderPaymentMethod(payment),
-        items: items.map((line) => {
-          const hasModifiers = Object.values(line.modifierSelections).some(
-            (ids) => ids.length > 0,
-          );
-          return {
-            menuItemId: line.menuItemId,
-            quantity: line.quantity,
-            ...(hasModifiers ? { modifierSelections: line.modifierSelections } : {}),
-          };
-        }),
-        customerName: resolvedCustomerName,
-        customerPhone: resolvedCustomerPhone,
-        comment: comment.trim() || undefined,
-        ...(needsVenue && locationId ? { locationId } : {}),
-        ...(showSomeoneElseOption && orderForSomeoneElse
-          ? {
-              recipientName: recipientName.trim(),
-              recipientPhone: recipientPhone.trim(),
-            }
-          : {}),
+      const payload = buildCreatePreOrderPayload({
+        fulfillment,
+        payment,
+        items,
+        customerName: draft.customerName,
+        customerPhone: draft.phone,
+        locationId,
+        deliveryAddress:
+          fulfillment === 'fulfillmentDelivery' ? draft.deliveryAddress : null,
+        requestedAtIso,
+        orderForSomeoneElse: draft.orderForSomeoneElse,
+        recipientName: draft.recipientName,
+        recipientPhone: draft.recipientPhone,
+        comment: draft.comment,
+        needsVenue,
+        multipleLocations,
+        showSomeoneElseOption,
       });
+
+      const order = await createPreOrder(restaurantId, accessToken, payload);
 
       if (order.paymentRedirectUrl) {
         clearCart();
@@ -246,11 +317,15 @@ export function RestaurantCartModal({
         return;
       }
 
-      setSuccess('Заказ принят. Мы свяжемся с вами для подтверждения.');
+      setSuccessOrderNumber(order.orderNumber);
       clearCart();
-      window.setTimeout(handleClose, 1200);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось оформить заказ');
+      setError(getPreOrderErrorMessage(err));
+      if (isItemUnavailableError(err) && items.length === 1) {
+        setError(
+          `${getPreOrderErrorMessage(err)} Нажмите «Удалить» у позиции в корзине.`,
+        );
+      }
     } finally {
       setSubmitting(false);
     }
@@ -266,293 +341,349 @@ export function RestaurantCartModal({
     <RestaurantStylingPortalRoot>
       <>
         <button
-        type="button"
-        className={`restaurant-cart-modal__backdrop${activeClass}`}
-        onClick={handleClose}
-        aria-label="Закрыть"
-      />
+          type="button"
+          className={`restaurant-cart-modal__backdrop${activeClass}`}
+          onClick={handleClose}
+          aria-label="Закрыть"
+        />
 
-      <div
-        className={`restaurant-cart-modal${activeClass}`}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="restaurant-cart-modal-title"
-      >
-        <div className={`restaurant-cart-modal__panel${activeClass}`}>
-          <button
-            type="button"
-            className="restaurant-cart-modal__close"
-            onClick={handleClose}
-            aria-label="Закрыть"
-          >
-            ×
-          </button>
+        <div
+          className={`restaurant-cart-modal${activeClass}`}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="restaurant-cart-modal-title"
+          data-testid="restaurant-cart-modal"
+        >
+          <div className={`restaurant-cart-modal__panel${activeClass}`}>
+            <button
+              type="button"
+              className="restaurant-cart-modal__close"
+              onClick={handleClose}
+              aria-label="Закрыть"
+            >
+              ×
+            </button>
 
-          <header className="restaurant-cart-modal__header">
-            <h2 id="restaurant-cart-modal-title">Корзина</h2>
-            {isGuestOfRestaurant && user && (
-              <p className="restaurant-cart-modal__guest">
-                Заказ от {user.firstName} {user.lastName}
-              </p>
-            )}
-          </header>
-
-          <div className="restaurant-cart-modal__body">
-            {!isGuestOfRestaurant && (
-              <section className="restaurant-cart-modal__section">
-                <h3 className="restaurant-cart-modal__section-title">Контакты</h3>
-                <label className="restaurant-cart-modal__field">
-                  <span>Имя</span>
-                  <input
-                    type="text"
-                    autoComplete="name"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Как к вам обращаться"
-                  />
-                </label>
-                <div className="restaurant-cart-modal__field">
-                  <label htmlFor="cart-customer-phone">Телефон</label>
-                  <PhoneInput
-                    id="cart-customer-phone"
-                    value={phone}
-                    onChange={setPhone}
-                  />
-                </div>
-              </section>
-            )}
-
-            {enabledFulfillment.length > 1 && (
-              <section className="restaurant-cart-modal__section">
-                <h3 className="restaurant-cart-modal__section-title">Способ получения</h3>
-                <div className="restaurant-cart-modal__fulfillment">
-                  <FulfillmentSelector
-                    settings={orderSettings}
-                    value={fulfillment}
-                    onChange={setFulfillment}
-                  />
-                </div>
-              </section>
-            )}
-
-            {enabledFulfillment.length === 1 && (
-              <section className="restaurant-cart-modal__section">
-                <h3 className="restaurant-cart-modal__section-title">Способ получения</h3>
-                <p className="restaurant-cart-modal__fulfillment-single">
-                  {enabledFulfillment[0].title}
+            <header className="restaurant-cart-modal__header">
+              <h2 id="restaurant-cart-modal-title">Корзина</h2>
+              {isGuestOfRestaurant && user && (
+                <p className="restaurant-cart-modal__guest">
+                  Заказ от {user.firstName} {user.lastName}
                 </p>
-              </section>
-            )}
+              )}
+            </header>
 
-            {needsVenue && locations.length > 0 && (
-              <section className="restaurant-cart-modal__section">
-                <h3 className="restaurant-cart-modal__section-title">Точка заведения</h3>
-                <CartLocationPicker
-                  locations={locations}
-                  selectedId={locationId}
-                  onSelect={setLocationId}
+            <div className="restaurant-cart-modal__body">
+              {ordersPaused && (
+                <div
+                  className="restaurant-cart-modal__paused"
+                  data-testid="orders-paused-banner"
+                  role="status"
+                >
+                  Заведение сейчас не принимает заказы
+                </div>
+              )}
+
+              {successOrderNumber !== null ? (
+                <OrderSuccessView
+                  orderNumber={successOrderNumber}
+                  ordersHref={paths.preOrder}
+                  onClose={handleClose}
                 />
-              </section>
-            )}
-
-            {fulfillment === 'fulfillmentDineIn' && bookingEnabled && (
-              <p className="restaurant-cart-modal__cross-sell">
-                Планируете прийти?{' '}
-                <a href={paths.booking} className="restaurant-cart-modal__cross-sell-link">
-                  Забронировать стол
-                </a>
-              </p>
-            )}
-
-            {showSomeoneElseOption && (
-              <section className="restaurant-cart-modal__section">
-                <h3 className="restaurant-cart-modal__section-title">Получатель</h3>
-                <label className="restaurant-cart-modal__checkbox">
-                  <input
-                    type="checkbox"
-                    checked={orderForSomeoneElse}
-                    onChange={(e) => {
-                      setOrderForSomeoneElse(e.target.checked);
-                      if (!e.target.checked) {
-                        setRecipientName('');
-                        setRecipientPhone('');
-                      }
-                    }}
-                  />
-                  <span>Доставка другому человеку</span>
-                </label>
-                {orderForSomeoneElse && (
-                  <div className="restaurant-cart-modal__recipient">
-                    <p className="restaurant-cart-modal__recipient-hint">
-                      Укажите, кому доставить заказ — мы свяжемся с получателем по этому номеру.
-                    </p>
+              ) : (
+                <>
+                  <section className="restaurant-cart-modal__section">
+                    <h3 className="restaurant-cart-modal__section-title">Контакты</h3>
                     <label className="restaurant-cart-modal__field">
-                      <span>Имя получателя</span>
+                      <span>Имя *</span>
                       <input
                         type="text"
-                        autoComplete="off"
-                        value={recipientName}
-                        onChange={(e) => setRecipientName(e.target.value)}
-                        placeholder="Имя получателя"
+                        autoComplete="name"
+                        value={draft.customerName}
+                        onChange={(e) => syncDraft({ customerName: e.target.value })}
+                        placeholder="Как к вам обращаться"
+                        data-testid="cart-customer-name"
                       />
                     </label>
                     <div className="restaurant-cart-modal__field">
-                      <label htmlFor="cart-recipient-phone">Телефон получателя</label>
+                      <label htmlFor="cart-customer-phone">Телефон *</label>
                       <PhoneInput
-                        id="cart-recipient-phone"
-                        value={recipientPhone}
-                        onChange={setRecipientPhone}
-                        autoComplete="off"
+                        id="cart-customer-phone"
+                        value={draft.phone}
+                        onChange={(value) => syncDraft({ phone: value })}
                       />
                     </div>
-                  </div>
-                )}
-              </section>
-            )}
+                  </section>
 
-            {enabledPayments.length > 1 && (
-              <section className="restaurant-cart-modal__section">
-                <h3 className="restaurant-cart-modal__section-title">Способ оплаты</h3>
-                <div className="restaurant-cart-modal__fulfillment">
-                  <PaymentSelector
-                    settings={orderSettings}
-                    value={payment ?? enabledPayments[0].key}
-                    onChange={setPayment}
-                  />
-                </div>
-              </section>
-            )}
+                  {enabledFulfillment.length > 1 && (
+                    <section className="restaurant-cart-modal__section">
+                      <h3 className="restaurant-cart-modal__section-title">Способ получения</h3>
+                      <div className="restaurant-cart-modal__fulfillment">
+                        <FulfillmentSelector
+                          settings={orderSettings}
+                          value={fulfillment}
+                          onChange={(value) => {
+                            setFulfillment(value);
+                            syncDraft({ fulfillment: value });
+                          }}
+                        />
+                      </div>
+                    </section>
+                  )}
 
-            {enabledPayments.length === 1 && (
-              <section className="restaurant-cart-modal__section">
-                <h3 className="restaurant-cart-modal__section-title">Способ оплаты</h3>
-                <p className="restaurant-cart-modal__fulfillment-single">
-                  {enabledPayments[0].title}
-                </p>
-              </section>
-            )}
+                  {enabledFulfillment.length === 1 && (
+                    <section className="restaurant-cart-modal__section">
+                      <h3 className="restaurant-cart-modal__section-title">Способ получения</h3>
+                      <p className="restaurant-cart-modal__fulfillment-single">
+                        {enabledFulfillment[0].title}
+                      </p>
+                    </section>
+                  )}
 
-            <section className="restaurant-cart-modal__section">
-              <h3 className="restaurant-cart-modal__section-title">Комментарии к заказу</h3>
-              <label className="restaurant-cart-modal__field">
-                <span className="restaurant-cart-modal__field-hint">Необязательно</span>
-                <textarea
-                  rows={4}
-                  maxLength={4000}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Пожелания к заказу"
-                />
-              </label>
-            </section>
+                  {fulfillment === 'fulfillmentDelivery' && (
+                    <section className="restaurant-cart-modal__section">
+                      <h3 className="restaurant-cart-modal__section-title">Адрес доставки</h3>
+                      <DeliveryAddressFields
+                        value={draft.deliveryAddress}
+                        onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
+                      />
+                    </section>
+                  )}
 
-            <section className="restaurant-cart-modal__section">
-              <h3 className="restaurant-cart-modal__section-title">Ваш заказ</h3>
-              {items.length === 0 ? (
-                <p className="restaurant-cart-modal__empty">Корзина пуста</p>
-              ) : (
-                <ul className="restaurant-cart-modal__list">
-                  {items.map((line) => (
-                    <li
-                      key={line.id}
-                      className={`restaurant-cart-modal__item${
-                        line.imageUrl ? ' restaurant-cart-modal__item--with-image' : ''
-                      }`}
-                    >
-                      {line.imageUrl && (
-                        <div className="restaurant-cart-modal__item-media">
-                          <ResponsiveImage
-                            src={line.imageUrl}
-                            webpSrc={line.imageWebpUrl}
-                            alt=""
-                          />
+                  {needsVenue && multipleLocations && (
+                    <section className="restaurant-cart-modal__section">
+                      <h3 className="restaurant-cart-modal__section-title">Точка заведения</h3>
+                      <CartLocationPicker
+                        locations={locations}
+                        selectedId={locationId}
+                        onSelect={(id) => {
+                          setLocationId(id);
+                          syncDraft({ locationId: id });
+                        }}
+                      />
+                    </section>
+                  )}
+
+                  <section className="restaurant-cart-modal__section">
+                    <h3 className="restaurant-cart-modal__section-title">Время</h3>
+                    <RequestedTimePicker
+                      mode={draft.requestedAtMode}
+                      slotIso={draft.requestedAtSlotIso}
+                      onModeChange={(mode) => syncDraft({ requestedAtMode: mode })}
+                      onSlotChange={(iso) => syncDraft({ requestedAtSlotIso: iso })}
+                    />
+                  </section>
+
+                  {fulfillment === 'fulfillmentDineIn' && bookingEnabled && (
+                    <p className="restaurant-cart-modal__cross-sell">
+                      Планируете прийти?{' '}
+                      <a href={paths.booking} className="restaurant-cart-modal__cross-sell-link">
+                        Забронировать стол
+                      </a>
+                    </p>
+                  )}
+
+                  {showSomeoneElseOption && (
+                    <section className="restaurant-cart-modal__section">
+                      <h3 className="restaurant-cart-modal__section-title">Получатель</h3>
+                      <label className="restaurant-cart-modal__checkbox">
+                        <input
+                          type="checkbox"
+                          checked={draft.orderForSomeoneElse}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            syncDraft({
+                              orderForSomeoneElse: checked,
+                              ...(checked
+                                ? {}
+                                : { recipientName: '', recipientPhone: '' }),
+                            });
+                          }}
+                        />
+                        <span>Доставка другому человеку</span>
+                      </label>
+                      {draft.orderForSomeoneElse && (
+                        <div className="restaurant-cart-modal__recipient">
+                          <p className="restaurant-cart-modal__recipient-hint">
+                            Укажите, кому доставить заказ — мы свяжемся с получателем по этому
+                            номеру.
+                          </p>
+                          <label className="restaurant-cart-modal__field">
+                            <span>Имя получателя *</span>
+                            <input
+                              type="text"
+                              autoComplete="off"
+                              value={draft.recipientName}
+                              onChange={(e) => syncDraft({ recipientName: e.target.value })}
+                              placeholder="Имя получателя"
+                            />
+                          </label>
+                          <div className="restaurant-cart-modal__field">
+                            <label htmlFor="cart-recipient-phone">Телефон получателя *</label>
+                            <PhoneInput
+                              id="cart-recipient-phone"
+                              value={draft.recipientPhone}
+                              onChange={(value) => syncDraft({ recipientPhone: value })}
+                              autoComplete="off"
+                            />
+                          </div>
                         </div>
                       )}
+                    </section>
+                  )}
 
-                      <div className="restaurant-cart-modal__item-main">
-                        <p className="restaurant-cart-modal__item-title">
-                          {line.name}
-                          {line.variantLabel && (
-                            <span className="restaurant-cart-modal__item-variant">
-                              {' '}
-                              {line.variantLabel}
-                            </span>
-                          )}
-                        </p>
-
-                        {line.modifiers.length > 0 && (
-                          <ul className="restaurant-cart-modal__modifiers">
-                            {line.modifiers.map((modifier) => (
-                              <li key={`${modifier.groupName}-${modifier.optionName}`}>
-                                {modifier.groupName}: {modifier.optionName}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-
-                        <p className="restaurant-cart-modal__item-price">
-                          <CurrencyAmount amount={line.unitPrice * line.quantity} />
-                        </p>
+                  {enabledPayments.length > 1 && (
+                    <section className="restaurant-cart-modal__section">
+                      <h3 className="restaurant-cart-modal__section-title">Способ оплаты</h3>
+                      <div className="restaurant-cart-modal__fulfillment">
+                        <PaymentSelector
+                          settings={orderSettings}
+                          value={payment ?? enabledPayments[0].key}
+                          onChange={setPayment}
+                        />
                       </div>
+                    </section>
+                  )}
 
-                      <div className="restaurant-cart-modal__item-actions">
-                        <div className="restaurant-cart-modal__counter" aria-label="Количество">
-                          <button
-                            type="button"
-                            className="restaurant-cart-modal__counter-btn"
-                            onClick={() => updateLineQuantity(line.id, line.quantity - 1)}
-                            aria-label="Уменьшить количество"
-                          >
-                            −
-                          </button>
-                          <span className="restaurant-cart-modal__counter-value">{line.quantity}</span>
-                          <button
-                            type="button"
-                            className="restaurant-cart-modal__counter-btn"
-                            onClick={() => updateLineQuantity(line.id, line.quantity + 1)}
-                            aria-label="Увеличить количество"
-                          >
-                            +
-                          </button>
-                        </div>
+                  {enabledPayments.length === 1 && (
+                    <section className="restaurant-cart-modal__section">
+                      <h3 className="restaurant-cart-modal__section-title">Способ оплаты</h3>
+                      <p className="restaurant-cart-modal__fulfillment-single">
+                        {enabledPayments[0].title}
+                      </p>
+                    </section>
+                  )}
 
-                        <button
-                          type="button"
-                          className="restaurant-cart-modal__remove"
-                          onClick={() => removeLine(line.id)}
-                        >
-                          Удалить
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                  <section className="restaurant-cart-modal__section">
+                    <h3 className="restaurant-cart-modal__section-title">Комментарии к заказу</h3>
+                    <label className="restaurant-cart-modal__field">
+                      <span className="restaurant-cart-modal__field-hint">
+                        Необязательно · {draft.comment.length}/{COMMENT_MAX}
+                      </span>
+                      <textarea
+                        rows={3}
+                        maxLength={COMMENT_MAX}
+                        value={draft.comment}
+                        onChange={(e) => syncDraft({ comment: e.target.value })}
+                        placeholder="Пожелания к заказу"
+                        data-testid="cart-comment"
+                      />
+                    </label>
+                  </section>
+
+                  <section className="restaurant-cart-modal__section">
+                    <h3 className="restaurant-cart-modal__section-title">Ваш заказ</h3>
+                    {items.length === 0 ? (
+                      <p className="restaurant-cart-modal__empty">Корзина пуста</p>
+                    ) : (
+                      <ul className="restaurant-cart-modal__list">
+                        {items.map((line) => (
+                          <li
+                            key={line.id}
+                            className={`restaurant-cart-modal__item${
+                              line.imageUrl ? ' restaurant-cart-modal__item--with-image' : ''
+                            }`}
+                          >
+                            {line.imageUrl && (
+                              <div className="restaurant-cart-modal__item-media">
+                                <ResponsiveImage
+                                  src={line.imageUrl}
+                                  webpSrc={line.imageWebpUrl}
+                                  alt=""
+                                />
+                              </div>
+                            )}
+
+                            <div className="restaurant-cart-modal__item-main">
+                              <p className="restaurant-cart-modal__item-title">
+                                {line.name}
+                                {line.variantLabel && (
+                                  <span className="restaurant-cart-modal__item-variant">
+                                    {' '}
+                                    {line.variantLabel}
+                                  </span>
+                                )}
+                              </p>
+
+                              {line.modifiers.length > 0 && (
+                                <ul className="restaurant-cart-modal__modifiers">
+                                  {line.modifiers.map((modifier) => (
+                                    <li key={`${modifier.groupName}-${modifier.optionName}`}>
+                                      {modifier.groupName}: {modifier.optionName}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+
+                              <p className="restaurant-cart-modal__item-price">
+                                <CurrencyAmount amount={line.unitPrice * line.quantity} />
+                              </p>
+                            </div>
+
+                            <div className="restaurant-cart-modal__item-actions">
+                              <div className="restaurant-cart-modal__counter" aria-label="Количество">
+                                <button
+                                  type="button"
+                                  className="restaurant-cart-modal__counter-btn"
+                                  onClick={() => updateLineQuantity(line.id, line.quantity - 1)}
+                                  aria-label="Уменьшить количество"
+                                >
+                                  −
+                                </button>
+                                <span className="restaurant-cart-modal__counter-value">
+                                  {line.quantity}
+                                </span>
+                                <button
+                                  type="button"
+                                  className="restaurant-cart-modal__counter-btn"
+                                  onClick={() => updateLineQuantity(line.id, line.quantity + 1)}
+                                  aria-label="Увеличить количество"
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              <button
+                                type="button"
+                                className="restaurant-cart-modal__remove"
+                                onClick={() => removeLine(line.id)}
+                              >
+                                Удалить
+                              </button>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </section>
+
+                  {error && <p className="restaurant-cart-modal__error">{error}</p>}
+                </>
               )}
-            </section>
+            </div>
 
-            {error && <p className="restaurant-cart-modal__error">{error}</p>}
-            {success && <p className="restaurant-cart-modal__success">{success}</p>}
+            {successOrderNumber === null && (
+              <footer className="restaurant-cart-modal__footer">
+                <p className="restaurant-cart-modal__total">
+                  Итого: <CurrencyAmount amount={totalAmount} />
+                </p>
+                <button
+                  type="button"
+                  className="restaurant-cart-modal__submit"
+                  disabled={!canSubmit}
+                  onClick={() => void handleSubmit()}
+                  data-testid="cart-submit"
+                >
+                  {submitting
+                    ? 'Оформление…'
+                    : payment === 'paymentOnline'
+                      ? 'Перейти к оплате'
+                      : 'Оформить заказ'}
+                </button>
+              </footer>
+            )}
           </div>
-
-          <footer className="restaurant-cart-modal__footer">
-            <p className="restaurant-cart-modal__total">
-              Итого: <CurrencyAmount amount={totalAmount} />
-            </p>
-            <button
-              type="button"
-              className="restaurant-cart-modal__submit"
-              disabled={items.length === 0 || Boolean(success) || submitting}
-              onClick={() => void handleSubmit()}
-            >
-              {submitting
-                ? 'Оформление…'
-                : payment === 'paymentOnline'
-                  ? 'Перейти к оплате'
-                  : 'Оформить заказ'}
-            </button>
-          </footer>
         </div>
-      </div>
       </>
     </RestaurantStylingPortalRoot>,
     document.body,

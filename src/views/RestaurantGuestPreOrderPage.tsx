@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
-import { useAuthStore } from '@/store/auth.store';
-import '@/views/placeholder.scss';
+import { GuestOrdersList } from '@/features/restaurants/components/GuestOrdersList';
+import '@/features/restaurants/styles/guest-orders-page.scss';
 
 interface RestaurantGuestPreOrderPageProps {
   restaurantId: string;
@@ -14,25 +14,21 @@ export function RestaurantGuestPreOrderPage({
   restaurantId,
   restaurantName,
 }: RestaurantGuestPreOrderPageProps) {
-  const user = useAuthStore((s) => s.user);
   const paths = useRestaurantGuestPaths(restaurantId);
 
   return (
-    <div className="placeholder-page" data-testid="preorder-page">
-      <header className="glass-header glass-header--stacked placeholder-page__header">
+    <div className="guest-orders-page" data-testid="preorder-page">
+      <header className="glass-header glass-header--stacked guest-orders-page__header">
         <Link
           href={paths.home}
-          className="glass-header__link glass-header__link--accent placeholder-page__back"
+          className="glass-header__link glass-header__link--accent guest-orders-page__back"
         >
           ← {restaurantName}
         </Link>
-        <h1>Предзаказ</h1>
+        <h1>Мои заказы</h1>
       </header>
-      <main className="placeholder-page__main">
-        <p>
-          Здравствуйте, {user?.firstName}! Раздел предзаказа в «{restaurantName}» в разработке —
-          выбор блюд и оплата появятся в следующих версиях.
-        </p>
+      <main className="guest-orders-page__main">
+        <GuestOrdersList restaurantId={restaurantId} />
       </main>
     </div>
   );
