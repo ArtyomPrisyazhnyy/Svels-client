@@ -1,6 +1,11 @@
 import { test, expect, apiClient } from '../fixtures/test';
 import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
-import { assertCartMobileLayoutNoOverlap } from '../helpers/cart-layout-overlap';
+import {
+  assertCartMobileLayoutNoOverlap,
+  assertCartPanelBackgroundIsOpaque,
+  assertCartStep1SectionSpacing,
+  assertCartStep2SectionSpacing,
+} from '../helpers/cart-layout-overlap';
 import type { CartLineItem } from '../../src/shared/types/cart';
 
 function buildStressLine(index: number): CartLineItem {
@@ -58,7 +63,9 @@ test.describe('Cart mobile layout', () => {
     void asGuest;
     await seedCartItems(page, seed.restaurantId, 4);
     await openCartStep1(page, seed.restaurantId);
+    await assertCartPanelBackgroundIsOpaque(page);
     await assertCartMobileLayoutNoOverlap(page);
+    await assertCartStep1SectionSpacing(page);
   });
 
   test('нет пересечений на шаге 2 (самовывоз)', async ({ page, seed, asGuest }) => {
@@ -67,7 +74,9 @@ test.describe('Cart mobile layout', () => {
     await openCartStep1(page, seed.restaurantId);
     await page.getByTestId('cart-go-to-checkout').click();
     await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
+    await assertCartPanelBackgroundIsOpaque(page);
     await assertCartMobileLayoutNoOverlap(page);
+    await assertCartStep2SectionSpacing(page);
   });
 
   test('нет пересечений при CTA «Укажите адрес»', async ({ page, seed, asGuest }) => {
@@ -86,6 +95,8 @@ test.describe('Cart mobile layout', () => {
     await page.getByTestId('delivery-street').fill('');
     await page.getByTestId('delivery-house').fill('');
     await expect(page.getByTestId('cart-submit')).toHaveText('Укажите адрес');
+    await assertCartPanelBackgroundIsOpaque(page);
     await assertCartMobileLayoutNoOverlap(page);
+    await assertCartStep2SectionSpacing(page);
   });
 });

@@ -435,6 +435,7 @@ export function RestaurantCartModal({
             className={`restaurant-cart-modal__panel${activeClass}${
               step2 ? ' restaurant-cart-modal__panel--checkout' : ''
             }`}
+            data-testid="cart-modal-panel"
           >
             <header
               className={`restaurant-cart-modal__header${
@@ -534,7 +535,7 @@ export function RestaurantCartModal({
                   </div>
 
                   {fulfillment === 'fulfillmentDelivery' && (
-                    <section className="restaurant-cart-modal__section restaurant-cart-modal__section--tight">
+                    <div className="restaurant-cart-modal__address-block">
                       <DeliveryAddressFields
                         value={draft.deliveryAddress}
                         onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
@@ -560,7 +561,7 @@ export function RestaurantCartModal({
                           variant="extended"
                         />
                       </CartDetailRow>
-                    </section>
+                    </div>
                   )}
 
                   {needsVenue && multipleLocations && (
@@ -714,7 +715,10 @@ export function RestaurantCartModal({
               ) : (
                 <>
                   {enabledFulfillment.length > 1 && (
-                    <section className="restaurant-cart-modal__section restaurant-cart-modal__section--tight">
+                    <div
+                      className="restaurant-cart-modal__fulfillment-block"
+                      data-testid="cart-fulfillment-switcher"
+                    >
                       <div className="restaurant-cart-modal__fulfillment">
                         <FulfillmentSelector
                           settings={orderSettings}
@@ -725,7 +729,7 @@ export function RestaurantCartModal({
                           }}
                         />
                       </div>
-                    </section>
+                    </div>
                   )}
 
                   {items.length === 0 ? (

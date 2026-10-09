@@ -4,7 +4,7 @@ import type { CartLineItem } from '../../src/shared/types/cart';
 import path from 'path';
 import fs from 'fs';
 
-const ARTIFACT_DIR = '/opt/cursor/artifacts/cart-mobile';
+const ARTIFACT_DIR = '/opt/cursor/artifacts/cart-mobile-v2';
 
 const VIEWPORTS = [
   { w: 360, h: 740, tag: '360x740' },
@@ -35,29 +35,52 @@ async function seedCart(
   page: import('@playwright/test').Page,
   restaurantId: string,
   count: number,
+  fulfillment: 'fulfillmentDelivery' | 'fulfillmentTakeaway' = 'fulfillmentDelivery',
 ) {
   const items = Array.from({ length: count }, (_, i) => buildStressLine(i + 1));
   await page.addInitScript(
-    ({ rid, cartItems }) => {
+    ({ rid, cartItems, fulfillmentKey }) => {
       const payload = {
         state: {
           version: 2,
           restaurantId: rid,
           items: cartItems,
-          checkoutByRestaurant: {},
+          checkoutByRestaurant: {
+            [rid]: {
+              fulfillment: fulfillmentKey,
+              customerName: '',
+              phone: '',
+              deliveryAddress: {
+                street: '',
+                house: '',
+                apartment: '',
+                entrance: '',
+                floor: '',
+                intercom: '',
+                comment: '',
+              },
+              locationId: null,
+              requestedAtMode: 'asap',
+              requestedAtSlotIso: null,
+              orderForSomeoneElse: false,
+              recipientName: '',
+              recipientPhone: '',
+              comment: '',
+            },
+          },
         },
         version: 2,
       };
       window.localStorage.setItem('svels-cart', JSON.stringify(payload));
     },
-    { rid: restaurantId, cartItems: items },
+    { rid: restaurantId, cartItems: items, fulfillmentKey: fulfillment },
   );
 }
 
 async function snap(page: import('@playwright/test').Page, name: string) {
   fs.mkdirSync(ARTIFACT_DIR, { recursive: true });
   const filePath = path.join(ARTIFACT_DIR, `${name}.png`);
-  await page.getByTestId('restaurant-cart-modal').screenshot({ path: filePath });
+  await page.getByTestId('cart-modal-panel').screenshot({ path: filePath });
 }
 
 test.describe('Cart mobile visual captures', () => {
@@ -93,13 +116,9 @@ test.describe('Cart mobile visual captures', () => {
           paymentCash: true,
         });
         await revalidateRestaurantPublicPage(seed.restaurantId);
-        await seedCart(page, seed.restaurantId, 2);
+        await seedCart(page, seed.restaurantId, 2, 'fulfillmentTakeaway');
         await page.goto(`/restaurants/${seed.restaurantId}`);
         await page.getByTestId('cart-button').click();
-        const takeawayTab = page.getByRole('tab', { name: 'Самовывоз' });
-        if (await takeawayTab.isVisible()) {
-          await takeawayTab.click();
-        }
         await page.getByTestId('cart-go-to-checkout').click();
         await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
         await expect(page.getByTestId('cart-header-title')).toHaveText('Самовывоз');
@@ -142,6 +161,10 @@ test.describe('Cart mobile visual captures', () => {
         await page.getByTestId('cart-go-to-checkout').click();
         await page.getByTestId('cart-address-extra-row').getByRole('button').click();
         await page.getByTestId('cart-time-row').getByRole('button').click();
+        const paymentRow = page.getByTestId('cart-payment-row');
+        if (await paymentRow.isVisible()) {
+          await paymentRow.getByRole('button').click();
+        }
         await page.getByTestId('cart-comment-row').getByRole('button').click();
         const recipientRow = page.getByTestId('cart-recipient-row');
         if (await recipientRow.isVisible()) {

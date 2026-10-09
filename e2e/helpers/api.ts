@@ -9,6 +9,10 @@ import type {
   RestaurantOrderSettings,
   UpdateRestaurantOrderSettingsPayload,
 } from '../../src/shared/types/order-settings';
+import type {
+  RestaurantStyling,
+  UpdateRestaurantStylingPayload,
+} from '../../src/shared/types/restaurant-styling';
 import { getApiUrl } from './env';
 
 export interface PublicRestaurant {
@@ -258,6 +262,17 @@ export const apiClient = {
     payload: UpdateRestaurantOrderSettingsPayload,
   ): Promise<RestaurantOrderSettings> {
     return api<RestaurantOrderSettings>('PATCH', `/restaurants/${restaurantId}/order-settings`, {
+      token,
+      body: payload,
+    });
+  },
+
+  patchStyling(
+    restaurantId: string,
+    token: string,
+    payload: UpdateRestaurantStylingPayload,
+  ): Promise<RestaurantStyling> {
+    return api<RestaurantStyling>('PATCH', `/restaurants/${restaurantId}/styling`, {
       token,
       body: payload,
     });

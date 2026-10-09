@@ -45,6 +45,83 @@ export async function expectLocatorsDoNotOverlap(
   }
 }
 
+function parseAlpha(color: string): number {
+  if (color === 'transparent') {
+    return 0;
+  }
+  const match = color.match(/rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+(?:\s*,\s*([\d.]+))?\s*\)/);
+  if (!match) {
+    return 1;
+  }
+  return match[1] === undefined ? 1 : Number.parseFloat(match[1]);
+}
+
+export async function assertCartPanelBackgroundIsOpaque(page: Page): Promise<void> {
+  const panel = page.getByTestId('cart-modal-panel');
+  await expect(panel).toBeVisible();
+  const colors = await panel.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return {
+      backgroundColor: style.backgroundColor,
+      opacity: style.opacity,
+    };
+  });
+  expect(Number.parseFloat(colors.opacity)).toBeGreaterThanOrEqual(0.99);
+  expect(parseAlpha(colors.backgroundColor)).toBeGreaterThanOrEqual(0.99);
+}
+
+const MIN_SECTION_GAP_PX = 12;
+
+export async function assertMinVerticalGap(
+  above: Locator,
+  below: Locator,
+  minGap: number,
+  label: string,
+): Promise<void> {
+  const boxAbove = await boxFor(above);
+  const boxBelow = await boxFor(below);
+  expect(boxAbove, `${label}: above element missing`).not.toBeNull();
+  expect(boxBelow, `${label}: below element missing`).not.toBeNull();
+  const gap = boxBelow!.y - (boxAbove!.y + boxAbove!.height);
+  expect(gap, `${label} vertical gap (px)`).toBeGreaterThanOrEqual(minGap);
+}
+
+export async function assertCartStep1SectionSpacing(page: Page): Promise<void> {
+  const modal = page.getByTestId('restaurant-cart-modal');
+  const switcher = modal.getByTestId('cart-fulfillment-switcher');
+  if (await switcher.count() === 0) {
+    return;
+  }
+  await assertMinVerticalGap(
+    modal.getByTestId('cart-header-bar'),
+    switcher,
+    MIN_SECTION_GAP_PX,
+    'header vs fulfillment switcher',
+  );
+  const firstItem = modal.locator('.restaurant-cart-modal__item').first();
+  if (await firstItem.count() > 0) {
+    await assertMinVerticalGap(
+      switcher,
+      firstItem,
+      MIN_SECTION_GAP_PX,
+      'fulfillment switcher vs first item',
+    );
+  }
+}
+
+export async function assertCartStep2SectionSpacing(page: Page): Promise<void> {
+  const checkout = page.getByTestId('cart-checkout-step');
+  await expect(checkout).toBeVisible();
+  const contacts = checkout.locator('.restaurant-cart-modal__contacts-card');
+  const timeRow = checkout.getByTestId('cart-time-row');
+  await assertMinVerticalGap(
+    contacts,
+    timeRow,
+    MIN_SECTION_GAP_PX,
+    'contacts card vs time row',
+  );
+}
+
 export async function assertCartMobileLayoutNoOverlap(page: Page): Promise<void> {
   const modal = page.getByTestId('restaurant-cart-modal');
   await expect(modal).toBeVisible();

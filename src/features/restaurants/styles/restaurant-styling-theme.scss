@@ -22,6 +22,9 @@
   &--portal {
     position: static;
     background: transparent;
+    --rs-cart-surface: var(--rs-surface);
+    --rs-cart-canvas: var(--rs-surface);
+    --rs-cart-item-surface: color-mix(in srgb, var(--rs-text) 4%, var(--rs-surface));
   }
 
   .restaurant-public {
@@ -242,6 +245,44 @@
   .restaurant-auth-modal__panel,
   .restaurant-public__footer {
     background: var(--rs-surface);
+  }
+
+  .restaurant-cart-modal__panel,
+  .restaurant-cart-modal__header,
+  .restaurant-cart-modal__body,
+  .restaurant-cart-modal__footer {
+    background-color: var(--rs-cart-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .restaurant-cart-modal__item,
+  .restaurant-cart-modal__contacts-card,
+  .cart-detail-row,
+  .cart-detail-row--static {
+    background-color: var(--rs-cart-item-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  &[data-rs-card-style='glass'] {
+    .restaurant-cart-modal__panel,
+    .restaurant-cart-modal__header,
+    .restaurant-cart-modal__body,
+    .restaurant-cart-modal__footer,
+    .restaurant-cart-modal__item,
+    .restaurant-cart-modal__contacts-card,
+    .cart-detail-row,
+    .cart-detail-row--static {
+      background-color: var(--rs-cart-surface);
+    }
+
+    .restaurant-cart-modal__item,
+    .restaurant-cart-modal__contacts-card,
+    .cart-detail-row,
+    .cart-detail-row--static {
+      background-color: var(--rs-cart-item-surface);
+    }
   }
 
   .restaurant-cart-modal__item-media {

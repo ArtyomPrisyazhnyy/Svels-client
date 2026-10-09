@@ -22,11 +22,13 @@ export function CartDetailRow({
   error,
   testId,
 }: CartDetailRowProps) {
+  const hasValue = value.trim().length > 0;
+
   return (
     <div
       className={`cart-detail-row${error ? ' cart-detail-row--error' : ''}${
         expanded ? ' cart-detail-row--expanded' : ''
-      }`}
+      }${hasValue ? '' : ' cart-detail-row--no-value'}`}
       data-testid={testId}
     >
       <button
@@ -36,7 +38,7 @@ export function CartDetailRow({
         aria-expanded={expanded}
       >
         <span className="cart-detail-row__label">{label}</span>
-        <span className="cart-detail-row__value">{value}</span>
+        {hasValue ? <span className="cart-detail-row__value">{value}</span> : null}
         <span className="cart-detail-row__chevron" aria-hidden>›</span>
       </button>
       {error && <p className="cart-detail-row__error" role="alert">{error}</p>}
