@@ -14,11 +14,23 @@ docker build -t svels-client:latest .
 docker build -t svels-client:latest \
   --build-arg NEXT_PUBLIC_SITE_URL=https://svels.by \
   --build-arg NEXT_PUBLIC_PLATFORM_HOSTS=localhost,127.0.0.1,svels.by,www.svels.by \
-  --build-arg NEXT_PUBLIC_API_URL=https://api.svels.by \
   --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com \
   --build-arg NEXT_PUBLIC_YANDEX_MAPS_KEY=your-yandex-key \
   .
 ```
+
+Сборка **для Docker Compose** (middleware резолвит домены через внутренний `api:3000`):
+
+```bash
+docker build -t svels-client:latest \
+  --add-host=api:127.0.0.1 \
+  --build-arg NEXT_PUBLIC_API_URL=http://api:3000 \
+  --build-arg NEXT_PUBLIC_SITE_URL=https://svels.by \
+  --build-arg NEXT_PUBLIC_PLATFORM_HOSTS=localhost,127.0.0.1,svels.by,www.svels.by \
+  .
+```
+
+Для браузера на проде часто дополнительно задают публичный API (`https://api.svels.by`) вместо внутреннего URL — зависит от того, как настроен Caddy и CORS.
 
 Локальная проверка без compose:
 
@@ -40,13 +52,13 @@ curl -sf -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3000/privacypolicy
 |------------|------------|
 | `NEXT_PUBLIC_SITE_URL` | Канонический URL платформы (metadata, sitemap, редиректы с custom domain). |
 | `NEXT_PUBLIC_PLATFORM_HOSTS` | Список хостов платформы через запятую; остальные `Host` → custom domain (middleware). Также влияет на `allowedDevOrigins` в `next.config.ts`. |
-| `NEXT_PUBLIC_API_URL` | Базовый URL API для SSR/middleware и (если задан) для браузера. **В compose-сети** для middleware удобно `http://api:3000`; для браузера на проде — публичный URL вида `https://api.svels.by`. |
+| `NEXT_PUBLIC_API_URL` | Базовый URL API для SSR/middleware и (если задан) для браузера. **Не задан** при `docker build` → на сборке используется `http://localhost:3000` (mock в Dockerfile). Для compose-образа передайте `http://api:3000` и `--add-host=api:127.0.0.1` (см. выше). |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | OAuth Google (кнопка входа). |
 | `NEXT_PUBLIC_YANDEX_MAPS_KEY` | Ключ Яндекс.Карт (опционально). |
 
 `NEXT_PUBLIC_*` в Next.js встраиваются в клиентский бандл **на сборке**. Смена значения без пересборки образа для клиента не сработает (кроме серверных путей, где читается `process.env` без инлайна — для middleware `NEXT_PUBLIC_*` тоже фиксируется при build).
 
-Значения по умолчанию в `Dockerfile` ориентированы на compose (`NEXT_PUBLIC_API_URL=http://api:3000`). Для публичного продакшена обычно передают публичный API URL в `--build-arg`.
+CI (`docker.yml`) собирает образ **без** `NEXT_PUBLIC_API_URL` — достаточно mock API на `localhost:3000`. Продакшн-образ для compose собирают с `--build-arg NEXT_PUBLIC_API_URL=http://api:3000` и `--add-host=api:127.0.0.1`.
 
 ### В рантайме (`docker run` / `environment` в compose)
 

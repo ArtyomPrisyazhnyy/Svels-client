@@ -10,13 +10,12 @@ WORKDIR /app
 
 ARG NEXT_PUBLIC_SITE_URL=https://svels.by
 ARG NEXT_PUBLIC_PLATFORM_HOSTS=localhost,127.0.0.1,svels.by,www.svels.by
-ARG NEXT_PUBLIC_API_URL=http://api:3000
-ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=
-ARG NEXT_PUBLIC_YANDEX_MAPS_KEY=
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ARG NEXT_PUBLIC_YANDEX_MAPS_KEY
 
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_PLATFORM_HOSTS=$NEXT_PUBLIC_PLATFORM_HOSTS
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
 ENV NEXT_PUBLIC_YANDEX_MAPS_KEY=$NEXT_PUBLIC_YANDEX_MAPS_KEY
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -25,10 +24,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Минимальный mock API для generateStaticParams / sitemap на этапе сборки (без бэкенда).
-# Имя `api` резолвим на loopback, чтобы совпадало с дефолтным NEXT_PUBLIC_API_URL=http://api:3000 в compose.
-RUN echo '127.0.0.1 api' >> /etc/hosts && \
-    node -e "require('http').createServer((q,r)=>{r.setHeader('Content-Type','application/json');if(q.url==='/restaurants'){r.end('[]');return;}r.writeHead(404);r.end('{}');}).listen(3000,'0.0.0.0')" & \
+# Без NEXT_PUBLIC_API_URL сборка ходит на http://localhost:3000 (см. src/shared/config/env.ts).
+# Для compose-образа: docker build --add-host=api:127.0.0.1 --build-arg NEXT_PUBLIC_API_URL=http://api:3000
+RUN node -e "require('http').createServer((q,r)=>{r.setHeader('Content-Type','application/json');if(q.url==='/restaurants'){r.end('[]');return;}r.writeHead(404);r.end('{}');}).listen(3000,'127.0.0.1')" & \
     sleep 2 && \
+    if [ -n "${NEXT_PUBLIC_API_URL}" ]; then export NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL}"; fi && \
     npm run build
 
 FROM node:22-alpine AS runner
