@@ -21,7 +21,7 @@ export function MenuItemPriceDisplay({
   oldPrice,
   quantity = 1,
   showFromPrefix = false,
-  fractionDigits = 0,
+  fractionDigits,
   className,
   oldClassName = 'menu-item-price__old',
 }: MenuItemPriceDisplayProps) {

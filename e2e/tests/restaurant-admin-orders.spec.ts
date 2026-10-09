@@ -119,14 +119,7 @@ test.describe('Restaurant admin orders', () => {
       buildOrderPayload(menuItemId),
     );
 
-    const productionAuth = {
-      ...seed.restaurantAdmin.auth,
-      user: {
-        ...seed.restaurantAdmin.auth.user,
-        role: 'restaurant_production' as const,
-      },
-    };
-    await injectAuth(page, productionAuth);
+    await injectAuth(page, seed.restaurantProduction.auth);
     await page.goto('/restaurant-admin/orders');
 
     const card = page.getByTestId(`order-card-${created.id}`);

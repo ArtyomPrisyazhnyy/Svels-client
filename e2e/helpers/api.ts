@@ -1,5 +1,5 @@
 export type { AuthResponse, AuthUser } from '../../src/shared/types/auth';
-import type { AuthResponse, AuthUser } from '../../src/shared/types/auth';
+import type { AuthResponse, AuthUser, UserRole } from '../../src/shared/types/auth';
 import type { CreateMenuItemPayload, MenuCategory } from '../../src/shared/types/menu';
 import type {
   CreatePreOrderPayload,
@@ -272,5 +272,68 @@ export const apiClient = {
       token,
       body: payload,
     });
+  },
+
+  async createRestaurantStaffUser(
+    restaurantId: string,
+    adminToken: string,
+    payload: {
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      role: Extract<UserRole, 'restaurant_production' | 'restaurant_hall' | 'restaurant_manager'>;
+    },
+  ): Promise<AuthResponse> {
+    await api<AuthUser>('POST', `/restaurants/${restaurantId}/staff`, {
+      token: adminToken,
+      body: payload,
+    });
+    return this.login(payload.email, payload.password);
+  },
+
+  async seedDefaultMenu(
+    restaurantId: string,
+    adminToken: string,
+  ): Promise<{ categoryId: string; defaultMenuItemId: string; modifierMenuItemId: string }> {
+    await this.setOrderSettings(restaurantId, adminToken, {
+      fulfillmentDelivery: true,
+      fulfillmentTakeaway: true,
+      fulfillmentDineIn: false,
+      paymentCash: true,
+      paymentCardOnSite: false,
+      paymentOnline: false,
+    });
+
+    const category = await this.createMenuCategory(restaurantId, adminToken, 'E2E Меню');
+    const defaultItem = (await this.createMenuItem(restaurantId, adminToken, {
+      categoryId: category.id,
+      name: 'E2E Блюдо 9.90',
+      price: 9.9,
+      description: 'Playwright seed item',
+      imageUrl: 'https://example.com/e2e-item.jpg',
+    })) as { id: string };
+
+    const modifierItem = (await this.createMenuItem(restaurantId, adminToken, {
+      categoryId: category.id,
+      name: 'E2E С модификатором',
+      price: 12.5,
+      description: 'Playwright seed item with modifiers',
+      imageUrl: 'https://example.com/e2e-item-mod.jpg',
+      modifierGroups: [
+        {
+          name: 'Добавка',
+          selectionType: 'single',
+          required: false,
+          options: [{ name: 'Сыр', priceDelta: 1.5 }],
+        },
+      ],
+    })) as { id: string };
+
+    return {
+      categoryId: category.id,
+      defaultMenuItemId: defaultItem.id,
+      modifierMenuItemId: modifierItem.id,
+    };
   },
 };

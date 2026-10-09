@@ -12,6 +12,7 @@ test.describe('Guest OTP auth', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}/auth`);
     await page.getByTestId('otp-phone').fill(phone);
+    await page.getByTestId('guest-otp-privacy-consent').check();
     await page.getByTestId('otp-send-submit').click();
 
     await expect(page.getByTestId('guest-otp-code-form')).toBeVisible({ timeout: 15_000 });
@@ -34,7 +35,7 @@ test.describe('Guest OTP auth', () => {
 
     await apiClient.sendGuestOtp(seed.restaurantId, phone);
     let otp = await apiClient.getLastDevOtp(phone);
-    let verified = await apiClient.verifyGuestOtp(seed.restaurantId, phone, otp.code);
+    const verified = await apiClient.verifyGuestOtp(seed.restaurantId, phone, otp.code);
     if (verified.status !== 'registration_required') {
       throw new Error('Expected registration_required for new phone');
     }
@@ -46,6 +47,7 @@ test.describe('Guest OTP auth', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}/auth`);
     await page.getByTestId('otp-phone').fill(phone);
+    await page.getByTestId('guest-otp-privacy-consent').check();
     await page.getByTestId('otp-send-submit').click();
     await expect(page.getByTestId('guest-otp-code-form')).toBeVisible({ timeout: 15_000 });
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { CurrencySign } from '@/shared/components/CurrencySign';
+import { formatCurrencyAmount } from '@/shared/utils/currency-format.util';
 
 interface CurrencyAmountProps {
   amount: number | string;
@@ -10,12 +11,12 @@ interface CurrencyAmountProps {
 
 export function CurrencyAmount({
   amount,
-  fractionDigits = 0,
+  fractionDigits,
   className,
 }: CurrencyAmountProps) {
   return (
     <span className={className ? `byn-price ${className}` : 'byn-price'}>
-      <span className="byn-price__amount">{Number(amount).toFixed(fractionDigits)}</span>
+      <span className="byn-price__amount">{formatCurrencyAmount(amount, fractionDigits)}</span>
       <CurrencySign />
     </span>
   );
