@@ -8,15 +8,19 @@ import {
   reviewRegistration,
   type PendingRegistration,
 } from '../api/admin.api';
+import { SuperAdminRestaurantsTab } from '../components/SuperAdminRestaurantsTab';
 import { useRegistrationNotifications } from '../hooks/useRegistrationNotifications';
 import { ApiError } from '../../../shared/api/api-client';
 import { useAuthStore } from '../../../store/auth.store';
 import '../styles/admin.scss';
 
+type SuperAdminTab = 'registrations' | 'restaurants';
+
 export default function SuperAdminPage() {
   const user = useAuthStore((s) => s.user);
   const accessToken = useAuthStore((s) => s.accessToken);
   const logout = useAuthStore((s) => s.logout);
+  const [tab, setTab] = useState<SuperAdminTab>('registrations');
   const [requests, setRequests] = useState<PendingRegistration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,8 +44,11 @@ export default function SuperAdminPage() {
   }, [accessToken]);
 
   useEffect(() => {
-    void loadRequests();
-  }, [loadRequests]);
+    if (tab === 'registrations') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reload when returning to tab
+      void loadRequests();
+    }
+  }, [loadRequests, tab]);
 
   const handleSubmitted = useCallback((registration: PendingRegistration) => {
     setIsLive(true);
@@ -107,65 +114,90 @@ export default function SuperAdminPage() {
         <p className="admin__intro">
           Здравствуйте, {user?.firstName}. Рассматривайте заявки заведений на подключение к
           платформе.
-          {isLive && <span className="admin__live"> · Live-обновления включены</span>}
+          {tab === 'registrations' && isLive && (
+            <span className="admin__live"> · Live-обновления включены</span>
+          )}
         </p>
+
+        <nav className="admin__tabs" aria-label="Разделы суперадмина">
+          <button
+            type="button"
+            className={`admin__tabs-btn${tab === 'registrations' ? ' admin__tabs-btn--active' : ''}`}
+            onClick={() => setTab('registrations')}
+            data-testid="super-admin-tab-registrations"
+          >
+            Заявки
+          </button>
+          <button
+            type="button"
+            className={`admin__tabs-btn${tab === 'restaurants' ? ' admin__tabs-btn--active' : ''}`}
+            onClick={() => setTab('restaurants')}
+            data-testid="super-admin-tab-restaurants"
+          >
+            Заведения
+          </button>
+        </nav>
 
         {error && <p className="admin__error">{error}</p>}
 
-        {loading ? (
-          <p className="admin__empty">Загрузка заявок…</p>
-        ) : requests.length === 0 ? (
-          <p className="admin__empty">Нет заявок на модерации.</p>
+        {tab === 'registrations' ? (
+          loading ? (
+            <p className="admin__empty">Загрузка заявок…</p>
+          ) : requests.length === 0 ? (
+            <p className="admin__empty">Нет заявок на модерации.</p>
+          ) : (
+            <div className="admin__list">
+              {requests.map((request) => (
+                <article
+                  key={request.id}
+                  className="admin__card"
+                  data-testid={`registration-card-${request.id}`}
+                >
+                  <h2 className="admin__card-title">{request.name}</h2>
+                  <p className="admin__meta">
+                    УНП: {request.unp}
+                    {request.isChain ? ' · Сеть' : ''}
+                    <br />
+                    Подано: <ClientFormattedDate iso={request.createdAt} />
+                  </p>
+                  {request.description && (
+                    <p className="admin__meta">{request.description}</p>
+                  )}
+                  <ul className="admin__locations">
+                    {request.locations.map((loc, index) => (
+                      <li key={`${request.id}-${index}`}>
+                        {loc.label ? `${loc.label}: ` : ''}
+                        {loc.city ? `${loc.city}, ` : ''}
+                        {loc.address}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="admin__actions">
+                    <button
+                      type="button"
+                      className="admin__btn admin__btn--approve"
+                      disabled={processingId === request.id}
+                      onClick={() => void handleReview(request.id, 'approve')}
+                      data-testid={`registration-approve-${request.id}`}
+                    >
+                      Одобрить
+                    </button>
+                    <button
+                      type="button"
+                      className="admin__btn admin__btn--reject"
+                      disabled={processingId === request.id}
+                      onClick={() => void handleReview(request.id, 'reject')}
+                      data-testid={`registration-reject-${request.id}`}
+                    >
+                      Отклонить
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )
         ) : (
-          <div className="admin__list">
-            {requests.map((request) => (
-              <article
-                key={request.id}
-                className="admin__card"
-                data-testid={`registration-card-${request.id}`}
-              >
-                <h2 className="admin__card-title">{request.name}</h2>
-                <p className="admin__meta">
-                  УНП: {request.unp}
-                  {request.isChain ? ' · Сеть' : ''}
-                  <br />
-                  Подано: <ClientFormattedDate iso={request.createdAt} />
-                </p>
-                {request.description && (
-                  <p className="admin__meta">{request.description}</p>
-                )}
-                <ul className="admin__locations">
-                  {request.locations.map((loc, index) => (
-                    <li key={`${request.id}-${index}`}>
-                      {loc.label ? `${loc.label}: ` : ''}
-                      {loc.city ? `${loc.city}, ` : ''}
-                      {loc.address}
-                    </li>
-                  ))}
-                </ul>
-                <div className="admin__actions">
-                  <button
-                    type="button"
-                    className="admin__btn admin__btn--approve"
-                    disabled={processingId === request.id}
-                    onClick={() => void handleReview(request.id, 'approve')}
-                    data-testid={`registration-approve-${request.id}`}
-                  >
-                    Одобрить
-                  </button>
-                  <button
-                    type="button"
-                    className="admin__btn admin__btn--reject"
-                    disabled={processingId === request.id}
-                    onClick={() => void handleReview(request.id, 'reject')}
-                    data-testid={`registration-reject-${request.id}`}
-                  >
-                    Отклонить
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+          accessToken && <SuperAdminRestaurantsTab accessToken={accessToken} />
         )}
       </main>
     </div>

@@ -145,11 +145,11 @@ function ShowcaseScene({ id }: { id: ShowcaseId }) {
                 <i />
                 <i />
               </span>
-              <span className="landing-browser__url">moontea.by</span>
+              <span className="landing-browser__url">bistro-lotos.by</span>
             </div>
             <div className="landing-browser__body">
               <div className="landing-browser__hero">
-                <span className="landing-browser__mark">MoonTea</span>
+                <span className="landing-browser__mark">Bistro Lotos</span>
                 <strong>Меню и бронь</strong>
               </div>
               <div className="landing-browser__grid">
@@ -168,7 +168,7 @@ function ShowcaseScene({ id }: { id: ShowcaseId }) {
             <div className="landing-phone__notch" />
             <div className="landing-phone__screen">
               <header>
-                <b>MoonTea</b>
+                <b>Bistro Lotos</b>
                 <span>Меню</span>
               </header>
               <ul>

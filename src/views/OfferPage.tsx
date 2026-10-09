@@ -3,13 +3,13 @@ import { loadLegalMarkdown } from '../../content/legal/load-legal-markdown';
 import { LandingHeader } from './LandingHeader';
 
 /**
- * Страница политики конфиденциальности платформы Svels.
+ * Публичная оферта платформы Svels для заведений.
  */
-export async function PrivacyPolicyPage() {
-  const source = await loadLegalMarkdown('privacy.md');
+export async function OfferPage() {
+  const source = await loadLegalMarkdown('offer.md');
 
   return (
-    <div className="privacy-policy" data-testid="privacy-policy-page">
+    <div className="privacy-policy" data-testid="offer-page">
       <LandingHeader />
 
       <main className="privacy-policy__main privacy-policy__container legal-doc">

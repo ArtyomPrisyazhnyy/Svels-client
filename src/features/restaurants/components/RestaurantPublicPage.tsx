@@ -52,6 +52,9 @@ function RestaurantPublicPageBody({
   categoryNavEnabled,
 }: RestaurantPublicPageProps & { categoryNavEnabled: boolean }) {
   const paths = useRestaurantGuestPaths(restaurant.id, embedded);
+  const legalPath = paths.tenantMode
+    ? '/legal'
+    : `/restaurants/${restaurant.id}/legal`;
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const bookingEnabled = bookingSettings?.bookingEnabled ?? false;
@@ -140,6 +143,13 @@ function RestaurantPublicPageBody({
             </Link>
             <Link href={paths.account} className="restaurant-public__footer-link">
               Личный кабинет
+            </Link>
+            <Link
+              href={legalPath}
+              className="restaurant-public__footer-link"
+              data-testid="restaurant-footer-legal"
+            >
+              Реквизиты и условия
             </Link>
           </nav>
 
