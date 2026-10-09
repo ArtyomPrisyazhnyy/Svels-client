@@ -9,12 +9,16 @@ import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useAuthStore } from '../../../store/auth.store';
 import {
   createCategory,
+  deleteCategory,
   deleteMenuItem,
   fetchMenu,
+  reorderCategories,
+  updateCategory,
 } from '../api/menu.api';
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
 import { MenuItemForm } from '../components/MenuItemForm';
 import { NutritionBadges } from '../components/NutritionBadges';
+import { sortMenuCategories } from './menu-category-sort';
 import '../styles/menu-admin.scss';
 
 export default function MenuAdminPage() {
@@ -25,7 +29,10 @@ export default function MenuAdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [categoryBusyId, setCategoryBusyId] = useState<string | null>(null);
   const formPanelRef = useRef<HTMLElement>(null);
+
+  const sortedCategories = sortMenuCategories(categories);
 
   const loadMenu = useCallback(async () => {
     if (!restaurantId) {
@@ -47,6 +54,7 @@ export default function MenuAdminPage() {
   }, [restaurantId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadMenu();
   }, [loadMenu]);
 
@@ -79,6 +87,75 @@ export default function MenuAdminPage() {
   function handleEditItem(item: MenuItem) {
     setEditingItem(item);
     formPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function categoryDeleteErrorMessage(err: unknown): string {
+    if (err instanceof ApiError && err.code === 'CATEGORY_NOT_EMPTY') {
+      return 'Нельзя удалить категорию с позициями меню. Сначала удалите или перенесите блюда.';
+    }
+    return err instanceof ApiError ? err.message : 'Не удалось удалить категорию';
+  }
+
+  async function handleRenameCategory(category: MenuCategory) {
+    if (!restaurantId || !accessToken) return;
+    const nextName = window.prompt('Новое название категории', category.name);
+    if (nextName === null) return;
+    const trimmed = nextName.trim();
+    if (!trimmed || trimmed === category.name) return;
+
+    setCategoryBusyId(category.id);
+    setError(null);
+    try {
+      await updateCategory(restaurantId, accessToken, category.id, { name: trimmed });
+      await loadMenu();
+      await revalidateRestaurantPublicPage(restaurantId);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Не удалось переименовать категорию');
+    } finally {
+      setCategoryBusyId(null);
+    }
+  }
+
+  async function handleDeleteCategory(category: MenuCategory) {
+    if (!restaurantId || !accessToken) return;
+    if (!window.confirm(`Удалить категорию «${category.name}»?`)) return;
+
+    setCategoryBusyId(category.id);
+    setError(null);
+    try {
+      await deleteCategory(restaurantId, accessToken, category.id);
+      await loadMenu();
+      await revalidateRestaurantPublicPage(restaurantId);
+    } catch (err) {
+      setError(categoryDeleteErrorMessage(err));
+    } finally {
+      setCategoryBusyId(null);
+    }
+  }
+
+  async function handleMoveCategory(categoryId: string, direction: 'up' | 'down') {
+    if (!restaurantId || !accessToken) return;
+
+    const ids = sortedCategories.map((c) => c.id);
+    const index = ids.indexOf(categoryId);
+    if (index < 0) return;
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= ids.length) return;
+
+    const nextIds = [...ids];
+    [nextIds[index], nextIds[swapIndex]] = [nextIds[swapIndex], nextIds[index]];
+
+    setCategoryBusyId(categoryId);
+    setError(null);
+    try {
+      await reorderCategories(restaurantId, accessToken, nextIds);
+      await loadMenu();
+      await revalidateRestaurantPublicPage(restaurantId);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Не удалось изменить порядок категорий');
+    } finally {
+      setCategoryBusyId(null);
+    }
   }
 
   if (!restaurantId) {
@@ -115,12 +192,57 @@ export default function MenuAdminPage() {
           <h2>Текущее меню</h2>
           {loading ? (
             <p className="menu-admin__empty">Загрузка…</p>
-          ) : categories.length === 0 ? (
+          ) : sortedCategories.length === 0 ? (
             <p className="menu-admin__empty">Пока нет категорий и позиций.</p>
           ) : (
-            categories.map((category) => (
-              <div key={category.id} className="menu-admin__category">
-                <h3>{category.name}</h3>
+            sortedCategories.map((category, categoryIndex) => (
+              <div key={category.id} className="menu-admin__category" data-testid={`menu-category-${category.id}`}>
+                <div className="menu-admin__category-header">
+                  <h3>{category.name}</h3>
+                  <div className="menu-admin__category-actions">
+                    <button
+                      type="button"
+                      className="menu-admin__category-btn"
+                      disabled={categoryBusyId === category.id || categoryIndex === 0}
+                      onClick={() => void handleMoveCategory(category.id, 'up')}
+                      aria-label="Выше"
+                      data-testid={`category-move-up-${category.id}`}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      className="menu-admin__category-btn"
+                      disabled={
+                        categoryBusyId === category.id ||
+                        categoryIndex === sortedCategories.length - 1
+                      }
+                      onClick={() => void handleMoveCategory(category.id, 'down')}
+                      aria-label="Ниже"
+                      data-testid={`category-move-down-${category.id}`}
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      className="menu-admin__category-btn"
+                      disabled={categoryBusyId === category.id}
+                      onClick={() => void handleRenameCategory(category)}
+                      data-testid={`category-rename-${category.id}`}
+                    >
+                      Переименовать
+                    </button>
+                    <button
+                      type="button"
+                      className="menu-admin__category-btn menu-admin__category-btn--danger"
+                      disabled={categoryBusyId === category.id}
+                      onClick={() => void handleDeleteCategory(category)}
+                      data-testid={`category-delete-${category.id}`}
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                </div>
                 {category.items.length === 0 ? (
                   <p className="menu-admin__empty">Нет позиций</p>
                 ) : (
