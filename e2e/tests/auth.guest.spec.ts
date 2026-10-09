@@ -35,7 +35,7 @@ test.describe('Guest OTP auth', () => {
 
     await apiClient.sendGuestOtp(seed.restaurantId, phone);
     let otp = await apiClient.getLastDevOtp(phone);
-    let verified = await apiClient.verifyGuestOtp(seed.restaurantId, phone, otp.code);
+    const verified = await apiClient.verifyGuestOtp(seed.restaurantId, phone, otp.code);
     if (verified.status !== 'registration_required') {
       throw new Error('Expected registration_required for new phone');
     }

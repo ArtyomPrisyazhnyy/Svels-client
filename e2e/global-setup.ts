@@ -114,6 +114,5 @@ export default async function globalSetup(): Promise<void> {
   };
 
   writeSeed(seed);
-  // eslint-disable-next-line no-console
   console.log(`[e2e] Seeded restaurant ${seed.restaurantId} (${restaurantName}) as ${email}`);
 }
