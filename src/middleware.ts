@@ -3,7 +3,7 @@ import { buildRestaurantGuestPath } from '@/shared/routing/restaurant-guest-path
 import { isPlatformHost, normalizeHost } from '@/shared/tenant/platform-hosts';
 import { resolveRestaurantByDomain } from '@/shared/tenant/resolve-restaurant';
 
-const TENANT_GUEST_SEGMENTS = new Set(['booking', 'pre-order', 'account', 'auth', 'favorites']);
+const TENANT_GUEST_SEGMENTS = new Set(['booking', 'pre-order', 'account', 'auth', 'favorites', 'legal']);
 const TENANT_BLOCKED_PREFIXES = ['/admin', '/restaurant-admin'];
 
 function mapTenantPath(pathname: string, restaurantId: string): string {

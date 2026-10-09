@@ -576,7 +576,7 @@ export default function StylingAdminPage() {
               <RestaurantStylingShell styling={previewStyling} className="styling-admin__preview" enableScrollToTop={false}>
                 <header className="glass-header glass-header--tenant">
                   <div className="glass-header__brand">
-                    <span className="glass-header__brand-name">Moontea</span>
+                    <span className="glass-header__brand-name">Bistro Lotos</span>
                   </div>
                   <div className="glass-header__actions">
                     <span className="restaurant-profile-button" aria-hidden>
@@ -628,7 +628,7 @@ export default function StylingAdminPage() {
                   <div className="restaurant-public__footer-inner">
                     <div className="restaurant-public__footer-brand">
                       <div className="restaurant-public__footer-brand-text">
-                        <span className="restaurant-public__footer-name">Moontea</span>
+                        <span className="restaurant-public__footer-name">Bistro Lotos</span>
                         <p className="restaurant-public__footer-tagline">
                           Чайная мастерская в самом сердце города
                         </p>
@@ -642,7 +642,7 @@ export default function StylingAdminPage() {
                     </nav>
                   </div>
                   <div className="restaurant-public__footer-bottom">
-                    <span>© 2026 Moontea · ул. Примерная, 1</span>
+                    <span>© 2026 Bistro Lotos · ул. Примерная, 1</span>
                     <span className="restaurant-public__footer-credit">Работает на Svels</span>
                   </div>
                 </footer>
