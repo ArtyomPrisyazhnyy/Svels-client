@@ -4,11 +4,15 @@ UI-регрессионные тесты для всего клиентског�
 
 ## Требования
 
-1. Backend на `:3000` (Postgres + Redis) с `NODE_ENV !== production`
-2. В `Svels-backend/.env` заданы `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD` (или те же ключи в `e2e/.env` как `E2E_SUPER_ADMIN_*`)
-3. Frontend поднимается Playwright’ом (`npm run dev` на `:3001`) либо уже запущен
+1. Backend на `:3000` (Postgres + Redis), миграции и super admin (см. `Svels-backend/.env.example`).
+2. В **`Svels-backend/.env`** для e2e обязательно:
+   - `NODE_ENV=development`
+   - `ENABLE_DEV_ENDPOINTS=true` — иначе `GET /dev/last-otp` отвечает **404** (нужен global-setup и OTP-тесты)
+   - `CORS_ALLOWED_ORIGINS=http://localhost:3001,http://127.0.0.1:3001` — клиент Playwright по умолчанию на **3001** (`E2E_BASE_URL`); без этого браузерные запросы к API блокируются CORS (см. Svels-backend `878d76d`+)
+   - `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD` (или дубли в `e2e/.env` как `E2E_SUPER_ADMIN_*`)
+3. Frontend поднимается Playwright’ом (`npm run dev` / `npm run start` на `:3001`) либо уже запущен.
 
-Dev-эндпоинт `GET /dev/last-otp?phone=...` нужен для OTP-сценариев (только non-production).
+Dev-эндпоинт `GET /dev/last-otp?phone=...` доступен только при **`NODE_ENV=development`** и **`ENABLE_DEV_ENDPOINTS=true`**.
 
 ## Команды
 
@@ -36,6 +40,10 @@ E2E_SKIP_WEBSERVER=1 npm run test:e2e
 4. Одобряет заявку
 5. Пишет `e2e/.auth/seed.json` (gitignore)
 
+## CI
+
+На каждый PR в `main` workflow **e2e** поднимает Postgres 16, Redis, собирает и запускает [Svels-backend](https://github.com/ArtyomPrisyazhnyy/Svels-backend) `main`, собирает клиент и гоняет **все** спеки Playwright. При падении сохраняются HTML-отчёт и traces (`playwright-e2e-artifacts`).
+
 ## Покрытие
 
 | Область | Файл |
@@ -46,7 +54,8 @@ E2E_SKIP_WEBSERVER=1 npm run test:e2e
 | Guest OTP | `auth.guest.spec.ts` |
 | Публичная страница / меню / корзина | `restaurant.public.spec.ts` |
 | Бронирование | `booking.spec.ts` |
-| Предзаказ (placeholder) | `preorder.spec.ts` |
+| Предзаказ / корзина | `preorder.spec.ts` |
+| Заказы (админка) | `restaurant-admin-orders.spec.ts` |
 | ЛК гостя | `account.spec.ts` |
 | Админка заведения (все разделы) | `restaurant-admin.spec.ts` |
 | Суперадмин модерация | `super-admin.spec.ts` |

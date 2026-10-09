@@ -25,7 +25,7 @@ export default defineConfig({
   outputDir: 'e2e/test-results',
   use: {
     baseURL,
-    trace: 'on-first-retry',
+    trace: process.env.CI ? 'retain-on-failure' : 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     locale: 'ru-RU',
@@ -39,9 +39,9 @@ export default defineConfig({
   webServer: process.env.E2E_SKIP_WEBSERVER
     ? undefined
     : {
-        command: 'npm run dev',
+        command: process.env.CI ? 'npm run start' : 'npm run dev',
         url: baseURL,
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        timeout: process.env.CI ? 180_000 : 120_000,
       },
 });

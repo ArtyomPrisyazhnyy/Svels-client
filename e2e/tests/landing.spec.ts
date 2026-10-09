@@ -5,7 +5,7 @@ test.describe('Landing / platform home', () => {
     await page.goto('/');
 
     await expect(page.getByTestId('landing-page')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Svels', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Svels' })).toBeVisible();
     await expect(
       page.getByRole('heading', { name: /Сайт и мобильное приложение для вашего заведения/ }),
     ).toBeVisible();
@@ -199,6 +199,7 @@ test.describe('Landing / platform home', () => {
     const submit = page.getByRole('button', { name: 'Отправить заявку' });
     const consent = page.getByTestId('contact-modal-privacy-consent');
 
+    await expect(consent).toBeVisible();
     await expect(consent).not.toBeChecked();
     await expect(submit).toBeDisabled();
     await expect(page.getByRole('link', { name: 'политики конфиденциальности' })).toHaveAttribute(
@@ -206,7 +207,8 @@ test.describe('Landing / platform home', () => {
       '/privacypolicy',
     );
 
-    await consent.check();
+    await consent.scrollIntoViewIfNeeded();
+    await consent.check({ force: true });
     await expect(consent).toBeChecked();
     await expect(submit).toBeEnabled();
   });

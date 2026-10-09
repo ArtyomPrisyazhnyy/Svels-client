@@ -46,3 +46,155 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      E2E_API_URL: http://127.0.0.1:3000
+      E2E_BASE_URL: http://127.0.0.1:3001
+      REVALIDATE_SECRET: ci-revalidate-secret
+      E2E_SUPER_ADMIN_EMAIL: e2e-super@svels.test
+      E2E_SUPER_ADMIN_PASSWORD: E2eSuperAdminPass123!
+      E2E_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/svels
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: svels
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d svels"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout Svels-client
+        uses: actions/checkout@v4
+
+      - name: Checkout Svels-backend
+        uses: actions/checkout@v4
+        with:
+          repository: ArtyomPrisyazhnyy/Svels-backend
+          ref: main
+          path: Svels-backend
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install backend dependencies
+        working-directory: Svels-backend
+        run: npm ci
+
+      - name: Configure backend environment
+        working-directory: Svels-backend
+        env:
+          SUPER_ADMIN_EMAIL: ${{ env.E2E_SUPER_ADMIN_EMAIL }}
+          SUPER_ADMIN_PASSWORD: ${{ env.E2E_SUPER_ADMIN_PASSWORD }}
+        run: |
+          cat > .env <<EOF
+          NODE_ENV=development
+          ENABLE_DEV_ENDPOINTS=true
+          CORS_ALLOWED_ORIGINS=http://localhost:3001,http://127.0.0.1:3001
+          PORT=3000
+          DB_HOST=localhost
+          DB_PORT=5432
+          DB_USERNAME=postgres
+          DB_PASSWORD=postgres
+          DB_NAME=svels
+          REDIS_HOST=localhost
+          REDIS_PORT=6379
+          JWT_SECRET=ci-e2e-jwt-secret-change-me-32chars
+          JWT_EXPIRES_IN=7d
+          STORAGE_DRIVER=local
+          NEXT_SITE_URL=http://127.0.0.1:3001
+          API_PUBLIC_URL=http://127.0.0.1:3000
+          REVALIDATE_SECRET=ci-revalidate-secret
+          BEPAID_TEST_MODE=true
+          TELEGRAM_GATEWAY_TOKEN=
+          TELEGRAM_BOT_TOKEN=
+          TELEGRAM_BOT_USERNAME=
+          TELEGRAM_WEBHOOK_SECRET=
+          SMS_BY_TOKEN=
+          SMSC_LOGIN=
+          SMSC_PASSWORD=
+          SUPER_ADMIN_EMAIL=${SUPER_ADMIN_EMAIL}
+          SUPER_ADMIN_PASSWORD=${SUPER_ADMIN_PASSWORD}
+          EOF
+
+      - name: Run backend migrations
+        working-directory: Svels-backend
+        run: npm run migration:run
+
+      - name: Create super admin
+        working-directory: Svels-backend
+        run: npm run create:super-admin
+
+      - name: Build backend
+        working-directory: Svels-backend
+        run: npm run build
+
+      - name: Start backend
+        working-directory: Svels-backend
+        env:
+          NODE_ENV: development
+          ENABLE_DEV_ENDPOINTS: true
+        run: |
+          # Load .env before dist/main imports AppModule (DevModule needs NODE_ENV at import time).
+          node -r dotenv/config dist/main.js > /tmp/svels-backend.log 2>&1 &
+          echo $! > /tmp/svels-backend.pid
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:3000/health > /dev/null; then
+              sleep 3
+              echo "Backend is up"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Backend failed to start"
+          tail -n 200 /tmp/svels-backend.log || true
+          exit 1
+
+      - name: Install client dependencies
+        run: npm ci
+
+      - name: Build client
+        run: npm run build
+
+      - name: Install Playwright (Chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        run: npm run test:e2e
+
+      - name: Upload Playwright report and traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-e2e-artifacts
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          if-no-files-found: ignore
+
+      - name: Upload backend logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: svels-backend-logs
+          path: /tmp/svels-backend.log
+          if-no-files-found: ignore
