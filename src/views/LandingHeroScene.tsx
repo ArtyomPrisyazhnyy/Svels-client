@@ -9,11 +9,11 @@ export function LandingHeroScene() {
             <i />
             <i />
           </span>
-          <span className="landing-browser__url">moontea.by</span>
+          <span className="landing-browser__url">bistro-lotos.by</span>
         </div>
         <div className="landing-browser__body">
           <div className="landing-browser__hero">
-            <span className="landing-browser__mark">MoonTea</span>
+            <span className="landing-browser__mark">Bistro Lotos</span>
             <strong>Вечер в чайной</strong>
             <em>Стол у окна · 19:00</em>
           </div>
@@ -38,7 +38,7 @@ export function LandingHeroScene() {
         <div className="landing-phone__notch" />
         <div className="landing-phone__screen">
           <header>
-            <b>MoonTea</b>
+            <b>Bistro Lotos</b>
             <span>Сегодня</span>
           </header>
           <ul>
