@@ -102,11 +102,7 @@ test.describe('Super admin', () => {
   });
 });
 
-/**
- * Онбординг заведений суперадмином — контракт 3.7, бэкенд W2-B-ONB.
- * Прогон на интеграции: в main бэкенда эндпоинты могут отсутствовать до merge W2-B-ONB.
- */
-test.describe('Super admin restaurants (прогон на интеграции)', () => {
+test.describe('Super admin restaurants', () => {
   test('создание заведения и ссылка владельцу', async ({ page, asSuperAdmin }) => {
     void asSuperAdmin;
     const stamp = Date.now().toString(36);
@@ -158,9 +154,7 @@ test.describe('Super admin restaurants (прогон на интеграции)'
       },
     );
 
-    if (!createResponse.ok()) {
-      test.skip(true, 'POST /restaurants/admin/create недоступен (ожидается W2-B-ONB)');
-    }
+    expect(createResponse.ok()).toBeTruthy();
 
     const body = (await createResponse.json()) as { setPasswordUrl: string };
     const token = new URL(body.setPasswordUrl).searchParams.get('token');

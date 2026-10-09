@@ -1,10 +1,6 @@
 import { test, expect, apiClient } from '../fixtures/test';
 
-/**
- * Управление категориями меню (PATCH/DELETE/reorder) — контракт 3.7, бэкенд W2-B-ONB.
- * Прогон на интеграции: в main бэкенда эндпоинты могут отсутствовать до merge W2-B-ONB.
- */
-test.describe('Menu categories (прогон на интеграции)', () => {
+test.describe('Menu categories', () => {
   test('переименование, сортировка и удаление пустой категории', async ({
     page,
     asRestaurantAdmin,

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { setPassword } from '../api/set-password.api';
 import { useAuthStore } from '@/store/auth.store';
-import { ApiError } from '@/shared/api/api-client';
+import { formatSetPasswordError } from './set-password-errors';
 import '../styles/set-password.scss';
 
 export function SetPasswordPage() {
@@ -44,7 +44,7 @@ export function SetPasswordPage() {
       setAuth(response.accessToken, response.user);
       router.replace('/restaurant-admin');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось установить пароль');
+      setError(formatSetPasswordError(err));
     } finally {
       setLoading(false);
     }
