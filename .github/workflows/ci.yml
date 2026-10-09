@@ -151,18 +151,13 @@ jobs:
         env:
           NODE_ENV: development
         run: |
-          # DevModule (/dev/last-otp) is gated on process.env.NODE_ENV at import time — must be set before node starts.
-          npm run start:prod > /tmp/svels-backend.log 2>&1 &
+          # Load .env before dist/main imports AppModule (DevModule needs NODE_ENV at import time).
+          node -r dotenv/config dist/main.js > /tmp/svels-backend.log 2>&1 &
           echo $! > /tmp/svels-backend.pid
           for i in $(seq 1 60); do
-            if ! curl -sf http://127.0.0.1:3000/health > /dev/null; then
-              sleep 2
-              continue
-            fi
-            # Wait until DevController is registered (400 = missing phone), not early 404 while routes still bind.
-            dev_code=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/dev/last-otp" || true)
-            if [ "$dev_code" = "400" ]; then
-              echo "Backend is up (dev OTP route available)"
+            if curl -sf http://127.0.0.1:3000/health > /dev/null; then
+              sleep 3
+              echo "Backend is up"
               exit 0
             fi
             sleep 2
