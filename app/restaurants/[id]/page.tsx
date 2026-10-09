@@ -23,8 +23,6 @@ import { devAwareStaticParams } from '@/shared/utils/dev-static-params.util';
 
 /** Fallback ISR (сек). Должен быть литералом — см. publicPageFetchOptions ниже. */
 export const revalidate = 3600;
-export const dynamic =
-  process.env.RESTAURANT_PUBLIC_FORCE_DYNAMIC === '1' ? 'force-dynamic' : 'auto';
 export const dynamicParams = true;
 
 interface RestaurantPageProps {
@@ -46,8 +44,9 @@ const DEFAULT_ORDER_SETTINGS = (restaurantId: string): RestaurantOrderSettings =
 const EMPTY_MENU: MenuResponse = { categories: [] };
 
 function publicPageFetchOptions(restaurantId: string): ServerFetchOptions {
+  const disableIsr = process.env.E2E_DISABLE_PUBLIC_PAGE_ISR === '1';
   return {
-    revalidate: RESTAURANT_PUBLIC_REVALIDATE_SECONDS,
+    revalidate: disableIsr ? false : RESTAURANT_PUBLIC_REVALIDATE_SECONDS,
     tags: [restaurantPublicPageTag(restaurantId)],
   };
 }
