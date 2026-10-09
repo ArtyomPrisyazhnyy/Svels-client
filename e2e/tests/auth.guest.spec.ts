@@ -55,7 +55,8 @@ test.describe('Guest OTP auth', () => {
       sessionStorage.clear();
     });
 
-    await page.waitForTimeout(45_000);
+    // Backend OtpRateLimitService: min 60s between sends to the same phone.
+    await page.waitForTimeout(61_000);
     await page.goto(`/restaurants/${seed.restaurantId}/auth`);
     await page.getByTestId('otp-phone').fill(phone);
     await page.getByTestId('guest-otp-privacy-consent').check();
