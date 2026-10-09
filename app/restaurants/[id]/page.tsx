@@ -23,6 +23,8 @@ import { devAwareStaticParams } from '@/shared/utils/dev-static-params.util';
 
 /** Fallback ISR (сек). Должен быть литералом — см. publicPageFetchOptions ниже. */
 export const revalidate = 3600;
+export const dynamic =
+  process.env.RESTAURANT_PUBLIC_FORCE_DYNAMIC === '1' ? 'force-dynamic' : 'auto';
 export const dynamicParams = true;
 
 interface RestaurantPageProps {

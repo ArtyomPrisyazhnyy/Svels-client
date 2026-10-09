@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
-      RESTAURANT_PUBLIC_REVALIDATE_SECONDS: 0
+      RESTAURANT_PUBLIC_FORCE_DYNAMIC: '1'
       E2E_API_URL: http://127.0.0.1:3000
       E2E_BASE_URL: http://127.0.0.1:3001
       E2E_SUPER_ADMIN_EMAIL: e2e-super@svels.test
