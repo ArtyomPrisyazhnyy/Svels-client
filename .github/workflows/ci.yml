@@ -148,7 +148,8 @@ jobs:
       - name: Start backend
         working-directory: Svels-backend
         run: |
-          npm run start:prod > /tmp/svels-backend.log 2>&1 &
+          # DevModule (/dev/last-otp) is gated on process.env.NODE_ENV at import time — must be set in shell, not only in .env.
+          NODE_ENV=development npm run start:prod > /tmp/svels-backend.log 2>&1 &
           echo $! > /tmp/svels-backend.pid
           for i in $(seq 1 60); do
             if curl -sf http://127.0.0.1:3000/health > /dev/null; then
