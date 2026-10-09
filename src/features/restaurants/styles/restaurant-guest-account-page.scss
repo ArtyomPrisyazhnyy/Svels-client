@@ -1,0 +1,182 @@
+.restaurant-guest-account {
+  min-height: 100vh;
+  background: var(--rs-bg, #f8fafc);
+  color: var(--rs-text, #0f172a);
+
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  &__header-spacer {
+    flex-shrink: 0;
+    min-width: 4.5rem;
+  }
+
+  &__logout {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+  }
+
+  &__main {
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.25rem 1rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  &__profile-card {
+    background: var(--rs-surface, #fff);
+    border: 1px solid var(--rs-border, #e2e8f0);
+    border-radius: 16px;
+    padding: 1.5rem 1.25rem;
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--rs-text, #0f172a) 6%, transparent);
+  }
+
+  &__greeting {
+    margin: 0 0 0.35rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--rs-text, #0f172a);
+  }
+
+  &__contact {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+    color: var(--rs-text-muted, #64748b);
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--rs-text-muted, #64748b);
+    line-height: 1.45;
+  }
+
+  &__section {
+    background: var(--rs-surface, #fff);
+    border: 1px solid var(--rs-border, #e2e8f0);
+    border-radius: 16px;
+    padding: 1.25rem;
+
+    h2 {
+      margin: 0 0 0.875rem;
+      font-size: 1.05rem;
+      color: var(--rs-text, #0f172a);
+    }
+  }
+
+  &__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      border-radius: var(--rs-btn-radius, 12px);
+      border: 1px solid var(--rs-border, #e2e8f0);
+      background: color-mix(in srgb, var(--rs-primary, #2563eb) 8%, transparent);
+      color: var(--rs-primary, #2563eb);
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+
+      &:hover {
+        border-color: var(--rs-primary, #2563eb);
+        background: color-mix(in srgb, var(--rs-primary, #2563eb) 14%, transparent);
+      }
+    }
+  }
+
+  &__bookings {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__booking {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--rs-border, #e2e8f0);
+    background: color-mix(in srgb, var(--rs-bg, #f8fafc) 60%, transparent);
+  }
+
+  &__booking-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+    color: var(--rs-text-muted, #64748b);
+
+    strong {
+      color: var(--rs-text, #0f172a);
+      font-size: 0.95rem;
+    }
+  }
+
+  &__booking-badge {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    &--pending {
+      background: color-mix(in srgb, #f59e0b 18%, transparent);
+      color: #b45309;
+    }
+
+    &--confirmed {
+      background: color-mix(in srgb, var(--rs-accent, #0f766e) 18%, transparent);
+      color: var(--rs-accent, #0f766e);
+    }
+
+    &--cancelled {
+      background: color-mix(in srgb, #94a3b8 22%, transparent);
+      color: #475569;
+    }
+
+    &--completed {
+      background: color-mix(in srgb, var(--rs-primary, #2563eb) 15%, transparent);
+      color: var(--rs-primary, #2563eb);
+    }
+  }
+
+  &__booking-cancel {
+    border: none;
+    border-radius: var(--rs-btn-radius, 10px);
+    padding: 0.5rem 0.875rem;
+    background: transparent;
+    color: #b91c1c;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: #991b1b;
+    }
+  }
+}
