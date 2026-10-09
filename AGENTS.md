@@ -20,7 +20,7 @@
 
 1. Клонировать [Svels-backend](https://github.com/ArtyomPrisyazhnyy/Svels-backend) рядом с клиентом (`../Svels-backend` или `Svels-backend` в корне монорепо — путь в `playwright.config.ts`).
 2. Postgres 16 + Redis, `npm ci` и `npm run migration:run` в backend, `npm run create:super-admin` (см. backend `.env.example`).
-3. Backend: `NODE_ENV=development npm run start:dev` (порт **3000**).
+3. Backend (порт **3000**): в `Svels-backend/.env` — `NODE_ENV=development`, `ENABLE_DEV_ENDPOINTS=true` (для `/dev/last-otp` в e2e), `CORS_ALLOWED_ORIGINS=http://localhost:3001,http://127.0.0.1:3001`; затем `npm run start:dev` (или `node -r dotenv/config dist/main.js` после `npm run build`).
 4. В `e2e/.env` (или backend `.env`) задать `E2E_SUPER_ADMIN_EMAIL` / `E2E_SUPER_ADMIN_PASSWORD` (или `SUPER_ADMIN_*`).
 5. Клиент: `npm ci`, при необходимости `npm run build`.
 6. `npx playwright install chromium` (первый раз).
