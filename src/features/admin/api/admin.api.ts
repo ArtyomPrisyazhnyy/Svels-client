@@ -81,3 +81,10 @@ export function createOwnerInvite(
     },
   );
 }
+
+export function deleteRestaurantByAdmin(token: string, restaurantId: string): Promise<void> {
+  return apiRequest<void>(`/restaurants/admin/${restaurantId}`, {
+    method: 'DELETE',
+    token,
+  });
+}
