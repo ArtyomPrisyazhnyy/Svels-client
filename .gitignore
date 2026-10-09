@@ -44,3 +44,4 @@ blob-report/
 /out/
 next-env.d.ts
 tsconfig.tsbuildinfo
+tmp/
