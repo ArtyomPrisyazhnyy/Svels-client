@@ -1,4 +1,5 @@
 import { test, expect, apiClient } from '../fixtures/test';
+import { getApiUrl, readSeed } from '../helpers/env';
 
 test.describe('Super admin', () => {
   test('панель модерации открывается', async ({ page, asSuperAdmin }) => {
@@ -131,12 +132,11 @@ test.describe('Super admin restaurants', () => {
   test('страница установки пароля и вход владельца', async ({ page }) => {
     const stamp = Date.now().toString(36);
 
-    const { readSeed } = await import('../helpers/env');
     const seed = readSeed();
     const superToken = seed.superAdmin.auth.accessToken;
 
     const createResponse = await page.request.post(
-      `${process.env.E2E_API_URL ?? 'http://127.0.0.1:3000'}/restaurants/admin/create`,
+      `${getApiUrl()}/restaurants/admin/create`,
       {
         headers: {
           Authorization: `Bearer ${superToken}`,

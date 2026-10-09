@@ -1,4 +1,27 @@
 import { test, expect, apiClient } from '../fixtures/test';
+import type { Page } from '@playwright/test';
+
+async function getMenuCategoryIdsInDom(page: Page): Promise<string[]> {
+  const nodes = page.locator('[data-testid^="menu-category-"]');
+  const count = await nodes.count();
+  const ids: string[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const testId = await nodes.nth(index).getAttribute('data-testid');
+    if (testId?.startsWith('menu-category-')) {
+      ids.push(testId.slice('menu-category-'.length));
+    }
+  }
+  return ids;
+}
+
+function orderCategoriesWithPairFirst(
+  categoryIds: string[],
+  firstId: string,
+  secondId: string,
+): string[] {
+  const rest = categoryIds.filter((id) => id !== firstId && id !== secondId);
+  return [...rest, firstId, secondId];
+}
 
 test.describe('Menu categories', () => {
   test('переименование, сортировка и удаление пустой категории', async ({
@@ -14,15 +37,37 @@ test.describe('Menu categories', () => {
     const catA = await apiClient.createMenuCategory(restaurantId, token, `Cat A ${stamp}`);
     const catB = await apiClient.createMenuCategory(restaurantId, token, `Cat B ${stamp}`);
 
+    const menu = await apiClient.getMenu(restaurantId);
+    const orderedIds = orderCategoriesWithPairFirst(
+      menu.categories.map((category) => category.id),
+      catA.id,
+      catB.id,
+    );
+    await apiClient.reorderMenuCategories(restaurantId, token, orderedIds);
+
     await page.goto('/restaurant-admin/menu');
     await expect(page.getByTestId(`menu-category-${catA.id}`)).toBeVisible({ timeout: 15_000 });
+
+    let domOrder = await getMenuCategoryIdsInDom(page);
+    expect(domOrder.indexOf(catA.id)).toBeLessThan(domOrder.indexOf(catB.id));
 
     page.once('dialog', (dialog) => dialog.accept(`Renamed ${stamp}`));
     await page.getByTestId(`category-rename-${catA.id}`).click();
     await expect(page.getByTestId(`menu-category-${catA.id}`)).toContainText(`Renamed ${stamp}`);
 
+    domOrder = await getMenuCategoryIdsInDom(page);
+    expect(domOrder.indexOf(catA.id)).toBeLessThan(domOrder.indexOf(catB.id));
+
     await page.getByTestId(`category-move-up-${catB.id}`).click();
-    await page.getByTestId(`category-move-down-${catA.id}`).click();
+    domOrder = await getMenuCategoryIdsInDom(page);
+    expect(domOrder.indexOf(catB.id)).toBeLessThan(domOrder.indexOf(catA.id));
+
+    const moveDown = page.getByTestId(`category-move-down-${catA.id}`);
+    if (await moveDown.isEnabled()) {
+      await moveDown.click();
+      domOrder = await getMenuCategoryIdsInDom(page);
+      expect(domOrder.indexOf(catA.id)).toBeGreaterThan(domOrder.indexOf(catB.id));
+    }
 
     page.once('dialog', (dialog) => dialog.accept());
     await page.getByTestId(`category-delete-${catB.id}`).click();

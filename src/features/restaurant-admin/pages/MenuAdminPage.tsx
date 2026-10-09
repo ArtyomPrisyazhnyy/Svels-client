@@ -18,6 +18,7 @@ import {
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
 import { MenuItemForm } from '../components/MenuItemForm';
 import { NutritionBadges } from '../components/NutritionBadges';
+import { sortMenuCategories } from './menu-category-sort';
 import '../styles/menu-admin.scss';
 
 export default function MenuAdminPage() {
@@ -31,7 +32,7 @@ export default function MenuAdminPage() {
   const [categoryBusyId, setCategoryBusyId] = useState<string | null>(null);
   const formPanelRef = useRef<HTMLElement>(null);
 
-  const sortedCategories = [...categories].sort((a, b) => a.sortOrder - b.sortOrder);
+  const sortedCategories = sortMenuCategories(categories);
 
   const loadMenu = useCallback(async () => {
     if (!restaurantId) {
