@@ -7,12 +7,11 @@ test.describe('Landing / platform home', () => {
 
     await expect(page.getByTestId('landing-page')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Svels' })).toBeVisible();
-    await expect(
-      page.getByRole('heading', {
-        name: /Сайт и мобильное приложение/,
-      }),
-    ).toBeVisible();
-    await expect(page.getByText('для вашего заведения')).toBeVisible();
+    const heroTitle = page.getByRole('heading', {
+      name: /Сайт и мобильное приложение/,
+    });
+    await expect(heroTitle).toBeVisible();
+    await expect(heroTitle.getByText('для вашего заведения', { exact: true })).toBeVisible();
     await expect(page.getByTestId('landing-cta-contact').first()).toBeVisible();
   });
 
