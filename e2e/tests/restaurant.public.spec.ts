@@ -61,6 +61,7 @@ test.describe('Restaurant public page', () => {
     await expect(page.getByTestId('restaurant-cart-modal').getByText(firstItem.name)).toBeVisible({
       timeout: 10_000,
     });
+    await expect(page.getByTestId('cart-location-picker')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('cart-location-address')).toBeVisible();
     await expect(page.getByTestId('location-map')).toBeVisible();
   });

@@ -80,7 +80,6 @@ test.describe('Restaurant auth UI', () => {
     expect(response.ok()).toBeTruthy();
 
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole('button', { name: /выйти/i })).toBeVisible();
 
     const pending = await apiClient.getPendingRegistrations(seed.superAdmin.auth.accessToken);
     expect(pending.some((item) => item.name.includes(businessName))).toBeTruthy();

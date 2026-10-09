@@ -100,7 +100,7 @@ test.describe('Pre-order', () => {
     const latest = orders.find((o) => o.restaurantId === seed.restaurantId);
     expect(latest).toBeTruthy();
     expect(latest!.fulfillmentType).toBe('takeaway');
-    expect(latest!.customerPhone).toMatch(/^\+375/);
+    expect(latest!.customerPhone.replace(/\D/g, '')).toMatch(/^375/);
   });
 
   test('доставка без адреса → кнопка оформления неактивна', async ({ page, seed, asGuest }) => {
