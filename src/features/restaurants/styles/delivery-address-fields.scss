@@ -31,11 +31,20 @@
   input,
   textarea {
     width: 100%;
-    padding: 0.55rem 0.75rem;
-    border: 1px solid #e2e8f0;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--rs-border, #cbd5e1);
     border-radius: 10px;
-    font-size: 0.9375rem;
+    font-size: 0.95rem;
     font-family: inherit;
+    background: var(--rs-surface, #fff);
+    color: var(--rs-text, inherit);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--rs-focus-border, #3b82f6);
+      box-shadow: 0 0 0 3px var(--rs-focus-ring, rgba(59, 130, 246, 0.15));
+    }
   }
 
   &--grow {

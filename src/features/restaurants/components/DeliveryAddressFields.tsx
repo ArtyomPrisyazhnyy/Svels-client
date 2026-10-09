@@ -3,42 +3,59 @@
 import type { DeliveryAddress } from '@/shared/types/pre-order';
 import '../styles/delivery-address-fields.scss';
 
+export type DeliveryAddressFieldsVariant = 'full' | 'required' | 'extended';
+
 interface DeliveryAddressFieldsProps {
   value: DeliveryAddress;
   onChange: (next: DeliveryAddress) => void;
+  variant?: DeliveryAddressFieldsVariant;
 }
 
-export function DeliveryAddressFields({ value, onChange }: DeliveryAddressFieldsProps) {
+export function DeliveryAddressFields({
+  value,
+  onChange,
+  variant = 'full',
+}: DeliveryAddressFieldsProps) {
   function patch(partial: Partial<DeliveryAddress>) {
     onChange({ ...value, ...partial });
   }
 
-  return (
-    <div className="delivery-address-fields" data-testid="delivery-address-fields">
-      <div className="delivery-address-fields__row">
-        <label className="delivery-address-fields__field delivery-address-fields__field--grow">
-          <span>Улица *</span>
-          <input
-            type="text"
-            autoComplete="street-address"
-            value={value.street}
-            onChange={(e) => patch({ street: e.target.value })}
-            placeholder="Название улицы"
-            data-testid="delivery-street"
-          />
-        </label>
-        <label className="delivery-address-fields__field delivery-address-fields__field--house">
-          <span>Дом *</span>
-          <input
-            type="text"
-            value={value.house}
-            onChange={(e) => patch({ house: e.target.value })}
-            placeholder="№"
-            data-testid="delivery-house"
-          />
-        </label>
-      </div>
+  const showRequired = variant === 'full' || variant === 'required';
+  const showExtended = variant === 'full' || variant === 'extended';
 
+  const rootTestId =
+    variant === 'full' || variant === 'required' ? 'delivery-address-fields' : undefined;
+
+  return (
+    <div className="delivery-address-fields" data-testid={rootTestId}>
+      {showRequired && (
+        <div className="delivery-address-fields__row">
+          <label className="delivery-address-fields__field delivery-address-fields__field--grow">
+            <span>Улица *</span>
+            <input
+              type="text"
+              autoComplete="street-address"
+              value={value.street}
+              onChange={(e) => patch({ street: e.target.value })}
+              placeholder="Название улицы"
+              data-testid="delivery-street"
+            />
+          </label>
+          <label className="delivery-address-fields__field delivery-address-fields__field--house">
+            <span>Дом *</span>
+            <input
+              type="text"
+              value={value.house}
+              onChange={(e) => patch({ house: e.target.value })}
+              placeholder="№"
+              data-testid="delivery-house"
+            />
+          </label>
+        </div>
+      )}
+
+      {showExtended && (
+      <>
       <div className="delivery-address-fields__row delivery-address-fields__row--triple">
         <label className="delivery-address-fields__field">
           <span>Квартира</span>
@@ -85,6 +102,8 @@ export function DeliveryAddressFields({ value, onChange }: DeliveryAddressFields
           placeholder="Подъезд, ориентиры"
         />
       </label>
+      </>
+      )}
     </div>
   );
 }

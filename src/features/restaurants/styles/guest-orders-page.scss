@@ -1,19 +1,30 @@
 .guest-orders-page {
   min-height: 100vh;
-  background: #f8fafc;
-}
+  background: var(--rs-bg, #f8fafc);
+  color: var(--rs-text, #0f172a);
 
-.guest-orders-page__header {
-  padding: 1rem 1.25rem;
-
-  h1 {
-    margin: 0.5rem 0 0;
-    font-size: 1.5rem;
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 1rem 1.25rem;
   }
-}
 
-.guest-orders-page__main {
-  padding: 1rem 1.25rem 2rem;
-  max-width: 960px;
-  margin: 0 auto;
+  &__back {
+    display: inline-block;
+    margin-bottom: 0.35rem;
+  }
+
+  h1,
+  .glass-header__title {
+    margin: 0.35rem 0 0;
+    font-size: 1.5rem;
+    color: var(--rs-text, #0f172a);
+  }
+
+  &__main {
+    padding: 1rem 1.25rem 2rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
 }

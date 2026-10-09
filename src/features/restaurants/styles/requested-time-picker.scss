@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding-bottom: 0.25rem;
 }
 
 .requested-time-picker__modes {
@@ -21,9 +22,10 @@
   cursor: pointer;
 
   &--active {
-    border-color: #0f172a;
-    background: #0f172a;
-    color: #fff;
+    border-color: var(--rs-accent, #0f172a);
+    background: var(--rs-accent, #0f172a);
+    color: var(--rs-on-accent, #fff);
+    border-radius: var(--rs-btn-radius, 999px);
   }
 }
 
