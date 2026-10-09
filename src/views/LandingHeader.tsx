@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { ContactButton } from './ContactButton';
 
@@ -20,9 +21,9 @@ export function LandingHeader() {
   return (
     <header className="landing__header">
       <div className="landing__container landing__header-inner">
-        <a className="landing__brand" href="/" aria-label="Svels">
+        <Link className="landing__brand" href="/" aria-label="Svels">
           <span className="landing__brand-mark">Svels</span>
-        </a>
+        </Link>
 
         <nav className="landing__nav landing__nav--desktop" aria-label="Разделы">
           {LANDING_SECTION_LINKS.map(({ href, label }) => (

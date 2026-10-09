@@ -38,7 +38,7 @@ export function Reveal<T extends ElementType = 'div'>({
     if (!node) return;
 
     if (typeof IntersectionObserver === 'undefined') {
-      setVisible(true);
+      requestAnimationFrame(() => setVisible(true));
       return;
     }
 
