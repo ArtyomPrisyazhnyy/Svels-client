@@ -148,13 +148,21 @@ jobs:
 
       - name: Start backend
         working-directory: Svels-backend
+        env:
+          NODE_ENV: development
         run: |
-          # DevModule (/dev/last-otp) is gated on process.env.NODE_ENV at import time — must be set in shell, not only in .env.
-          NODE_ENV=development npm run start:prod > /tmp/svels-backend.log 2>&1 &
+          # DevModule (/dev/last-otp) is gated on process.env.NODE_ENV at import time — must be set before node starts.
+          npm run start:prod > /tmp/svels-backend.log 2>&1 &
           echo $! > /tmp/svels-backend.pid
           for i in $(seq 1 60); do
             if curl -sf http://127.0.0.1:3000/health > /dev/null; then
-              echo "Backend is up"
+              dev_body=$(curl -s "http://127.0.0.1:3000/dev/last-otp?phone=%2B375000000001" || true)
+              if echo "$dev_body" | grep -q 'Cannot GET'; then
+                echo "Dev routes not mounted (NODE_ENV?): $dev_body"
+                tail -n 80 /tmp/svels-backend.log || true
+                exit 1
+              fi
+              echo "Backend is up (dev OTP route available)"
               exit 0
             fi
             sleep 2

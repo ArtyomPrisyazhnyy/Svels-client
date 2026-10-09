@@ -50,7 +50,8 @@ function normalizeCheckoutMap(
   );
 }
 
-function migratePersistedState(persisted: unknown, _version: number): CartPersistedV1 {
+function migratePersistedState(persisted: unknown, version: number): CartPersistedV1 {
+  void version;
   if (persisted && typeof persisted === 'object') {
     const state = persisted as Partial<CartPersistedV1>;
     const checkoutByRestaurant = normalizeCheckoutMap(state.checkoutByRestaurant);
