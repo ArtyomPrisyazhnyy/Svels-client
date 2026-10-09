@@ -3,8 +3,9 @@ import { persist } from 'zustand/middleware';
 import type { CartCheckoutDraft, CartLineItem } from '@/shared/types/cart';
 import { createDefaultCheckoutDraft } from '@/shared/types/cart';
 import { getCartTotals } from '@/features/restaurants/utils/cart.util';
+import { normalizePhoneForPhoneInput } from '@/shared/utils/phone.util';
 
-const CART_PERSIST_VERSION = 1;
+const CART_PERSIST_VERSION = 2;
 
 interface CartPersistedV0 {
   restaurantId: string | null;
@@ -27,17 +28,37 @@ interface CartState extends CartPersistedV1 {
   patchCheckoutDraft: (restaurantId: string, patch: Partial<CartCheckoutDraft>) => void;
 }
 
-function migratePersistedState(persisted: unknown, version: number): CartPersistedV1 {
-  if (version >= CART_PERSIST_VERSION && persisted && typeof persisted === 'object') {
+function normalizeCheckoutDraft(draft: CartCheckoutDraft): CartCheckoutDraft {
+  return {
+    ...draft,
+    phone: normalizePhoneForPhoneInput(draft.phone),
+    recipientPhone: normalizePhoneForPhoneInput(draft.recipientPhone),
+  };
+}
+
+function normalizeCheckoutMap(
+  map: Record<string, CartCheckoutDraft> | undefined,
+): Record<string, CartCheckoutDraft> {
+  if (!map || typeof map !== 'object') {
+    return {};
+  }
+  return Object.fromEntries(
+    Object.entries(map).map(([restaurantId, draft]) => [
+      restaurantId,
+      normalizeCheckoutDraft(draft),
+    ]),
+  );
+}
+
+function migratePersistedState(persisted: unknown, _version: number): CartPersistedV1 {
+  if (persisted && typeof persisted === 'object') {
     const state = persisted as Partial<CartPersistedV1>;
+    const checkoutByRestaurant = normalizeCheckoutMap(state.checkoutByRestaurant);
     return {
       version: CART_PERSIST_VERSION,
       restaurantId: state.restaurantId ?? null,
       items: Array.isArray(state.items) ? state.items : [],
-      checkoutByRestaurant:
-        state.checkoutByRestaurant && typeof state.checkoutByRestaurant === 'object'
-          ? state.checkoutByRestaurant
-          : {},
+      checkoutByRestaurant,
     };
   }
 
@@ -120,7 +141,7 @@ export const useCartStore = create<CartState>()(
       getCheckoutDraft: (restaurantId, defaultFulfillment = 'fulfillmentTakeaway') => {
         const existing = get().checkoutByRestaurant[restaurantId];
         if (existing) {
-          return existing;
+          return normalizeCheckoutDraft(existing);
         }
         return createDefaultCheckoutDraft(defaultFulfillment);
       },
@@ -133,7 +154,7 @@ export const useCartStore = create<CartState>()(
         set({
           checkoutByRestaurant: {
             ...state.checkoutByRestaurant,
-            [restaurantId]: { ...current, ...patch },
+            [restaurantId]: normalizeCheckoutDraft({ ...current, ...patch }),
           },
         });
       },

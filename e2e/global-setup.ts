@@ -64,19 +64,44 @@ export default async function globalSetup(): Promise<void> {
     );
   }
 
-  const { auth: guest } = await apiClient.createGuest(
-    adminAuth.user.restaurantId,
-    'Seed',
-    'Guest',
+  const restaurantId = adminAuth.user.restaurantId;
+
+  const productionEmail = `e2e.production.${stamp}@svels.test`;
+  const productionPassword = `E2ePass!${stamp}P`;
+  const productionAuth = await apiClient.createRestaurantStaffUser(
+    restaurantId,
+    adminAuth.accessToken,
+    {
+      email: productionEmail,
+      password: productionPassword,
+      firstName: 'E2E',
+      lastName: 'Production',
+      role: 'restaurant_production',
+    },
   );
 
+  if (productionAuth.user.role !== 'restaurant_production') {
+    throw new Error(
+      `Expected restaurant_production staff, got role=${productionAuth.user.role}`,
+    );
+  }
+
+  const menu = await apiClient.seedDefaultMenu(restaurantId, adminAuth.accessToken);
+
+  const { auth: guest } = await apiClient.createGuest(restaurantId, 'Seed', 'Guest');
+
   const seed: E2eSeed = {
-    restaurantId: adminAuth.user.restaurantId,
+    restaurantId,
     restaurantName,
     restaurantAdmin: {
       email,
       password,
       auth: adminAuth,
+    },
+    restaurantProduction: {
+      email: productionEmail,
+      password: productionPassword,
+      auth: productionAuth,
     },
     superAdmin: {
       email: superCreds.email,
@@ -84,6 +109,7 @@ export default async function globalSetup(): Promise<void> {
       auth: superAuth,
     },
     guest,
+    menu,
     createdAt: new Date().toISOString(),
   };
 

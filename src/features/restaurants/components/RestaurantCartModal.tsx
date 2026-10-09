@@ -28,8 +28,8 @@ import {
 import { useAuthStore } from '@/store/auth.store';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import {
-  extractBelarusNational,
   isCompleteBelarusPhone,
+  normalizePhoneForPhoneInput,
 } from '@/shared/utils/phone.util';
 import { createPreOrder } from '../api/pre-orders.api';
 import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
@@ -42,6 +42,7 @@ import '../styles/restaurant-cart-modal.scss';
 
 const MODAL_ANIMATION_MS = 200;
 const COMMENT_MAX = 1000;
+const CUSTOMER_NAME_MAX = 120;
 
 interface RestaurantCartModalProps {
   restaurantId: string;
@@ -148,7 +149,7 @@ export function RestaurantCartModal({
       return;
     }
     const nameFromProfile = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
-    const phoneFromProfile = user.phone ? extractBelarusNational(user.phone) : '';
+    const phoneFromProfile = user.phone ? normalizePhoneForPhoneInput(user.phone) : '';
     if (!draft.customerName && nameFromProfile) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- prefill from profile once
       syncDraft({ customerName: nameFromProfile });
@@ -231,7 +232,7 @@ export function RestaurantCartModal({
       return false;
     }
     const customerName = draft.customerName.trim();
-    if (!customerName) {
+    if (!customerName || customerName.length > CUSTOMER_NAME_MAX) {
       return false;
     }
     if (!isCompleteBelarusPhone(draft.phone)) {
@@ -399,6 +400,7 @@ export function RestaurantCartModal({
                       <input
                         type="text"
                         autoComplete="name"
+                        maxLength={CUSTOMER_NAME_MAX}
                         value={draft.customerName}
                         onChange={(e) => syncDraft({ customerName: e.target.value })}
                         placeholder="Как к вам обращаться"

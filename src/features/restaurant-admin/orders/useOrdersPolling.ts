@@ -24,8 +24,28 @@ export function useOrdersPolling(
   const knownIdsRef = useRef<Set<string>>(new Set());
   const knownNewIdsRef = useRef<Set<string>>(new Set());
   const newServerTimeRef = useRef<string | null>(null);
+  const openNewOrdersRef = useRef<Map<string, OrderDto>>(new Map());
   const tabRef = useRef(tab);
   const dateRef = useRef(date);
+
+  const syncNewCount = useCallback(() => {
+    setNewCount(openNewOrdersRef.current.size);
+  }, []);
+
+  const applyNewOrderSnapshots = useCallback(
+    (items: OrderDto[]) => {
+      const map = openNewOrdersRef.current;
+      for (const item of items) {
+        if (item.status === 'new') {
+          map.set(item.id, item);
+        } else if (map.has(item.id)) {
+          map.delete(item.id);
+        }
+      }
+      syncNewCount();
+    },
+    [syncNewCount],
+  );
 
   const mergeItems = useCallback(
     (incoming: OrderDto[], replace: boolean) => {
@@ -56,8 +76,9 @@ export function useOrdersPolling(
         );
         return next;
       });
+      applyNewOrderSnapshots(incoming);
     },
-    [],
+    [applyNewOrderSnapshots],
   );
 
   const loadFull = useCallback(async () => {
@@ -137,7 +158,6 @@ export function useOrdersPolling(
       }
       const res = await fetchRestaurantOrders(restaurantId, token, params);
       newServerTimeRef.current = res.serverTime;
-      setNewCount(res.total);
 
       const freshNewIds: string[] = [];
       for (const item of res.items) {
@@ -151,20 +171,35 @@ export function useOrdersPolling(
       if (freshNewIds.length > 0 && onNewOrdersDetected) {
         onNewOrdersDetected(freshNewIds);
       }
+
+      if (!params.updatedSince) {
+        const next = new Map<string, OrderDto>();
+        for (const item of res.items) {
+          if (item.status === 'new') {
+            next.set(item.id, item);
+          }
+        }
+        openNewOrdersRef.current = next;
+        syncNewCount();
+      } else {
+        applyNewOrderSnapshots(res.items);
+      }
     } catch {
       // ignore
     }
-  }, [restaurantId, token, onNewOrdersDetected]);
+  }, [restaurantId, token, onNewOrdersDetected, applyNewOrderSnapshots, syncNewCount]);
 
   useEffect(() => {
     tabRef.current = tab;
     dateRef.current = date;
+    openNewOrdersRef.current = new Map();
+    syncNewCount();
     const frame = requestAnimationFrame(() => {
       void loadFull();
       void pollNewOrders();
     });
     return () => cancelAnimationFrame(frame);
-  }, [tab, date, loadFull, pollNewOrders]);
+  }, [tab, date, loadFull, pollNewOrders, syncNewCount]);
 
   useEffect(() => {
     if (!restaurantId || !token) {
@@ -202,15 +237,24 @@ export function useOrdersPolling(
     };
   }, [restaurantId, token, pollIncremental, pollNewOrders]);
 
-  const patchOrder = useCallback((updated: OrderDto) => {
-    mergeItems([updated], false);
-    void pollNewOrders();
-  }, [mergeItems, pollNewOrders]);
+  const patchOrder = useCallback(
+    (updated: OrderDto) => {
+      mergeItems([updated], false);
+      void pollNewOrders();
+    },
+    [mergeItems, pollNewOrders],
+  );
 
-  const removeOrder = useCallback((orderId: string) => {
-    setOrders((prev) => prev.filter((o) => o.id !== orderId));
-    void pollNewOrders();
-  }, [pollNewOrders]);
+  const removeOrder = useCallback(
+    (orderId: string) => {
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+      if (openNewOrdersRef.current.delete(orderId)) {
+        syncNewCount();
+      }
+      void pollNewOrders();
+    },
+    [pollNewOrders, syncNewCount],
+  );
 
   return {
     orders,

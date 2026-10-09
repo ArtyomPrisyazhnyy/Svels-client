@@ -80,6 +80,33 @@ export function isCompleteBelarusPhone(value: string): boolean {
 export const PHONE_INPUT_PREFIX = '+375';
 export const PHONE_INPUT_NATIONAL_PLACEHOLDER = 'XX XXX-XX-XX';
 
+/**
+ * Значение для controlled PhoneInput: полный +375 …, совместимый с isCompleteBelarusPhone.
+ * Нормализует сохранённые национальные черновики («29 622-05-33») и E.164 из профиля.
+ */
+export function normalizePhoneForPhoneInput(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  if (isCompleteBelarusPhone(trimmed)) {
+    return formatPhoneDisplay(trimmed);
+  }
+
+  const national = extractBelarusNational(trimmed);
+  if (national && normalizePhoneDigits(national).length === BY_NATIONAL_LENGTH) {
+    return composeBelarusPhone(national);
+  }
+
+  const digits = normalizePhoneDigits(trimmed);
+  if (digits.startsWith(BY_COUNTRY_DIGITS) && digits.length === 12) {
+    return formatPhoneDisplay(`+${digits}`);
+  }
+
+  return trimmed;
+}
+
 /** Отображение уже сохранённого нормализованного номера. */
 export function formatPhoneDisplay(normalized: string): string {
   let digits = normalizePhoneDigits(normalized);

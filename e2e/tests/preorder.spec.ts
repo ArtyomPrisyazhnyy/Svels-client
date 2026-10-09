@@ -37,12 +37,19 @@ async function setOrdersPaused(
   return (await response.json()) as RestaurantOrderSettings;
 }
 
-async function addFirstMenuItemToCart(page: import('@playwright/test').Page, restaurantId: string) {
-  const menu = await apiClient.getMenu(restaurantId);
-  const firstItem = menu.categories.flatMap((c) => c.items)[0];
-  test.skip(!firstItem, 'Need a menu item in seeded restaurant');
+async function addFirstMenuItemToCart(
+  page: import('@playwright/test').Page,
+  restaurantId: string,
+  preferredMenuItemId?: string,
+) {
+  let menuItemId = preferredMenuItemId;
+  if (!menuItemId) {
+    const menu = await apiClient.getMenu(restaurantId);
+    menuItemId = menu.categories.flatMap((c) => c.items)[0]?.id;
+  }
+  test.skip(!menuItemId, 'Need a menu item in seeded restaurant');
 
-  await page.getByTestId(`menu-item-${firstItem!.id}`).click();
+  await page.getByTestId(`menu-item-${menuItemId}`).click();
   await expect(page.getByTestId('menu-add-to-cart')).toBeVisible();
   await page.getByTestId('menu-add-to-cart').click();
   await page.getByTestId('cart-button').click();
@@ -77,7 +84,7 @@ test.describe('Pre-order', () => {
     await setOrdersPaused(seed.restaurantId, adminToken, false);
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
-    await addFirstMenuItemToCart(page, seed.restaurantId);
+    await addFirstMenuItemToCart(page, seed.restaurantId, seed.menu.defaultMenuItemId);
 
     const phoneField = page.locator('#cart-customer-phone');
     if ((await phoneField.inputValue()).replace(/\D/g, '').length < 9) {
@@ -107,7 +114,7 @@ test.describe('Pre-order', () => {
     await setOrdersPaused(seed.restaurantId, adminToken, false);
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
-    await addFirstMenuItemToCart(page, seed.restaurantId);
+    await addFirstMenuItemToCart(page, seed.restaurantId, seed.menu.defaultMenuItemId);
 
     await expect(page.getByTestId('delivery-address-fields')).toBeVisible();
     await page.getByTestId('delivery-street').fill('');
@@ -123,7 +130,7 @@ test.describe('Pre-order', () => {
 
     try {
       await page.goto(`/restaurants/${seed.restaurantId}`);
-      await addFirstMenuItemToCart(page, seed.restaurantId);
+      await addFirstMenuItemToCart(page, seed.restaurantId, seed.menu.defaultMenuItemId);
       await expect(page.getByTestId('orders-paused-banner')).toHaveText(
         /не принимает заказы/i,
       );

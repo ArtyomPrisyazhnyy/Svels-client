@@ -2,6 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import type { AuthResponse, AuthUser } from './api';
 
+export interface E2eSeedMenu {
+  categoryId: string;
+  defaultMenuItemId: string;
+  modifierMenuItemId: string;
+}
+
+export interface E2eSeedStaffAccount {
+  email: string;
+  password: string;
+  auth: AuthResponse;
+}
+
 export interface E2eSeed {
   restaurantId: string;
   restaurantName: string;
@@ -10,12 +22,14 @@ export interface E2eSeed {
     password: string;
     auth: AuthResponse;
   };
+  restaurantProduction: E2eSeedStaffAccount;
   superAdmin: {
     email: string;
     password: string;
     auth: AuthResponse;
   };
   guest: AuthResponse;
+  menu: E2eSeedMenu;
   createdAt: string;
 }
 
