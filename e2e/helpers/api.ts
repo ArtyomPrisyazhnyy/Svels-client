@@ -299,6 +299,20 @@ export const apiClient = {
     });
 
     const category = await this.createMenuCategory(restaurantId, adminToken, 'E2E Меню');
+    const drinksCategory = await this.createMenuCategory(restaurantId, adminToken, 'E2E Напитки');
+    await this.createMenuItem(restaurantId, adminToken, {
+      categoryId: drinksCategory.id,
+      name: 'E2E Вода',
+      price: 2,
+      description: 'Playwright seed drink',
+      imageUrl: 'https://example.com/e2e-drink.jpg',
+    });
+
+    await api('PATCH', `/restaurants/${restaurantId}/styling`, {
+      token: adminToken,
+      body: { menuCategoryNavEnabled: true },
+    });
+
     const defaultItem = (await this.createMenuItem(restaurantId, adminToken, {
       categoryId: category.id,
       name: 'E2E Блюдо 9.90',

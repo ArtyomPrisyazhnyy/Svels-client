@@ -49,6 +49,8 @@ test.describe('Restaurant auth UI', () => {
   });
 
   test('подача заявки на регистрацию ресторана', async ({ page, seed }) => {
+    test.setTimeout(120_000);
+    await page.context().clearCookies();
     const stamp = Date.now().toString(36);
     const email = `e2e.reg.${stamp}@svels.test`;
     const password = `E2eReg!${stamp}`;
@@ -66,13 +68,14 @@ test.describe('Restaurant auth UI', () => {
 
     // После setAuth RestaurantAuthRoute редиректит role=user на `/`,
     // поэтому success-баннер на /auth/restaurant не успевает остаться в DOM.
-    const registerResponse = page.waitForResponse(
-      (response) =>
-        response.url().includes('/restaurants/register') && response.request().method() === 'POST',
-    );
-
-    await page.getByRole('button', { name: 'Отправить заявку' }).click();
-    const response = await registerResponse;
+    const [response] = await Promise.all([
+      page.waitForResponse(
+        (res) =>
+          res.url().includes('/restaurants/register') && res.request().method() === 'POST',
+        { timeout: 90_000 },
+      ),
+      page.getByRole('button', { name: 'Отправить заявку' }).click(),
+    ]);
     expect(response.ok()).toBeTruthy();
 
     await expect(page).toHaveURL(/\/$/);

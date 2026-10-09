@@ -24,7 +24,7 @@ export function RestaurantPublicHeaderStack({
   favoritesEnabled,
 }: RestaurantPublicHeaderStackProps) {
   return (
-    <div className="restaurant-public__header-stack">
+    <div className="restaurant-public__header-stack" data-testid="restaurant-public-header-stack">
       <RestaurantPublicHeader
         restaurantId={restaurantId}
         restaurantName={restaurantName}
