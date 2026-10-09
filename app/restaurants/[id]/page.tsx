@@ -44,9 +44,8 @@ const DEFAULT_ORDER_SETTINGS = (restaurantId: string): RestaurantOrderSettings =
 const EMPTY_MENU: MenuResponse = { categories: [] };
 
 function publicPageFetchOptions(restaurantId: string): ServerFetchOptions {
-  const disableIsr = process.env.E2E_DISABLE_PUBLIC_PAGE_ISR === '1';
   return {
-    revalidate: disableIsr ? false : RESTAURANT_PUBLIC_REVALIDATE_SECONDS,
+    revalidate: RESTAURANT_PUBLIC_REVALIDATE_SECONDS,
     tags: [restaurantPublicPageTag(restaurantId)],
   };
 }
