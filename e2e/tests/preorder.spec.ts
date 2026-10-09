@@ -67,6 +67,7 @@ test.describe('Pre-order', () => {
     void asGuest;
     await page.goto(`/restaurants/${seed.restaurantId}/pre-order`);
     await expect(page.getByTestId('preorder-page')).toBeVisible();
+    await expect(page.locator('.restaurant-styled')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Мои заказы' })).toBeVisible();
   });
 
@@ -87,6 +88,9 @@ test.describe('Pre-order', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await addFirstMenuItemToCart(page, seed.restaurantId, seed.menu.defaultMenuItemId);
+
+    await page.getByTestId('cart-go-to-checkout').click();
+    await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
 
     const phoneField = page.locator('#cart-customer-phone');
     if ((await phoneField.inputValue()).replace(/\D/g, '').length < 9) {
@@ -119,10 +123,24 @@ test.describe('Pre-order', () => {
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await addFirstMenuItemToCart(page, seed.restaurantId, seed.menu.defaultMenuItemId);
 
+    await page.getByTestId('cart-go-to-checkout').click();
     await expect(page.getByTestId('delivery-address-fields')).toBeVisible();
     await page.getByTestId('delivery-street').fill('');
     await page.getByTestId('delivery-house').fill('');
-    await expect(page.getByTestId('cart-submit')).toBeDisabled();
+    const submit = page.getByTestId('cart-submit');
+    await expect(submit).toBeEnabled();
+    await expect(submit).toHaveText('Укажите адрес');
+  });
+
+  test('корзина: шаг 1 → шаг оформления', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    await addFirstMenuItemToCart(page, seed.restaurantId, seed.menu.defaultMenuItemId);
+    await expect(page.getByTestId('cart-go-to-checkout')).toBeVisible();
+    await page.getByTestId('cart-go-to-checkout').click();
+    await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
+    await page.getByTestId('cart-back-to-step-1').click();
+    await expect(page.getByRole('heading', { name: 'Корзина' })).toBeVisible();
   });
 
   test('пауза приёма → сообщение и неактивная кнопка', async ({ page, seed, asGuest }) => {
@@ -138,7 +156,7 @@ test.describe('Pre-order', () => {
       await expect(page.getByTestId('orders-paused-banner')).toHaveText(
         /не принимает заказы/i,
       );
-      await expect(page.getByTestId('cart-submit')).toBeDisabled();
+      await expect(page.getByTestId('cart-go-to-checkout')).toBeDisabled();
     } finally {
       await setOrdersPaused(seed.restaurantId, adminToken, false);
     }

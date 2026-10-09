@@ -54,6 +54,26 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   }
 }
 
+.restaurant-cart-modal__back {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(241, 245, 249, 0.95);
+  color: #475569;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .restaurant-cart-modal__close {
   position: absolute;
   top: 0.75rem;
@@ -78,6 +98,65 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
     font-size: 1.25rem;
     color: #0f172a;
   }
+}
+
+.restaurant-cart-modal__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-right: 2rem;
+}
+
+.restaurant-cart-modal__clear {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  min-height: 2.75rem;
+  padding: 0 0.25rem;
+}
+
+.restaurant-cart-modal__checkout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.restaurant-cart-modal__contacts-card {
+  padding: 0.85rem;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+
+  .restaurant-cart-modal__field:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.restaurant-cart-modal__inline-error {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: #b91c1c;
+}
+
+.restaurant-cart-modal__section--tight {
+  margin-top: 0;
+}
+
+.restaurant-cart-modal__field--flush {
+  margin-bottom: 0;
+}
+
+.restaurant-cart-modal__cross-sell--row {
+  margin: 0;
+  padding: 0.5rem 0;
+  background: transparent;
+  border: none;
+  text-align: center;
 }
 
 .restaurant-cart-modal__guest {
@@ -369,7 +448,7 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   input {
     width: 1.125rem;
     height: 1.125rem;
-    accent-color: #0f766e;
+    accent-color: var(--rs-accent, #0f766e);
     cursor: pointer;
   }
 
@@ -402,8 +481,9 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   margin-bottom: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 10px;
-  background: #fef3c7;
-  color: #92400e;
+  background: color-mix(in srgb, var(--rs-accent, #d97706) 12%, var(--rs-surface, #fff));
+  border: 1px solid color-mix(in srgb, var(--rs-accent, #d97706) 35%, transparent);
+  color: var(--rs-text, #92400e);
   font-size: 0.9375rem;
   font-weight: 500;
 }
@@ -459,7 +539,31 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   }
 }
 
+.cart-detail-row--static {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
 @media (max-width: 540px) {
+  .restaurant-cart-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .restaurant-cart-modal__panel {
+    max-width: none;
+    width: 100%;
+    max-height: min(96vh, 100dvh);
+    border-radius: 20px 20px 0 0;
+  }
+
   .restaurant-cart-modal__item {
     grid-template-columns: 1fr;
   }

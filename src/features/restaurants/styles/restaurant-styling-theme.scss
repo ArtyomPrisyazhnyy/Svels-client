@@ -735,6 +735,65 @@
     color: #6ee7b7;
   }
 
+  .restaurant-cart-modal__back {
+    background: color-mix(in srgb, var(--rs-surface) 92%, transparent);
+    color: var(--rs-text-muted);
+  }
+
+  .restaurant-cart-modal__clear {
+    color: var(--rs-text-muted);
+  }
+
+  .restaurant-cart-modal__contacts-card,
+  .cart-detail-row,
+  .cart-detail-row--static {
+    background: color-mix(in srgb, var(--rs-text) 4%, var(--rs-bg));
+    border-color: var(--rs-border);
+  }
+
+  .cart-detail-row__label {
+    color: var(--rs-text-muted);
+  }
+
+  .cart-detail-row__value,
+  .cart-detail-row__trigger {
+    color: var(--rs-text);
+  }
+
+  .cart-detail-row__chevron {
+    color: var(--rs-text-soft);
+  }
+
+  .cart-detail-row__content {
+    border-top-color: var(--rs-border);
+  }
+
+  .cart-detail-row--expanded {
+    background: var(--rs-surface);
+  }
+
+  .requested-time-picker__mode {
+    border-color: var(--rs-border);
+    background: var(--rs-surface);
+    color: var(--rs-text);
+
+    &--active {
+      border-color: var(--rs-accent);
+      background: var(--rs-accent);
+      color: var(--rs-on-accent, #fff);
+    }
+  }
+
+  .requested-time-picker__select {
+    border-color: var(--rs-border);
+    background: var(--rs-surface);
+    color: var(--rs-text);
+  }
+
+  .delivery-address-fields__field span {
+    color: var(--rs-text-muted);
+  }
+
   .menu-product-card__media {
     background: color-mix(in srgb, var(--rs-border) 30%, var(--rs-bg));
   }

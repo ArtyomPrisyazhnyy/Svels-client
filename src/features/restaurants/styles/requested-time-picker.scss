@@ -21,9 +21,10 @@
   cursor: pointer;
 
   &--active {
-    border-color: #0f172a;
-    background: #0f172a;
-    color: #fff;
+    border-color: var(--rs-accent, #0f172a);
+    background: var(--rs-accent, #0f172a);
+    color: var(--rs-on-accent, #fff);
+    border-radius: var(--rs-btn-radius, 999px);
   }
 }
 

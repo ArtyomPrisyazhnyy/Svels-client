@@ -9,18 +9,21 @@ import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useCartStore } from '@/store/cart.store';
 import { fetchRestaurantLocations } from '../api/locations.api';
 import type { RestaurantLocation } from '@/shared/types/restaurant-location';
+import { formatRestaurantLocationLine } from '@/shared/types/restaurant-location';
 import { FulfillmentSelector } from './FulfillmentSelector';
 import { CartLocationPicker } from './CartLocationPicker';
 import { PaymentSelector } from './PaymentSelector';
 import { DeliveryAddressFields } from './DeliveryAddressFields';
 import { RequestedTimePicker } from './RequestedTimePicker';
 import { OrderSuccessView } from './OrderSuccessView';
+import { CartDetailRow } from './CartDetailRow';
 import type { CartCheckoutDraft, CartLineItem } from '@/shared/types/cart';
 import {
   getDefaultFulfillment,
   getDefaultPayment,
   getEnabledFulfillmentOptions,
   getEnabledPaymentOptions,
+  PAYMENT_OPTIONS,
   type FulfillmentKey,
   type PaymentKey,
   type RestaurantOrderSettings,
@@ -35,14 +38,21 @@ import { createPreOrder } from '../api/pre-orders.api';
 import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
 import {
   buildCreatePreOrderPayload,
-  isDeliveryAddressComplete,
 } from '../utils/checkout-payload.util';
 import { getPreOrderErrorMessage, isItemUnavailableError } from '../utils/pre-order-error.util';
+import { buildRequestedTimeSlots } from '../utils/requested-time.util';
+import {
+  getStep2Title,
+  validateCartCheckout,
+  type CartDetailRowKey,
+} from '../utils/cart-checkout-validation.util';
 import '../styles/restaurant-cart-modal.scss';
 
 const MODAL_ANIMATION_MS = 200;
 const COMMENT_MAX = 1000;
 const CUSTOMER_NAME_MAX = 120;
+
+type CartStep = 1 | 2;
 
 interface RestaurantCartModalProps {
   restaurantId: string;
@@ -53,6 +63,13 @@ interface RestaurantCartModalProps {
 }
 
 const EMPTY_CART_ITEMS: CartLineItem[] = [];
+
+function toggleRowKey(
+  current: Partial<Record<CartDetailRowKey, boolean>>,
+  key: CartDetailRowKey,
+): Partial<Record<CartDetailRowKey, boolean>> {
+  return { ...current, [key]: !current[key] };
+}
 
 export function RestaurantCartModal({
   restaurantId,
@@ -80,6 +97,7 @@ export function RestaurantCartModal({
 
   const { mounted, isActive, handleClose } = useModalPresence(onClose, MODAL_ANIMATION_MS);
 
+  const [cartStep, setCartStep] = useState<CartStep>(1);
   const [fulfillment, setFulfillment] = useState<FulfillmentKey>(defaultFulfillment);
   const [payment, setPayment] = useState<PaymentKey | null>(() =>
     getDefaultPayment(orderSettings),
@@ -92,6 +110,10 @@ export function RestaurantCartModal({
   const [submitting, setSubmitting] = useState(false);
   const [locations, setLocations] = useState<RestaurantLocation[]>([]);
   const [locationId, setLocationId] = useState<string | null>(draft.locationId);
+  const [expandedRows, setExpandedRows] = useState<Partial<Record<CartDetailRowKey, boolean>>>(
+    {},
+  );
+  const [showValidationHints, setShowValidationHints] = useState(false);
 
   const ordersPaused = orderSettings.ordersPaused === true;
 
@@ -120,6 +142,26 @@ export function RestaurantCartModal({
     fulfillment === 'fulfillmentTakeaway' || fulfillment === 'fulfillmentDineIn';
 
   const multipleLocations = locations.length > 1;
+
+  const selectedLocation = useMemo(
+    () => locations.find((row) => row.id === locationId) ?? null,
+    [locations, locationId],
+  );
+
+  const timeSlots = useMemo(() => buildRequestedTimeSlots(), []);
+
+  const timeSummary = useMemo(() => {
+    if (draft.requestedAtMode === 'asap') {
+      return 'Как можно скорее';
+    }
+    const slot = timeSlots.find((s) => s.id === draft.requestedAtSlotIso);
+    return slot?.label ?? 'Ко времени';
+  }, [draft.requestedAtMode, draft.requestedAtSlotIso, timeSlots]);
+
+  const paymentSummary = useMemo(() => {
+    const key = payment ?? enabledPayments[0]?.key;
+    return PAYMENT_OPTIONS.find((o) => o.key === key)?.title ?? '—';
+  }, [payment, enabledPayments]);
 
   const syncDraft = useCallback(
     (patch: Partial<CartCheckoutDraft>) => {
@@ -204,6 +246,10 @@ export function RestaurantCartModal({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        if (cartStep === 2 && successOrderNumber === null) {
+          setCartStep(1);
+          return;
+        }
         handleClose();
       }
     };
@@ -213,74 +259,87 @@ export function RestaurantCartModal({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleClose]);
+  }, [handleClose, cartStep, successOrderNumber]);
 
   const requestedAtIso =
     draft.requestedAtMode === 'slot' ? draft.requestedAtSlotIso : null;
 
-  const canSubmit = useMemo(() => {
-    if (items.length === 0 || ordersPaused || submitting || successOrderNumber !== null) {
-      return false;
-    }
-    if (!enabledFulfillment.some((option) => option.key === fulfillment)) {
-      return false;
-    }
-    if (enabledPayments.length > 0 && !payment) {
-      return false;
+  const enabledFulfillmentKeys = useMemo(
+    () => enabledFulfillment.map((o) => o.key),
+    [enabledFulfillment],
+  );
+
+  const checkoutValidation = useMemo(
+    () =>
+      validateCartCheckout({
+        items,
+        ordersPaused,
+        submitting,
+        successOrderNumber,
+        enabledFulfillmentKeys,
+        fulfillment,
+        enabledPaymentsCount: enabledPayments.length,
+        payment,
+        isGuestOfRestaurant,
+        accessToken,
+        draft,
+        needsVenue,
+        multipleLocations,
+        locationId,
+        showSomeoneElseOption,
+      }),
+    [
+      items,
+      ordersPaused,
+      submitting,
+      successOrderNumber,
+      enabledFulfillmentKeys,
+      fulfillment,
+      enabledPayments.length,
+      payment,
+      isGuestOfRestaurant,
+      accessToken,
+      draft,
+      needsVenue,
+      multipleLocations,
+      locationId,
+      showSomeoneElseOption,
+    ],
+  );
+
+  const canSubmit = checkoutValidation.canSubmit;
+
+  const canContinueToStep2 = items.length > 0 && !ordersPaused && successOrderNumber === null;
+
+  function expandRows(keys: CartDetailRowKey[]) {
+    setExpandedRows((prev) => {
+      const next = { ...prev };
+      for (const key of keys) {
+        next[key] = true;
+      }
+      return next;
+    });
+  }
+
+  function handleGoToCheckout() {
+    setError(null);
+    if (!canContinueToStep2) {
+      return;
     }
     if (!isGuestOfRestaurant || !accessToken) {
-      return false;
+      onOpenAuth?.();
+      return;
     }
-    const customerName = draft.customerName.trim();
-    if (!customerName || customerName.length > CUSTOMER_NAME_MAX) {
-      return false;
-    }
-    if (!isCompleteBelarusPhone(draft.phone)) {
-      return false;
-    }
-    if (fulfillment === 'fulfillmentDelivery' && !isDeliveryAddressComplete(draft.deliveryAddress)) {
-      return false;
-    }
-    if (needsVenue && multipleLocations && !locationId) {
-      return false;
-    }
-    if (showSomeoneElseOption && draft.orderForSomeoneElse) {
-      if (!draft.recipientName.trim()) {
-        return false;
-      }
-      if (!isCompleteBelarusPhone(draft.recipientPhone)) {
-        return false;
-      }
-    }
-    if (draft.comment.trim().length > COMMENT_MAX) {
-      return false;
-    }
-    if (draft.requestedAtMode === 'slot' && !draft.requestedAtSlotIso) {
-      return false;
-    }
-    return true;
-  }, [
-    items.length,
-    ordersPaused,
-    submitting,
-    successOrderNumber,
-    enabledFulfillment,
-    fulfillment,
-    enabledPayments,
-    payment,
-    isGuestOfRestaurant,
-    accessToken,
-    draft,
-    needsVenue,
-    multipleLocations,
-    locationId,
-    showSomeoneElseOption,
-  ]);
+    setCartStep(2);
+    setShowValidationHints(false);
+  }
 
   async function handleSubmit() {
     setError(null);
+    setShowValidationHints(true);
 
     if (!canSubmit || !payment || !accessToken) {
+      expandRows(checkoutValidation.rowsToExpand);
       if (!isGuestOfRestaurant || !accessToken) {
         setError('Войдите в аккаунт, чтобы оформить заказ');
         onOpenAuth?.();
@@ -324,7 +383,7 @@ export function RestaurantCartModal({
       setError(getPreOrderErrorMessage(err));
       if (isItemUnavailableError(err) && items.length === 1) {
         setError(
-          `${getPreOrderErrorMessage(err)} Нажмите «Удалить» у позиции в корзине.`,
+          `${getPreOrderErrorMessage(err)} Вернитесь в корзину и уберите позицию.`,
         );
       }
     } finally {
@@ -332,11 +391,25 @@ export function RestaurantCartModal({
     }
   }
 
+  function handleClearCart() {
+    if (items.length === 0) {
+      return;
+    }
+    clearCart();
+    setCartStep(1);
+    setError(null);
+  }
+
+  const fieldErrors = showValidationHints ? checkoutValidation.fieldErrors : {};
+
   if (!mounted) {
     return null;
   }
 
   const activeClass = isActive ? ' restaurant-cart-modal--active' : '';
+  const step2 = cartStep === 2 && successOrderNumber === null;
+  const modalTitle = step2 ? getStep2Title(fulfillment) : 'Корзина';
+  const titleId = 'restaurant-cart-modal-title';
 
   return createPortal(
     <RestaurantStylingPortalRoot>
@@ -352,10 +425,23 @@ export function RestaurantCartModal({
           className={`restaurant-cart-modal${activeClass}`}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="restaurant-cart-modal-title"
+          aria-labelledby={titleId}
           data-testid="restaurant-cart-modal"
+          data-cart-step={cartStep}
         >
           <div className={`restaurant-cart-modal__panel${activeClass}`}>
+            {step2 ? (
+              <button
+                type="button"
+                className="restaurant-cart-modal__back"
+                onClick={() => setCartStep(1)}
+                aria-label="Назад к корзине"
+                data-testid="cart-back-to-step-1"
+              >
+                ←
+              </button>
+            ) : null}
+
             <button
               type="button"
               className="restaurant-cart-modal__close"
@@ -366,12 +452,19 @@ export function RestaurantCartModal({
             </button>
 
             <header className="restaurant-cart-modal__header">
-              <h2 id="restaurant-cart-modal-title">Корзина</h2>
-              {isGuestOfRestaurant && user && (
-                <p className="restaurant-cart-modal__guest">
-                  Заказ от {user.firstName} {user.lastName}
-                </p>
-              )}
+              <div className="restaurant-cart-modal__header-row">
+                <h2 id={titleId}>{modalTitle}</h2>
+                {!step2 && items.length > 0 && (
+                  <button
+                    type="button"
+                    className="restaurant-cart-modal__clear"
+                    onClick={handleClearCart}
+                    data-testid="cart-clear"
+                  >
+                    Очистить
+                  </button>
+                )}
+              </div>
             </header>
 
             <div className="restaurant-cart-modal__body">
@@ -391,10 +484,9 @@ export function RestaurantCartModal({
                   ordersHref={paths.preOrder}
                   onClose={handleClose}
                 />
-              ) : (
-                <>
-                  <section className="restaurant-cart-modal__section">
-                    <h3 className="restaurant-cart-modal__section-title">Контакты</h3>
+              ) : step2 ? (
+                <div className="restaurant-cart-modal__checkout" data-testid="cart-checkout-step">
+                  <div className="restaurant-cart-modal__contacts-card">
                     <label className="restaurant-cart-modal__field">
                       <span>Имя *</span>
                       <input
@@ -415,46 +507,57 @@ export function RestaurantCartModal({
                         onChange={(value) => syncDraft({ phone: value })}
                       />
                     </div>
-                  </section>
-
-                  {enabledFulfillment.length > 1 && (
-                    <section className="restaurant-cart-modal__section">
-                      <h3 className="restaurant-cart-modal__section-title">Способ получения</h3>
-                      <div className="restaurant-cart-modal__fulfillment">
-                        <FulfillmentSelector
-                          settings={orderSettings}
-                          value={fulfillment}
-                          onChange={(value) => {
-                            setFulfillment(value);
-                            syncDraft({ fulfillment: value });
-                          }}
-                        />
-                      </div>
-                    </section>
-                  )}
-
-                  {enabledFulfillment.length === 1 && (
-                    <section className="restaurant-cart-modal__section">
-                      <h3 className="restaurant-cart-modal__section-title">Способ получения</h3>
-                      <p className="restaurant-cart-modal__fulfillment-single">
-                        {enabledFulfillment[0].title}
+                    {fieldErrors.contacts && (
+                      <p className="restaurant-cart-modal__inline-error" role="alert">
+                        {fieldErrors.contacts}
                       </p>
-                    </section>
-                  )}
+                    )}
+                  </div>
 
                   {fulfillment === 'fulfillmentDelivery' && (
-                    <section className="restaurant-cart-modal__section">
-                      <h3 className="restaurant-cart-modal__section-title">Адрес доставки</h3>
+                    <section className="restaurant-cart-modal__section restaurant-cart-modal__section--tight">
                       <DeliveryAddressFields
                         value={draft.deliveryAddress}
                         onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
+                        variant="required"
                       />
+                      {fieldErrors.address && (
+                        <p className="restaurant-cart-modal__inline-error" role="alert">
+                          {fieldErrors.address}
+                        </p>
+                      )}
+                      <CartDetailRow
+                        label="Уточнить адрес"
+                        value=""
+                        expanded={Boolean(expandedRows.addressExtra)}
+                        onToggle={() =>
+                          setExpandedRows((prev) => toggleRowKey(prev, 'addressExtra'))
+                        }
+                        testId="cart-address-extra-row"
+                      >
+                        <DeliveryAddressFields
+                          value={draft.deliveryAddress}
+                          onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
+                          variant="extended"
+                        />
+                      </CartDetailRow>
                     </section>
                   )}
 
                   {needsVenue && multipleLocations && (
-                    <section className="restaurant-cart-modal__section">
-                      <h3 className="restaurant-cart-modal__section-title">Точка заведения</h3>
+                    <CartDetailRow
+                      label="Точка"
+                      value={
+                        selectedLocation
+                          ? selectedLocation.label?.trim() ||
+                            formatRestaurantLocationLine(selectedLocation)
+                          : 'Не выбрана'
+                      }
+                      expanded={Boolean(expandedRows.location)}
+                      onToggle={() => setExpandedRows((prev) => toggleRowKey(prev, 'location'))}
+                      error={fieldErrors.location}
+                      testId="cart-location-row"
+                    >
                       <CartLocationPicker
                         locations={locations}
                         selectedId={locationId}
@@ -463,31 +566,80 @@ export function RestaurantCartModal({
                           syncDraft({ locationId: id });
                         }}
                       />
-                    </section>
+                    </CartDetailRow>
                   )}
 
-                  <section className="restaurant-cart-modal__section">
-                    <h3 className="restaurant-cart-modal__section-title">Время</h3>
+                  <CartDetailRow
+                    label="Время"
+                    value={timeSummary}
+                    expanded={Boolean(expandedRows.time)}
+                    onToggle={() => setExpandedRows((prev) => toggleRowKey(prev, 'time'))}
+                    error={fieldErrors.time}
+                    testId="cart-time-row"
+                  >
                     <RequestedTimePicker
                       mode={draft.requestedAtMode}
                       slotIso={draft.requestedAtSlotIso}
                       onModeChange={(mode) => syncDraft({ requestedAtMode: mode })}
                       onSlotChange={(iso) => syncDraft({ requestedAtSlotIso: iso })}
                     />
-                  </section>
+                  </CartDetailRow>
 
-                  {fulfillment === 'fulfillmentDineIn' && bookingEnabled && (
-                    <p className="restaurant-cart-modal__cross-sell">
-                      Планируете прийти?{' '}
-                      <a href={paths.booking} className="restaurant-cart-modal__cross-sell-link">
-                        Забронировать стол
-                      </a>
-                    </p>
+                  {enabledPayments.length > 1 ? (
+                    <CartDetailRow
+                      label="Оплата"
+                      value={paymentSummary}
+                      expanded={Boolean(expandedRows.payment)}
+                      onToggle={() => setExpandedRows((prev) => toggleRowKey(prev, 'payment'))}
+                      testId="cart-payment-row"
+                    >
+                      <div className="restaurant-cart-modal__fulfillment">
+                        <PaymentSelector
+                          settings={orderSettings}
+                          value={payment ?? enabledPayments[0].key}
+                          onChange={setPayment}
+                        />
+                      </div>
+                    </CartDetailRow>
+                  ) : (
+                    <div className="cart-detail-row cart-detail-row--static">
+                      <span className="cart-detail-row__label">Оплата</span>
+                      <span className="cart-detail-row__value">{paymentSummary}</span>
+                    </div>
                   )}
 
+                  <CartDetailRow
+                    label="Комментарий"
+                    value={draft.comment.trim() ? 'Добавлен' : 'Не указан'}
+                    expanded={Boolean(expandedRows.comment)}
+                    onToggle={() => setExpandedRows((prev) => toggleRowKey(prev, 'comment'))}
+                    error={fieldErrors.comment}
+                    testId="cart-comment-row"
+                  >
+                    <label className="restaurant-cart-modal__field restaurant-cart-modal__field--flush">
+                      <span className="restaurant-cart-modal__field-hint">
+                        Необязательно · {draft.comment.length}/{COMMENT_MAX}
+                      </span>
+                      <textarea
+                        rows={3}
+                        maxLength={COMMENT_MAX}
+                        value={draft.comment}
+                        onChange={(e) => syncDraft({ comment: e.target.value })}
+                        placeholder="Пожелания к заказу"
+                        data-testid="cart-comment"
+                      />
+                    </label>
+                  </CartDetailRow>
+
                   {showSomeoneElseOption && (
-                    <section className="restaurant-cart-modal__section">
-                      <h3 className="restaurant-cart-modal__section-title">Получатель</h3>
+                    <CartDetailRow
+                      label="Доставить другому человеку"
+                      value={draft.orderForSomeoneElse ? 'Да' : 'Нет'}
+                      expanded={Boolean(expandedRows.recipient)}
+                      onToggle={() => setExpandedRows((prev) => toggleRowKey(prev, 'recipient'))}
+                      error={fieldErrors.recipient}
+                      testId="cart-recipient-row"
+                    >
                       <label className="restaurant-cart-modal__checkbox">
                         <input
                           type="checkbox"
@@ -506,10 +658,6 @@ export function RestaurantCartModal({
                       </label>
                       {draft.orderForSomeoneElse && (
                         <div className="restaurant-cart-modal__recipient">
-                          <p className="restaurant-cart-modal__recipient-hint">
-                            Укажите, кому доставить заказ — мы свяжемся с получателем по этому
-                            номеру.
-                          </p>
                           <label className="restaurant-cart-modal__field">
                             <span>Имя получателя *</span>
                             <input
@@ -520,7 +668,7 @@ export function RestaurantCartModal({
                               placeholder="Имя получателя"
                             />
                           </label>
-                          <div className="restaurant-cart-modal__field">
+                          <div className="restaurant-cart-modal__field restaurant-cart-modal__field--flush">
                             <label htmlFor="cart-recipient-phone">Телефон получателя *</label>
                             <PhoneInput
                               id="cart-recipient-phone"
@@ -531,133 +679,112 @@ export function RestaurantCartModal({
                           </div>
                         </div>
                       )}
-                    </section>
+                    </CartDetailRow>
                   )}
 
-                  {enabledPayments.length > 1 && (
-                    <section className="restaurant-cart-modal__section">
-                      <h3 className="restaurant-cart-modal__section-title">Способ оплаты</h3>
+                  {fulfillment === 'fulfillmentDineIn' && bookingEnabled && (
+                    <p className="restaurant-cart-modal__cross-sell restaurant-cart-modal__cross-sell--row">
+                      <a href={paths.booking} className="restaurant-cart-modal__cross-sell-link">
+                        Забронировать стол
+                      </a>
+                    </p>
+                  )}
+
+                  {error && <p className="restaurant-cart-modal__error">{error}</p>}
+                </div>
+              ) : (
+                <>
+                  {enabledFulfillment.length > 1 && (
+                    <section className="restaurant-cart-modal__section restaurant-cart-modal__section--tight">
                       <div className="restaurant-cart-modal__fulfillment">
-                        <PaymentSelector
+                        <FulfillmentSelector
                           settings={orderSettings}
-                          value={payment ?? enabledPayments[0].key}
-                          onChange={setPayment}
+                          value={fulfillment}
+                          onChange={(value) => {
+                            setFulfillment(value);
+                            syncDraft({ fulfillment: value });
+                          }}
                         />
                       </div>
                     </section>
                   )}
 
-                  {enabledPayments.length === 1 && (
-                    <section className="restaurant-cart-modal__section">
-                      <h3 className="restaurant-cart-modal__section-title">Способ оплаты</h3>
-                      <p className="restaurant-cart-modal__fulfillment-single">
-                        {enabledPayments[0].title}
-                      </p>
-                    </section>
-                  )}
+                  {items.length === 0 ? (
+                    <p className="restaurant-cart-modal__empty" data-testid="cart-empty">
+                      Корзина пуста
+                    </p>
+                  ) : (
+                    <ul className="restaurant-cart-modal__list">
+                      {items.map((line) => (
+                        <li
+                          key={line.id}
+                          className={`restaurant-cart-modal__item${
+                            line.imageUrl ? ' restaurant-cart-modal__item--with-image' : ''
+                          }`}
+                        >
+                          {line.imageUrl && (
+                            <div className="restaurant-cart-modal__item-media">
+                              <ResponsiveImage
+                                src={line.imageUrl}
+                                webpSrc={line.imageWebpUrl}
+                                alt=""
+                              />
+                            </div>
+                          )}
 
-                  <section className="restaurant-cart-modal__section">
-                    <h3 className="restaurant-cart-modal__section-title">Комментарии к заказу</h3>
-                    <label className="restaurant-cart-modal__field">
-                      <span className="restaurant-cart-modal__field-hint">
-                        Необязательно · {draft.comment.length}/{COMMENT_MAX}
-                      </span>
-                      <textarea
-                        rows={3}
-                        maxLength={COMMENT_MAX}
-                        value={draft.comment}
-                        onChange={(e) => syncDraft({ comment: e.target.value })}
-                        placeholder="Пожелания к заказу"
-                        data-testid="cart-comment"
-                      />
-                    </label>
-                  </section>
+                          <div className="restaurant-cart-modal__item-main">
+                            <p className="restaurant-cart-modal__item-title">
+                              {line.name}
+                              {line.variantLabel && (
+                                <span className="restaurant-cart-modal__item-variant">
+                                  {' '}
+                                  {line.variantLabel}
+                                </span>
+                              )}
+                            </p>
 
-                  <section className="restaurant-cart-modal__section">
-                    <h3 className="restaurant-cart-modal__section-title">Ваш заказ</h3>
-                    {items.length === 0 ? (
-                      <p className="restaurant-cart-modal__empty">Корзина пуста</p>
-                    ) : (
-                      <ul className="restaurant-cart-modal__list">
-                        {items.map((line) => (
-                          <li
-                            key={line.id}
-                            className={`restaurant-cart-modal__item${
-                              line.imageUrl ? ' restaurant-cart-modal__item--with-image' : ''
-                            }`}
-                          >
-                            {line.imageUrl && (
-                              <div className="restaurant-cart-modal__item-media">
-                                <ResponsiveImage
-                                  src={line.imageUrl}
-                                  webpSrc={line.imageWebpUrl}
-                                  alt=""
-                                />
-                              </div>
+                            {line.modifiers.length > 0 && (
+                              <ul className="restaurant-cart-modal__modifiers">
+                                {line.modifiers.map((modifier) => (
+                                  <li key={`${modifier.groupName}-${modifier.optionName}`}>
+                                    {modifier.groupName}: {modifier.optionName}
+                                  </li>
+                                ))}
+                              </ul>
                             )}
 
-                            <div className="restaurant-cart-modal__item-main">
-                              <p className="restaurant-cart-modal__item-title">
-                                {line.name}
-                                {line.variantLabel && (
-                                  <span className="restaurant-cart-modal__item-variant">
-                                    {' '}
-                                    {line.variantLabel}
-                                  </span>
-                                )}
-                              </p>
+                            <p className="restaurant-cart-modal__item-price">
+                              <CurrencyAmount amount={line.unitPrice * line.quantity} />
+                            </p>
+                          </div>
 
-                              {line.modifiers.length > 0 && (
-                                <ul className="restaurant-cart-modal__modifiers">
-                                  {line.modifiers.map((modifier) => (
-                                    <li key={`${modifier.groupName}-${modifier.optionName}`}>
-                                      {modifier.groupName}: {modifier.optionName}
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-
-                              <p className="restaurant-cart-modal__item-price">
-                                <CurrencyAmount amount={line.unitPrice * line.quantity} />
-                              </p>
-                            </div>
-
-                            <div className="restaurant-cart-modal__item-actions">
-                              <div className="restaurant-cart-modal__counter" aria-label="Количество">
-                                <button
-                                  type="button"
-                                  className="restaurant-cart-modal__counter-btn"
-                                  onClick={() => updateLineQuantity(line.id, line.quantity - 1)}
-                                  aria-label="Уменьшить количество"
-                                >
-                                  −
-                                </button>
-                                <span className="restaurant-cart-modal__counter-value">
-                                  {line.quantity}
-                                </span>
-                                <button
-                                  type="button"
-                                  className="restaurant-cart-modal__counter-btn"
-                                  onClick={() => updateLineQuantity(line.id, line.quantity + 1)}
-                                  aria-label="Увеличить количество"
-                                >
-                                  +
-                                </button>
-                              </div>
-
+                          <div className="restaurant-cart-modal__item-actions">
+                            <div className="restaurant-cart-modal__counter" aria-label="Количество">
                               <button
                                 type="button"
-                                className="restaurant-cart-modal__remove"
-                                onClick={() => removeLine(line.id)}
+                                className="restaurant-cart-modal__counter-btn"
+                                onClick={() => updateLineQuantity(line.id, line.quantity - 1)}
+                                aria-label="Уменьшить количество"
                               >
-                                Удалить
+                                −
+                              </button>
+                              <span className="restaurant-cart-modal__counter-value">
+                                {line.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                className="restaurant-cart-modal__counter-btn"
+                                onClick={() => updateLineQuantity(line.id, line.quantity + 1)}
+                                aria-label="Увеличить количество"
+                              >
+                                +
                               </button>
                             </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </section>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
 
                   {error && <p className="restaurant-cart-modal__error">{error}</p>}
                 </>
@@ -669,19 +796,27 @@ export function RestaurantCartModal({
                 <p className="restaurant-cart-modal__total">
                   Итого: <CurrencyAmount amount={totalAmount} />
                 </p>
-                <button
-                  type="button"
-                  className="restaurant-cart-modal__submit"
-                  disabled={!canSubmit}
-                  onClick={() => void handleSubmit()}
-                  data-testid="cart-submit"
-                >
-                  {submitting
-                    ? 'Оформление…'
-                    : payment === 'paymentOnline'
-                      ? 'Перейти к оплате'
-                      : 'Оформить заказ'}
-                </button>
+                {step2 ? (
+                  <button
+                    type="button"
+                    className="restaurant-cart-modal__submit"
+                    disabled={submitting}
+                    onClick={() => void handleSubmit()}
+                    data-testid="cart-submit"
+                  >
+                    {submitting ? 'Оформление…' : checkoutValidation.ctaLabel}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="restaurant-cart-modal__submit"
+                    disabled={!canContinueToStep2}
+                    onClick={handleGoToCheckout}
+                    data-testid="cart-go-to-checkout"
+                  >
+                    Оформить заказ
+                  </button>
+                )}
               </footer>
             )}
           </div>

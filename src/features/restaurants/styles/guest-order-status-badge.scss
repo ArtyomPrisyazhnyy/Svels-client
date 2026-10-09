@@ -6,30 +6,36 @@
   font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.3;
+  border: 1px solid transparent;
 }
 
 .guest-order-status-badge--new {
-  background: #e0f2fe;
+  background: color-mix(in srgb, #0369a1 14%, var(--rs-surface, #fff));
   color: #0369a1;
+  border-color: color-mix(in srgb, #0369a1 22%, transparent);
 }
 
 .guest-order-status-badge--accepted,
 .guest-order-status-badge--preparing {
-  background: #fef3c7;
+  background: color-mix(in srgb, #b45309 14%, var(--rs-surface, #fff));
   color: #b45309;
+  border-color: color-mix(in srgb, #b45309 22%, transparent);
 }
 
 .guest-order-status-badge--ready {
-  background: #d1fae5;
+  background: color-mix(in srgb, #047857 14%, var(--rs-surface, #fff));
   color: #047857;
+  border-color: color-mix(in srgb, #047857 22%, transparent);
 }
 
 .guest-order-status-badge--completed {
-  background: #f1f5f9;
-  color: #475569;
+  background: color-mix(in srgb, var(--rs-text-muted, #475569) 12%, var(--rs-surface, #fff));
+  color: var(--rs-text-muted, #475569);
+  border-color: var(--rs-border, #e2e8f0);
 }
 
 .guest-order-status-badge--cancelled {
-  background: #fee2e2;
+  background: color-mix(in srgb, #b91c1c 14%, var(--rs-surface, #fff));
   color: #b91c1c;
+  border-color: color-mix(in srgb, #b91c1c 22%, transparent);
 }
