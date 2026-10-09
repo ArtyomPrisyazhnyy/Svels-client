@@ -6,18 +6,29 @@ import { Reveal } from './Reveal';
 function TelegramOrderMock() {
   return (
     <div className="landing-telegram-mock" data-testid="landing-telegram-mock">
-      <div className="landing-telegram-mock__bubble">
-        <p className="landing-telegram-mock__title">Новый заказ #1842</p>
-        <p className="landing-telegram-mock__line">Капучино ×1 · 8,50 BYN</p>
-        <p className="landing-telegram-mock__line">Доставка · ул. Примерная 12</p>
-        <div className="landing-telegram-mock__actions">
-          <span className="landing-telegram-mock__btn landing-telegram-mock__btn--accept">
-            ✅ Принять
-          </span>
-          <span className="landing-telegram-mock__btn landing-telegram-mock__btn--decline">
-            ❌ Отклонить
-          </span>
+      <div className="landing-telegram-mock__topbar">
+        <span className="landing-telegram-mock__back" aria-hidden>‹</span>
+        <div className="landing-telegram-mock__peer">
+          <span className="landing-telegram-mock__avatar" aria-hidden>S</span>
+          <div>
+            <strong className="landing-telegram-mock__name">Svels · Заказы</strong>
+            <span className="landing-telegram-mock__sub">бот</span>
+          </div>
         </div>
+      </div>
+      <div className="landing-telegram-mock__messages">
+        <div className="landing-telegram-mock__bubble">
+          <p className="landing-telegram-mock__title">Новый заказ #1842</p>
+          <p className="landing-telegram-mock__line">Капучино ×1 · 8,50 BYN</p>
+          <p className="landing-telegram-mock__line">Круассан ×2 · 12,40 BYN</p>
+          <p className="landing-telegram-mock__line">Доставка · ул. Немига, 12</p>
+        </div>
+        <button type="button" className="landing-telegram-mock__inline" disabled>
+          ✅ Принять
+        </button>
+        <button type="button" className="landing-telegram-mock__inline" disabled>
+          ❌ Отклонить
+        </button>
       </div>
     </div>
   );
@@ -51,9 +62,10 @@ export function LandingLiveExample() {
                   <Image
                     src={screen.imageSrc ?? ''}
                     alt=""
-                    width={390}
-                    height={844}
+                    width={screen.width ?? 390}
+                    height={screen.height ?? 844}
                     className="landing__live-shot"
+                    unoptimized
                     sizes="(max-width: 767px) 78vw, 240px"
                   />
                 )}

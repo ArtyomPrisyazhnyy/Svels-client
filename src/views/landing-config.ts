@@ -69,6 +69,8 @@ export interface LandingLiveScreen {
   caption: string;
   kind: 'image' | 'telegram';
   imageSrc?: string;
+  width?: number;
+  height?: number;
 }
 
 export const LANDING_LIVE_SCREENS: LandingLiveScreen[] = [
@@ -93,6 +95,8 @@ export const LANDING_LIVE_SCREENS: LandingLiveScreen[] = [
     id: 'admin',
     caption: 'Админка: заказы и меню',
     kind: 'image',
-    imageSrc: '/landing/admin-mobile.webp',
+    imageSrc: '/landing/admin-orders.webp',
+    width: 1280,
+    height: 720,
   },
 ];

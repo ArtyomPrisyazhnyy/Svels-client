@@ -46,9 +46,9 @@ export function LandingPage() {
             Для кафе, ресторанов, кофеен и цветочных
           </Reveal>
           <Reveal as="h1" className="landing__hero-title" delay={50}>
-            Свой сайт и приложение для заказов
+            Сайт и мобильное приложение
             <br />
-            <span className="landing__hero-title-accent">без процента с выручки</span>
+            <span className="landing__hero-title-accent">для вашего заведения</span>
           </Reveal>
           <Reveal as="p" className="landing__hero-text" delay={100}>
             Доставка, самовывоз и заказы в зале. Оплата картой онлайн, новые заказы — сразу в

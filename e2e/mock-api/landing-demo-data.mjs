@@ -3,6 +3,12 @@
 export const LANDING_DEMO_RESTAURANT_ID = 'demo';
 export const LANDING_DEMO_DOMAIN = 'chaika-coffee.by';
 
+export const LANDING_DEMO_AUTH = {
+  email: 'owner@chaika.demo',
+  password: 'DemoChaika2026!',
+  accessToken: 'landing-demo-access-token',
+};
+
 const now = () => new Date().toISOString();
 
 export function buildLandingDemoPayload() {
@@ -116,8 +122,136 @@ export function buildLandingDemoPayload() {
     paymentCardOnSite: true,
     paymentOnline: true,
     deliveryForSomeoneElse: true,
+    ordersPaused: false,
     updatedAt: now(),
   };
+
+  const demoOrders = [
+    {
+      id: 'demo-order-1842',
+      restaurantId,
+      orderNumber: 1842,
+      status: 'new',
+      paymentMethod: 'online',
+      paymentStatus: 'paid',
+      fulfillmentType: 'delivery',
+      customerName: 'Анна',
+      customerPhone: '+375291112233',
+      recipientName: null,
+      recipientPhone: null,
+      deliveryAddress: {
+        street: 'ул. Немига',
+        house: '12',
+        apartment: '4',
+      },
+      locationId: 'demo-loc-1',
+      requestedAt: null,
+      comment: 'Без сахара',
+      cancelReason: null,
+      totalAmount: 24.7,
+      items: [
+        {
+          id: 'demo-line-1',
+          menuItemId: 'demo-item-cappuccino',
+          name: 'Капучино',
+          quantity: 1,
+          unitPrice: 8.5,
+          modifiers: [],
+          lineTotal: 8.5,
+        },
+        {
+          id: 'demo-line-2',
+          menuItemId: 'demo-item-croissant',
+          name: 'Круассан с миндалём',
+          quantity: 2,
+          unitPrice: 6.2,
+          modifiers: [],
+          lineTotal: 12.4,
+        },
+      ],
+      bookingId: null,
+      statusChangedAt: now(),
+      createdAt: now(),
+      updatedAt: now(),
+    },
+    {
+      id: 'demo-order-1841',
+      restaurantId,
+      orderNumber: 1841,
+      status: 'new',
+      paymentMethod: 'online',
+      paymentStatus: 'paid',
+      fulfillmentType: 'takeaway',
+      customerName: 'Игорь',
+      customerPhone: '+375292223344',
+      recipientName: null,
+      recipientPhone: null,
+      deliveryAddress: null,
+      locationId: 'demo-loc-1',
+      requestedAt: null,
+      comment: null,
+      cancelReason: null,
+      totalAmount: 16.4,
+      items: [
+        {
+          id: 'demo-line-3',
+          menuItemId: 'demo-item-raf',
+          name: 'Раф ванильный',
+          quantity: 1,
+          unitPrice: 9.9,
+          modifiers: [],
+          lineTotal: 9.9,
+        },
+        {
+          id: 'demo-line-4',
+          menuItemId: 'demo-item-cheesecake',
+          name: 'Чизкейк',
+          quantity: 1,
+          unitPrice: 7.8,
+          modifiers: [],
+          lineTotal: 7.8,
+        },
+      ],
+      bookingId: null,
+      statusChangedAt: now(),
+      createdAt: now(),
+      updatedAt: now(),
+    },
+    {
+      id: 'demo-order-1840',
+      restaurantId,
+      orderNumber: 1840,
+      status: 'ready',
+      paymentMethod: 'cash',
+      paymentStatus: 'pending',
+      fulfillmentType: 'takeaway',
+      customerName: 'Мария',
+      customerPhone: '+375293334455',
+      recipientName: null,
+      recipientPhone: null,
+      deliveryAddress: null,
+      locationId: 'demo-loc-1',
+      requestedAt: null,
+      comment: 'К 18:30',
+      cancelReason: null,
+      totalAmount: 8.5,
+      items: [
+        {
+          id: 'demo-line-5',
+          menuItemId: 'demo-item-cappuccino',
+          name: 'Капучино',
+          quantity: 1,
+          unitPrice: 8.5,
+          modifiers: [],
+          lineTotal: 8.5,
+        },
+      ],
+      bookingId: null,
+      statusChangedAt: now(),
+      createdAt: now(),
+      updatedAt: now(),
+    },
+  ];
 
   const styling = {
     restaurantId,
@@ -195,6 +329,19 @@ export function buildLandingDemoPayload() {
       flameLevels: [],
       otherPrograms: [],
       updatedAt: now(),
+    },
+    demoOrders,
+    demoAuth: {
+      accessToken: LANDING_DEMO_AUTH.accessToken,
+      user: {
+        id: 'demo-owner',
+        email: LANDING_DEMO_AUTH.email,
+        firstName: 'Анна',
+        lastName: 'Владелец',
+        role: 'restaurant_admin',
+        authProvider: 'local',
+        restaurantId,
+      },
     },
   };
 }

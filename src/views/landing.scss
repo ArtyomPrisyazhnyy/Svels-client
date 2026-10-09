@@ -736,6 +736,12 @@ html:has(.landing) {
   object-position: top;
 }
 
+.landing__live-slide[data-testid='landing-live-admin'] .landing__live-shot {
+  max-height: 280px;
+  aspect-ratio: 16 / 10;
+  object-position: top center;
+}
+
 .landing__live-caption {
   font-size: 0.92rem;
   font-weight: 600;
@@ -745,17 +751,71 @@ html:has(.landing) {
 
 .landing-telegram-mock {
   width: 100%;
-  padding: 0.5rem;
+  min-height: 300px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #e7ebee;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: $landing-ink;
+}
+
+.landing-telegram-mock__topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  background: #ffffff;
+  border-bottom: 1px solid #dfe5ea;
+}
+
+.landing-telegram-mock__back {
+  font-size: 1.25rem;
+  line-height: 1;
+  color: #2aabee;
+}
+
+.landing-telegram-mock__peer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.landing-telegram-mock__avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $landing-primary, $landing-accent);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.landing-telegram-mock__name {
+  display: block;
+  font-size: 0.82rem;
+}
+
+.landing-telegram-mock__sub {
+  display: block;
+  font-size: 0.72rem;
+  color: $landing-ink-muted;
+}
+
+.landing-telegram-mock__messages {
+  padding: 0.75rem 0.65rem 1rem;
 }
 
 .landing-telegram-mock__bubble {
-  padding: 1rem;
-  border-radius: 16px;
-  background: #e8f5fc;
-  border: 1px solid #c5e3f5;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: $landing-ink;
+  max-width: 92%;
+  margin-bottom: 0.45rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px 14px 14px 4px;
+  background: #ffffff;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
 }
 
 .landing-telegram-mock__title {
@@ -768,21 +828,19 @@ html:has(.landing) {
   color: $landing-ink-muted;
 }
 
-.landing-telegram-mock__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 0.75rem;
-}
-
-.landing-telegram-mock__btn {
-  display: inline-flex;
-  padding: 0.35rem 0.55rem;
+.landing-telegram-mock__inline {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.55rem 0.75rem;
+  border: none;
   border-radius: 10px;
-  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.95);
+  color: #2aabee;
+  font-size: 0.82rem;
   font-weight: 600;
-  background: $landing-surface;
-  border: 1px solid $landing-line;
+  text-align: center;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
 /* ===== Для кого ===== */

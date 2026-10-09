@@ -7,7 +7,7 @@ import '@/shared/styles/byn-sign.scss';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001'),
   title: {
-    default: 'Svels — сайт и приложение для заказов в вашем заведении',
+    default: 'Svels — сайт и мобильное приложение для вашего заведения',
     template: '%s | Svels',
   },
   description:

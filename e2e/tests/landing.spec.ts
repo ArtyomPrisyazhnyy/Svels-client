@@ -9,10 +9,10 @@ test.describe('Landing / platform home', () => {
     await expect(page.getByRole('link', { name: 'Svels' })).toBeVisible();
     await expect(
       page.getByRole('heading', {
-        name: /Свой сайт и приложение для заказов/,
+        name: /Сайт и мобильное приложение/,
       }),
     ).toBeVisible();
-    await expect(page.getByText('без процента с выручки')).toBeVisible();
+    await expect(page.getByText('для вашего заведения')).toBeVisible();
     await expect(page.getByTestId('landing-cta-contact').first()).toBeVisible();
   });
 
