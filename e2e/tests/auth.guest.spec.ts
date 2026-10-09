@@ -47,6 +47,7 @@ test.describe('Guest OTP auth', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}/auth`);
     await page.getByTestId('otp-phone').fill(phone);
+    await page.getByTestId('guest-otp-privacy-consent').check();
     await page.getByTestId('otp-send-submit').click();
     await expect(page.getByTestId('guest-otp-code-form')).toBeVisible({ timeout: 15_000 });
 
