@@ -135,6 +135,24 @@ export const apiClient = {
     return api<PublicRestaurant[]>('GET', '/restaurants');
   },
 
+  listRestaurantLocations(restaurantId: string, token: string) {
+    return api<Array<{ id: string }>>('GET', `/restaurants/${restaurantId}/locations`, {
+      token,
+    });
+  },
+
+  updateRestaurantLocation(
+    restaurantId: string,
+    token: string,
+    locationId: string,
+    payload: { lat?: number; lng?: number },
+  ) {
+    return api('PATCH', `/restaurants/${restaurantId}/locations/${locationId}`, {
+      token,
+      body: payload,
+    });
+  },
+
   getRestaurant(id: string) {
     return api<PublicRestaurant>('GET', `/restaurants/${id}`);
   },
@@ -306,6 +324,20 @@ export const apiClient = {
     });
 
     const category = await this.createMenuCategory(restaurantId, adminToken, 'E2E Меню');
+    const drinksCategory = await this.createMenuCategory(restaurantId, adminToken, 'E2E Напитки');
+    await this.createMenuItem(restaurantId, adminToken, {
+      categoryId: drinksCategory.id,
+      name: 'E2E Вода',
+      price: 2,
+      description: 'Playwright seed drink',
+      imageUrl: 'https://example.com/e2e-drink.jpg',
+    });
+
+    await api('PATCH', `/restaurants/${restaurantId}/styling`, {
+      token: adminToken,
+      body: { menuCategoryNavEnabled: true },
+    });
+
     const defaultItem = (await this.createMenuItem(restaurantId, adminToken, {
       categoryId: category.id,
       name: 'E2E Блюдо 9.90',

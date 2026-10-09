@@ -53,6 +53,7 @@ jobs:
       CI: true
       E2E_API_URL: http://127.0.0.1:3000
       E2E_BASE_URL: http://127.0.0.1:3001
+      REVALIDATE_SECRET: ci-revalidate-secret
       E2E_SUPER_ADMIN_EMAIL: e2e-super@svels.test
       E2E_SUPER_ADMIN_PASSWORD: E2eSuperAdminPass123!
       E2E_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/svels

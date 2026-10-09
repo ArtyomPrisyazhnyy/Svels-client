@@ -207,6 +207,7 @@ test.describe('Landing / platform home', () => {
       '/privacypolicy',
     );
 
+    await consent.scrollIntoViewIfNeeded();
     await consent.check({ force: true });
     await expect(consent).toBeChecked();
     await expect(submit).toBeEnabled();

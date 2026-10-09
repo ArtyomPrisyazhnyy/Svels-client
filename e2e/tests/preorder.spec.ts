@@ -1,5 +1,6 @@
 import { test, expect, apiClient } from '../fixtures/test';
 import { getApiUrl } from '../helpers/env';
+import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
 import type { OrderDto } from '../../src/shared/types/pre-order';
 import type { RestaurantOrderSettings } from '../../src/shared/types/order-settings';
 
@@ -82,6 +83,7 @@ test.describe('Pre-order', () => {
       paymentOnline: false,
     });
     await setOrdersPaused(seed.restaurantId, adminToken, false);
+    await revalidateRestaurantPublicPage(seed.restaurantId);
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await addFirstMenuItemToCart(page, seed.restaurantId, seed.menu.defaultMenuItemId);
@@ -112,6 +114,7 @@ test.describe('Pre-order', () => {
       paymentCash: true,
     });
     await setOrdersPaused(seed.restaurantId, adminToken, false);
+    await revalidateRestaurantPublicPage(seed.restaurantId);
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await addFirstMenuItemToCart(page, seed.restaurantId, seed.menu.defaultMenuItemId);
@@ -127,6 +130,7 @@ test.describe('Pre-order', () => {
     const adminToken = seed.restaurantAdmin.auth.accessToken;
 
     await setOrdersPaused(seed.restaurantId, adminToken, true);
+    await revalidateRestaurantPublicPage(seed.restaurantId);
 
     try {
       await page.goto(`/restaurants/${seed.restaurantId}`);

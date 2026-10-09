@@ -53,7 +53,10 @@ export default async function globalSetup(): Promise<void> {
     unp,
     description: 'Playwright e2e restaurant',
     isChain: false,
-    locations: [{ address: 'ул. Тестовая 1' }],
+    locations: [
+      { city: 'Минск', address: 'ул. Тестовая 1' },
+      { city: 'Минск', address: 'ул. Тестовая 2' },
+    ],
   });
 
   await apiClient.reviewRegistration(superAuth.accessToken, request.id, 'approve');
@@ -87,6 +90,17 @@ export default async function globalSetup(): Promise<void> {
   }
 
   const menu = await apiClient.seedDefaultMenu(restaurantId, adminAuth.accessToken);
+
+  const seededLocations = await apiClient.listRestaurantLocations(
+    restaurantId,
+    adminAuth.accessToken,
+  );
+  for (const [index, location] of seededLocations.entries()) {
+    await apiClient.updateRestaurantLocation(restaurantId, adminAuth.accessToken, location.id, {
+      lat: 53.9045 + index * 0.01,
+      lng: 27.5615 + index * 0.01,
+    });
+  }
 
   const { auth: guest } = await apiClient.createGuest(restaurantId, 'Seed', 'Guest');
 

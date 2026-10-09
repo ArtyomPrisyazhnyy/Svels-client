@@ -64,6 +64,7 @@ test.describe('Restaurant auth UI', () => {
     await page.locator('#rest-confirm').fill(password);
     await page.locator('#rest-business').fill(businessName);
     await page.locator('#rest-unp').fill(String(Math.floor(100000000 + Math.random() * 899999999)));
+    await page.locator('#loc-city-0').fill('Минск');
     await page.locator('#loc-address-0').fill('ул. Очереди 5');
 
     // После setAuth RestaurantAuthRoute редиректит role=user на `/`,
