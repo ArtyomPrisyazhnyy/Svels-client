@@ -67,7 +67,9 @@ test.describe('Pre-order', () => {
     void asGuest;
     await page.goto(`/restaurants/${seed.restaurantId}/pre-order`);
     await expect(page.getByTestId('preorder-page')).toBeVisible();
-    await expect(page.locator('.restaurant-styled')).toBeVisible();
+    await expect(
+      page.locator('.restaurant-styled').filter({ has: page.getByTestId('preorder-page') }),
+    ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Мои заказы' })).toBeVisible();
   });
 
