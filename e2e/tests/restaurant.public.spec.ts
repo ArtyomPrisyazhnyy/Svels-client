@@ -62,7 +62,10 @@ test.describe('Restaurant public page', () => {
     await expect(page.getByTestId('restaurant-cart-modal').getByText(firstItem.name)).toBeVisible({
       timeout: 10_000,
     });
-    await page.getByRole('button', { name: 'Самовывоз' }).click();
+    const takeawayTab = page.getByRole('tab', { name: 'Самовывоз' });
+    if (await takeawayTab.isVisible()) {
+      await takeawayTab.click();
+    }
     await expect(page.getByTestId('cart-location-picker')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('cart-location-address')).toBeVisible();
     await expect(page.getByTestId('location-map')).toBeVisible();
