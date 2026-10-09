@@ -1,10 +1,12 @@
 import Link from 'next/link';
+import { preload } from 'react-dom';
 import { ContactButton } from './ContactButton';
 import { LandingBenefits } from './LandingBenefits';
 import { LandingFaq } from './LandingFaq';
 import { LandingForWhom } from './LandingForWhom';
 import { LandingHeader } from './LandingHeader';
-import { LandingHeroScene } from './LandingHeroScene';
+import { LandingHeroVisual } from './LandingHeroVisual';
+import { getHeroPreloadProps } from './landing-scenes';
 import { LandingLiveExample } from './LandingLiveExample';
 import { LandingPricing } from './LandingPricing';
 import { getDemoRestaurantUrl } from './landing-config';
@@ -34,6 +36,13 @@ const TRUST_CHIPS = ['0% с заказов', 'Дизайн под ваш бре�
 
 export function LandingPage() {
   const demoUrl = getDemoRestaurantUrl();
+  const heroPreload = getHeroPreloadProps();
+  preload(heroPreload.href, {
+    as: 'image',
+    imageSrcSet: heroPreload.imageSrcSet,
+    imageSizes: heroPreload.imageSizes,
+    type: 'image/avif',
+  });
 
   return (
     <div className="landing" data-testid="landing-page">
@@ -67,7 +76,7 @@ export function LandingPage() {
           </Reveal>
         </div>
         <Reveal className="landing__hero-visual" delay={120}>
-          <LandingHeroScene />
+          <LandingHeroVisual />
         </Reveal>
       </section>
 

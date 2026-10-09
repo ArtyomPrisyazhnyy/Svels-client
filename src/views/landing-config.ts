@@ -1,3 +1,5 @@
+import type { LandingSceneId } from './landing-scenes';
+
 /** URL демо-заведения для CTA лендинга (без хардкода реальных брендов). */
 export function getDemoRestaurantUrl(): string {
   const fromEnv = process.env.NEXT_PUBLIC_DEMO_RESTAURANT_URL?.trim();
@@ -67,36 +69,12 @@ export const LANDING_AUDIENCE: LandingAudienceCard[] = [
 export interface LandingLiveScreen {
   id: string;
   caption: string;
-  kind: 'image' | 'telegram';
-  imageSrc?: string;
-  width?: number;
-  height?: number;
+  sceneId: LandingSceneId;
 }
 
 export const LANDING_LIVE_SCREENS: LandingLiveScreen[] = [
-  {
-    id: 'menu',
-    caption: 'Меню в стиле заведения',
-    kind: 'image',
-    imageSrc: '/landing/menu.webp',
-  },
-  {
-    id: 'cart',
-    caption: 'Корзина в два шага',
-    kind: 'image',
-    imageSrc: '/landing/cart-mobile.webp',
-  },
-  {
-    id: 'telegram',
-    caption: 'Заказ в Telegram персонала',
-    kind: 'telegram',
-  },
-  {
-    id: 'admin',
-    caption: 'Админка: заказы и меню',
-    kind: 'image',
-    imageSrc: '/landing/admin-orders.webp',
-    width: 1280,
-    height: 720,
-  },
+  { id: 'menu', caption: 'Меню в стиле заведения', sceneId: 'feature-menu' },
+  { id: 'cart', caption: 'Корзина в два шага', sceneId: 'feature-cart' },
+  { id: 'telegram', caption: 'Заказ в Telegram персонала', sceneId: 'feature-telegram' },
+  { id: 'admin', caption: 'Админка: заказы и меню', sceneId: 'feature-admin' },
 ];

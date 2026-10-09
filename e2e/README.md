@@ -16,7 +16,7 @@ Dev-эндпоинт `GET /dev/last-otp?phone=...` доступен только
 
 ## Демо-заведение лендинга
 
-Фиктивная кофейня «Чайка» (`/restaurants/demo`) отдаётся **`scripts/landing-mock-api.mjs`** (данные в `e2e/mock-api/landing-demo-data.mjs`). Для съёмки скриншотов лендинга: `npm run landing:capture-screenshots` (mock API + `next build` + `next start`). Переменная `NEXT_PUBLIC_DEMO_RESTAURANT_URL` (см. `.env.example`) задаёт ссылку CTA «Открыть демо-заведение».
+Фиктивная кофейня «Чайка» (`/restaurants/demo`) отдаётся **`scripts/landing-mock-api.mjs`**: полное меню и фото из `e2e/fixtures/demo-venue/` (контент-пак), картинки в `public/demo-venue/images/`. Съёмка лендинга: `npm run landing:capture` (raw Playwright → `scripts/landing/build-scenes.mjs` → `public/landing/scenes/*` + manifest). Только пересборка растров: `npm run landing:scenes` (нужны raw PNG в `scripts/landing/raw/`). Переменная `NEXT_PUBLIC_DEMO_RESTAURANT_URL` (см. `.env.example`) — CTA «Открыть демо-заведение».
 
 ## Команды
 

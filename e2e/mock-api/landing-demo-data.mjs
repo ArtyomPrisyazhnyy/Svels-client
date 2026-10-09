@@ -1,7 +1,16 @@
-/** Фиктивное демо-заведение «Чайка» для лендинга и mock API (id: demo). */
+/** Фиктивное демо-заведение «Чайка» (контент-пак) для лендинга и mock API (id: demo). */
+
+import {
+  buildMenuFromPack,
+  demoVenueLocation,
+  demoVenuePromoBanner,
+  demoVenueRestaurant,
+  demoVenueStyling,
+  loadDemoVenuePack,
+} from './demo-venue-transform.mjs';
 
 export const LANDING_DEMO_RESTAURANT_ID = 'demo';
-export const LANDING_DEMO_DOMAIN = 'chaika-coffee.by';
+export const LANDING_DEMO_DOMAIN = 'chayka-coffee.by';
 
 export const LANDING_DEMO_AUTH = {
   email: 'owner@chaika.demo',
@@ -12,106 +21,11 @@ export const LANDING_DEMO_AUTH = {
 const now = () => new Date().toISOString();
 
 export function buildLandingDemoPayload() {
+  const pack = loadDemoVenuePack();
   const restaurantId = LANDING_DEMO_RESTAURANT_ID;
 
-  const restaurant = {
-    id: restaurantId,
-    name: 'Чайка',
-    description: 'Кофейня с завтраками и выпечкой собственного производства',
-    address: 'г. Минск, ул. Немига, 12',
-    status: 'active',
-    customDomain: LANDING_DEMO_DOMAIN,
-    logoUrl: '/landing/demo/logo.webp',
-    logoWebpUrl: '/landing/demo/logo.webp',
-    createdAt: now(),
-  };
-
-  const menu = {
-    categories: [
-      {
-        id: 'demo-cat-coffee',
-        name: 'Кофе',
-        sortOrder: 0,
-        items: [
-          {
-            id: 'demo-item-cappuccino',
-            categoryId: 'demo-cat-coffee',
-            name: 'Капучино',
-            variantLabel: '350 мл',
-            description: 'Эспрессо и молоко',
-            ingredients: null,
-            nutrition: null,
-            price: 8.5,
-            oldPrice: null,
-            isAvailable: true,
-            imageUrl: '/landing/demo/cappuccino.webp',
-            imageWebpUrl: '/landing/demo/cappuccino.webp',
-            galleryUrls: [],
-            galleryWebpUrls: [],
-            modifierGroups: [],
-          },
-          {
-            id: 'demo-item-raf',
-            categoryId: 'demo-cat-coffee',
-            name: 'Раф ванильный',
-            variantLabel: '400 мл',
-            description: 'Сливки и ванильный сироп',
-            ingredients: null,
-            nutrition: null,
-            price: 9.9,
-            oldPrice: 11.5,
-            isAvailable: true,
-            imageUrl: '/landing/demo/raf.webp',
-            imageWebpUrl: '/landing/demo/raf.webp',
-            galleryUrls: [],
-            galleryWebpUrls: [],
-            modifierGroups: [],
-          },
-        ],
-      },
-      {
-        id: 'demo-cat-food',
-        name: 'Выпечка',
-        sortOrder: 1,
-        items: [
-          {
-            id: 'demo-item-croissant',
-            categoryId: 'demo-cat-food',
-            name: 'Круассан с миндалём',
-            variantLabel: null,
-            description: 'Свежая выпечка',
-            ingredients: null,
-            nutrition: null,
-            price: 6.2,
-            oldPrice: null,
-            isAvailable: true,
-            imageUrl: '/landing/demo/croissant.webp',
-            imageWebpUrl: '/landing/demo/croissant.webp',
-            galleryUrls: [],
-            galleryWebpUrls: [],
-            modifierGroups: [],
-          },
-          {
-            id: 'demo-item-cheesecake',
-            categoryId: 'demo-cat-food',
-            name: 'Чизкейк',
-            variantLabel: 'порция',
-            description: 'Классический сырный десерт',
-            ingredients: null,
-            nutrition: null,
-            price: 7.8,
-            oldPrice: null,
-            isAvailable: true,
-            imageUrl: '/landing/demo/cheesecake.webp',
-            imageWebpUrl: '/landing/demo/cheesecake.webp',
-            galleryUrls: [],
-            galleryWebpUrls: [],
-            modifierGroups: [],
-          },
-        ],
-      },
-    ],
-  };
+  const restaurant = demoVenueRestaurant(pack, restaurantId, LANDING_DEMO_DOMAIN);
+  const menu = buildMenuFromPack(pack, restaurantId);
 
   const orderSettings = {
     restaurantId,
@@ -139,34 +53,39 @@ export function buildLandingDemoPayload() {
       customerPhone: '+375291112233',
       recipientName: null,
       recipientPhone: null,
-      deliveryAddress: {
-        street: 'ул. Немига',
-        house: '12',
-        apartment: '4',
-      },
+      deliveryAddress: { street: 'ул. Набережная Чаек', house: '12', apartment: '4' },
       locationId: 'demo-loc-1',
       requestedAt: null,
       comment: 'Без сахара',
       cancelReason: null,
-      totalAmount: 24.7,
+      totalAmount: 25.3,
       items: [
         {
           id: 'demo-line-1',
-          menuItemId: 'demo-item-cappuccino',
+          menuItemId: 'demo-cappuccino',
           name: 'Капучино',
           quantity: 1,
-          unitPrice: 8.5,
+          unitPrice: 6.9,
           modifiers: [],
-          lineTotal: 8.5,
+          lineTotal: 6.9,
         },
         {
           id: 'demo-line-2',
-          menuItemId: 'demo-item-croissant',
-          name: 'Круассан с миндалём',
+          menuItemId: 'demo-almond-croissant',
+          name: 'Миндальный круассан',
           quantity: 2,
-          unitPrice: 6.2,
+          unitPrice: 6.9,
           modifiers: [],
-          lineTotal: 12.4,
+          lineTotal: 13.8,
+        },
+        {
+          id: 'demo-line-2b',
+          menuItemId: 'demo-latte',
+          name: 'Латте',
+          quantity: 1,
+          unitPrice: 7.5,
+          modifiers: [],
+          lineTotal: 7.5,
         },
       ],
       bookingId: null,
@@ -191,25 +110,25 @@ export function buildLandingDemoPayload() {
       requestedAt: null,
       comment: null,
       cancelReason: null,
-      totalAmount: 16.4,
+      totalAmount: 17.8,
       items: [
         {
           id: 'demo-line-3',
-          menuItemId: 'demo-item-raf',
-          name: 'Раф ванильный',
+          menuItemId: 'demo-raf-lavender',
+          name: 'Лавандовый раф',
+          quantity: 1,
+          unitPrice: 8.9,
+          modifiers: [],
+          lineTotal: 8.9,
+        },
+        {
+          id: 'demo-line-4',
+          menuItemId: 'demo-basque-cheesecake',
+          name: 'Баскский чизкейк',
           quantity: 1,
           unitPrice: 9.9,
           modifiers: [],
           lineTotal: 9.9,
-        },
-        {
-          id: 'demo-line-4',
-          menuItemId: 'demo-item-cheesecake',
-          name: 'Чизкейк',
-          quantity: 1,
-          unitPrice: 7.8,
-          modifiers: [],
-          lineTotal: 7.8,
         },
       ],
       bookingId: null,
@@ -234,16 +153,50 @@ export function buildLandingDemoPayload() {
       requestedAt: null,
       comment: 'К 18:30',
       cancelReason: null,
-      totalAmount: 8.5,
+      totalAmount: 7.2,
       items: [
         {
           id: 'demo-line-5',
-          menuItemId: 'demo-item-cappuccino',
-          name: 'Капучино',
+          menuItemId: 'demo-flat-white',
+          name: 'Флэт уайт',
           quantity: 1,
-          unitPrice: 8.5,
+          unitPrice: 7.2,
           modifiers: [],
-          lineTotal: 8.5,
+          lineTotal: 7.2,
+        },
+      ],
+      bookingId: null,
+      statusChangedAt: now(),
+      createdAt: now(),
+      updatedAt: now(),
+    },
+    {
+      id: 'demo-order-1839',
+      restaurantId,
+      orderNumber: 1839,
+      status: 'new',
+      paymentMethod: 'online',
+      paymentStatus: 'paid',
+      fulfillmentType: 'dine_in',
+      customerName: 'Олег',
+      customerPhone: '+375294445566',
+      recipientName: null,
+      recipientPhone: null,
+      deliveryAddress: null,
+      locationId: 'demo-loc-1',
+      requestedAt: null,
+      comment: 'Стол у окна',
+      cancelReason: null,
+      totalAmount: 10.5,
+      items: [
+        {
+          id: 'demo-line-6',
+          menuItemId: 'demo-tiramisu',
+          name: 'Тирамису',
+          quantity: 1,
+          unitPrice: 10.5,
+          modifiers: [],
+          lineTotal: 10.5,
         },
       ],
       bookingId: null,
@@ -253,61 +206,14 @@ export function buildLandingDemoPayload() {
     },
   ];
 
-  const styling = {
-    restaurantId,
-    fontFamily: 'system',
-    colorTheme: 'forest',
-    currencyDisplay: 'byn_glyph',
-    buttonShape: 'rounded',
-    buttonVariant: 'filled',
-    switcherStyle: 'pill',
-    cardStyle: 'classic',
-    magazineCardLayout: 'content_left',
-    menuCategoryNavEnabled: true,
-    favoritesEnabled: true,
-    headerStyle: 'glass',
-    footerLayout: 'columns',
-    footerAccent: 'tinted',
-    updatedAt: now(),
-  };
-
-  const locations = [
-    {
-      id: 'demo-loc-1',
-      restaurantId,
-      label: 'Немига',
-      city: 'Минск',
-      address: 'ул. Немига, 12',
-      lat: 53.9045,
-      lng: 27.5615,
-      sortOrder: 0,
-    },
-  ];
-
   return {
     restaurant,
     menu,
     orderSettings,
-    styling,
-    locations,
+    styling: demoVenueStyling(restaurantId),
+    locations: demoVenueLocation(pack, restaurantId),
     socialLinks: [],
-    promoBanners: [
-      {
-        id: 'demo-banner-1',
-        restaurantId,
-        type: 'strip',
-        title: 'Завтраки до 12:00',
-        imageUrl: '/landing/demo/banner.webp',
-        imageWebpUrl: '/landing/demo/banner.webp',
-        linkUrl: null,
-        sortOrder: 0,
-        isActive: true,
-        displayFrequency: 'every_visit',
-        aspectRatio: '4_1',
-        createdAt: now(),
-        updatedAt: now(),
-      },
-    ],
+    promoBanners: demoVenuePromoBanner(pack, restaurantId),
     bookingSettings: {
       restaurantId,
       bookingEnabled: false,

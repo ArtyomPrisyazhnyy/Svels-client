@@ -13,17 +13,12 @@ import {
 } from '../e2e/mock-api/landing-demo-data.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ARTIFACTS = '/opt/cursor/artifacts/landing-v3';
-const PUBLIC_LANDING = path.join(ROOT, 'public/landing');
+const ARTIFACTS = '/opt/cursor/artifacts/landing-v4';
+const RAW = path.join(ROOT, 'scripts/landing/raw');
 const BASE = 'http://127.0.0.1:3001';
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
-}
-
-function toWebp(png, webp, quality = 84) {
-  execSync(`cwebp -q ${quality} "${png}" -o "${webp}"`, { stdio: 'inherit' });
-  fs.unlinkSync(png);
 }
 
 async function waitHttp(url, attempts = 90) {
@@ -95,6 +90,20 @@ function start(cmd, args, env = {}) {
   });
 }
 
+function syncStandaloneAssets() {
+  execSync('cp -r public .next/standalone/public', { cwd: ROOT, stdio: 'inherit' });
+  execSync('cp -r .next/static .next/standalone/.next/static', { cwd: ROOT, stdio: 'inherit' });
+}
+
+function startNextStandalone(apiUrl) {
+  syncStandaloneAssets();
+  return start('node', ['.next/standalone/server.js'], {
+    PORT: '3001',
+    HOSTNAME: '127.0.0.1',
+    NEXT_PUBLIC_API_URL: apiUrl,
+  });
+}
+
 async function dismissPromoModal(page) {
   const close = page.locator('.promo-banner-modal__close');
   if (await close.isVisible().catch(() => false)) {
@@ -108,6 +117,7 @@ async function openRestaurantMenu(page) {
   await page.getByTestId('restaurant-public-page').waitFor({ state: 'visible', timeout: 30000 });
   await page.getByTestId('restaurant-menu').waitFor({ state: 'visible', timeout: 30000 });
   await dismissPromoModal(page);
+  await page.locator('[data-testid^="menu-item-demo-"]').first().waitFor({ state: 'visible', timeout: 30000 });
 }
 
 async function addItemsToCart(page, itemIds) {
@@ -124,6 +134,24 @@ async function addItemsToCart(page, itemIds) {
     await page.keyboard.press('Escape');
     await page.waitForTimeout(250);
   }
+}
+
+async function waitForImages(page) {
+  await page.waitForLoadState('networkidle');
+  await page.evaluate(async () => {
+    const imgs = Array.from(document.images);
+    await Promise.all(
+      imgs.map((img) => {
+        if (img.complete) {
+          return img.decode?.() ?? Promise.resolve();
+        }
+        return new Promise((resolve) => {
+          img.addEventListener('load', () => resolve(img.decode?.() ?? undefined), { once: true });
+          img.addEventListener('error', () => resolve(undefined), { once: true });
+        });
+      }),
+    );
+  });
 }
 
 async function loginDemoAdmin(page) {
@@ -169,10 +197,7 @@ async function captureLandingArtifacts(page) {
 fs.mkdirSync(ARTIFACTS, { recursive: true });
 fs.mkdirSync(path.join(ARTIFACTS, '390'), { recursive: true });
 fs.mkdirSync(path.join(ARTIFACTS, '1280'), { recursive: true });
-fs.mkdirSync(PUBLIC_LANDING, { recursive: true });
-
-const skipDemoImages = process.env.LANDING_SKIP_DEMO_IMAGES === '1';
-const skipHeroCapture = process.env.LANDING_SKIP_HERO_CAPTURE === '1';
+fs.mkdirSync(RAW, { recursive: true });
 
 function killPorts() {
   try {
@@ -197,11 +222,6 @@ await sleep(2000);
 await waitPortFree(3001);
 await waitPortFree(3000);
 
-if (!skipDemoImages) {
-  const { generateLandingDemoImages } = await import('./generate-landing-demo-images.mjs');
-  await generateLandingDemoImages();
-}
-
 const mockApi = start('node', ['scripts/landing-mock-api.mjs']);
 await waitHttp('http://127.0.0.1:3000/health');
 await assertMockMenu();
@@ -213,66 +233,63 @@ execSync('npm run build', {
 });
 
 await waitPortFree(3001);
-const next = start('npm', ['run', 'start'], { NEXT_PUBLIC_API_URL: 'http://127.0.0.1:3000' });
+const next = startNextStandalone('http://127.0.0.1:3000');
 await waitHttp(`${BASE}/`);
 await waitHttp(`${BASE}/restaurants/${LANDING_DEMO_RESTAURANT_ID}`);
 
 const browser = await chromium.launch();
-const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });
+const phone = await browser.newPage({
+  viewport: { width: 393, height: 852 },
+  deviceScaleFactor: 3,
+});
 const desktop = await browser.newPage({
-  viewport: { width: 1280, height: 800 },
+  viewport: { width: 1440, height: 900 },
   deviceScaleFactor: 2,
 });
 
-if (!skipHeroCapture) {
-  await openRestaurantMenu(phone);
-  await phone.waitForTimeout(400);
-  const heroPhonePng = path.join(PUBLIC_LANDING, 'hero-phone.png');
-  await phone.screenshot({ path: heroPhonePng });
-  toWebp(heroPhonePng, path.join(PUBLIC_LANDING, 'hero-phone.webp'));
-
-  const menuPng = path.join(PUBLIC_LANDING, 'menu.png');
-  await phone.screenshot({ path: menuPng });
-  toWebp(menuPng, path.join(PUBLIC_LANDING, 'menu.webp'));
-}
-
-// —— Cart modal with 3 items ——
 await openRestaurantMenu(phone);
-await addItemsToCart(phone, [
-  'demo-item-cappuccino',
-  'demo-item-raf',
-  'demo-item-croissant',
-]);
+await waitForImages(phone);
+await phone.screenshot({ path: path.join(RAW, 'phone-menu.png') });
+
+await addItemsToCart(phone, ['demo-cappuccino', 'demo-almond-croissant', 'demo-latte']);
 await phone.getByTestId('cart-button').click();
 await phone.getByTestId('restaurant-cart-modal').waitFor({ state: 'visible' });
-const cartModal = phone.locator('[data-testid="restaurant-cart-modal"]');
-const cartPng = path.join(PUBLIC_LANDING, 'cart-mobile.png');
-await cartModal.screenshot({ path: cartPng });
-toWebp(cartPng, path.join(PUBLIC_LANDING, 'cart-mobile.webp'));
+await waitForImages(phone);
+await phone.screenshot({ path: path.join(RAW, 'phone-cart.png') });
 
-if (!skipHeroCapture) {
-  await openRestaurantMenu(desktop);
-  await desktop.waitForTimeout(400);
-  const heroDesktopPng = path.join(PUBLIC_LANDING, 'hero-desktop.png');
-  await desktop.screenshot({ path: heroDesktopPng, fullPage: false });
-  toWebp(heroDesktopPng, path.join(PUBLIC_LANDING, 'hero-desktop.webp'), 88);
-}
+await openRestaurantMenu(desktop);
+await waitForImages(desktop);
+await desktop.screenshot({ path: path.join(RAW, 'desktop-menu.png') });
 
-// —— Admin orders ——
 await loginDemoAdmin(desktop);
 await desktop.goto(`${BASE}/restaurant-admin/orders`);
 await desktop.getByTestId('orders-admin-list').waitFor({ state: 'visible', timeout: 20000 });
 await desktop.getByTestId('order-card-demo-order-1842').waitFor({ state: 'visible', timeout: 15000 });
-await desktop.waitForTimeout(600);
-const adminMain = desktop.locator('.orders-admin');
-const adminPng = path.join(PUBLIC_LANDING, 'admin-orders.png');
-await adminMain.screenshot({ path: adminPng });
-toWebp(adminPng, path.join(PUBLIC_LANDING, 'admin-orders.webp'), 86);
-
-await captureLandingArtifacts(desktop);
+await waitForImages(desktop);
+await desktop.screenshot({ path: path.join(RAW, 'desktop-admin.png') });
 
 await browser.close();
 mockApi.kill();
 next.kill();
 
-console.log('Landing screenshots saved to', PUBLIC_LANDING, 'and', ARTIFACTS);
+execSync('node scripts/landing/build-scenes.mjs', { cwd: ROOT, stdio: 'inherit' });
+
+killPorts();
+await sleep(2000);
+await waitPortFree(3000);
+await waitPortFree(3001);
+
+const mockApi2 = start('node', ['scripts/landing-mock-api.mjs']);
+await waitHttp('http://127.0.0.1:3000/health');
+await waitPortFree(3001);
+const next2 = startNextStandalone('http://127.0.0.1:3000');
+await waitHttp(`${BASE}/`);
+
+const artifactBrowser = await chromium.launch();
+const artifactPage = await artifactBrowser.newPage({ viewport: { width: 1280, height: 800 } });
+await captureLandingArtifacts(artifactPage);
+await artifactBrowser.close();
+mockApi2.kill();
+next2.kill();
+
+console.log('Raw captures →', RAW, '; artifacts →', ARTIFACTS);

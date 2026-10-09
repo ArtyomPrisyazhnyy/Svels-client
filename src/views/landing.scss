@@ -427,6 +427,52 @@ html:has(.landing) {
   min-height: 320px;
 }
 
+.landing-hero-visual {
+  position: relative;
+  width: min(100%, 560px);
+  margin-inline: auto;
+}
+
+.landing-hero-visual__desktop {
+  display: none;
+
+  @media (min-width: 980px) {
+    display: block;
+  }
+}
+
+.landing-hero-visual__mobile {
+  @media (min-width: 980px) {
+    display: none;
+  }
+}
+
+.landing-picture__img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.landing__live-picture {
+  display: block;
+  width: 100%;
+
+  .landing-picture__img {
+    width: auto;
+    max-width: 100%;
+    margin-inline: auto;
+    max-height: 300px;
+    border-radius: 16px;
+    object-fit: cover;
+    object-position: top center;
+  }
+}
+
+.landing__live-slide[data-testid='landing-live-admin'] .landing-picture__img {
+  max-height: 280px;
+  aspect-ratio: 16 / 10;
+}
+
 /* ===== Секции ===== */
 .landing__section {
   padding: 4rem 0;
