@@ -1,0 +1,35 @@
+---
+description: Playwright E2E requirements for user-facing UI and flows
+alwaysApply: true
+---
+
+# Playwright E2E (обязательно)
+
+## Когда нужен тест
+
+Любой **новый или изменённый** пользовательский экран или сценарий (гость, админка, auth, корзина, заказы и т.д.) сопровождается спекой в `e2e/tests/`:
+
+- **happy path** — основной успешный поток;
+- **ключевые валидации и ошибки** — disabled-кнопки, сообщения об ошибках, редиректы без auth.
+
+## Селекторы и стиль
+
+- Используйте **`data-testid`** на интерактивных элементах и ключевых блоках; добавляйте test id в компоненты вместе с тестом.
+- **Без `sleep` / фиксированных пауз** — только `expect`, `toBeVisible`, `poll`, таймауты Playwright.
+- **Без моков API** в e2e: только реальный Svels-backend (локально или в CI).
+
+## Данные
+
+- Сидирование — через **`e2e/global-setup.ts`** и хелперы в `e2e/helpers/` (`apiClient`, `staff-seed`, seed в `e2e/.auth/seed.json`).
+- Новые сущности для тестов — **расширяйте** global-setup / api-хелперы, не создавайте разрозненные one-off скрипты в спеках.
+
+## Перед PR
+
+1. Поднять backend (Postgres + Redis, миграции, super admin) и клиент — см. `e2e/README.md` и `AGENTS.md`.
+2. Прогнать **затронутые** спеки: `npx playwright test e2e/tests/<file>.spec.ts`.
+3. В описании PR указать, какие e2e прогоняли и результат.
+4. **Не удалять и не `test.skip` существующие тесты**, чтобы «починить» CI, без явного объяснения в PR.
+
+## CI
+
+На каждый PR в `main` job **`e2e`** гоняет полный suite против checkout `Svels-backend` `main` — падение e2e блокирует merge.

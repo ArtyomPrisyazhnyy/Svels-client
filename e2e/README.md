@@ -36,6 +36,10 @@ E2E_SKIP_WEBSERVER=1 npm run test:e2e
 4. Одобряет заявку
 5. Пишет `e2e/.auth/seed.json` (gitignore)
 
+## CI
+
+На каждый PR в `main` workflow **e2e** поднимает Postgres 16, Redis, собирает и запускает [Svels-backend](https://github.com/ArtyomPrisyazhnyy/Svels-backend) `main`, собирает клиент и гоняет **все** спеки Playwright. При падении сохраняются HTML-отчёт и traces (`playwright-e2e-artifacts`).
+
 ## Покрытие
 
 | Область | Файл |
@@ -46,7 +50,8 @@ E2E_SKIP_WEBSERVER=1 npm run test:e2e
 | Guest OTP | `auth.guest.spec.ts` |
 | Публичная страница / меню / корзина | `restaurant.public.spec.ts` |
 | Бронирование | `booking.spec.ts` |
-| Предзаказ (placeholder) | `preorder.spec.ts` |
+| Предзаказ / корзина | `preorder.spec.ts` |
+| Заказы (админка) | `restaurant-admin-orders.spec.ts` |
 | ЛК гостя | `account.spec.ts` |
 | Админка заведения (все разделы) | `restaurant-admin.spec.ts` |
 | Суперадмин модерация | `super-admin.spec.ts` |
