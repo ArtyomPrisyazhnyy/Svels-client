@@ -14,7 +14,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report e2e/playwright-report"
+    "test:e2e:report": "playwright show-report e2e/playwright-report",
+    "mock:landing-api": "node scripts/landing-mock-api.mjs",
+    "landing:capture-screenshots": "node scripts/capture-landing-screenshots.mjs"
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",

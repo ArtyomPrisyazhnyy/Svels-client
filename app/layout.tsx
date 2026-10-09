@@ -7,11 +7,11 @@ import '@/shared/styles/byn-sign.scss';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001'),
   title: {
-    default: 'Svels — бронирование столов и предзаказы',
+    default: 'Svels — сайт и приложение для заказов в вашем заведении',
     template: '%s | Svels',
   },
   description:
-    'Svels помогает гостям быстро забронировать стол и оформить предзаказ, а ресторанам — принимать заявки и управлять меню онлайн.',
+    'Онлайн-заказы на доставку, самовывоз и в зале на вашем сайте и в приложении под вашим брендом. Без процента с выручки. Запуск за несколько дней.',
   openGraph: {
     type: 'website',
     locale: 'ru_RU',

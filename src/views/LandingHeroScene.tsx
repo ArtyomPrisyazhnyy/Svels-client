@@ -1,58 +1,50 @@
-/** Статичная сцена продукта в hero: окно сайта + телефон приложения. */
+import Image from 'next/image';
+import { LANDING_DEMO_DOMAIN } from '@/views/landing-demo-constants';
+
+/** Hero: iPhone 15 Pro + macOS browser с реальными скриншотами демо-заведения. */
 export function LandingHeroScene() {
   return (
-    <div className="landing-scene" aria-hidden>
-      <div className="landing-browser">
+    <div className="landing-hero-devices" aria-hidden data-testid="landing-hero-scene">
+      <div className="landing-browser landing-browser--hero landing-browser--mac">
         <div className="landing-browser__bar">
           <span className="landing-browser__dots">
             <i />
             <i />
             <i />
           </span>
-          <span className="landing-browser__url">bistro-lotos.by</span>
+          <span className="landing-browser__tab">Чайка — меню</span>
+          <span className="landing-browser__url">{LANDING_DEMO_DOMAIN}</span>
         </div>
-        <div className="landing-browser__body">
-          <div className="landing-browser__hero">
-            <span className="landing-browser__mark">Bistro Lotos</span>
-            <strong>Вечер в чайной</strong>
-            <em>Стол у окна · 19:00</em>
-          </div>
-          <div className="landing-browser__grid">
-            <span>
-              Сенча
-              <small>12 BYN</small>
-            </span>
-            <span>
-              Матча
-              <small>16 BYN</small>
-            </span>
-            <span>
-              Десерт
-              <small>9 BYN</small>
-            </span>
-          </div>
+        <div className="landing-browser__shot landing-browser__shot--hero">
+          <Image
+            src="/landing/hero-desktop.webp"
+            alt=""
+            width={1280}
+            height={800}
+            className="landing-browser__img"
+            priority
+            sizes="(max-width: 979px) 0px, 520px"
+          />
         </div>
       </div>
 
-      <div className="landing-phone">
-        <div className="landing-phone__notch" />
-        <div className="landing-phone__screen">
-          <header>
-            <b>Bistro Lotos</b>
-            <span>Сегодня</span>
-          </header>
-          <ul>
-            <li>
-              <i />
-              Стол 7
-              <em>подтверждён</em>
-            </li>
-            <li>
-              <i />
-              Предзаказ
-              <em>24 BYN</em>
-            </li>
-          </ul>
+      <div className="landing-iphone15">
+        <span className="landing-iphone15__btn landing-iphone15__btn--silent" aria-hidden />
+        <span className="landing-iphone15__btn landing-iphone15__btn--volume" aria-hidden />
+        <span className="landing-iphone15__btn landing-iphone15__btn--power" aria-hidden />
+        <div className="landing-iphone15__bezel">
+          <div className="landing-iphone15__island" aria-hidden />
+          <div className="landing-iphone15__screen">
+            <Image
+              src="/landing/hero-phone.webp"
+              alt=""
+              width={390}
+              height={844}
+              className="landing-iphone15__img"
+              priority
+              sizes="(max-width: 979px) 46vw, 200px"
+            />
+          </div>
         </div>
       </div>
     </div>

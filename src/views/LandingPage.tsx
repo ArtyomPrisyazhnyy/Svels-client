@@ -1,10 +1,13 @@
 import Link from 'next/link';
 import { ContactButton } from './ContactButton';
-import { LandingHeader } from './LandingHeader';
+import { LandingBenefits } from './LandingBenefits';
 import { LandingFaq } from './LandingFaq';
-import { LandingFeatures } from './LandingFeatures';
+import { LandingForWhom } from './LandingForWhom';
+import { LandingHeader } from './LandingHeader';
 import { LandingHeroScene } from './LandingHeroScene';
+import { LandingLiveExample } from './LandingLiveExample';
 import { LandingPricing } from './LandingPricing';
+import { getDemoRestaurantUrl } from './landing-config';
 import { Reveal } from './Reveal';
 
 /**
@@ -27,7 +30,11 @@ const STEPS = [
   },
 ];
 
+const TRUST_CHIPS = ['0% с заказов', 'Дизайн под ваш бренд', 'Гости и данные — ваши'] as const;
+
 export function LandingPage() {
+  const demoUrl = getDemoRestaurantUrl();
+
   return (
     <div className="landing" data-testid="landing-page">
       <LandingHeader />
@@ -36,20 +43,27 @@ export function LandingPage() {
         <div className="landing__hero-copy">
           <Reveal className="landing__hero-badge">
             <span className="landing__hero-badge-dot" aria-hidden />
-            Для ресторанов, баров и кофеен
+            Для кафе, ресторанов, кофеен и цветочных
           </Reveal>
           <Reveal as="h1" className="landing__hero-title" delay={50}>
-            Сайт и мобильное приложение
+            Свой сайт и приложение для заказов
             <br />
-            <span className="landing__hero-title-accent">для вашего заведения</span>
+            <span className="landing__hero-title-accent">без процента с выручки</span>
           </Reveal>
           <Reveal as="p" className="landing__hero-text" delay={100}>
-            Гость бронирует стол, заказывает заранее и открывает вас по адресу
-            заведения — не платформы. Выглядит как ваш продукт, потому что это он и есть.
+            Доставка, самовывоз и заказы в зале. Оплата картой онлайн, новые заказы — сразу в
+            Telegram. Запуск за несколько дней.
+          </Reveal>
+          <Reveal className="landing__hero-chips" delay={120}>
+            {TRUST_CHIPS.map((chip) => (
+              <span key={chip} className="landing__hero-chip">{chip}</span>
+            ))}
           </Reveal>
           <Reveal className="landing__hero-actions" delay={150}>
             <ContactButton label="Оставить заявку" variant="primary" />
-            <a href="#features" className="landing-cta landing-cta--ghost">Смотреть экраны</a>
+            <Link href={demoUrl} className="landing-cta landing-cta--ghost landing-cta--block-mobile">
+              Посмотреть живой пример
+            </Link>
           </Reveal>
         </div>
         <Reveal className="landing__hero-visual" delay={120}>
@@ -71,7 +85,9 @@ export function LandingPage() {
         </div>
       </section>
 
-      <LandingFeatures />
+      <LandingBenefits />
+      <LandingLiveExample />
+      <LandingForWhom />
       <LandingPricing />
       <LandingFaq />
 

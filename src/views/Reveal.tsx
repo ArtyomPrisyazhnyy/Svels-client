@@ -1,6 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentPropsWithoutRef,
+  type ElementType,
+  type ReactNode,
+} from 'react';
 
 /**
  * Лёгкий reveal-on-scroll на IntersectionObserver.
@@ -8,17 +15,20 @@ import { useEffect, useRef, useState, type ElementType, type ReactNode } from 'r
  * Без JS-библиотек анимации — только CSS-переходы, чтобы лендинг
  * оставался моментальным даже на слабом интернете.
  */
-export function Reveal({
+type RevealProps<T extends ElementType> = {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  as?: T;
+} & Omit<ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className' | 'delay'>;
+
+export function Reveal<T extends ElementType = 'div'>({
   children,
   className = '',
   delay = 0,
   as,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-  as?: ElementType;
-}) {
+  ...rest
+}: RevealProps<T>) {
   const Tag = (as ?? 'div') as ElementType;
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -54,6 +64,7 @@ export function Reveal({
       ref={ref}
       className={`reveal${visible ? ' is-visible' : ''}${className ? ` ${className}` : ''}`}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+      {...rest}
     >
       {children}
     </Tag>

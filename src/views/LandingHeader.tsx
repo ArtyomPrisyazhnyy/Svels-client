@@ -1,7 +1,11 @@
+'use client';
+
+import { useState } from 'react';
 import { ContactButton } from './ContactButton';
 
 const LANDING_SECTION_LINKS = [
-  { href: '/#features', label: 'Возможности' },
+  { href: '/#benefits', label: 'Как это работает' },
+  { href: '/#features', label: 'Пример' },
   { href: '/#pricing', label: 'Тарифы' },
   { href: '/#faq', label: 'FAQ' },
 ] as const;
@@ -11,21 +15,66 @@ const LANDING_SECTION_LINKS = [
  * Якоря ведут на главную — с других страниц открывается / и скролл к разделу.
  */
 export function LandingHeader() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <header className="landing__header">
-      <div className="landing__container">
+      <div className="landing__container landing__header-inner">
         <a className="landing__brand" href="/" aria-label="Svels">
           <span className="landing__brand-mark">Svels</span>
         </a>
-        <nav className="landing__nav" aria-label="Разделы">
+
+        <nav className="landing__nav landing__nav--desktop" aria-label="Разделы">
           {LANDING_SECTION_LINKS.map(({ href, label }) => (
             <a key={href} href={href} className="landing__nav-link">
               {label}
             </a>
           ))}
         </nav>
-        <ContactButton label="Оставить заявку" variant="primary" className="landing__header-cta" />
+
+        <nav
+          className="landing__nav landing__nav--mobile"
+          aria-label="Разделы (мобильная навигация)"
+          data-testid="landing-nav-mobile"
+        >
+          {LANDING_SECTION_LINKS.map(({ href, label }) => (
+            <a key={href} href={href} className="landing__nav-pill">
+              {label}
+            </a>
+          ))}
+        </nav>
+
+        <div className="landing__header-actions">
+          <button
+            type="button"
+            className="landing__menu-toggle"
+            aria-expanded={menuOpen}
+            aria-controls="landing-mobile-menu"
+            onClick={() => setMenuOpen((open) => !open)}
+            data-testid="landing-menu-toggle"
+          >
+            <span className="landing__menu-toggle-label">Меню</span>
+          </button>
+          <ContactButton label="Оставить заявку" variant="primary" className="landing__header-cta" />
+        </div>
       </div>
+
+      {menuOpen && (
+        <div id="landing-mobile-menu" className="landing__mobile-menu" data-testid="landing-mobile-menu">
+          <nav className="landing__mobile-menu-nav" aria-label="Разделы">
+            {LANDING_SECTION_LINKS.map(({ href, label }) => (
+              <a
+                key={href}
+                href={href}
+                className="landing__mobile-menu-link"
+                onClick={() => setMenuOpen(false)}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
