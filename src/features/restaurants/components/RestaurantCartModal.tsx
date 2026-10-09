@@ -8,8 +8,10 @@ import { useModalPresence } from '@/hooks/useModalPresence';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useCartStore } from '@/store/cart.store';
 import { fetchRestaurantLocations } from '../api/locations.api';
-import type { RestaurantLocation } from '@/shared/types/restaurant-location';
-import { formatRestaurantLocationLine } from '@/shared/types/restaurant-location';
+import {
+  formatRestaurantLocationLine,
+  type RestaurantLocation,
+} from '@/shared/types/restaurant-location';
 import { FulfillmentSelector } from './FulfillmentSelector';
 import { CartLocationPicker } from './CartLocationPicker';
 import { PaymentSelector } from './PaymentSelector';
@@ -429,45 +431,62 @@ export function RestaurantCartModal({
           data-testid="restaurant-cart-modal"
           data-cart-step={cartStep}
         >
-          <div className={`restaurant-cart-modal__panel${activeClass}`}>
-            {step2 ? (
-              <button
-                type="button"
-                className="restaurant-cart-modal__back"
-                onClick={() => setCartStep(1)}
-                aria-label="Назад к корзине"
-                data-testid="cart-back-to-step-1"
-              >
-                ←
-              </button>
-            ) : null}
-
-            <button
-              type="button"
-              className="restaurant-cart-modal__close"
-              onClick={handleClose}
-              aria-label="Закрыть"
+          <div
+            className={`restaurant-cart-modal__panel${activeClass}${
+              step2 ? ' restaurant-cart-modal__panel--checkout' : ''
+            }`}
+          >
+            <header
+              className={`restaurant-cart-modal__header${
+                step2 ? ' restaurant-cart-modal__header--checkout' : ''
+              }`}
             >
-              ×
-            </button>
-
-            <header className="restaurant-cart-modal__header">
-              <div className="restaurant-cart-modal__header-row">
-                <h2 id={titleId}>{modalTitle}</h2>
-                {!step2 && items.length > 0 && (
+              <div className="restaurant-cart-modal__header-bar" data-testid="cart-header-bar">
+                <div className="restaurant-cart-modal__header-start">
+                  {step2 ? (
+                    <button
+                      type="button"
+                      className="restaurant-cart-modal__icon-btn"
+                      onClick={() => setCartStep(1)}
+                      aria-label="Назад к корзине"
+                      data-testid="cart-back-to-step-1"
+                    >
+                      ←
+                    </button>
+                  ) : null}
+                </div>
+                <h2
+                  id={titleId}
+                  className="restaurant-cart-modal__header-title"
+                  data-testid="cart-header-title"
+                >
+                  {modalTitle}
+                </h2>
+                <div className="restaurant-cart-modal__header-end">
+                  {!step2 && items.length > 0 && (
+                    <button
+                      type="button"
+                      className="restaurant-cart-modal__clear"
+                      onClick={handleClearCart}
+                      data-testid="cart-clear"
+                    >
+                      Очистить
+                    </button>
+                  )}
                   <button
                     type="button"
-                    className="restaurant-cart-modal__clear"
-                    onClick={handleClearCart}
-                    data-testid="cart-clear"
+                    className="restaurant-cart-modal__icon-btn restaurant-cart-modal__close"
+                    onClick={handleClose}
+                    aria-label="Закрыть"
+                    data-testid="cart-close"
                   >
-                    Очистить
+                    ×
                   </button>
-                )}
+                </div>
               </div>
             </header>
 
-            <div className="restaurant-cart-modal__body">
+            <div className="restaurant-cart-modal__body" data-testid="cart-modal-body">
               {ordersPaused && (
                 <div
                   className="restaurant-cart-modal__paused"
@@ -758,8 +777,15 @@ export function RestaurantCartModal({
                             </p>
                           </div>
 
-                          <div className="restaurant-cart-modal__item-actions">
-                            <div className="restaurant-cart-modal__counter" aria-label="Количество">
+                          <div
+                            className="restaurant-cart-modal__item-actions"
+                            data-testid="cart-item-actions"
+                          >
+                            <div
+                              className="restaurant-cart-modal__counter"
+                              aria-label="Количество"
+                              data-testid="cart-item-counter"
+                            >
                               <button
                                 type="button"
                                 className="restaurant-cart-modal__counter-btn"
@@ -792,7 +818,7 @@ export function RestaurantCartModal({
             </div>
 
             {successOrderNumber === null && (
-              <footer className="restaurant-cart-modal__footer">
+              <footer className="restaurant-cart-modal__footer" data-testid="cart-modal-footer">
                 <p className="restaurant-cart-modal__total">
                   Итого: <CurrencyAmount amount={totalAmount} />
                 </p>
