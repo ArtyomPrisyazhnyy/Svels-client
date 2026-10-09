@@ -33,26 +33,16 @@ test.describe('Guest OTP auth', () => {
   test('повторный вход существующего гостя по OTP', async ({ page, seed }) => {
     const phone = `+37533${String(Date.now()).slice(-7)}`;
 
-    await apiClient.sendGuestOtp(seed.restaurantId, phone);
-    let otp = await apiClient.getLastDevOtp(phone);
-    const verified = await apiClient.verifyGuestOtp(seed.restaurantId, phone, otp.code);
-    if (verified.status !== 'registration_required') {
-      throw new Error('Expected registration_required for new phone');
-    }
-    await apiClient.registerGuestWithOtp(seed.restaurantId, {
-      registrationToken: verified.registrationToken,
-      firstName: 'Return',
-      lastName: 'Guest',
-    });
+    await apiClient.guestOtpLogin(seed.restaurantId, phone);
 
+    await page.waitForTimeout(15_000);
     await page.goto(`/restaurants/${seed.restaurantId}/auth`);
-    await page.waitForTimeout(5_000);
     await page.getByTestId('otp-phone').fill(phone);
     await page.getByTestId('guest-otp-privacy-consent').check();
     await page.getByTestId('otp-send-submit').click();
     await expect(page.getByTestId('guest-otp-code-form')).toBeVisible({ timeout: 15_000 });
 
-    otp = await apiClient.getLastDevOtp(phone);
+    const otp = await apiClient.getLastDevOtp(phone);
     await page.getByTestId('otp-code').fill(otp.code);
     await page.getByTestId('otp-verify-submit').click();
 

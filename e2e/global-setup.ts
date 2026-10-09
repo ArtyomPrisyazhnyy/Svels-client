@@ -52,10 +52,10 @@ export default async function globalSetup(): Promise<void> {
     name: restaurantName,
     unp,
     description: 'Playwright e2e restaurant',
-    isChain: false,
+    isChain: true,
     locations: [
-      { city: 'Минск', address: 'ул. Тестовая 1' },
-      { city: 'Минск', address: 'ул. Тестовая 2' },
+      { label: 'Точка 1', city: 'Минск', address: 'ул. Тестовая 1' },
+      { label: 'Точка 2', city: 'Минск', address: 'ул. Тестовая 2' },
     ],
   });
 
