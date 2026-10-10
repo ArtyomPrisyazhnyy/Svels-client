@@ -1,0 +1,85 @@
+// Design tokens — spacing, radii, z-index, typography, motion, semantic --rs-* defaults.
+
+$space-scale: (
+  1: 4px,
+  2: 8px,
+  3: 12px,
+  4: 16px,
+  5: 20px,
+  6: 24px,
+  8: 32px,
+  10: 40px,
+) !default;
+
+$z-scale: (
+  base: 0,
+  sticky: 10,
+  header: 20,
+  dropdown: 30,
+  sheet: 40,
+  modal: 50,
+  toast: 60,
+) !default;
+
+@function space($step) {
+  @return var(--space-#{$step});
+}
+
+@function z($layer) {
+  @return var(--z-#{$layer});
+}
+
+:root {
+  @each $step, $value in $space-scale {
+    --space-#{$step}: #{$value};
+  }
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  @each $name, $value in $z-scale {
+    --z-#{$name}: #{$value};
+  }
+
+  --control-h-sm: 36px;
+  --control-h-md: 44px;
+  --control-h-lg: 52px;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  --header-h: 56px;
+
+  /* Classic theme defaults (overridden on `.restaurant-styled`). */
+  --rs-bg: #f8fafc;
+  --rs-text: #0f172a;
+  --rs-text-muted: #64748b;
+  --rs-text-soft: #94a3b8;
+  --rs-border: #e2e8f0;
+  --rs-accent: #0f766e;
+  --rs-on-accent: #ffffff;
+  --rs-primary: #2563eb;
+  --rs-primary-hover: #1d4ed8;
+  --rs-primary-soft: #eff6ff;
+  --rs-surface: #ffffff;
+  --rs-on-primary: #ffffff;
+  --rs-danger: #ef4444;
+  --overlay: rgba(15, 23, 42, 0.5);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 64px;
+  }
+}

@@ -28,6 +28,11 @@
 
 Полный чеклист: `e2e/README.md`.
 
+## UI
+
+- Обязательные правила качества UI: **[docs/ui-rules.md](docs/ui-rules.md)** и **[`.cursor/rules/ui.mdc`](.cursor/rules/ui.mdc)** — применяются ко всем PR с разметкой или стилями.
+- Токены дизайна: `src/shared/styles/_tokens.scss` (импорт в `app/layout.tsx`).
+
 ## Параллельная работа агентов
 
 - Типы и API-обёртки — в `src/shared/types` и `src/features/**/api/`.

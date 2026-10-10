@@ -47,6 +47,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Check UI tokens (non-blocking)
+        continue-on-error: true
+        run: node scripts/check-ui-tokens.mjs
+
   e2e:
     runs-on: ubuntu-latest
     env:
@@ -173,6 +177,8 @@ jobs:
         run: npm ci
 
       - name: Build client
+        env:
+          NEXT_PUBLIC_ENABLE_UI_PLAYGROUND: '1'
         run: npm run build
 
       - name: Install Playwright (Chromium)

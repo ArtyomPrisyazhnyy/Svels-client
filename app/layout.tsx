@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Providers } from './providers';
 import './globals.css';
+import '@/shared/styles/_tokens.scss';
 import '@/shared/styles/glass-header.scss';
 import '@/shared/styles/byn-sign.scss';
 
