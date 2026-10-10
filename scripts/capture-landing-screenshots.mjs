@@ -93,6 +93,7 @@ function start(cmd, args, env = {}) {
 }
 
 function syncStandaloneAssets() {
+  execSync('rm -rf .next/standalone/public/landing', { cwd: ROOT, stdio: 'inherit' });
   execSync('cp -r public .next/standalone/public', { cwd: ROOT, stdio: 'inherit' });
   execSync('cp -r .next/static .next/standalone/.next/static', { cwd: ROOT, stdio: 'inherit' });
 }
@@ -261,11 +262,23 @@ const phoneClean = `
   ::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
   .scroll-to-top, .promo-banner-modal { display: none !important; }
 `;
+/** Status bar in the scene studio covers 54px, so the shot is cropped at y=798. Keep prices above that. */
+const phoneMenuFit = `
+  ${phoneClean}
+  .promo-banner-strip__image--16-9 {
+    aspect-ratio: 16 / 9 !important;
+    max-height: 188px !important;
+    object-fit: cover !important;
+  }
+  .restaurant-public__main { padding-top: 0.85rem !important; }
+  .restaurant-public__description { margin-bottom: 0.7rem !important; }
+  .restaurant-public__address { margin-bottom: 0.5rem !important; }
+`;
 const desktopFit = `
   ${phoneClean}
   .promo-banner-strip__image--16-9 {
-    aspect-ratio: 2.8 / 1 !important;
-    max-height: 240px !important;
+    aspect-ratio: 3.4 / 1 !important;
+    max-height: 168px !important;
     object-fit: cover !important;
   }
   .restaurant-public__main { padding-top: 1.1rem !important; }
@@ -335,9 +348,13 @@ async function assertGuestTheme(page) {
 }
 
 await openRestaurantMenu(phone);
-await phone.addStyleTag({ content: phoneClean });
+await phone.addStyleTag({ content: phoneMenuFit });
 await assertGuestTheme(phone);
 await waitForImages(phone);
+const phonePrice = await phone.locator('.menu-product-card__price').first().boundingBox();
+if (!phonePrice || phonePrice.y + phonePrice.height > 786) {
+  throw new Error(`Phone menu price is clipped by the status-bar crop: ${JSON.stringify(phonePrice)}`);
+}
 await phone.screenshot({ path: path.join(RAW, 'phone-menu.png'), animations: 'disabled' });
 
 await addItemsToCart(phone, ['demo-cappuccino', 'demo-almond-croissant', 'demo-latte']);
@@ -353,7 +370,7 @@ await desktop.addStyleTag({ content: desktopFit });
 await assertGuestTheme(desktop);
 await waitForImages(desktop);
 const cardBox = await desktop.locator('.menu-product-card').first().boundingBox();
-if (!cardBox || cardBox.y + 80 > 900) {
+if (!cardBox || cardBox.y + cardBox.height > 890) {
   throw new Error(`Desktop product row is outside the 900px viewport: ${JSON.stringify(cardBox)}`);
 }
 await desktop.screenshot({
@@ -378,8 +395,13 @@ await phoneAdmin.addStyleTag({
     .restaurant-admin__body { display: block !important; min-height: 0 !important; }
     .restaurant-admin__content { padding: 0.45rem 0.65rem 0.6rem !important; }
     .orders-admin__header { margin-bottom: 0.35rem !important; }
-    .orders-admin__header h2 { font-size: 1.05rem !important; }
-    .orders-admin__card { margin-bottom: 0.4rem !important; }
+    .orders-admin__header h2 { font-size: 1.02rem !important; margin-bottom: 0 !important; }
+    .orders-admin__list { gap: 0.45rem !important; }
+    .orders-admin__card { margin-bottom: 0 !important; padding: 0.65rem 0.7rem !important; }
+    .orders-admin__card-header { margin-bottom: 0.35rem !important; }
+    .orders-admin__meta, .orders-admin__comment, .orders-admin__card-actions { display: none !important; }
+    .orders-admin__items { margin-bottom: 0.25rem !important; }
+    .restaurant-admin__header { padding-block: 0.45rem !important; }
     html { scrollbar-width: none !important; }
     ::-webkit-scrollbar { display: none !important; }
   `,
@@ -388,14 +410,32 @@ const visibleOrders = await phoneAdmin.locator('[data-testid^="order-card-"]').c
 if (visibleOrders < 3) {
   throw new Error(`Admin orders list shows ${visibleOrders} cards, expected 3–4`);
 }
+const thirdCard = await phoneAdmin.locator('[data-testid^="order-card-"]').nth(2).boundingBox();
+if (!thirdCard || thirdCard.y + 36 > 840) {
+  throw new Error(`Third order card is outside the phone viewport: ${JSON.stringify(thirdCard)}`);
+}
 await waitForImages(phoneAdmin);
 await phoneAdmin.screenshot({ path: path.join(RAW, 'phone-admin.png'), animations: 'disabled' });
 
 await browser.close();
-mockApi.kill();
 next.kill();
+await waitPortFree(3001);
 
 execSync('node scripts/landing/build-scenes.mjs', { cwd: ROOT, stdio: 'inherit' });
+
+// Scene manifest is imported at build time. Rebuild while the mock API is still up
+// so srcset widths match the files just written to public/landing/scenes.
+execSync('npm run build', {
+  cwd: ROOT,
+  stdio: 'inherit',
+  env: {
+    ...process.env,
+    NEXT_PUBLIC_API_URL: 'http://127.0.0.1:3000',
+    RESTAURANT_PUBLIC_REVALIDATE_SECONDS: '0',
+  },
+});
+
+mockApi.kill();
 
 killPorts();
 await sleep(2000);

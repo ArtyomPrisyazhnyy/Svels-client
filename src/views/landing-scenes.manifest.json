@@ -2,82 +2,87 @@
   "scenes": {
     "hero": {
       "id": "hero",
-      "width": 1600,
-      "height": 1083,
+      "width": 1980,
+      "height": 1227,
       "widths": [
-        480,
-        768,
-        1080,
-        1600
+        660,
+        990,
+        1320,
+        1980
       ],
-      "sizes": "(max-width: 979px) 85vw, min(640px, 54vw)",
+      "sizes": "(max-width: 979px) 85vw, 660px",
       "alt": "",
-      "fallbackWidth": 480
+      "fallbackWidth": 660
     },
     "hero-mobile": {
       "id": "hero-mobile",
-      "width": 1080,
-      "height": 2224,
+      "width": 1200,
+      "height": 2123,
       "widths": [
-        480,
-        768,
-        1080
+        400,
+        640,
+        900,
+        1200
       ],
       "sizes": "85vw",
       "alt": "",
-      "fallbackWidth": 480
+      "fallbackWidth": 400
     },
     "feature-menu": {
       "id": "feature-menu",
-      "width": 720,
-      "height": 1416,
+      "width": 960,
+      "height": 1699,
       "widths": [
-        360,
-        540,
-        720
+        280,
+        480,
+        720,
+        960
       ],
-      "sizes": "(max-width: 768px) 72vw, 240px",
+      "sizes": "(max-width: 979px) 70vw, 260px",
       "alt": "",
-      "fallbackWidth": 360
+      "fallbackWidth": 280
     },
     "feature-cart": {
       "id": "feature-cart",
-      "width": 720,
-      "height": 1416,
+      "width": 960,
+      "height": 1699,
       "widths": [
-        360,
-        540,
-        720
+        280,
+        480,
+        720,
+        960
       ],
-      "sizes": "(max-width: 768px) 72vw, 240px",
+      "sizes": "(max-width: 979px) 70vw, 260px",
       "alt": "",
-      "fallbackWidth": 360
+      "fallbackWidth": 280
     },
     "feature-telegram": {
       "id": "feature-telegram",
-      "width": 720,
-      "height": 1416,
+      "width": 960,
+      "height": 1699,
       "widths": [
-        360,
-        540,
-        720
+        280,
+        480,
+        720,
+        960
       ],
-      "sizes": "(max-width: 768px) 72vw, 240px",
+      "sizes": "(max-width: 979px) 70vw, 260px",
       "alt": "",
-      "fallbackWidth": 360
+      "fallbackWidth": 280
     },
     "feature-admin": {
       "id": "feature-admin",
-      "width": 720,
-      "height": 1416,
+      "width": 960,
+      "height": 1699,
       "widths": [
-        360,
-        540,
-        720
+        280,
+        480,
+        720,
+        960
       ],
-      "sizes": "(max-width: 768px) 72vw, 240px",
+      "sizes": "(max-width: 979px) 70vw, 260px",
       "alt": "",
-      "fallbackWidth": 360
+      "fallbackWidth": 280
     }
   }
 }

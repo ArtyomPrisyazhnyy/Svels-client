@@ -33,6 +33,17 @@ async function exportScene(page, sceneKey, query, masterPath) {
   await box.screenshot({ path: masterPath, omitBackground: true, animations: 'disabled' });
 }
 
+function zeroBorder(data, info, margin = 8) {
+  const { width, height, channels } = info;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if (x < margin || y < margin || x >= width - margin || y >= height - margin) {
+        data[(y * width + x) * channels + channels - 1] = 0;
+      }
+    }
+  }
+}
+
 async function assertTransparentCorner(filePath) {
   const meta = await sharp(filePath).metadata();
   if (!meta.hasAlpha) {
@@ -45,6 +56,14 @@ async function assertTransparentCorner(filePath) {
   }
 }
 
+async function withClearBorder(pipeline) {
+  const { data, info } = await pipeline.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  zeroBorder(data, info, 8);
+  return sharp(data, {
+    raw: { width: info.width, height: info.height, channels: info.channels },
+  });
+}
+
 async function encodeVariants(sceneId, masterPath, widths, sizes, alt) {
   const master = sharp(masterPath);
   const meta = await master.metadata();
@@ -53,13 +72,15 @@ async function encodeVariants(sceneId, masterPath, widths, sizes, alt) {
 
   for (const w of widths) {
     const h = Math.round(w * aspect);
-    const resized = master.clone().resize(w, h, { fit: 'inside', withoutEnlargement: false });
+    const resized = await withClearBorder(
+      master.clone().resize(w, h, { fit: 'inside', withoutEnlargement: false }),
+    );
 
     const avifPath = path.join(OUT, `${sceneId}-${w}.avif`);
     const webpPath = path.join(OUT, `${sceneId}-${w}.webp`);
     await resized
       .clone()
-      .avif({ quality: 58, effort: 6, chromaSubsampling: '4:4:4' })
+      .avif({ quality: 72, effort: 5, chromaSubsampling: '4:4:4' })
       .toFile(avifPath);
     await resized.clone().webp({ quality: 82, alphaQuality: 100, smartSubsample: false }).toFile(webpPath);
     await assertTransparentCorner(avifPath);
@@ -72,9 +93,9 @@ async function encodeVariants(sceneId, masterPath, widths, sizes, alt) {
   const pngW = widths[0];
   const pngH = Math.round(pngW * aspect);
   const pngPath = path.join(OUT, `${sceneId}-${pngW}.png`);
-  await master
-    .clone()
-    .resize(pngW, pngH, { fit: 'inside' })
+  await (
+    await withClearBorder(master.clone().resize(pngW, pngH, { fit: 'inside' }))
+  )
     .png({ compressionLevel: 9 })
     .toFile(pngPath);
   await assertTransparentCorner(pngPath);

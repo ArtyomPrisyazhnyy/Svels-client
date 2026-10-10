@@ -17,12 +17,29 @@ async function recolorLogo(fileName) {
     return;
   }
   fs.mkdirSync(IMAGES, { recursive: true });
+  const { data, info } = await sharp(source).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const a = data[i + 3];
+    const dist = Math.hypot(255 - r, 255 - g, 255 - b);
+    const coverage = Math.min(255, Math.round((dist / 160) * (a / 255) * 255));
+    data[i] = TEAL.r;
+    data[i + 1] = TEAL.g;
+    data[i + 2] = TEAL.b;
+    data[i + 3] = coverage;
+  }
   const tmp = `${input}.tmp`;
-  await sharp(source)
-    .ensureAlpha()
-    .greyscale()
-    .tint(TEAL)
-    .toFile(tmp);
+  let pipeline = sharp(data, {
+    raw: { width: info.width, height: info.height, channels: 4 },
+  });
+  if (fileName.endsWith('.webp')) {
+    pipeline = pipeline.webp({ quality: 92, alphaQuality: 100 });
+  } else {
+    pipeline = pipeline.png();
+  }
+  await pipeline.toFile(tmp);
   fs.renameSync(tmp, input);
 }
 
