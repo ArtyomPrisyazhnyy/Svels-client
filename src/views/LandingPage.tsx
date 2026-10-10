@@ -9,7 +9,6 @@ import { getHeroPreloadProps } from './landing-scenes';
 import { LandingLiveExample } from './LandingLiveExample';
 import { LandingPricing } from './LandingPricing';
 import { getDemoRestaurantUrl } from './landing-config';
-import { Reveal } from './Reveal';
 
 /**
  * Главная (лендинг) страница Svels.
@@ -63,34 +62,34 @@ export function LandingPage() {
 
       <section className="landing__hero landing__container">
         <div className="landing__hero-copy">
-          <Reveal className="landing__hero-badge">
+          <p className="landing__hero-badge">
             <span className="landing__hero-badge-dot" aria-hidden />
             Для кафе, ресторанов, кофеен и цветочных
-          </Reveal>
-          <Reveal as="h1" className="landing__hero-title" delay={50}>
+          </p>
+          <h1 className="landing__hero-title">
             Сайт и мобильное приложение
             <br />
             <span className="landing__hero-title-accent">для вашего заведения</span>
-          </Reveal>
-          <Reveal as="p" className="landing__hero-text" delay={100}>
+          </h1>
+          <p className="landing__hero-text">
             Доставка, самовывоз и заказы в зале. Оплата картой онлайн, новые заказы — сразу в
             Telegram. Запуск за несколько дней.
-          </Reveal>
-          <Reveal className="landing__hero-chips" delay={120}>
+          </p>
+          <div className="landing__hero-chips">
             {TRUST_CHIPS.map((chip) => (
               <span key={chip} className="landing__hero-chip">{chip}</span>
             ))}
-          </Reveal>
-          <Reveal className="landing__hero-actions" delay={150}>
+          </div>
+          <div className="landing__hero-actions">
             <ContactButton label="Оставить заявку" variant="primary" />
             <Link href={demoUrl} className="landing-cta landing-cta--ghost landing-cta--block-mobile">
               Посмотреть живой пример
             </Link>
-          </Reveal>
+          </div>
         </div>
-        <Reveal className="landing__hero-visual" delay={120}>
+        <div className="landing__hero-visual">
           <LandingHeroVisual />
-        </Reveal>
+        </div>
       </section>
 
       <section className="landing__section landing__section--steps" aria-label="Как подключаем">

@@ -33,30 +33,25 @@ export function LandingHeader() {
           ))}
         </nav>
 
-        <nav
-          className="landing__nav landing__nav--mobile"
-          aria-label="Разделы (мобильная навигация)"
-          data-testid="landing-nav-mobile"
-        >
-          {LANDING_SECTION_LINKS.map(({ href, label }) => (
-            <a key={href} href={href} className="landing__nav-pill">
-              {label}
-            </a>
-          ))}
-        </nav>
-
         <div className="landing__header-actions">
+          <ContactButton label="Оставить заявку" variant="primary" className="landing__header-cta" />
           <button
             type="button"
             className="landing__menu-toggle"
             aria-expanded={menuOpen}
             aria-controls="landing-mobile-menu"
+            aria-label={menuOpen ? 'Закрыть меню' : 'Меню'}
             onClick={() => setMenuOpen((open) => !open)}
             data-testid="landing-menu-toggle"
           >
-            <span className="landing__menu-toggle-label">Меню</span>
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+              {menuOpen ? (
+                <path d="M4 4l10 10M14 4L4 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              ) : (
+                <path d="M3 5h12M3 9h12M3 13h12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              )}
+            </svg>
           </button>
-          <ContactButton label="Оставить заявку" variant="primary" className="landing__header-cta" />
         </div>
       </div>
 

@@ -37,7 +37,8 @@ export function Reveal<T extends ElementType = 'div'>({
     const node = ref.current;
     if (!node) return;
 
-    if (typeof IntersectionObserver === 'undefined') {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || typeof IntersectionObserver === 'undefined') {
       requestAnimationFrame(() => setVisible(true));
       return;
     }
@@ -52,11 +53,16 @@ export function Reveal<T extends ElementType = 'div'>({
           }
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+      { threshold: 0, rootMargin: '80px 0px' },
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+    // Large blocks and full-page captures can miss the observer. Never stay faded.
+    const fallback = window.setTimeout(() => setVisible(true), 1200);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, []);
 
   return (

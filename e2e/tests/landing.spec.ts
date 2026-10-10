@@ -80,6 +80,39 @@ test.describe('Landing / platform home', () => {
     await expect(demoCta).toHaveAttribute('href', DEMO_PATH);
   });
 
+  test('на 390px герой сразу показывает телефон, шапка в одну строку, бургер открывает якоря', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+
+    const heroImg = page.locator('.landing-hero-visual__mobile img');
+    await expect(heroImg).toBeVisible();
+    await expect
+      .poll(async () => heroImg.evaluate((img: HTMLImageElement) => img.naturalWidth))
+      .toBeGreaterThan(50);
+    await expect(page.locator('.landing__hero-visual')).not.toHaveClass(/reveal/);
+    const heroOpacity = await page.locator('.landing__hero-visual').evaluate((el) => {
+      return getComputedStyle(el).opacity;
+    });
+    expect(heroOpacity).toBe('1');
+
+    await expect(page.getByTestId('landing-nav-mobile')).toHaveCount(0);
+    const headerCta = page.locator('.landing__header-cta');
+    const ctaBox = await headerCta.boundingBox();
+    expect(ctaBox).not.toBeNull();
+    expect(ctaBox!.height).toBeLessThanOrEqual(42);
+    expect(ctaBox!.height).toBeGreaterThanOrEqual(38);
+
+    await page.getByTestId('landing-menu-toggle').click();
+    const menu = page.getByTestId('landing-mobile-menu');
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Как это работает' })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Пример' })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Тарифы' })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'FAQ' })).toBeVisible();
+  });
+
   test('нет горизонтального скролла на 360px', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto('/');

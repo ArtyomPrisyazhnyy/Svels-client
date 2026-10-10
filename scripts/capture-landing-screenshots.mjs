@@ -292,14 +292,15 @@ const cartFill = `
   .restaurant-cart-modal.restaurant-cart-modal--active {
     background: #ffffff !important;
     padding: 0 !important;
-    align-items: stretch !important;
+    align-items: flex-start !important;
   }
   .restaurant-cart-modal__panel,
   .restaurant-cart-modal__panel.restaurant-cart-modal--active {
     max-width: none !important;
     max-height: none !important;
     width: 100% !important;
-    height: 100% !important;
+    height: 760px !important;
+    margin-top: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     transform: none !important;

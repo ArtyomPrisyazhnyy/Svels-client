@@ -21,8 +21,8 @@
         line-height: 0;
       }
       .scene-pad--hero { padding: 96px 110px 120px 84px; }
-      .scene-pad--feature { padding: 110px 100px 128px; }
-      .scene-pad--hero-mobile { padding: 110px 100px 128px; }
+      .scene-pad--feature { padding: 28px 18px 34px; }
+      .scene-pad--hero-mobile { padding: 72px 56px 88px; }
 
       /* iPhone 15 Pro — screen 393×852, frame 433×882, display radius 55 */
       .iphone {
@@ -47,6 +47,11 @@
         filter:
           drop-shadow(0 28px 46px rgba(11, 26, 24, 0.22))
           drop-shadow(0 4px 8px rgba(11, 26, 24, 0.14));
+      }
+      .scene-pad--feature .iphone {
+        filter:
+          drop-shadow(0 12px 14px rgba(11, 26, 24, 0.16))
+          drop-shadow(0 2px 4px rgba(11, 26, 24, 0.12));
       }
       .iphone__btn {
         position: absolute;
@@ -203,50 +208,114 @@
 
       .telegram {
         height: 798px;
-        background: #e7ebee;
+        display: flex;
+        flex-direction: column;
+        background-color: #8eabc0;
+        background-image:
+          radial-gradient(circle at 12px 12px, rgba(255, 255, 255, 0.16) 1.4px, transparent 1.6px),
+          radial-gradient(circle at 28px 30px, rgba(255, 255, 255, 0.1) 1.2px, transparent 1.5px);
+        background-size: 42px 42px;
         color: #0b1a18;
-        font-size: 14px;
+        font-size: 15px;
         line-height: 1.35;
       }
       .telegram__top {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 10px 14px;
+        padding: 8px 12px;
         background: #fff;
-        border-bottom: 1px solid #dfe5ea;
+        border-bottom: 1px solid #d7e0e6;
+        flex: 0 0 auto;
+      }
+      .telegram__back {
+        color: #2aabee;
+        font-size: 22px;
+        line-height: 1;
+        font-weight: 500;
       }
       .telegram__avatar {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         background: linear-gradient(135deg, #0f766e, #0b5f59);
         color: #fff;
         display: grid;
         place-items: center;
         font-weight: 700;
+        font-size: 16px;
+        flex: 0 0 auto;
       }
-      .telegram__peer small { display: block; color: #54635f; font-size: 12px; }
-      .telegram__body { padding: 14px; }
+      .telegram__peer { min-width: 0; }
+      .telegram__peer strong { display: block; font-size: 16px; }
+      .telegram__peer small { display: block; color: #54635f; font-size: 13px; }
+      .telegram__body {
+        flex: 1 1 auto;
+        padding: 14px 12px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .telegram__msg { max-width: 92%; }
       .telegram__bubble {
         background: #fff;
         border-radius: 16px 16px 16px 6px;
-        padding: 12px 14px;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+        padding: 10px 12px 8px;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
       }
-      .telegram__bubble strong { display: block; margin-bottom: 6px; }
-      .telegram__bubble p { margin: 0 0 4px; color: #54635f; font-size: 13px; }
-      .telegram__btn {
+      .telegram__bubble strong { display: block; margin-bottom: 4px; font-size: 15px; }
+      .telegram__bubble p { margin: 0 0 2px; color: #24312e; font-size: 14px; }
+      .telegram__time {
         display: block;
-        width: 100%;
-        margin-top: 8px;
-        padding: 11px 12px;
+        margin-top: 4px;
+        text-align: right;
+        color: #8b9894;
+        font-size: 11px;
+      }
+      .telegram__keyboard {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        margin-top: 4px;
+      }
+      .telegram__btn {
+        padding: 9px 6px;
         border: 0;
-        border-radius: 10px;
-        background: #fff;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.92);
         color: #2aabee;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 650;
+      }
+      .telegram__composer {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px 12px;
+        background: #f4f7f8;
+      }
+      .telegram__input {
+        flex: 1 1 auto;
+        height: 36px;
+        border-radius: 18px;
+        background: #fff;
+        border: 1px solid #e1e7ea;
+        color: #8b9894;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+      }
+      .telegram__send {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 0;
+        background: #2aabee;
+        color: #fff;
+        font-size: 16px;
+        flex: 0 0 auto;
       }
     </style>
   </head>
@@ -304,18 +373,35 @@
         return `
           <div class="telegram">
             <div class="telegram__top">
+              <span class="telegram__back" aria-hidden="true">‹</span>
               <div class="telegram__avatar">S</div>
               <div class="telegram__peer"><strong>Svels · Заказы</strong><small>бот</small></div>
             </div>
             <div class="telegram__body">
-              <div class="telegram__bubble">
-                <strong>Новый заказ #1842</strong>
-                <p>Капучино ×1 · 6,90 BYN</p>
-                <p>Миндальный круассан ×2 · 13,80 BYN</p>
-                <p>Доставка · ул. Набережная Чаек, 12</p>
+              <div class="telegram__msg">
+                <div class="telegram__bubble">
+                  <strong>Новый заказ #1842</strong>
+                  <p>Капучино ×1 · 6,90 BYN</p>
+                  <p>Миндальный круассан ×2 · 13,80 BYN</p>
+                  <p>Доставка · ул. Набережная Чаек, 12</p>
+                  <span class="telegram__time">9:41</span>
+                </div>
+                <div class="telegram__keyboard">
+                  <button type="button" class="telegram__btn">✅ Принять</button>
+                  <button type="button" class="telegram__btn">❌ Отклонить</button>
+                </div>
               </div>
-              <button type="button" class="telegram__btn">Принять</button>
-              <button type="button" class="telegram__btn">Отклонить</button>
+              <div class="telegram__msg">
+                <div class="telegram__bubble">
+                  <strong>Заказ #1841 принят · готовим</strong>
+                  <p>Лавандовый раф ×1, Баскский чизкейк ×1</p>
+                  <span class="telegram__time">9:38</span>
+                </div>
+              </div>
+            </div>
+            <div class="telegram__composer">
+              <div class="telegram__input">Сообщение</div>
+              <button type="button" class="telegram__send" aria-hidden="true">➤</button>
             </div>
           </div>`;
       }

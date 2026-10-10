@@ -175,7 +175,7 @@ const sceneDefs = [
     sceneKey: 'phone',
     query: { ...common, shot: 'menu' },
     widths: FEATURE_WIDTHS,
-    sizes: '(max-width: 979px) 70vw, 260px',
+    sizes: '(max-width: 979px) 72vw, 280px',
     alt: '',
   },
   {
@@ -183,7 +183,7 @@ const sceneDefs = [
     sceneKey: 'phone',
     query: { ...common, shot: 'cart' },
     widths: FEATURE_WIDTHS,
-    sizes: '(max-width: 979px) 70vw, 260px',
+    sizes: '(max-width: 979px) 72vw, 280px',
     alt: '',
   },
   {
@@ -191,7 +191,7 @@ const sceneDefs = [
     sceneKey: 'phone',
     query: { ...common, shot: 'telegram' },
     widths: FEATURE_WIDTHS,
-    sizes: '(max-width: 979px) 70vw, 260px',
+    sizes: '(max-width: 979px) 72vw, 280px',
     alt: '',
   },
   {
@@ -199,7 +199,7 @@ const sceneDefs = [
     sceneKey: 'phone',
     query: { ...common, shot: 'admin' },
     widths: FEATURE_WIDTHS,
-    sizes: '(max-width: 979px) 70vw, 260px',
+    sizes: '(max-width: 979px) 72vw, 280px',
     alt: '',
   },
 ];

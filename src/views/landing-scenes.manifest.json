@@ -17,7 +17,7 @@
     "hero-mobile": {
       "id": "hero-mobile",
       "width": 1200,
-      "height": 2123,
+      "height": 2294,
       "widths": [
         400,
         640,
@@ -31,56 +31,56 @@
     "feature-menu": {
       "id": "feature-menu",
       "width": 960,
-      "height": 1699,
+      "height": 1932,
       "widths": [
         280,
         480,
         720,
         960
       ],
-      "sizes": "(max-width: 979px) 70vw, 260px",
+      "sizes": "(max-width: 979px) 72vw, 280px",
       "alt": "",
       "fallbackWidth": 280
     },
     "feature-cart": {
       "id": "feature-cart",
       "width": 960,
-      "height": 1699,
+      "height": 1932,
       "widths": [
         280,
         480,
         720,
         960
       ],
-      "sizes": "(max-width: 979px) 70vw, 260px",
+      "sizes": "(max-width: 979px) 72vw, 280px",
       "alt": "",
       "fallbackWidth": 280
     },
     "feature-telegram": {
       "id": "feature-telegram",
       "width": 960,
-      "height": 1699,
+      "height": 1932,
       "widths": [
         280,
         480,
         720,
         960
       ],
-      "sizes": "(max-width: 979px) 70vw, 260px",
+      "sizes": "(max-width: 979px) 72vw, 280px",
       "alt": "",
       "fallbackWidth": 280
     },
     "feature-admin": {
       "id": "feature-admin",
       "width": 960,
-      "height": 1699,
+      "height": 1932,
       "widths": [
         280,
         480,
         720,
         960
       ],
-      "sizes": "(max-width: 979px) 70vw, 260px",
+      "sizes": "(max-width: 979px) 72vw, 280px",
       "alt": "",
       "fallbackWidth": 280
     }
