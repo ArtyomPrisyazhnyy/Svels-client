@@ -1,0 +1,12 @@
+.ui-stack {
+  display: flex;
+  min-width: 0;
+}
+
+.ui-stack--column {
+  flex-direction: column;
+}
+
+.ui-stack--row {
+  flex-direction: row;
+}

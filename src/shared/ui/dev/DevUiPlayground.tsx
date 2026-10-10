@@ -6,6 +6,8 @@ import {
 } from '@/shared/types/restaurant-styling';
 import { RestaurantStylingShell } from '@/features/restaurants/context/RestaurantStylingContext';
 import { UiTokensBoard } from '@/shared/ui/dev/UiTokensBoard';
+import { UiPrimitivesBoard } from '@/shared/ui/dev/UiPrimitivesBoard';
+import { Stack } from '@/shared/ui/Stack/Stack';
 
 const PLAYGROUND_THEMES: RestaurantColorTheme[] = ['classic', 'midnight', 'warm'];
 
@@ -33,7 +35,10 @@ export function DevUiPlayground({ theme }: DevUiPlaygroundProps) {
 
   return (
     <RestaurantStylingShell styling={styling} enableScrollToTop={false}>
-      <UiTokensBoard />
+      <Stack gap={8}>
+        <UiTokensBoard />
+        <UiPrimitivesBoard />
+      </Stack>
     </RestaurantStylingShell>
   );
 }

@@ -19,6 +19,7 @@ const FREEZE_MOTION_CSS = `
 
 export async function prepareForScreenshot(page: Page): Promise<void> {
   await page.evaluate(async () => {
+    document.documentElement.setAttribute('data-visual-test', 'true');
     await document.fonts.ready;
   });
 
