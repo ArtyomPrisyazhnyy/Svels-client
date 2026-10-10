@@ -1,0 +1,89 @@
+{
+  "scenes": {
+    "hero": {
+      "id": "hero",
+      "width": 2000,
+      "height": 1356,
+      "widths": [
+        720,
+        1080,
+        1440,
+        1600,
+        2000
+      ],
+      "sizes": "(max-width: 979px) 85vw, (max-width: 1360px) calc((100vw - 4rem - 1.5rem) * 7 / 12), 742px",
+      "alt": "",
+      "fallbackWidth": 720
+    },
+    "hero-mobile": {
+      "id": "hero-mobile",
+      "width": 1200,
+      "height": 2280,
+      "widths": [
+        400,
+        640,
+        900,
+        1200
+      ],
+      "sizes": "85vw",
+      "alt": "",
+      "fallbackWidth": 400
+    },
+    "feature-menu": {
+      "id": "feature-menu",
+      "width": 960,
+      "height": 1916,
+      "widths": [
+        280,
+        480,
+        720,
+        960
+      ],
+      "sizes": "(max-width: 979px) 72vw, 280px",
+      "alt": "",
+      "fallbackWidth": 280
+    },
+    "feature-cart": {
+      "id": "feature-cart",
+      "width": 960,
+      "height": 1916,
+      "widths": [
+        280,
+        480,
+        720,
+        960
+      ],
+      "sizes": "(max-width: 979px) 72vw, 280px",
+      "alt": "",
+      "fallbackWidth": 280
+    },
+    "feature-telegram": {
+      "id": "feature-telegram",
+      "width": 960,
+      "height": 1916,
+      "widths": [
+        280,
+        480,
+        720,
+        960
+      ],
+      "sizes": "(max-width: 979px) 72vw, 280px",
+      "alt": "",
+      "fallbackWidth": 280
+    },
+    "feature-admin": {
+      "id": "feature-admin",
+      "width": 960,
+      "height": 1916,
+      "widths": [
+        280,
+        480,
+        720,
+        960
+      ],
+      "sizes": "(max-width: 979px) 72vw, 280px",
+      "alt": "",
+      "fallbackWidth": 280
+    }
+  }
+}

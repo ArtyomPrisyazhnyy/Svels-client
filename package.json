@@ -14,7 +14,11 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report e2e/playwright-report"
+    "test:e2e:report": "playwright show-report e2e/playwright-report",
+    "mock:landing-api": "node scripts/landing-mock-api.mjs",
+    "landing:capture": "node scripts/capture-landing-screenshots.mjs",
+    "landing:scenes": "node scripts/landing/build-scenes.mjs",
+    "landing:images": "npm run landing:capture"
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
@@ -22,6 +26,7 @@
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "konva": "^10.3.0",
+    "lucide-react": "^1.55.0",
     "next": "^15.5.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -44,6 +49,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.6.0",
     "sass": "^1.101.0",
+    "sharp": "^0.35.5",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2"
   }

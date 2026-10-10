@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, type CSSProperties, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, type CSSProperties, type ReactNode } from 'react';
 import {
   DEFAULT_RESTAURANT_STYLING,
   type RestaurantCurrencyDisplay,
@@ -44,6 +44,15 @@ function RestaurantStylingRoot({
   const rootClassName = ['restaurant-styled', RESTAURANT_FONT_CLASSES, className]
     .filter(Boolean)
     .join(' ');
+  const pageBackground = (cssVars as Record<string, string>)['--rs-bg'] ?? '#ffffff';
+
+  useEffect(() => {
+    const previous = document.body.style.backgroundColor;
+    document.body.style.backgroundColor = pageBackground;
+    return () => {
+      document.body.style.backgroundColor = previous;
+    };
+  }, [pageBackground]);
 
   return (
     <div className={rootClassName} style={cssVars} {...domProps}>
