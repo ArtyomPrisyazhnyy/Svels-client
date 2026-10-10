@@ -17,7 +17,7 @@ const MANIFEST = path.join(ROOT, 'src/views/landing-scenes.manifest.json');
 const STUDIO = path.join(ROOT, 'scripts/landing/scene-studio.html');
 const DOMAIN = 'chayka-coffee.by';
 
-const HERO_WIDTHS = [660, 990, 1320, 1980];
+const HERO_WIDTHS = [720, 1080, 1440, 1600, 2000];
 const HERO_MOBILE_WIDTHS = [400, 640, 900, 1200];
 const FEATURE_WIDTHS = [280, 480, 720, 960];
 
@@ -33,17 +33,6 @@ async function exportScene(page, sceneKey, query, masterPath) {
   await box.screenshot({ path: masterPath, omitBackground: true, animations: 'disabled' });
 }
 
-function zeroBorder(data, info, margin = 8) {
-  const { width, height, channels } = info;
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      if (x < margin || y < margin || x >= width - margin || y >= height - margin) {
-        data[(y * width + x) * channels + channels - 1] = 0;
-      }
-    }
-  }
-}
-
 async function assertTransparentCorner(filePath) {
   const meta = await sharp(filePath).metadata();
   if (!meta.hasAlpha) {
@@ -56,48 +45,60 @@ async function assertTransparentCorner(filePath) {
   }
 }
 
-async function withClearBorder(pipeline) {
-  const { data, info } = await pipeline.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-  zeroBorder(data, info, 8);
-  return sharp(data, {
-    raw: { width: info.width, height: info.height, channels: info.channels },
-  });
+const TRANSPARENT_EDGE = 8;
+
+async function frameScene(masterPath, width) {
+  const meta = await sharp(masterPath).metadata();
+  const aspect = (meta.height ?? 1) / (meta.width ?? 1);
+  const innerW = width - TRANSPARENT_EDGE * 2;
+  const innerH = Math.max(2, Math.round((innerW * aspect) / 2) * 2);
+  const { data, info } = await sharp(masterPath)
+    .resize(innerW, innerH, { fit: 'fill' })
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  return {
+    image: sharp(data, {
+      raw: { width: info.width, height: info.height, channels: info.channels },
+    }).extend({
+      top: TRANSPARENT_EDGE,
+      bottom: TRANSPARENT_EDGE,
+      left: TRANSPARENT_EDGE,
+      right: TRANSPARENT_EDGE,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    }),
+    height: innerH + TRANSPARENT_EDGE * 2,
+  };
 }
 
 async function encodeVariants(sceneId, masterPath, widths, sizes, alt) {
-  const master = sharp(masterPath);
-  const meta = await master.metadata();
-  const aspect = (meta.height ?? 1) / (meta.width ?? 1);
   const results = [];
+  let displayH = 0;
 
   for (const w of widths) {
-    const h = Math.round(w * aspect);
-    const resized = await withClearBorder(
-      master.clone().resize(w, h, { fit: 'inside', withoutEnlargement: false }),
-    );
+    const framed = await frameScene(masterPath, w);
+    if (w === widths[widths.length - 1]) displayH = framed.height;
 
     const avifPath = path.join(OUT, `${sceneId}-${w}.avif`);
     const webpPath = path.join(OUT, `${sceneId}-${w}.webp`);
-    await resized
+    await framed.image
       .clone()
       .avif({ quality: 72, effort: 5, chromaSubsampling: '4:4:4' })
       .toFile(avifPath);
-    await resized.clone().webp({ quality: 82, alphaQuality: 100, smartSubsample: false }).toFile(webpPath);
+    await framed.image
+      .clone()
+      .webp({ quality: 82, alphaQuality: 100, smartSubsample: false })
+      .toFile(webpPath);
     await assertTransparentCorner(avifPath);
     await assertTransparentCorner(webpPath);
     results.push(w);
   }
 
   const displayW = widths[widths.length - 1];
-  const displayH = Math.round(displayW * aspect);
   const pngW = widths[0];
-  const pngH = Math.round(pngW * aspect);
   const pngPath = path.join(OUT, `${sceneId}-${pngW}.png`);
-  await (
-    await withClearBorder(master.clone().resize(pngW, pngH, { fit: 'inside' }))
-  )
-    .png({ compressionLevel: 9 })
-    .toFile(pngPath);
+  const pngFramed = await frameScene(masterPath, pngW);
+  await pngFramed.image.png({ compressionLevel: 9 }).toFile(pngPath);
   await assertTransparentCorner(pngPath);
 
   return {
@@ -159,7 +160,7 @@ const sceneDefs = [
     sceneKey: 'hero',
     query: common,
     widths: HERO_WIDTHS,
-    sizes: '(max-width: 979px) 85vw, 660px',
+    sizes: '(max-width: 979px) 85vw, (max-width: 1360px) calc((100vw - 4rem - 1.5rem) * 7 / 12), 742px',
     alt: '',
   },
   {

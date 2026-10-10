@@ -20,7 +20,7 @@
         background: transparent;
         line-height: 0;
       }
-      .scene-pad--hero { padding: 96px 110px 120px 84px; }
+      .scene-pad--hero { padding: 24px 16px 40px 16px; }
       .scene-pad--feature { padding: 28px 18px 34px; }
       .scene-pad--hero-mobile { padding: 72px 56px 88px; }
 
@@ -444,9 +444,9 @@
         const browser = root.querySelector('.browser');
         const phone = root.querySelector('.hero-phone .iphone');
         const browserHeight = browser.offsetHeight;
-        const scale = (browserHeight * 0.775) / 882;
+        const scale = (browserHeight * 0.45) / 882;
         const visualW = 433 * scale;
-        const extend = Math.round(visualW * 0.72);
+        const extend = Math.round(visualW * 0.18);
         compose.style.paddingRight = `${extend}px`;
         phone.style.transform = `scale(${scale})`;
       }

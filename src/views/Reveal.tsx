@@ -39,29 +39,57 @@ export function Reveal<T extends ElementType = 'div'>({
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion || typeof IntersectionObserver === 'undefined') {
-      requestAnimationFrame(() => setVisible(true));
-      return;
+      const frame = requestAnimationFrame(() => setVisible(true));
+      return () => cancelAnimationFrame(frame);
     }
+
+    let shown = false;
+    const show = () => {
+      if (shown) return;
+      shown = true;
+      setVisible(true);
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+
+    // Same geometry as the observer: 12% of the block inside a root
+    // shortened by 8% at the bottom. Covers the case when IO never fires.
+    const inView = () => {
+      const rect = node.getBoundingClientRect();
+      if (rect.height <= 0) return false;
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const rootBottom = viewportHeight * 0.92;
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, rootBottom) - Math.max(rect.top, 0));
+      return visibleHeight / rect.height >= 0.12;
+    };
+
+    const onScroll = () => {
+      if (inView()) show();
+    };
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            setVisible(true);
-            observer.disconnect();
+            show();
             break;
           }
         }
       },
-      { threshold: 0, rootMargin: '80px 0px' },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
     );
 
     observer.observe(node);
-    // Large blocks and full-page captures can miss the observer. Never stay faded.
-    const fallback = window.setTimeout(() => setVisible(true), 1200);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    const frame = requestAnimationFrame(onScroll);
+
     return () => {
+      cancelAnimationFrame(frame);
       observer.disconnect();
-      window.clearTimeout(fallback);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
     };
   }, []);
 

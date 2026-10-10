@@ -82,7 +82,7 @@ export function LandingPage() {
           </div>
           <div className="landing__hero-actions">
             <ContactButton label="Оставить заявку" variant="primary" />
-            <Link href={demoUrl} className="landing-cta landing-cta--ghost landing-cta--block-mobile">
+            <Link href={demoUrl} className="landing-cta landing-cta--ghost">
               Посмотреть живой пример
             </Link>
           </div>
