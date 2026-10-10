@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { preload } from 'react-dom';
 import { ContactButton } from './ContactButton';
 import { LandingBenefits } from './LandingBenefits';
 import { LandingFaq } from './LandingFaq';
@@ -37,15 +36,29 @@ const TRUST_CHIPS = ['0% с заказов', 'Дизайн под ваш бре�
 export function LandingPage() {
   const demoUrl = getDemoRestaurantUrl();
   const heroPreload = getHeroPreloadProps();
-  preload(heroPreload.href, {
-    as: 'image',
-    imageSrcSet: heroPreload.imageSrcSet,
-    imageSizes: heroPreload.imageSizes,
-    type: 'image/avif',
-  });
 
   return (
     <div className="landing" data-testid="landing-page">
+      <link
+        rel="preload"
+        as="image"
+        href={heroPreload.mobile.href}
+        imageSrcSet={heroPreload.mobile.imageSrcSet}
+        imageSizes={heroPreload.mobile.imageSizes}
+        media="(max-width: 979px)"
+        type="image/avif"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href={heroPreload.desktop.href}
+        imageSrcSet={heroPreload.desktop.imageSrcSet}
+        imageSizes={heroPreload.desktop.imageSizes}
+        media="(min-width: 980px)"
+        type="image/avif"
+        fetchPriority="high"
+      />
       <LandingHeader />
 
       <section className="landing__hero landing__container">

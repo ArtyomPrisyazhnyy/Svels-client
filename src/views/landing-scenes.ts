@@ -40,9 +40,17 @@ export function getSceneFallbackSrc(scene: LandingSceneMeta): string {
 
 export function getHeroPreloadProps() {
   const hero = getLandingScene('hero');
+  const heroMobile = getLandingScene('hero-mobile');
   return {
-    href: `/landing/scenes/hero-${hero.widths[0]}.avif`,
-    imageSrcSet: buildSceneSrcSet(hero, 'avif'),
-    imageSizes: hero.sizes,
+    desktop: {
+      href: `/landing/scenes/hero-${hero.widths[hero.widths.length - 1]}.avif`,
+      imageSrcSet: buildSceneSrcSet(hero, 'avif'),
+      imageSizes: hero.sizes,
+    },
+    mobile: {
+      href: `/landing/scenes/hero-mobile-${heroMobile.widths[heroMobile.widths.length - 1]}.avif`,
+      imageSrcSet: buildSceneSrcSet(heroMobile, 'avif'),
+      imageSizes: heroMobile.sizes,
+    },
   };
 }
