@@ -1,0 +1,39 @@
+'use client';
+
+import {
+  DEFAULT_RESTAURANT_STYLING,
+  type RestaurantColorTheme,
+} from '@/shared/types/restaurant-styling';
+import { RestaurantStylingShell } from '@/features/restaurants/context/RestaurantStylingContext';
+import { UiTokensBoard } from '@/shared/ui/dev/UiTokensBoard';
+
+const PLAYGROUND_THEMES: RestaurantColorTheme[] = ['classic', 'midnight', 'warm'];
+
+function resolveTheme(theme: string): RestaurantColorTheme {
+  if (PLAYGROUND_THEMES.includes(theme as RestaurantColorTheme)) {
+    return theme as RestaurantColorTheme;
+  }
+
+  return 'classic';
+}
+
+interface DevUiPlaygroundProps {
+  theme: string;
+}
+
+export function DevUiPlayground({ theme }: DevUiPlaygroundProps) {
+  const colorTheme = resolveTheme(theme);
+
+  const styling = {
+    restaurantId: 'dev-ui-playground',
+    ...DEFAULT_RESTAURANT_STYLING,
+    colorTheme,
+    updatedAt: new Date(0).toISOString(),
+  };
+
+  return (
+    <RestaurantStylingShell styling={styling} enableScrollToTop={false}>
+      <UiTokensBoard />
+    </RestaurantStylingShell>
+  );
+}
