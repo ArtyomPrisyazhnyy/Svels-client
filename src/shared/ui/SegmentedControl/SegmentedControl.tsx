@@ -65,6 +65,7 @@ export function SegmentedControl<T extends string>({
   }, [updateThumb, options.length, value]);
 
   useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- legacy thumb snap when option count changes
     setThumbAnimated(false);
     const frameId = requestAnimationFrame(() => {
       setThumbAnimated(true);
