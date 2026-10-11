@@ -50,6 +50,7 @@ export function RequestedTimePicker({
         ariaLabel="Время доставки"
         fullWidth
         legacyFulfillmentClasses
+        compact
         testId="cart-requested-time-segmented"
       />
 

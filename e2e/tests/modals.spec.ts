@@ -39,23 +39,44 @@ async function seedCart(page: import('@playwright/test').Page, restaurantId: str
 }
 
 async function clickBackdrop(page: import('@playwright/test').Page, rootTestId: string) {
-  await page.evaluate((testId) => {
-    const root = document.querySelector(`[data-testid="${testId}"]`);
-    const backdrop = root?.previousElementSibling;
-    if (!(backdrop instanceof HTMLButtonElement)) {
-      return;
-    }
-    const pointer = new PointerEvent('pointerdown', {
-      bubbles: true,
-      cancelable: true,
-      button: 0,
-      pointerId: 1,
-      pointerType: 'mouse',
-    });
-    const click = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
-    backdrop.dispatchEvent(pointer);
-    backdrop.dispatchEvent(click);
+  const root = page.getByTestId(rootTestId);
+  await expect(root).toBeVisible();
+  await page.waitForFunction((testId) => {
+    const modal = document.querySelector(`[data-testid="${testId}"]`);
+    const backdrop = modal?.previousElementSibling;
+    return (
+      backdrop instanceof HTMLElement &&
+      backdrop.classList.contains('ui-modal__backdrop--active')
+    );
   }, rootTestId);
+
+  const point = await page.evaluate((testId) => {
+    const modal = document.querySelector(`[data-testid="${testId}"]`);
+    const backdrop = modal?.previousElementSibling;
+    if (!(backdrop instanceof HTMLElement) || !modal) {
+      return null;
+    }
+    const panel = modal.querySelector('.ui-overlay-panel');
+    const panelTop = panel?.getBoundingClientRect().top ?? 80;
+    const x = 16;
+    const candidates = [Math.max(4, panelTop - 8), 8, panelTop / 2];
+    for (const y of candidates) {
+      if (document.elementFromPoint(x, y) === backdrop) {
+        return { x, y };
+      }
+    }
+    for (let y = 4; y < window.innerHeight; y += 6) {
+      if (document.elementFromPoint(x, y) === backdrop) {
+        return { x, y };
+      }
+    }
+    return null;
+  }, rootTestId);
+
+  if (!point) {
+    throw new Error(`backdrop not hittable for ${rootTestId}`);
+  }
+  await page.mouse.click(point.x, point.y);
 }
 
 test.describe('Modals', () => {

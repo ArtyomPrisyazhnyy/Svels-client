@@ -27,6 +27,7 @@ export function PaymentSelector({ settings, value, onChange }: PaymentSelectorPr
       onChange={onChange}
       ariaLabel="Способ оплаты"
       legacyFulfillmentClasses
+      compact
       fullWidth
       testId="cart-payment-segmented"
     />

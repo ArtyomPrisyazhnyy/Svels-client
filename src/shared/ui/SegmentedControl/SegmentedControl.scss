@@ -41,6 +41,10 @@
 
 .ui-seg--md .ui-seg__option {
   min-height: var(--control-h-md);
+  padding: 6px 8px;
+}
+
+.ui-seg--compact .ui-seg__option {
   padding-block: var(--space-1);
   padding-inline: var(--space-1);
 }
@@ -98,7 +102,11 @@
   max-width: 100%;
   overflow: visible;
   text-overflow: clip;
-  white-space: nowrap;
+  white-space: normal;
+
+  .ui-seg--compact & {
+    white-space: nowrap;
+  }
   overflow-wrap: normal;
   word-break: keep-all;
   text-align: center;

@@ -27,6 +27,7 @@ export function FulfillmentSelector({ settings, value, onChange }: FulfillmentSe
       onChange={onChange}
       ariaLabel="Способ получения заказа"
       legacyFulfillmentClasses
+      compact
       fullWidth
       testId="cart-fulfillment-segmented"
     />
