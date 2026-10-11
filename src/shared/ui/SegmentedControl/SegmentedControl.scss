@@ -44,9 +44,10 @@
   padding: 6px 8px;
 }
 
-.ui-seg--compact .ui-seg__option {
-  padding-block: var(--space-1);
-  padding-inline: var(--space-1);
+.ui-seg.ui-seg--compact .ui-seg__option {
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3);
+  min-height: calc(var(--control-h-md) + var(--space-2));
 }
 
 .ui-seg__thumb {
@@ -103,10 +104,6 @@
   overflow: visible;
   text-overflow: clip;
   white-space: normal;
-
-  .ui-seg--compact & {
-    white-space: nowrap;
-  }
   overflow-wrap: normal;
   word-break: keep-all;
   text-align: center;

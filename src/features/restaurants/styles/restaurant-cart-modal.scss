@@ -25,19 +25,29 @@
   margin: 0;
   border: none;
   border-radius: 0;
-  background: transparent;
+  background: var(--rs-surface);
   box-shadow: none;
   border-top: 1px solid var(--rs-border);
 
   .cart-detail-row,
   .cart-detail-row--grouped,
   .cart-detail-row--expanded {
-    background: transparent;
+    background: var(--rs-surface);
+  }
+
+  .cart-detail-row__trigger {
+    box-sizing: border-box;
+    min-height: var(--control-h-md);
+    padding: var(--space-3) 0 0;
+  }
+
+  .cart-detail-row__content {
+    padding: var(--space-3) 0 0;
   }
 }
 
 .restaurant-cart-modal__panel .cart-checkout-rows--inset .cart-detail-row {
-  background: transparent;
+  background: var(--rs-surface);
 }
 
 .restaurant-cart-modal__list-header-title,
@@ -152,7 +162,19 @@
 }
 
 .restaurant-cart-modal__panel .ui-icon-btn {
+  background: transparent;
   color: var(--rs-text);
+}
+
+.restaurant-cart-modal__panel .ui-textarea {
+  resize: none;
+}
+
+.restaurant-cart-modal__panel .ui-seg--compact.fulfillment-selector .fulfillment-selector__option,
+.restaurant-cart-modal__panel .ui-seg--compact .ui-seg__option {
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3);
+  min-height: calc(var(--control-h-md) + var(--space-2));
 }
 
 .restaurant-cart-modal__panel .phone-input {

@@ -5,14 +5,14 @@
   min-width: 0;
 }
 
-.delivery-address-fields__street-row {
+.delivery-address-fields__pair {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-3);
   min-width: 0;
 
   @media (min-width: 360px) {
-    grid-template-columns: minmax(0, 1fr) 96px;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   }
 }
 

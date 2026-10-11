@@ -56,7 +56,7 @@ export function RequestedTimePicker({
 
       {mode === 'slot' && (
         <Field
-          label="Время"
+          label="Время доставки/получения"
           htmlFor="cart-requested-time-slot"
           className="requested-time-picker__slot-field"
         >

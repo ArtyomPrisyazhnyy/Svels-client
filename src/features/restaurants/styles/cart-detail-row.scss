@@ -7,7 +7,7 @@
   &--grouped {
     border: none;
     border-radius: 0;
-    background: transparent;
+    background: var(--rs-surface);
 
     & + & {
       border-top: 1px solid var(--rs-border);
@@ -23,7 +23,7 @@
   }
 
   &--grouped.cart-detail-row--expanded {
-    background: transparent;
+    background: var(--rs-surface);
   }
 }
 

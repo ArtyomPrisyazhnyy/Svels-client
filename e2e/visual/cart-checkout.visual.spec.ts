@@ -12,6 +12,7 @@ import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-sty
 
 const THEMES = ['classic', 'midnight', 'warm'] as const;
 const VIEWPORT_KEYS: VisualViewportKey[] = ['m360', 'm390', 't768'];
+const DESKTOP_SCENARIOS: CheckoutScenario[] = ['step1', 'step2-delivery', 'step2-pickup'];
 
 type CheckoutScenario =
   | 'step1'
@@ -233,5 +234,53 @@ test.describe('Cart checkout visual', () => {
         );
       });
     }
+  }
+
+  for (const theme of THEMES) {
+    for (const scenario of DESKTOP_SCENARIOS) {
+      test(`${scenario} ${theme} @d1280`, async ({ page, seed, asGuest }) => {
+        void asGuest;
+        await page.setViewportSize(VIEWPORTS.d1280);
+        await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
+        const fulfillment =
+          scenario === 'step2-pickup' ? 'fulfillmentTakeaway' : 'fulfillmentDelivery';
+        await seedCart(page, seed.restaurantId, fulfillment, scenario === 'step1' ? 3 : 1);
+        const panel = await openScenario(page, seed.restaurantId, scenario);
+        await assertCartTitleCentered(panel);
+        await snapCartPanel(page, panel, `cart-${scenario}-${theme}-d1280`);
+      });
+    }
+  }
+});
+
+test.describe('Product and auth modal visual', () => {
+  for (const viewportKey of ['m390', 'd1280'] as const) {
+    test(`product modal classic @${viewportKey}`, async ({ page, seed, asGuest }) => {
+      void asGuest;
+      await page.setViewportSize(VIEWPORTS[viewportKey]);
+      await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, 'classic');
+      await page.goto(`/restaurants/${seed.restaurantId}`);
+      const opener = page.locator('[data-testid^="menu-item-"]').first();
+      await expect(opener).toBeVisible();
+      await opener.click();
+      const panel = page.getByTestId('menu-product-modal-panel');
+      await expect(panel).toBeVisible();
+      await expect(page.getByTestId('menu-product-modal-title')).toBeVisible();
+      await snapCartPanel(page, panel, `product-modal-classic-${viewportKey}`);
+    });
+
+    test(`auth modal classic @${viewportKey}`, async ({ page, seed }) => {
+      await page.setViewportSize(VIEWPORTS[viewportKey]);
+      await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, 'classic');
+      await page.goto(`/restaurants/${seed.restaurantId}`);
+      await page.getByTestId('guest-profile-button').click();
+      const panel = page.getByTestId('restaurant-auth-modal-panel');
+      await expect(panel).toBeVisible();
+      await expect(page.getByTestId('restaurant-auth-modal-title')).toBeVisible();
+      await page.getByTestId('restaurant-auth-modal-title').evaluate((el) => {
+        el.textContent = 'Вход в E2E Cafe';
+      });
+      await snapCartPanel(page, panel, `auth-modal-classic-${viewportKey}`);
+    });
   }
 });

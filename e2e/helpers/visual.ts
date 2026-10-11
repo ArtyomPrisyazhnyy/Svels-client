@@ -99,6 +99,7 @@ export async function assertSegmentedControlStyled(page: Page): Promise<void> {
 }
 
 export async function prepareForScreenshot(page: Page): Promise<void> {
+  await page.mouse.move(8, 8);
   await stylesheetsAccessible(page);
   await page.evaluate(async () => {
     document.documentElement.setAttribute('data-visual-test', 'true');

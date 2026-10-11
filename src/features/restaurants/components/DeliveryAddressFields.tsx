@@ -33,7 +33,7 @@ export function DeliveryAddressFields({
   return (
     <div className="delivery-address-fields" data-testid={rootTestId}>
       {showRequired && (
-        <div className="delivery-address-fields__street-row">
+        <>
           <Field label="Улица" htmlFor={`${idPrefix}-street`} required>
             <Input
               autoComplete="street-address"
@@ -43,25 +43,28 @@ export function DeliveryAddressFields({
               testId="delivery-street"
             />
           </Field>
-          <Field label="Дом" htmlFor={`${idPrefix}-house`} required>
-            <Input
-              value={value.house}
-              onChange={(e) => patch({ house: e.target.value })}
-              placeholder="№"
-              testId="delivery-house"
-            />
-          </Field>
-        </div>
+          <div className="delivery-address-fields__pair">
+            <Field label="Дом" htmlFor={`${idPrefix}-house`} required>
+              <Input
+                value={value.house}
+                onChange={(e) => patch({ house: e.target.value })}
+                placeholder="№"
+                testId="delivery-house"
+              />
+            </Field>
+            <Field label="Квартира" htmlFor={`${idPrefix}-apartment`}>
+              <Input
+                value={value.apartment ?? ''}
+                onChange={(e) => patch({ apartment: e.target.value })}
+                testId="delivery-apartment"
+              />
+            </Field>
+          </div>
+        </>
       )}
 
       {showExtended && (
         <>
-          <Field label="Квартира" htmlFor={`${idPrefix}-apartment`}>
-            <Input
-              value={value.apartment ?? ''}
-              onChange={(e) => patch({ apartment: e.target.value })}
-            />
-          </Field>
           <div className="delivery-address-fields__triple">
             <Field label="Подъезд" htmlFor={`${idPrefix}-entrance`}>
               <Input
