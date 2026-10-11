@@ -47,7 +47,21 @@ async function assertTransparentCorner(filePath) {
 
 const TRANSPARENT_EDGE = 8;
 
-async function frameScene(masterPath, width) {
+/**
+ * Studio drop-shadows are clipped by the capture padding, which leaves a flat
+ * gray rectangle under the devices. Drop those pixels so the bitmap is transparent
+ * and the page can paint a soft shadow that actually fades out.
+ */
+function stripBakedShadow(data, channels) {
+  for (let i = 0; i < data.length; i += channels) {
+    const alpha = data[i + 3];
+    if (alpha === 0 || alpha >= 250) continue;
+    if (Math.max(data[i], data[i + 1], data[i + 2]) > 90) continue;
+    data[i + 3] = 0;
+  }
+}
+
+async function frameScene(masterPath, width, stripShadow = false) {
   const meta = await sharp(masterPath).metadata();
   const aspect = (meta.height ?? 1) / (meta.width ?? 1);
   const innerW = width - TRANSPARENT_EDGE * 2;
@@ -57,6 +71,7 @@ async function frameScene(masterPath, width) {
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
+  if (stripShadow) stripBakedShadow(data, info.channels);
   return {
     image: sharp(data, {
       raw: { width: info.width, height: info.height, channels: info.channels },
@@ -71,12 +86,12 @@ async function frameScene(masterPath, width) {
   };
 }
 
-async function encodeVariants(sceneId, masterPath, widths, sizes, alt) {
+async function encodeVariants(sceneId, masterPath, widths, sizes, alt, stripShadow = false) {
   const results = [];
   let displayH = 0;
 
   for (const w of widths) {
-    const framed = await frameScene(masterPath, w);
+    const framed = await frameScene(masterPath, w, stripShadow);
     if (w === widths[widths.length - 1]) displayH = framed.height;
 
     const avifPath = path.join(OUT, `${sceneId}-${w}.avif`);
@@ -97,7 +112,7 @@ async function encodeVariants(sceneId, masterPath, widths, sizes, alt) {
   const displayW = widths[widths.length - 1];
   const pngW = widths[0];
   const pngPath = path.join(OUT, `${sceneId}-${pngW}.png`);
-  const pngFramed = await frameScene(masterPath, pngW);
+  const pngFramed = await frameScene(masterPath, pngW, stripShadow);
   await pngFramed.image.png({ compressionLevel: 9 }).toFile(pngPath);
   await assertTransparentCorner(pngPath);
 
@@ -120,8 +135,10 @@ function requireRaw(name) {
   return p;
 }
 
+const encodeOnly = process.argv.includes('--encode-only');
+
 fs.mkdirSync(OUT, { recursive: true });
-if (fs.existsSync(OUT)) {
+if (!encodeOnly && fs.existsSync(OUT)) {
   for (const file of fs.readdirSync(OUT)) {
     fs.unlinkSync(path.join(OUT, file));
   }
@@ -135,11 +152,13 @@ const raw = {
   phoneAdmin: requireRaw('phone-admin.png'),
 };
 
-const browser = await chromium.launch();
-const page = await browser.newPage({
-  viewport: { width: 2200, height: 1600 },
-  deviceScaleFactor: 2,
-});
+const browser = encodeOnly ? null : await chromium.launch();
+const page = encodeOnly
+  ? null
+  : await browser.newPage({
+      viewport: { width: 2200, height: 1600 },
+      deviceScaleFactor: 2,
+    });
 
 const mastersDir = path.join(ROOT, 'scripts/landing/masters');
 fs.mkdirSync(mastersDir, { recursive: true });
@@ -159,6 +178,7 @@ const sceneDefs = [
     id: 'hero',
     sceneKey: 'hero',
     query: common,
+    stripShadow: true,
     widths: HERO_WIDTHS,
     sizes: '(max-width: 979px) 85vw, (max-width: 1360px) calc((100vw - 4rem - 1.5rem) * 7 / 12), 742px',
     alt: '',
@@ -167,6 +187,7 @@ const sceneDefs = [
     id: 'hero-mobile',
     sceneKey: 'hero-mobile',
     query: common,
+    stripShadow: true,
     widths: HERO_MOBILE_WIDTHS,
     sizes: '85vw',
     alt: '',
@@ -205,22 +226,24 @@ const sceneDefs = [
   },
 ];
 
-const scenes = {};
+const scenes = encodeOnly ? JSON.parse(fs.readFileSync(MANIFEST, 'utf8')).scenes : {};
 
 for (const def of sceneDefs) {
+  if (encodeOnly && def.stripShadow !== true) continue;
   const masterPath = path.join(mastersDir, `${def.id}.png`);
-  await exportScene(page, def.sceneKey, def.query, masterPath);
+  if (!encodeOnly) await exportScene(page, def.sceneKey, def.query, masterPath);
   scenes[def.id] = await encodeVariants(
     def.id,
     masterPath,
     def.widths,
     def.sizes,
     def.alt,
+    def.stripShadow === true,
   );
   console.log('Encoded', def.id);
 }
 
-await browser.close();
+if (browser) await browser.close();
 
 fs.writeFileSync(MANIFEST, `${JSON.stringify({ scenes }, null, 2)}\n`);
 
