@@ -38,14 +38,24 @@ async function seedCart(page: import('@playwright/test').Page, restaurantId: str
   );
 }
 
-async function clickBackdrop(page: import('@playwright/test').Page) {
-  await page.evaluate(() => {
-    const backdrop = document.querySelector('.ui-modal__backdrop');
-    if (backdrop instanceof HTMLButtonElement) {
-      backdrop.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
-      backdrop.click();
+async function clickBackdrop(page: import('@playwright/test').Page, rootTestId: string) {
+  await page.evaluate((testId) => {
+    const root = document.querySelector(`[data-testid="${testId}"]`);
+    const backdrop = root?.previousElementSibling;
+    if (!(backdrop instanceof HTMLButtonElement)) {
+      return;
     }
-  });
+    const pointer = new PointerEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      pointerId: 1,
+      pointerType: 'mouse',
+    });
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
+    backdrop.dispatchEvent(pointer);
+    backdrop.dispatchEvent(click);
+  }, rootTestId);
 }
 
 test.describe('Modals', () => {
@@ -77,7 +87,7 @@ test.describe('Modals', () => {
     await expect(opener).toBeFocused();
 
     await opener.click();
-    await clickBackdrop(page);
+    await clickBackdrop(page, 'restaurant-cart-modal');
     await expect(root).toBeHidden();
     await expect(opener).toBeFocused();
 
@@ -113,7 +123,7 @@ test.describe('Modals', () => {
     await expect(opener).toBeFocused();
 
     await opener.click();
-    await clickBackdrop(page);
+    await clickBackdrop(page, 'menu-product-modal');
     await expect(root).toBeHidden();
     await expect(opener).toBeFocused();
   });
@@ -137,7 +147,7 @@ test.describe('Modals', () => {
     await expect(opener).toBeFocused();
 
     await opener.click();
-    await clickBackdrop(page);
+    await clickBackdrop(page, 'restaurant-auth-modal');
     await expect(root).toBeHidden();
     await expect(opener).toBeFocused();
   });
