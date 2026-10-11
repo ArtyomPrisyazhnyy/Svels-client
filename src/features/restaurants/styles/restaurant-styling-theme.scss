@@ -37,6 +37,7 @@
   .glass-header--tenant .glass-header__title,
   .menu-product-card__title,
   .menu-product-modal__title,
+  .restaurant-cart-modal__panel .ui-overlay-panel__title,
   .restaurant-cart-modal__header h2,
   .restaurant-auth-modal__header h2,
   .restaurant-cart-modal__section-title,
@@ -248,6 +249,7 @@
   }
 
   .restaurant-cart-modal__panel,
+  .restaurant-cart-modal__panel.ui-overlay-panel,
   .restaurant-cart-modal__header,
   .restaurant-cart-modal__body,
   .restaurant-cart-modal__footer {
@@ -267,6 +269,7 @@
 
   &[data-rs-card-style='glass'] {
     .restaurant-cart-modal__panel,
+    .restaurant-cart-modal__panel.ui-overlay-panel,
     .restaurant-cart-modal__header,
     .restaurant-cart-modal__body,
     .restaurant-cart-modal__footer,

@@ -16,6 +16,7 @@ interface SegmentedSwitcherProps<K extends string> {
   value: K;
   onChange: (value: K) => void;
   ariaLabel: string;
+  testId?: string;
 }
 
 /** @deprecated Use SegmentedControl from `@/shared/ui` */
@@ -24,6 +25,7 @@ export function SegmentedSwitcher<K extends string>({
   value,
   onChange,
   ariaLabel,
+  testId,
 }: SegmentedSwitcherProps<K>) {
   const mapped: SegmentedControlOption<K>[] = options.map((option) => ({
     value: option.key,
@@ -38,6 +40,7 @@ export function SegmentedSwitcher<K extends string>({
       ariaLabel={ariaLabel}
       legacyFulfillmentClasses
       fullWidth
+      testId={testId}
     />
   );
 }

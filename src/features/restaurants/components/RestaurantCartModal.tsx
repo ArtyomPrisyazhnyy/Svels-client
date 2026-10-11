@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import { PhoneInput } from '@/shared/components/PhoneInput';
-import { useModalPresence } from '@/hooks/useModalPresence';
+import { Modal } from '@/shared/ui';
+import { IconButton } from '@/shared/ui/IconButton/IconButton';
+import { Button } from '@/shared/ui/Button/Button';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useCartStore } from '@/store/cart.store';
 import { fetchRestaurantLocations } from '../api/locations.api';
@@ -50,7 +51,6 @@ import {
 } from '../utils/cart-checkout-validation.util';
 import '../styles/restaurant-cart-modal.scss';
 
-const MODAL_ANIMATION_MS = 200;
 const COMMENT_MAX = 1000;
 const CUSTOMER_NAME_MAX = 120;
 
@@ -96,8 +96,6 @@ export function RestaurantCartModal({
     () => getDefaultFulfillment(orderSettings),
     [orderSettings],
   );
-
-  const { mounted, isActive, handleClose } = useModalPresence(onClose, MODAL_ANIMATION_MS);
 
   const [cartStep, setCartStep] = useState<CartStep>(1);
   const [fulfillment, setFulfillment] = useState<FulfillmentKey>(defaultFulfillment);
@@ -245,24 +243,6 @@ export function RestaurantCartModal({
     };
   }, [restaurantId, draft.locationId, syncDraft]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        if (cartStep === 2 && successOrderNumber === null) {
-          setCartStep(1);
-          return;
-        }
-        handleClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleClose, cartStep, successOrderNumber]);
-
   const requestedAtIso =
     draft.requestedAtMode === 'slot' ? draft.requestedAtSlotIso : null;
 
@@ -404,90 +384,77 @@ export function RestaurantCartModal({
 
   const fieldErrors = showValidationHints ? checkoutValidation.fieldErrors : {};
 
-  if (!mounted) {
-    return null;
-  }
-
-  const activeClass = isActive ? ' restaurant-cart-modal--active' : '';
   const step2 = cartStep === 2 && successOrderNumber === null;
   const modalTitle = step2 ? getStep2Title(fulfillment) : 'Корзина';
   const titleId = 'restaurant-cart-modal-title';
 
-  return createPortal(
-    <RestaurantStylingPortalRoot>
-      <>
-        <button
-          type="button"
-          className={`restaurant-cart-modal__backdrop${activeClass}`}
-          onClick={handleClose}
-          aria-label="Закрыть"
-        />
+  const footer =
+    successOrderNumber === null
+      ? (
+          <footer className="restaurant-cart-modal__footer" data-testid="cart-modal-footer">
+            <p className="restaurant-cart-modal__total">
+              Итого: <CurrencyAmount amount={totalAmount} />
+            </p>
+            {step2 ? (
+              <button
+                type="button"
+                className="restaurant-cart-modal__submit"
+                disabled={submitting}
+                onClick={() => void handleSubmit()}
+                data-testid="cart-submit"
+              >
+                {submitting ? 'Оформление…' : checkoutValidation.ctaLabel}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="restaurant-cart-modal__submit"
+                disabled={!canContinueToStep2}
+                onClick={handleGoToCheckout}
+                data-testid="cart-go-to-checkout"
+              >
+                Оформить заказ
+              </button>
+            )}
+          </footer>
+        )
+      : undefined;
 
+  return (
+    <RestaurantStylingPortalRoot>
+      <Modal
+        open
+        onClose={onClose}
+        title={modalTitle}
+        titleId={titleId}
+        size="md"
+        rootTestId="restaurant-cart-modal"
+        testId="cart-modal-panel"
+        closeTestId="cart-close"
+        headerTestId="cart-header-bar"
+        titleTestId="cart-header-title"
+        panelClassName={`restaurant-cart-modal__panel${
+          step2 ? ' restaurant-cart-modal__panel--checkout' : ''
+        }`}
+        headerStart={
+          step2 ? (
+            <IconButton
+              label="Назад к корзине"
+              variant="surface"
+              onClick={() => setCartStep(1)}
+              testId="cart-back-to-step-1"
+            >
+              ←
+            </IconButton>
+          ) : null
+        }
+        footer={footer}
+      >
         <div
-          className={`restaurant-cart-modal${activeClass}`}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={titleId}
-          data-testid="restaurant-cart-modal"
+          className="restaurant-cart-modal__body"
+          data-testid="cart-modal-body"
           data-cart-step={cartStep}
         >
-          <div
-            className={`restaurant-cart-modal__panel${activeClass}${
-              step2 ? ' restaurant-cart-modal__panel--checkout' : ''
-            }`}
-            data-testid="cart-modal-panel"
-          >
-            <header
-              className={`restaurant-cart-modal__header${
-                step2 ? ' restaurant-cart-modal__header--checkout' : ''
-              }`}
-            >
-              <div className="restaurant-cart-modal__header-bar" data-testid="cart-header-bar">
-                <div className="restaurant-cart-modal__header-start">
-                  {step2 ? (
-                    <button
-                      type="button"
-                      className="restaurant-cart-modal__icon-btn"
-                      onClick={() => setCartStep(1)}
-                      aria-label="Назад к корзине"
-                      data-testid="cart-back-to-step-1"
-                    >
-                      ←
-                    </button>
-                  ) : null}
-                </div>
-                <h2
-                  id={titleId}
-                  className="restaurant-cart-modal__header-title"
-                  data-testid="cart-header-title"
-                >
-                  {modalTitle}
-                </h2>
-                <div className="restaurant-cart-modal__header-end">
-                  {!step2 && items.length > 0 && (
-                    <button
-                      type="button"
-                      className="restaurant-cart-modal__clear"
-                      onClick={handleClearCart}
-                      data-testid="cart-clear"
-                    >
-                      Очистить
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="restaurant-cart-modal__icon-btn restaurant-cart-modal__close"
-                    onClick={handleClose}
-                    aria-label="Закрыть"
-                    data-testid="cart-close"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-            </header>
-
-            <div className="restaurant-cart-modal__body" data-testid="cart-modal-body">
               {ordersPaused && (
                 <div
                   className="restaurant-cart-modal__paused"
@@ -502,7 +469,7 @@ export function RestaurantCartModal({
                 <OrderSuccessView
                   orderNumber={successOrderNumber}
                   ordersHref={paths.preOrder}
-                  onClose={handleClose}
+                  onClose={onClose}
                 />
               ) : step2 ? (
                 <div className="restaurant-cart-modal__checkout" data-testid="cart-checkout-step">
@@ -737,7 +704,23 @@ export function RestaurantCartModal({
                       Корзина пуста
                     </p>
                   ) : (
-                    <ul className="restaurant-cart-modal__list">
+                    <>
+                      <div
+                        className="restaurant-cart-modal__list-header"
+                        data-testid="cart-items-header"
+                      >
+                        <span className="restaurant-cart-modal__list-header-title">Позиции</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleClearCart}
+                          testId="cart-clear"
+                        >
+                          Очистить
+                        </Button>
+                      </div>
+                      <ul className="restaurant-cart-modal__list">
                       {items.map((line) => (
                         <li
                           key={line.id}
@@ -814,45 +797,14 @@ export function RestaurantCartModal({
                         </li>
                       ))}
                     </ul>
+                    </>
                   )}
 
                   {error && <p className="restaurant-cart-modal__error">{error}</p>}
                 </>
               )}
-            </div>
-
-            {successOrderNumber === null && (
-              <footer className="restaurant-cart-modal__footer" data-testid="cart-modal-footer">
-                <p className="restaurant-cart-modal__total">
-                  Итого: <CurrencyAmount amount={totalAmount} />
-                </p>
-                {step2 ? (
-                  <button
-                    type="button"
-                    className="restaurant-cart-modal__submit"
-                    disabled={submitting}
-                    onClick={() => void handleSubmit()}
-                    data-testid="cart-submit"
-                  >
-                    {submitting ? 'Оформление…' : checkoutValidation.ctaLabel}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="restaurant-cart-modal__submit"
-                    disabled={!canContinueToStep2}
-                    onClick={handleGoToCheckout}
-                    data-testid="cart-go-to-checkout"
-                  >
-                    Оформить заказ
-                  </button>
-                )}
-              </footer>
-            )}
-          </div>
         </div>
-      </>
-    </RestaurantStylingPortalRoot>,
-    document.body,
+      </Modal>
+    </RestaurantStylingPortalRoot>
   );
 }

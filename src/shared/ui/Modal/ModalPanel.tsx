@@ -20,6 +20,10 @@ export interface ModalPanelProps {
   variant: 'modal' | 'sheet';
   preview?: boolean;
   testId?: string;
+  closeTestId?: string;
+  panelClassName?: string;
+  headerTestId?: string;
+  titleTestId?: string;
   children: ReactNode;
 }
 
@@ -37,6 +41,10 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(function M
     variant,
     preview = false,
     testId,
+    closeTestId,
+    panelClassName,
+    headerTestId,
+    titleTestId,
     children,
   },
   ref,
@@ -54,6 +62,7 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(function M
         `ui-overlay-panel--size-${size}`,
         preview && 'ui-overlay-panel--preview',
         activeClass,
+        panelClassName,
       )}
       role="dialog"
       aria-modal={preview ? undefined : 'true'}
@@ -62,10 +71,10 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(function M
       tabIndex={-1}
     >
       {variant === 'sheet' ? <div className="ui-overlay-panel__handle" aria-hidden /> : null}
-      <header className="ui-overlay-panel__header">
+      <header className="ui-overlay-panel__header" data-testid={headerTestId}>
         <div className="ui-overlay-panel__header-start">{headerStart}</div>
         {title ? (
-          <h2 id={titleId} className="ui-overlay-panel__title">
+          <h2 id={titleId} className="ui-overlay-panel__title" data-testid={titleTestId}>
             {title}
           </h2>
         ) : (
@@ -80,7 +89,7 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(function M
               variant="ghost"
               className="ui-overlay-panel__close"
               onClick={onRequestClose}
-              testId={testId ? `${testId}-close` : undefined}
+              testId={closeTestId ?? (testId ? `${testId}-close` : undefined)}
             >
               ×
             </IconButton>

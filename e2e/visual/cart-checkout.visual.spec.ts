@@ -1,0 +1,211 @@
+import { test, expect, apiClient } from '../fixtures/test';
+import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
+import {
+  assertCartTitleCentered,
+  assertExpandedRowContentGap,
+  snapCartCrop,
+  snapCartPanel,
+} from '../helpers/cart-visual';
+import { VIEWPORTS, type VisualViewportKey } from '../helpers/visual';
+import type { CartLineItem } from '../../src/shared/types/cart';
+import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
+
+const THEMES = ['classic', 'midnight', 'warm'] as const;
+const VIEWPORT_KEYS: VisualViewportKey[] = ['m360', 'm390', 't768'];
+
+type CheckoutScenario =
+  | 'step1'
+  | 'step2-delivery'
+  | 'step2-pickup'
+  | 'row-time'
+  | 'row-payment'
+  | 'row-comment'
+  | 'row-address-extra'
+  | 'row-recipient';
+
+function buildLine(): CartLineItem {
+  return {
+    id: 'visual-checkout-1',
+    lineKey: 'vc-1',
+    menuItemId: 'vc-item-1',
+    name: 'Блюдо для визуального теста корзины',
+    variantLabel: 'Стандарт',
+    quantity: 1,
+    unitPrice: 7.5,
+    imageUrl: '',
+    imageWebpUrl: null,
+    modifiers: [],
+    modifierSelections: {},
+  };
+}
+
+async function seedCart(
+  page: import('@playwright/test').Page,
+  restaurantId: string,
+  fulfillment: 'fulfillmentDelivery' | 'fulfillmentTakeaway' = 'fulfillmentDelivery',
+) {
+  await page.addInitScript(
+    ({ rid, cartItems, fulfillmentKey }) => {
+      window.localStorage.setItem(
+        'svels-cart',
+        JSON.stringify({
+          state: {
+            version: 2,
+            restaurantId: rid,
+            items: cartItems,
+            checkoutByRestaurant: {
+              [rid]: {
+                fulfillment: fulfillmentKey,
+                customerName: 'Тест',
+                phone: '+375291234567',
+                deliveryAddress: {
+                  street: 'Ленина',
+                  house: '1',
+                  apartment: '',
+                  entrance: '',
+                  floor: '',
+                  intercom: '',
+                  comment: '',
+                },
+                locationId: null,
+                requestedAtMode: 'asap',
+                requestedAtSlotIso: null,
+                orderForSomeoneElse: false,
+                recipientName: '',
+                recipientPhone: '',
+                comment: '',
+              },
+            },
+          },
+          version: 2,
+        }),
+      );
+    },
+    { rid: restaurantId, cartItems: [buildLine()], fulfillmentKey: fulfillment },
+  );
+}
+
+async function applyTheme(
+  restaurantId: string,
+  adminToken: string,
+  theme: RestaurantColorTheme,
+) {
+  await apiClient.patchStyling(restaurantId, adminToken, {
+    colorTheme: theme,
+    cardStyle: 'classic',
+    headerStyle: 'solid',
+    switcherStyle: 'pill',
+  });
+  await revalidateRestaurantPublicPage(restaurantId);
+}
+
+async function openScenario(
+  page: import('@playwright/test').Page,
+  restaurantId: string,
+  scenario: CheckoutScenario,
+) {
+  await page.goto(`/restaurants/${restaurantId}`);
+  await page.getByTestId('cart-button').click();
+  const panel = page.getByTestId('cart-modal-panel');
+  await expect(panel).toBeVisible();
+
+  if (scenario === 'step1') {
+    return panel;
+  }
+
+  if (scenario === 'step2-pickup') {
+    await page.getByRole('radio', { name: 'Самовывоз' }).click();
+  }
+
+  await page.getByTestId('cart-go-to-checkout').click();
+  await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
+
+  if (scenario === 'step2-delivery' || scenario === 'step2-pickup') {
+    return panel;
+  }
+
+  const rowMap: Record<string, string> = {
+    'row-time': 'cart-time-row',
+    'row-payment': 'cart-payment-row',
+    'row-comment': 'cart-comment-row',
+    'row-address-extra': 'cart-address-extra-row',
+    'row-recipient': 'cart-recipient-row',
+  };
+  const rowTestId = rowMap[scenario];
+  const row = page.getByTestId(rowTestId);
+  await expect(row).toBeVisible();
+  await row.getByRole('button').first().click();
+  await assertExpandedRowContentGap(row);
+  return panel;
+}
+
+test.describe('Cart checkout visual', () => {
+  const scenarios: CheckoutScenario[] = [
+    'step1',
+    'step2-delivery',
+    'step2-pickup',
+    'row-time',
+    'row-payment',
+    'row-comment',
+    'row-address-extra',
+    'row-recipient',
+  ];
+
+  test.beforeEach(async ({ seed, asGuest }) => {
+    void asGuest;
+    const adminToken = seed.restaurantAdmin.auth.accessToken;
+    await apiClient.setOrderSettings(seed.restaurantId, adminToken, {
+      fulfillmentDelivery: true,
+      fulfillmentTakeaway: true,
+      fulfillmentDineIn: false,
+      paymentCash: true,
+      paymentCardOnSite: true,
+      deliveryForSomeoneElse: true,
+    });
+    await revalidateRestaurantPublicPage(seed.restaurantId);
+  });
+
+  for (const theme of THEMES) {
+    for (const viewportKey of VIEWPORT_KEYS) {
+      for (const scenario of scenarios) {
+        test(`${scenario} ${theme} @${viewportKey}`, async ({ page, seed, asGuest }) => {
+          void asGuest;
+          await page.setViewportSize(VIEWPORTS[viewportKey]);
+          await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
+          const fulfillment =
+            scenario === 'step2-pickup' ? 'fulfillmentTakeaway' : 'fulfillmentDelivery';
+          await seedCart(page, seed.restaurantId, fulfillment);
+          const panel = await openScenario(page, seed.restaurantId, scenario);
+          await assertCartTitleCentered(panel);
+          await snapCartPanel(page, panel, `cart-${scenario}-${theme}-${viewportKey}`);
+        });
+      }
+
+      test(`crops header+selectors ${theme} @${viewportKey}`, async ({ page, seed, asGuest }) => {
+        void asGuest;
+        await page.setViewportSize(VIEWPORTS[viewportKey]);
+        await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
+        await seedCart(page, seed.restaurantId, 'fulfillmentDelivery');
+        const panel = await openScenario(page, seed.restaurantId, 'step2-delivery');
+        await page.getByTestId('cart-time-row').getByRole('button').first().click();
+        await page.getByTestId('cart-payment-row').getByRole('button').first().click();
+        await assertCartTitleCentered(panel);
+        await snapCartCrop(
+          page,
+          page.getByTestId('cart-header-bar'),
+          `cart-crop-header-${theme}-${viewportKey}`,
+        );
+        await snapCartCrop(
+          page,
+          page.getByTestId('cart-requested-time-segmented'),
+          `cart-crop-time-seg-${theme}-${viewportKey}`,
+        );
+        await snapCartCrop(
+          page,
+          page.getByTestId('cart-payment-segmented'),
+          `cart-crop-payment-seg-${theme}-${viewportKey}`,
+        );
+      });
+    }
+  }
+});

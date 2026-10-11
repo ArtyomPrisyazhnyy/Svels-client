@@ -59,6 +59,13 @@ function parseAlpha(color: string): number {
 export async function assertCartPanelBackgroundIsOpaque(page: Page): Promise<void> {
   const panel = page.getByTestId('cart-modal-panel');
   await expect(panel).toBeVisible();
+  await expect(panel).toHaveClass(/ui-overlay-panel--active/);
+  await expect
+    .poll(async () => {
+      const opacity = await panel.evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
+      return opacity;
+    })
+    .toBeGreaterThanOrEqual(0.99);
   const colors = await panel.evaluate((el) => {
     const style = getComputedStyle(el);
     return {
@@ -131,11 +138,6 @@ export async function assertCartMobileLayoutNoOverlap(page: Page): Promise<void>
       a: modal.getByTestId('cart-header-title'),
       b: modal.getByTestId('cart-close'),
       label: 'title vs close',
-    },
-    {
-      a: modal.getByTestId('cart-header-title'),
-      b: modal.getByTestId('cart-clear'),
-      label: 'title vs clear',
     },
     {
       a: modal.getByTestId('cart-header-title'),

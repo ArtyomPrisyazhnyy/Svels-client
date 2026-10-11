@@ -26,6 +26,7 @@ export function PaymentSelector({ settings, value, onChange }: PaymentSelectorPr
       value={value}
       onChange={onChange}
       ariaLabel="Способ оплаты"
+      testId="cart-payment-segmented"
     />
   );
 }
