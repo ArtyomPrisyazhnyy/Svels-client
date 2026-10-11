@@ -20,6 +20,8 @@ const FREEZE_MOTION_CSS = `
 export async function prepareForScreenshot(page: Page): Promise<void> {
   await page.evaluate(async () => {
     document.documentElement.setAttribute('data-visual-test', 'true');
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
     await document.fonts.ready;
   });
 

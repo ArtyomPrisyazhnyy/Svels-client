@@ -19,6 +19,8 @@
   border-radius: var(--rs-card-radius, var(--radius-lg));
   background: var(--rs-surface);
   min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .ui-primitives-board__section-title {

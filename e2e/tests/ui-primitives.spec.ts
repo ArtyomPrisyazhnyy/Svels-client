@@ -60,7 +60,7 @@ test.describe('UI primitives playground', () => {
 
   test('segmented control arrow keys change value', async ({ page }) => {
     const group = page.getByTestId('ui-seg-md');
-    await group.focus();
+    await group.getByRole('radio', { name: 'Как можно скорее' }).focus();
     await page.keyboard.press('ArrowRight');
     await expect(group.getByRole('radio', { name: 'Ко времени' })).toHaveAttribute('aria-checked', 'true');
     await page.keyboard.press('ArrowLeft');
