@@ -1,0 +1,32 @@
+---
+description: UI spacing, tokens, primitives, and visual-regression rules
+alwaysApply: true
+globs:
+  - src/**/*.{tsx,scss,css}
+  - app/**/*.{tsx,scss,css}
+---
+
+# UI rules (mandatory)
+
+Full rules: **[docs/ui-rules.md](../../docs/ui-rules.md)**.
+
+## Tokens & spacing
+- Spacing/gap/padding/margin: only `var(--space-*)` (4/8 scale) or `0`; borders `1px` OK.
+- Colours in feature SCSS: only `var(--rs-*)` or design tokens — no hex/rgb literals.
+- z-index: only `var(--z-*)`. Type: `var(--text-*)`. Radii: token scale or `--rs-*-radius`.
+- Control heights: `--control-h-sm/md/lg`; tap targets ≥ 44px.
+
+## Layout
+- Parent sets sibling spacing with `gap` (Stack/Cluster/grid). No margins on children except `margin-inline: auto`.
+- Card/row inner padding: `--space-3` or `--space-4` on all sides.
+- Modal/header titles: `1fr auto 1fr` grid; overflow text: `min-width: 0` + ellipsis/wrap.
+
+## Primitives (`src/shared/ui`)
+Use shared Modal, Sheet, SegmentedControl, Button, Field, Stack, etc. — extend via props, never fork locally.
+2–4 options → SegmentedControl; no hand-built modals/headers in feature code.
+
+## Mobile-first
+Design for 360px first; `min-width` breakpoints 480/768/1024/1280 only. No horizontal scroll at 360.
+
+## Loading & verification
+Skeleton on first paint — no "Загрузка…" placeholders. Changed screens: Playwright `toHaveScreenshot` at 360/390/768/1280, `maxDiffPixelRatio: 0.01`, baselines committed.

@@ -18,7 +18,8 @@
     "mock:landing-api": "node scripts/landing-mock-api.mjs",
     "landing:capture": "node scripts/capture-landing-screenshots.mjs",
     "landing:scenes": "node scripts/landing/build-scenes.mjs",
-    "landing:images": "npm run landing:capture"
+    "landing:images": "npm run landing:capture",
+    "check:ui-tokens": "node scripts/check-ui-tokens.mjs"
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
