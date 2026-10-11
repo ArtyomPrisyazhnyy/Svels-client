@@ -1,0 +1,91 @@
+import { test, expect } from '@playwright/test';
+import { prepareForScreenshot, VIEWPORTS, type VisualViewportKey } from '../helpers/visual';
+
+const THEMES = ['classic', 'midnight', 'warm'] as const;
+
+const FULL_BOARDS = [
+  'ui-board-modal',
+  'ui-board-sheet',
+  'ui-board-segmented',
+  'ui-board-buttons',
+  'ui-board-fields',
+] as const;
+
+const PARTIAL_BOARDS = ['ui-board-stack', 'ui-board-skeleton', 'ui-board-pagetitle'] as const;
+
+const FULL_VIEWPORTS: VisualViewportKey[] = ['m360', 'm390', 't768', 'd1280'];
+const PARTIAL_VIEWPORTS: VisualViewportKey[] = ['m390', 'd1280'];
+
+async function assertSegmentedLabelsFit(page: import('@playwright/test').Page): Promise<void> {
+  const labels = await page.getByTestId('ui-board-segmented').locator('.ui-seg__label').evaluateAll((nodes) =>
+    nodes.map((node) => {
+      const el = node as HTMLElement;
+      const style = getComputedStyle(el);
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      return {
+        text: (el.textContent ?? '').trim(),
+        lines: range.getClientRects().length,
+        textOverflow: style.textOverflow,
+        whiteSpace: style.whiteSpace,
+      };
+    }),
+  );
+
+  expect(labels.length).toBeGreaterThan(0);
+  for (const label of labels) {
+    expect(label.textOverflow, label.text).not.toBe('ellipsis');
+    expect(label.whiteSpace, label.text).not.toBe('nowrap');
+    expect(label.lines, label.text).toBeGreaterThan(0);
+    expect(label.lines, label.text).toBeLessThanOrEqual(2);
+    expect(label.text.endsWith('…') || label.text.endsWith('...'), label.text).toBe(false);
+  }
+}
+
+async function assertNoHorizontalOverflow(page: import('@playwright/test').Page): Promise<void> {
+  const viewport = page.viewportSize();
+  if (!viewport) {
+    return;
+  }
+  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  expect(scrollWidth).toBeLessThanOrEqual(viewport.width);
+}
+
+test.describe('UI primitives boards (/dev/ui)', () => {
+  for (const theme of THEMES) {
+    for (const board of FULL_BOARDS) {
+      for (const viewportKey of FULL_VIEWPORTS) {
+        test(`${board} ${theme} @ ${viewportKey}`, async ({ page }) => {
+          await page.goto(`/dev/ui?theme=${theme}`, { waitUntil: 'networkidle' });
+          await expect(page.getByTestId('ui-primitives-board')).toBeVisible();
+          const viewport = VIEWPORTS[viewportKey];
+          await page.setViewportSize(viewport);
+          const section = page.getByTestId(board);
+          await section.scrollIntoViewIfNeeded();
+          await prepareForScreenshot(page);
+          if (viewportKey === 'm360') {
+            await assertNoHorizontalOverflow(page);
+          }
+          if (board === 'ui-board-segmented') {
+            await assertSegmentedLabelsFit(page);
+          }
+          await expect(section).toHaveScreenshot(`${board}-${theme}-${viewportKey}.png`);
+        });
+      }
+    }
+
+    for (const board of PARTIAL_BOARDS) {
+      for (const viewportKey of PARTIAL_VIEWPORTS) {
+        test(`${board} ${theme} @ ${viewportKey}`, async ({ page }) => {
+          await page.goto(`/dev/ui?theme=${theme}`, { waitUntil: 'networkidle' });
+          await expect(page.getByTestId('ui-primitives-board')).toBeVisible();
+          await page.setViewportSize(VIEWPORTS[viewportKey]);
+          const section = page.getByTestId(board);
+          await section.scrollIntoViewIfNeeded();
+          await prepareForScreenshot(page);
+          await expect(section).toHaveScreenshot(`${board}-${theme}-${viewportKey}.png`);
+        });
+      }
+    }
+  }
+});

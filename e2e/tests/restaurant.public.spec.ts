@@ -63,7 +63,7 @@ test.describe('Restaurant public page', () => {
     await expect(page.getByTestId('restaurant-cart-modal').getByText(firstItem.name)).toBeVisible({
       timeout: 10_000,
     });
-    const takeawayTab = page.getByRole('tab', { name: 'Самовывоз' });
+    const takeawayTab = page.getByRole('radio', { name: 'Самовывоз' });
     if (await takeawayTab.isVisible()) {
       await takeawayTab.click();
     }
