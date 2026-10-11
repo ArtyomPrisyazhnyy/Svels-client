@@ -41,7 +41,8 @@
 
 .ui-seg--md .ui-seg__option {
   min-height: var(--control-h-md);
-  padding: 6px 8px;
+  padding-block: var(--space-1);
+  padding-inline: var(--space-1);
 }
 
 .ui-seg__thumb {
@@ -97,7 +98,7 @@
   max-width: 100%;
   overflow: visible;
   text-overflow: clip;
-  white-space: normal;
+  white-space: nowrap;
   overflow-wrap: normal;
   word-break: keep-all;
   text-align: center;

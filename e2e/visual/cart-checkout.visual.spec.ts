@@ -138,6 +138,7 @@ async function openScenario(
     await page.getByTestId('requested-time-slot-mode').click();
     await expect(page.getByTestId('requested-time-slot-select')).toBeVisible();
     await assertExpandedRowContentGap(timeRow);
+    await timeRow.evaluate((el) => el.scrollIntoView({ block: 'start', inline: 'nearest' }));
     return panel;
   }
 
@@ -153,6 +154,7 @@ async function openScenario(
   await expect(row).toBeVisible();
   await row.getByRole('button').first().click();
   await assertExpandedRowContentGap(row);
+  await row.evaluate((el) => el.scrollIntoView({ block: 'start', inline: 'nearest' }));
   return panel;
 }
 

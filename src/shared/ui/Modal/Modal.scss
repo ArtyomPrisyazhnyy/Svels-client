@@ -59,6 +59,7 @@
     opacity var(--duration-base) var(--ease-standard),
     transform var(--duration-base) var(--ease-standard);
   min-width: 0;
+  overflow: hidden;
 }
 
 .ui-overlay-panel--active {

@@ -1,5 +1,4 @@
-import { test, expect, apiClient } from '../fixtures/test';
-import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
+import { test, expect } from '../fixtures/test';
 import { assertCartTitleCentered } from '../helpers/cart-visual';
 import type { CartLineItem } from '../../src/shared/types/cart';
 
@@ -83,8 +82,9 @@ test.describe('Modals', () => {
     await expect(opener).toBeFocused();
 
     await page.setViewportSize({ width: 1280, height: 800 });
-    await opener.click();
-    await expect(root).toBeVisible();
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    await page.getByTestId('cart-button').click();
+    await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
     await assertCartTitleCentered(page.getByTestId('cart-modal-panel'));
   });
 
@@ -118,17 +118,7 @@ test.describe('Modals', () => {
     await expect(opener).toBeFocused();
   });
 
-  test('вход гостя: backdrop, Escape, ×, фокус возвращается', async ({
-    page,
-    seed,
-    asGuest,
-  }) => {
-    void asGuest;
-    await apiClient.setOrderSettings(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, {
-      fulfillmentDelivery: true,
-      fulfillmentTakeaway: true,
-    });
-    await revalidateRestaurantPublicPage(seed.restaurantId);
+  test('вход гостя: backdrop, Escape, ×, фокус возвращается', async ({ page, seed }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`/restaurants/${seed.restaurantId}`);
     const opener = page.getByTestId('guest-profile-button');

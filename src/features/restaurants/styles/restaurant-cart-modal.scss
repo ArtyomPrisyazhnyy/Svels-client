@@ -28,6 +28,16 @@
   background: transparent;
   box-shadow: none;
   border-top: 1px solid var(--rs-border);
+
+  .cart-detail-row,
+  .cart-detail-row--grouped,
+  .cart-detail-row--expanded {
+    background: transparent;
+  }
+}
+
+.restaurant-cart-modal__panel .cart-checkout-rows--inset .cart-detail-row {
+  background: transparent;
 }
 
 .restaurant-cart-modal__list-header-title,
@@ -132,24 +142,40 @@
   overscroll-behavior: contain;
   padding: var(--space-4);
   background-color: var(--rs-cart-canvas, var(--rs-cart-surface, var(--rs-surface)));
-  scrollbar-width: thin;
-  scrollbar-color: var(--rs-text-soft) var(--rs-bg);
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
-    width: 8px;
+    display: none;
+    width: 0;
+    height: 0;
   }
+}
 
-  &::-webkit-scrollbar-track {
-    margin: var(--space-1) 0;
-    background: var(--rs-bg);
-    border-radius: var(--radius-pill);
-  }
+.restaurant-cart-modal__panel .ui-icon-btn {
+  color: var(--rs-text);
+}
 
-  &::-webkit-scrollbar-thumb {
-    background: var(--rs-text-soft);
-    border: 2px solid var(--rs-bg);
-    border-radius: var(--radius-pill);
-  }
+.restaurant-cart-modal__panel .phone-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--control-h-md);
+  height: var(--control-h-md);
+  margin: 0;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--rs-border);
+  border-radius: var(--rs-btn-radius, var(--radius-md));
+  background: var(--rs-bg);
+  color: var(--rs-text);
+  font-family: inherit;
+  font-size: var(--text-md);
+  font-weight: 400;
+  line-height: 1.45;
+  --phone-input-autofill-bg: var(--rs-bg);
+  --phone-input-autofill-text: var(--rs-text);
+}
+
+.restaurant-cart-modal__panel .phone-input__control::placeholder {
+  color: var(--rs-text-soft);
 }
 
 .restaurant-cart-modal__empty {
