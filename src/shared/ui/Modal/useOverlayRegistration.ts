@@ -4,7 +4,10 @@ import { pushOverlay, subscribeEscapeKey } from '@/shared/ui/Modal/modal-stack';
 /** Register overlay once per mount; always invokes latest onClose via ref. */
 export function useOverlayRegistration(onClose: () => void): void {
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     const close = () => {
