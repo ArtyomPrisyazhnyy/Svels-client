@@ -159,7 +159,6 @@ export function SegmentedControl<T extends string>({
             type="button"
             role="radio"
             aria-checked={checked}
-            aria-selected={checked}
             disabled={option.disabled}
             className="ui-seg__option fulfillment-selector__option"
             onClick={() => onChange(option.value)}
