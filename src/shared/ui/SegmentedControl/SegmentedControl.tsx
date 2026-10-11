@@ -1,8 +1,17 @@
 'use client';
 
-import { type KeyboardEvent, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { cn } from '@/shared/ui/utils/cn';
 import './SegmentedControl.scss';
+
+export type SegmentedSwitcherStyle = 'pill' | 'segmented' | 'tabs';
 
 export interface SegmentedControlOption<T extends string> {
   value: T;
@@ -18,6 +27,10 @@ export interface SegmentedControlProps<T extends string> {
   ariaLabel: string;
   size?: 'sm' | 'md';
   fullWidth?: boolean;
+  /** Venue switcher look; defaults to pill. Playground passes explicit styles. */
+  switcherStyle?: SegmentedSwitcherStyle;
+  /** Adds legacy `fulfillment-selector*` classes for cart selectors only. */
+  legacyFulfillmentClasses?: boolean;
   className?: string;
   testId?: string;
 }
@@ -34,7 +47,9 @@ export function SegmentedControl<T extends string>({
   onChange,
   ariaLabel,
   size = 'md',
-  fullWidth = false,
+  fullWidth = true,
+  switcherStyle = 'pill',
+  legacyFulfillmentClasses = false,
   className,
   testId,
 }: SegmentedControlProps<T>) {
@@ -46,26 +61,37 @@ export function SegmentedControl<T extends string>({
   const activeIndex = options.findIndex((option) => option.value === value);
 
   const updateThumb = useCallback(() => {
+    const container = containerRef.current;
     const activeEl = optionRefs.current[activeIndex];
 
-    if (!activeEl || activeIndex < 0) {
+    if (!container || !activeEl || activeIndex < 0) {
       setThumb(null);
       return;
     }
 
+    const containerRect = container.getBoundingClientRect();
+    const activeRect = activeEl.getBoundingClientRect();
+
     setThumb({
-      width: activeEl.offsetWidth,
-      height: activeEl.offsetHeight,
-      transform: `translate(${activeEl.offsetLeft}px, ${activeEl.offsetTop}px)`,
+      width: activeRect.width,
+      height: activeRect.height,
+      transform: `translate(${activeRect.left - containerRect.left}px, ${activeRect.top - containerRect.top}px)`,
     });
   }, [activeIndex]);
 
-  useLayoutEffect(() => {
+  const scheduleThumbMeasure = useCallback(() => {
     updateThumb();
-  }, [updateThumb, options.length, value]);
+    void document.fonts.ready.then(() => {
+      updateThumb();
+    });
+  }, [updateThumb]);
 
   useLayoutEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- legacy thumb snap when option count changes
+    scheduleThumbMeasure();
+  }, [scheduleThumbMeasure, options.length, value, switcherStyle]);
+
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- thumb snap when option count changes
     setThumbAnimated(false);
     const frameId = requestAnimationFrame(() => {
       setThumbAnimated(true);
@@ -80,17 +106,22 @@ export function SegmentedControl<T extends string>({
     }
 
     const observer = new ResizeObserver(() => {
-      updateThumb();
+      scheduleThumbMeasure();
     });
 
     observer.observe(container);
-    window.addEventListener('resize', updateThumb);
+    optionRefs.current.forEach((el) => {
+      if (el) {
+        observer.observe(el);
+      }
+    });
+    window.addEventListener('resize', scheduleThumbMeasure);
 
     return () => {
       observer.disconnect();
-      window.removeEventListener('resize', updateThumb);
+      window.removeEventListener('resize', scheduleThumbMeasure);
     };
-  }, [updateThumb]);
+  }, [scheduleThumbMeasure, options.length]);
 
   const focusOption = (index: number) => {
     const option = options[index];
@@ -122,31 +153,45 @@ export function SegmentedControl<T extends string>({
     return null;
   }
 
+  const gridStyle = {
+    '--ui-seg-cols': String(options.length),
+  } as CSSProperties;
+
+  const rootClass = cn(
+    'ui-seg',
+    `ui-seg--${size}`,
+    !legacyFulfillmentClasses && `ui-seg--style-${switcherStyle}`,
+    legacyFulfillmentClasses && 'ui-seg--legacy',
+    fullWidth ? 'ui-seg--full' : 'ui-seg--fit',
+    legacyFulfillmentClasses && 'fulfillment-selector',
+    className,
+  );
+
+  const thumbClass = cn(
+    'ui-seg__thumb',
+    legacyFulfillmentClasses && 'fulfillment-selector__thumb',
+    thumbAnimated && 'ui-seg__thumb--animated',
+    legacyFulfillmentClasses && thumbAnimated && 'fulfillment-selector__thumb--animated',
+  );
+
+  const optionClass = cn(
+    'ui-seg__option',
+    legacyFulfillmentClasses && 'fulfillment-selector__option',
+  );
+
   return (
     <div
       ref={containerRef}
-      className={cn(
-        'ui-seg',
-        'fulfillment-selector',
-        `ui-seg--${size}`,
-        fullWidth && 'ui-seg--full',
-        className,
-      )}
+      className={rootClass}
+      style={gridStyle}
       role="radiogroup"
       aria-label={ariaLabel}
       onKeyDown={handleKeyDown}
       data-testid={testId}
+      data-ui-seg-style={legacyFulfillmentClasses ? undefined : switcherStyle}
     >
-      {thumb ? (
-        <div
-          className={cn(
-            'ui-seg__thumb',
-            'fulfillment-selector__thumb',
-            thumbAnimated && 'ui-seg__thumb--animated fulfillment-selector__thumb--animated',
-          )}
-          style={thumb}
-          aria-hidden
-        />
+      {thumb && (legacyFulfillmentClasses || switcherStyle !== 'tabs') ? (
+        <div className={thumbClass} style={thumb} aria-hidden />
       ) : null}
 
       {options.map((option, index) => {
@@ -161,11 +206,11 @@ export function SegmentedControl<T extends string>({
             role="radio"
             aria-checked={checked}
             disabled={option.disabled}
-            className="ui-seg__option fulfillment-selector__option"
+            className={optionClass}
             onClick={() => onChange(option.value)}
             data-testid={option.testId}
           >
-            {option.label}
+            <span className="ui-seg__label">{option.label}</span>
           </button>
         );
       })}

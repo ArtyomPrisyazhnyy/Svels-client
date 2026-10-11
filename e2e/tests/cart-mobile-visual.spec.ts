@@ -138,7 +138,7 @@ test.describe('Cart mobile visual captures', () => {
         await seedCart(page, seed.restaurantId, 1);
         await page.goto(`/restaurants/${seed.restaurantId}`);
         await page.getByTestId('cart-button').click();
-        await page.getByRole('tab', { name: 'Доставка' }).click();
+        await page.getByRole('radio', { name: 'Доставка' }).click();
         await page.getByTestId('cart-go-to-checkout').click();
         await expect(page.getByTestId('cart-header-title')).toHaveText('Доставка');
         await snap(page, `step2-delivery-collapsed-${vp.tag}`);

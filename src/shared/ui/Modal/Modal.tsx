@@ -1,9 +1,9 @@
 'use client';
 
-import { type ReactNode, type RefObject, useEffect, useRef } from 'react';
+import { type ReactNode, type RefObject, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useModalPresence } from '@/hooks/useModalPresence';
-import { pushOverlay, subscribeEscapeKey } from '@/shared/ui/Modal/modal-stack';
+import { useOverlayRegistration } from '@/shared/ui/Modal/useOverlayRegistration';
 import { ModalPanel, type OverlaySize } from '@/shared/ui/Modal/ModalPanel';
 import { useBackdropClose } from '@/shared/ui/Modal/useBackdropClose';
 import { useFocusTrap } from '@/shared/ui/Modal/useFocusTrap';
@@ -45,15 +45,7 @@ function ModalInner({
   const { onBackdropPointerDown, onBackdropClick } = useBackdropClose(handleClose);
 
   useFocusTrap(panelRef, isActive, initialFocusRef);
-
-  useEffect(() => {
-    const pop = pushOverlay(handleClose);
-    const unsub = subscribeEscapeKey(handleClose);
-    return () => {
-      pop();
-      unsub();
-    };
-  }, [handleClose]);
+  useOverlayRegistration(handleClose);
 
   if (!mounted) {
     return null;

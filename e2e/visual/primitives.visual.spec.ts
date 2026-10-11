@@ -16,6 +16,15 @@ const PARTIAL_BOARDS = ['ui-board-stack', 'ui-board-skeleton', 'ui-board-pagetit
 const FULL_VIEWPORTS: VisualViewportKey[] = ['m360', 'm390', 't768', 'd1280'];
 const PARTIAL_VIEWPORTS: VisualViewportKey[] = ['m390', 'd1280'];
 
+async function assertNoHorizontalOverflow(page: import('@playwright/test').Page): Promise<void> {
+  const viewport = page.viewportSize();
+  if (!viewport) {
+    return;
+  }
+  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  expect(scrollWidth).toBeLessThanOrEqual(viewport.width);
+}
+
 test.describe('UI primitives boards (/dev/ui)', () => {
   for (const theme of THEMES) {
     for (const board of FULL_BOARDS) {
@@ -23,10 +32,14 @@ test.describe('UI primitives boards (/dev/ui)', () => {
         test(`${board} ${theme} @ ${viewportKey}`, async ({ page }) => {
           await page.goto(`/dev/ui?theme=${theme}`, { waitUntil: 'networkidle' });
           await expect(page.getByTestId('ui-primitives-board')).toBeVisible();
-          await page.setViewportSize(VIEWPORTS[viewportKey]);
+          const viewport = VIEWPORTS[viewportKey];
+          await page.setViewportSize(viewport);
           const section = page.getByTestId(board);
           await section.scrollIntoViewIfNeeded();
           await prepareForScreenshot(page);
+          if (viewportKey === 'm360') {
+            await assertNoHorizontalOverflow(page);
+          }
           await expect(section).toHaveScreenshot(`${board}-${theme}-${viewportKey}.png`);
         });
       }

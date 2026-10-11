@@ -33,6 +33,34 @@ const SEGMENTED_THREE = [
   { value: 'c', label: 'В зале' },
 ] as const;
 
+function ModalRerenderEscapeDemo() {
+  const [open, setOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [tick, setTick] = useState(0);
+
+  return (
+    <>
+      <Button testId="ui-rerender-modal-open" variant="secondary" onClick={() => setOpen(true)}>
+        Rerender + sheet stack
+      </Button>
+      <Modal open={open} onClose={() => setOpen(false)} title="Rerender test" testId="ui-rerender-modal">
+        <Stack gap={3}>
+          <p data-testid="ui-rerender-tick">tick={tick}</p>
+          <Button testId="ui-rerender-sheet-open" onClick={() => setSheetOpen(true)}>
+            Открыть sheet
+          </Button>
+          <Button testId="ui-rerender-bump" variant="ghost" onClick={() => setTick((value) => value + 1)}>
+            Bump parent
+          </Button>
+          <Sheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Sheet inside modal" testId="ui-rerender-sheet">
+            <p>Вложенный sheet</p>
+          </Sheet>
+        </Stack>
+      </Modal>
+    </>
+  );
+}
+
 export function UiPrimitivesBoard() {
   const [segSm, setSegSm] = useState('asap');
   const [segMd, setSegMd] = useState('asap');
@@ -54,6 +82,17 @@ export function UiPrimitivesBoard() {
         <ModalPreview title="Заголовок модалки" footer={<Button fullWidth>Готово</Button>}>
           <p>Тело модального окна с прокруткой и отступами от краёв.</p>
         </ModalPreview>
+        <ModalPreview
+          title="Корзина"
+          headerEnd={
+            <Button variant="ghost" size="sm" type="button">
+              Очистить
+            </Button>
+          }
+          testId="ui-modal-header-preview"
+        >
+          <p>Заголовок с действием справа.</p>
+        </ModalPreview>
         <div className="ui-primitives-board__actions">
           <Button testId="ui-open-modal" onClick={() => setModalOpen(true)}>
             Открыть модалку
@@ -61,6 +100,7 @@ export function UiPrimitivesBoard() {
           <Button variant="secondary" onClick={() => setNestedModalOpen(true)}>
             Вложенная модалка + sheet
           </Button>
+          <ModalRerenderEscapeDemo />
         </div>
         <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Живая модалка" testId="ui-live-modal">
           <p data-testid="ui-live-modal-body">Клик по фону, Escape или × закрывают окно.</p>
@@ -119,11 +159,7 @@ export function UiPrimitivesBoard() {
             testId="ui-seg-three"
           />
           {(['pill', 'segmented', 'tabs'] as const).map((style) => (
-            <div
-              key={style}
-              className="restaurant-styled ui-primitives-board__switcher-preview"
-              data-rs-switcher-style={style}
-            >
+            <div key={style} className="ui-primitives-board__switcher-preview">
               <p className="ui-primitives-board__switcher-label">{style}</p>
               <SegmentedControl
                 options={[...SEGMENTED_LONG]}
@@ -136,6 +172,7 @@ export function UiPrimitivesBoard() {
                       : setSegTabs
                 }
                 ariaLabel={`Стиль ${style}`}
+                switcherStyle={style}
                 size="md"
                 fullWidth
                 testId={`ui-seg-style-${style}`}

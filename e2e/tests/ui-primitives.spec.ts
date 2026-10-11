@@ -71,6 +71,33 @@ test.describe('UI primitives playground', () => {
     );
   });
 
+  test('modal header title stays centered with headerEnd action', async ({ page }) => {
+    const panel = page.getByTestId('ui-modal-header-preview');
+    await expect(panel).toBeVisible();
+    const title = panel.locator('.ui-overlay-panel__title');
+    const panelBox = await panel.boundingBox();
+    const titleBox = await title.boundingBox();
+    expect(panelBox).not.toBeNull();
+    expect(titleBox).not.toBeNull();
+    if (panelBox && titleBox) {
+      const panelCenter = panelBox.x + panelBox.width / 2;
+      const titleCenter = titleBox.x + titleBox.width / 2;
+      expect(Math.abs(panelCenter - titleCenter)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  test('sheet inside modal survives parent rerender; escape closes sheet first', async ({ page }) => {
+    await page.getByTestId('ui-rerender-modal-open').click();
+    await expect(page.getByTestId('ui-rerender-modal')).toBeVisible();
+    await page.getByTestId('ui-rerender-sheet-open').click();
+    await expect(page.getByTestId('ui-rerender-sheet')).toBeVisible();
+    await page.getByTestId('ui-rerender-bump').click();
+    await expect(page.getByTestId('ui-rerender-tick')).toContainText('tick=1');
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('ui-rerender-sheet')).toBeHidden();
+    await expect(page.getByTestId('ui-rerender-modal')).toBeVisible();
+  });
+
   test('loading button keeps width', async ({ page }) => {
     const button = page.getByTestId('ui-btn-loading');
     const before = await button.boundingBox();

@@ -31,6 +31,13 @@ export function SegmentedSwitcher<K extends string>({
   }));
 
   return (
-    <SegmentedControl options={mapped} value={value} onChange={onChange} ariaLabel={ariaLabel} />
+    <SegmentedControl
+      options={mapped}
+      value={value}
+      onChange={onChange}
+      ariaLabel={ariaLabel}
+      legacyFulfillmentClasses
+      fullWidth={false}
+    />
   );
 }

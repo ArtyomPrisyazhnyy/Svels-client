@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import {
+  type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
   type ReactNode,
   forwardRef,
@@ -12,7 +13,9 @@ import './Button.scss';
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'link';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
+type ButtonRestProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>;
+
+export interface ButtonProps extends ButtonRestProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
@@ -62,8 +65,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   );
 
   if (href && !isDisabled) {
+    const linkRest = rest as Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'children'>;
     return (
-      <Link href={href} className={classes} data-testid={testId}>
+      <Link
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        href={href}
+        className={classes}
+        data-testid={testId}
+        {...linkRest}
+      >
         {content}
       </Link>
     );
