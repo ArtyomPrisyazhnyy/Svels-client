@@ -408,22 +408,19 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
 
   .fulfillment-selector {
     margin: 0;
-    display: flex;
+    display: grid;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
   .fulfillment-selector__option {
-    flex: 1 1 0;
     min-width: 0;
     white-space: normal;
     text-align: center;
     line-height: 1.2;
-    padding: 0.5rem 0.4rem;
-    font-size: 0.8125rem;
+    padding: 6px 8px;
+    font-size: 14px;
   }
 }
 

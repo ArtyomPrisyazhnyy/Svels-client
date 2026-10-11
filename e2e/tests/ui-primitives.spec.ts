@@ -98,6 +98,44 @@ test.describe('UI primitives playground', () => {
     await expect(page.getByTestId('ui-rerender-modal')).toBeVisible();
   });
 
+  test('segmented labels fit at 360 without ellipsis', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    await page.goto('/dev/ui?theme=classic', { waitUntil: 'networkidle' });
+    const board = page.getByTestId('ui-board-segmented');
+    await expect(board).toBeVisible();
+    const labels = await board.locator('.ui-seg__label').evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const el = node as HTMLElement;
+        const style = getComputedStyle(el);
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return {
+          text: (el.textContent ?? '').trim(),
+          lines: range.getClientRects().length,
+          textOverflow: style.textOverflow,
+          whiteSpace: style.whiteSpace,
+        };
+      }),
+    );
+    expect(labels.map((label) => label.text)).toEqual(
+      expect.arrayContaining([
+        'Как можно скорее',
+        'Ко времени',
+        'Самовывоз',
+        'Доставка',
+        'В зале',
+        'Наличными',
+        'Картой на месте',
+        'Картой онлайн',
+      ]),
+    );
+    for (const label of labels) {
+      expect(label.textOverflow, label.text).not.toBe('ellipsis');
+      expect(label.whiteSpace, label.text).not.toBe('nowrap');
+      expect(label.lines, label.text).toBeLessThanOrEqual(2);
+    }
+  });
+
   test('loading button keeps width', async ({ page }) => {
     const button = page.getByTestId('ui-btn-loading');
     const before = await button.boundingBox();

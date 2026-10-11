@@ -38,14 +38,21 @@
   gap: var(--space-2);
 }
 
+.ui-primitives-board__section--segmented {
+  box-sizing: border-box;
+  width: calc(100% + 2 * var(--space-4));
+  margin-inline: calc(-1 * var(--space-4));
+}
+
 .ui-primitives-board__switcher-preview {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-3);
-  border: 1px dashed var(--rs-border);
-  border-radius: var(--radius-md);
-  background: var(--rs-bg);
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .ui-primitives-board__switcher-label {

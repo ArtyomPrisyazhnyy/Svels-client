@@ -159,6 +159,7 @@ export function SegmentedControl<T extends string>({
 
   const rootClass = cn(
     'ui-seg',
+    'ui-segmented',
     `ui-seg--${size}`,
     !legacyFulfillmentClasses && `ui-seg--style-${switcherStyle}`,
     legacyFulfillmentClasses && 'ui-seg--legacy',

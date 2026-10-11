@@ -16,6 +16,32 @@ const PARTIAL_BOARDS = ['ui-board-stack', 'ui-board-skeleton', 'ui-board-pagetit
 const FULL_VIEWPORTS: VisualViewportKey[] = ['m360', 'm390', 't768', 'd1280'];
 const PARTIAL_VIEWPORTS: VisualViewportKey[] = ['m390', 'd1280'];
 
+async function assertSegmentedLabelsFit(page: import('@playwright/test').Page): Promise<void> {
+  const labels = await page.getByTestId('ui-board-segmented').locator('.ui-seg__label').evaluateAll((nodes) =>
+    nodes.map((node) => {
+      const el = node as HTMLElement;
+      const style = getComputedStyle(el);
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      return {
+        text: (el.textContent ?? '').trim(),
+        lines: range.getClientRects().length,
+        textOverflow: style.textOverflow,
+        whiteSpace: style.whiteSpace,
+      };
+    }),
+  );
+
+  expect(labels.length).toBeGreaterThan(0);
+  for (const label of labels) {
+    expect(label.textOverflow, label.text).not.toBe('ellipsis');
+    expect(label.whiteSpace, label.text).not.toBe('nowrap');
+    expect(label.lines, label.text).toBeGreaterThan(0);
+    expect(label.lines, label.text).toBeLessThanOrEqual(2);
+    expect(label.text.endsWith('…') || label.text.endsWith('...'), label.text).toBe(false);
+  }
+}
+
 async function assertNoHorizontalOverflow(page: import('@playwright/test').Page): Promise<void> {
   const viewport = page.viewportSize();
   if (!viewport) {
@@ -39,6 +65,9 @@ test.describe('UI primitives boards (/dev/ui)', () => {
           await prepareForScreenshot(page);
           if (viewportKey === 'm360') {
             await assertNoHorizontalOverflow(page);
+          }
+          if (board === 'ui-board-segmented') {
+            await assertSegmentedLabelsFit(page);
           }
           await expect(section).toHaveScreenshot(`${board}-${theme}-${viewportKey}.png`);
         });

@@ -33,6 +33,12 @@ const SEGMENTED_THREE = [
   { value: 'c', label: 'В зале' },
 ] as const;
 
+const SEGMENTED_PAYMENT = [
+  { value: 'cash', label: 'Наличными' },
+  { value: 'card', label: 'Картой на месте' },
+  { value: 'online', label: 'Картой онлайн' },
+] as const;
+
 function ModalRerenderEscapeDemo() {
   const [open, setOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -65,6 +71,7 @@ export function UiPrimitivesBoard() {
   const [segSm, setSegSm] = useState('asap');
   const [segMd, setSegMd] = useState('asap');
   const [segThree, setSegThree] = useState('a');
+  const [segPayment, setSegPayment] = useState('cash');
   const [segPill, setSegPill] = useState('asap');
   const [segSegmented, setSegSegmented] = useState('asap');
   const [segTabs, setSegTabs] = useState('asap');
@@ -128,7 +135,10 @@ export function UiPrimitivesBoard() {
         </SheetPreview>
       </section>
 
-      <section className="ui-primitives-board__section" data-testid="ui-board-segmented">
+      <section
+        className="ui-primitives-board__section ui-primitives-board__section--segmented"
+        data-testid="ui-board-segmented"
+      >
         <h2 className="ui-primitives-board__section-title">Segmented control</h2>
         <Stack gap={4}>
           <SegmentedControl
@@ -157,6 +167,15 @@ export function UiPrimitivesBoard() {
             size="md"
             fullWidth
             testId="ui-seg-three"
+          />
+          <SegmentedControl
+            options={[...SEGMENTED_PAYMENT]}
+            value={segPayment}
+            onChange={setSegPayment}
+            ariaLabel="Оплата"
+            size="md"
+            fullWidth
+            testId="ui-seg-payment"
           />
           {(['pill', 'segmented', 'tabs'] as const).map((style) => (
             <div key={style} className="ui-primitives-board__switcher-preview">

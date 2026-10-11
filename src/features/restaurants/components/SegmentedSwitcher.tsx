@@ -37,7 +37,7 @@ export function SegmentedSwitcher<K extends string>({
       onChange={onChange}
       ariaLabel={ariaLabel}
       legacyFulfillmentClasses
-      fullWidth={false}
+      fullWidth
     />
   );
 }

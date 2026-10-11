@@ -30,6 +30,7 @@ export function DevUiPlayground({ theme }: DevUiPlaygroundProps) {
   const styling = {
     restaurantId: 'dev-ui-playground',
     ...DEFAULT_RESTAURANT_STYLING,
+    fontFamily: 'inter' as const,
     colorTheme,
     updatedAt: new Date(0).toISOString(),
   };
