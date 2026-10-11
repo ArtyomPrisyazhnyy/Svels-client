@@ -1,6 +1,7 @@
 'use client';
 
 import { type ReactNode, forwardRef, useId } from 'react';
+import { IconClose } from '@/shared/ui/icons/icons';
 import { IconButton } from '@/shared/ui/IconButton/IconButton';
 import { cn } from '@/shared/ui/utils/cn';
 import './Modal.scss';
@@ -91,7 +92,7 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(function M
               onClick={onRequestClose}
               testId={closeTestId ?? (testId ? `${testId}-close` : undefined)}
             >
-              ×
+              <IconClose />
             </IconButton>
           ) : null}
         </div>

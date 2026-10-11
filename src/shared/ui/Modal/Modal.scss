@@ -28,6 +28,14 @@
   transition: opacity var(--duration-base) var(--ease-standard);
 }
 
+.ui-modal__backdrop {
+  z-index: var(--z-modal);
+}
+
+.ui-sheet__backdrop {
+  z-index: var(--z-sheet);
+}
+
 .ui-modal__backdrop--active,
 .ui-sheet__backdrop--active {
   opacity: 1;

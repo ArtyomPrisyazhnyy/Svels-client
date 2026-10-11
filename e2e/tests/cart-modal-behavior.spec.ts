@@ -117,12 +117,36 @@ test.describe('Cart modal behavior', () => {
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await page.getByTestId('cart-button').click();
     await page.getByTestId('cart-go-to-checkout').click();
-    await page.getByTestId('cart-time-row').getByRole('button').click();
+    const timeRow = page.getByTestId('cart-time-row');
+    await timeRow.getByRole('button').click();
     await expect(page.getByTestId('cart-requested-time-segmented')).toBeVisible();
     await page.getByTestId('cart-payment-row').getByRole('button').click();
     const timeSeg = page.getByTestId('cart-requested-time-segmented');
     const paySeg = page.getByTestId('cart-payment-segmented');
     await expect(timeSeg).toHaveClass(/ui-segmented/);
     await expect(paySeg).toHaveClass(/ui-segmented/);
+
+    const streetBox = await page.getByTestId('delivery-street').boundingBox();
+    const houseBox = await page.getByTestId('delivery-house').boundingBox();
+    expect(streetBox).not.toBeNull();
+    expect(houseBox).not.toBeNull();
+    expect(Math.abs(streetBox!.y - houseBox!.y)).toBeLessThanOrEqual(8);
+
+    const asapLabel = page.getByTestId('requested-time-asap').locator('.ui-seg__label');
+    const labelBox = await asapLabel.boundingBox();
+    const lineHeight = await asapLabel.evaluate((el) => {
+      const value = getComputedStyle(el).lineHeight;
+      return Number.parseFloat(value);
+    });
+    expect(labelBox).not.toBeNull();
+    expect(labelBox!.height).toBeLessThanOrEqual(lineHeight * 1.35);
+
+    const chevronBox = await timeRow.locator('.cart-detail-row__chevron').boundingBox();
+    const triggerBox = await timeRow.locator('.cart-detail-row__trigger').boundingBox();
+    expect(chevronBox).not.toBeNull();
+    expect(triggerBox).not.toBeNull();
+    const rightGap = triggerBox!.x + triggerBox!.width - (chevronBox!.x + chevronBox!.width);
+    expect(rightGap).toBeGreaterThanOrEqual(8);
+    expect(rightGap).toBeLessThanOrEqual(24);
   });
 });

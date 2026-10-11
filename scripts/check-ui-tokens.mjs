@@ -9,11 +9,30 @@ import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const SCAN_DIR = path.join(ROOT, 'src/shared/ui');
+const EXTRA_FILES = [
+  'src/features/restaurants/styles/restaurant-cart-modal.scss',
+  'src/features/restaurants/styles/cart-detail-row.scss',
+  'src/features/restaurants/styles/delivery-address-fields.scss',
+  'src/features/restaurants/styles/requested-time-picker.scss',
+  'src/features/restaurants/styles/order-success-view.scss',
+];
 
 const HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
 const SPACING_PROP_RE = /\b(margin|padding|gap)(-block|-inline)?\s*:\s*([^;]+)/gi;
 const ALLOWED_SPACING_RE =
-  /^(0|1px|var\(--space-\d+\)(\s+var\(--space-\d+\))*|calc\([^)]+\)|auto|inherit|unset|initial)$/;
+  /^(0|1px|var\(--space-\d+\)|auto|inherit|unset|initial)$/;
+
+function isAllowedSpacing(rawPart) {
+  const normalized = rawPart.replace(/!important$/, '');
+  if (ALLOWED_SPACING_RE.test(normalized)) {
+    return true;
+  }
+  if (!normalized.startsWith('calc(') || !normalized.endsWith(')')) {
+    return false;
+  }
+  const inner = normalized.slice(5, -1).replace(/var\(--space-\d+\)/g, '0').replace(/env\([^)]*\)/g, '0');
+  return /^[\d+\-*/().\s]+$/.test(inner);
+}
 
 async function collectScssFiles(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -36,7 +55,10 @@ function rel(file) {
 const issues = [];
 
 try {
-  const files = await collectScssFiles(SCAN_DIR);
+  const files = [
+    ...(await collectScssFiles(SCAN_DIR)),
+    ...EXTRA_FILES.map((file) => path.join(ROOT, file)),
+  ];
   for (const file of files) {
     const content = await readFile(file, 'utf8');
     const lines = content.split('\n');
@@ -55,8 +77,7 @@ try {
         const raw = match[3].trim();
         const parts = raw.split(/\s+/);
         for (const part of parts) {
-          const normalized = part.replace(/!important$/, '');
-          if (!ALLOWED_SPACING_RE.test(normalized)) {
+          if (!isAllowedSpacing(part)) {
             issues.push(
               `${rel(file)}:${index + 1}: spacing value "${part}" not on token scale`,
             );

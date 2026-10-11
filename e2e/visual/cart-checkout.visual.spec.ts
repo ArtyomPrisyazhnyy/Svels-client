@@ -24,12 +24,12 @@ type CheckoutScenario =
   | 'row-address-extra'
   | 'row-recipient';
 
-function buildLine(): CartLineItem {
+function buildLine(index = 1): CartLineItem {
   return {
-    id: 'visual-checkout-1',
-    lineKey: 'vc-1',
-    menuItemId: 'vc-item-1',
-    name: 'Блюдо для визуального теста корзины',
+    id: `visual-checkout-${index}`,
+    lineKey: `vc-${index}`,
+    menuItemId: `vc-item-${index}`,
+    name: index === 1 ? 'Блюдо для визуального теста корзины' : `Блюдо ${index}`,
     variantLabel: 'Стандарт',
     quantity: 1,
     unitPrice: 7.5,
@@ -44,6 +44,7 @@ async function seedCart(
   page: import('@playwright/test').Page,
   restaurantId: string,
   fulfillment: 'fulfillmentDelivery' | 'fulfillmentTakeaway' = 'fulfillmentDelivery',
+  itemCount = 1,
 ) {
   await page.addInitScript(
     ({ rid, cartItems, fulfillmentKey }) => {
@@ -58,7 +59,7 @@ async function seedCart(
               [rid]: {
                 fulfillment: fulfillmentKey,
                 customerName: 'Тест',
-                phone: '+375291234567',
+                phone: '+375290000001',
                 deliveryAddress: {
                   street: 'Ленина',
                   house: '1',
@@ -82,7 +83,11 @@ async function seedCart(
         }),
       );
     },
-    { rid: restaurantId, cartItems: [buildLine()], fulfillmentKey: fulfillment },
+    {
+      rid: restaurantId,
+      cartItems: Array.from({ length: itemCount }, (_, index) => buildLine(index + 1)),
+      fulfillmentKey: fulfillment,
+    },
   );
 }
 
@@ -187,7 +192,12 @@ test.describe('Cart checkout visual', () => {
           await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
           const fulfillment =
             scenario === 'step2-pickup' ? 'fulfillmentTakeaway' : 'fulfillmentDelivery';
-          await seedCart(page, seed.restaurantId, fulfillment);
+          await seedCart(
+            page,
+            seed.restaurantId,
+            fulfillment,
+            scenario === 'step1' ? 3 : 1,
+          );
           const panel = await openScenario(page, seed.restaurantId, scenario);
           await assertCartTitleCentered(panel);
           await snapCartPanel(page, panel, `cart-${scenario}-${theme}-${viewportKey}`);

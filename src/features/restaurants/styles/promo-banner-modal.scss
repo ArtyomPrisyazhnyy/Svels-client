@@ -1,75 +1,7 @@
-$modal-duration: 0.25s;
-$modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
-
-.promo-banner-modal__backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  border: none;
-  background: rgba(15, 23, 42, 0.55);
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity $modal-duration $modal-easing;
-
-  &.promo-banner-modal--active {
-    opacity: 1;
-    pointer-events: auto;
+.promo-banner-modal__panel.ui-overlay-panel {
+  .ui-overlay-panel__body {
+    padding: 0;
   }
-}
-
-.promo-banner-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 120;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  pointer-events: none;
-}
-
-.promo-banner-modal__panel {
-  position: relative;
-  width: min(100%, 420px);
-  overflow: hidden;
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
-  pointer-events: auto;
-  opacity: 0;
-  transform: scale(0.96);
-  transition:
-    opacity $modal-duration $modal-easing,
-    transform $modal-duration $modal-easing;
-
-  &.promo-banner-modal--active {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .promo-banner-modal__backdrop,
-  .promo-banner-modal__panel {
-    transition: none;
-  }
-}
-
-.promo-banner-modal__close {
-  position: absolute;
-  top: 0.65rem;
-  right: 0.65rem;
-  z-index: 2;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: none;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.55);
-  color: #ffffff;
-  font-size: 1.35rem;
-  line-height: 1;
-  cursor: pointer;
 }
 
 .promo-banner-modal__link {

@@ -3,9 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import { PhoneInput } from '@/shared/components/PhoneInput';
-import { Modal, Cluster } from '@/shared/ui';
-import { IconButton } from '@/shared/ui/IconButton/IconButton';
+import { Modal, Cluster, Stack } from '@/shared/ui';
 import { Button } from '@/shared/ui/Button/Button';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
+import { Field } from '@/shared/ui/Field/Field';
+import { IconButton } from '@/shared/ui/IconButton/IconButton';
+import { Input } from '@/shared/ui/Input/Input';
+import { Textarea } from '@/shared/ui/Textarea/Textarea';
+import { IconBack } from '@/shared/ui/icons/icons';
 import { formatCartItemsCount } from '../utils/cart-items-label.util';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useCartStore } from '@/store/cart.store';
@@ -416,7 +421,7 @@ export function RestaurantCartModal({
                 disabled={submitting}
                 onClick={() => void handleSubmit()}
                 testId="cart-submit"
-                className="restaurant-cart-modal__submit-btn"
+                className="restaurant-cart-modal__submit"
               >
                 {submitting ? 'Оформление…' : checkoutValidation.ctaLabel}
               </Button>
@@ -429,7 +434,7 @@ export function RestaurantCartModal({
                 disabled={!canContinueToStep2}
                 onClick={handleGoToCheckout}
                 testId="cart-go-to-checkout"
-                className="restaurant-cart-modal__submit-btn"
+                className="restaurant-cart-modal__submit"
               >
                 Оформить заказ
               </Button>
@@ -439,8 +444,7 @@ export function RestaurantCartModal({
       : undefined;
 
   return (
-    <RestaurantStylingPortalRoot>
-      <Modal
+    <Modal
         open
         onClose={onClose}
         title={modalTitle}
@@ -455,6 +459,7 @@ export function RestaurantCartModal({
         panelClassName={`restaurant-cart-modal__panel${
           step2 ? ' restaurant-cart-modal__panel--checkout' : ''
         }`}
+        wrap={(node) => <RestaurantStylingPortalRoot>{node}</RestaurantStylingPortalRoot>}
         headerStart={
           step2 ? (
             <IconButton
@@ -464,7 +469,7 @@ export function RestaurantCartModal({
               onClick={() => setCartStep(1)}
               testId="cart-back-to-step-1"
             >
-              ←
+              <IconBack />
             </IconButton>
           ) : null
         }
@@ -492,39 +497,38 @@ export function RestaurantCartModal({
                   onClose={onClose}
                 />
               ) : step2 ? (
-                <div className="restaurant-cart-modal__checkout" data-testid="cart-checkout-step">
-                  <section className="cart-checkout-section" data-testid="cart-contacts-section">
-                    <label className="restaurant-cart-modal__field">
-                      <span>Имя *</span>
-                      <input
-                        type="text"
+                <Stack gap={4} className="restaurant-cart-modal__checkout" testId="cart-checkout-step">
+                  <Stack gap={3} as="section" className="cart-checkout-section" testId="cart-contacts-section">
+                    <Field label="Имя" htmlFor="cart-customer-name" required>
+                      <Input
                         autoComplete="name"
                         maxLength={CUSTOMER_NAME_MAX}
                         value={draft.customerName}
                         onChange={(e) => syncDraft({ customerName: e.target.value })}
                         placeholder="Как к вам обращаться"
-                        data-testid="cart-customer-name"
+                        testId="cart-customer-name"
                       />
-                    </label>
-                    <div className="restaurant-cart-modal__field restaurant-cart-modal__field--flush">
-                      <label htmlFor="cart-customer-phone">Телефон *</label>
+                    </Field>
+                    <Field label="Телефон" htmlFor="cart-customer-phone" required>
                       <PhoneInput
                         id="cart-customer-phone"
                         value={draft.phone}
                         onChange={(value) => syncDraft({ phone: value })}
                       />
-                    </div>
+                    </Field>
                     {fieldErrors.contacts && (
                       <p className="restaurant-cart-modal__inline-error" role="alert">
                         {fieldErrors.contacts}
                       </p>
                     )}
-                  </section>
+                  </Stack>
 
                   {fulfillment === 'fulfillmentDelivery' && (
-                    <section
+                    <Stack
+                      gap={3}
+                      as="section"
                       className="cart-checkout-section cart-checkout-section--address"
-                      data-testid="cart-address-section"
+                      testId="cart-address-section"
                     >
                       <DeliveryAddressFields
                         value={draft.deliveryAddress}
@@ -554,7 +558,7 @@ export function RestaurantCartModal({
                           />
                         </CartDetailRow>
                       </div>
-                    </section>
+                    </Stack>
                   )}
 
                   <div className="cart-checkout-rows" data-testid="cart-checkout-rows">
@@ -632,24 +636,25 @@ export function RestaurantCartModal({
                       error={fieldErrors.comment}
                       testId="cart-comment-row"
                     >
-                    <label className="restaurant-cart-modal__field restaurant-cart-modal__field--flush">
-                      <span className="restaurant-cart-modal__field-hint">
-                        Необязательно · {draft.comment.length}/{COMMENT_MAX}
-                      </span>
-                      <textarea
+                    <Field
+                      label="Комментарий к заказу"
+                      htmlFor="cart-comment"
+                      hint={`${draft.comment.length}/${COMMENT_MAX}`}
+                    >
+                      <Textarea
                         rows={3}
                         maxLength={COMMENT_MAX}
                         value={draft.comment}
                         onChange={(e) => syncDraft({ comment: e.target.value })}
                         placeholder="Пожелания к заказу"
-                        data-testid="cart-comment"
+                        testId="cart-comment"
                       />
-                    </label>
+                    </Field>
                   </CartDetailRow>
 
                   {showSomeoneElseOption && (
                     <CartDetailRow
-                      label="Доставить другому человеку"
+                      label="Другому человеку"
                       grouped
                       value={draft.orderForSomeoneElse ? 'Да' : 'Нет'}
                       expanded={Boolean(expandedRows.recipient)}
@@ -657,9 +662,9 @@ export function RestaurantCartModal({
                       error={fieldErrors.recipient}
                       testId="cart-recipient-row"
                     >
-                      <label className="restaurant-cart-modal__checkbox">
-                        <input
-                          type="checkbox"
+                      <Stack gap={3}>
+                        <Checkbox
+                          label="Доставка другому человеку"
                           checked={draft.orderForSomeoneElse}
                           onChange={(e) => {
                             const checked = e.target.checked;
@@ -671,31 +676,27 @@ export function RestaurantCartModal({
                             });
                           }}
                         />
-                        <span>Доставка другому человеку</span>
-                      </label>
-                      {draft.orderForSomeoneElse && (
-                        <div className="restaurant-cart-modal__recipient">
-                          <label className="restaurant-cart-modal__field">
-                            <span>Имя получателя *</span>
-                            <input
-                              type="text"
-                              autoComplete="off"
-                              value={draft.recipientName}
-                              onChange={(e) => syncDraft({ recipientName: e.target.value })}
-                              placeholder="Имя получателя"
-                            />
-                          </label>
-                          <div className="restaurant-cart-modal__field restaurant-cart-modal__field--flush">
-                            <label htmlFor="cart-recipient-phone">Телефон получателя *</label>
-                            <PhoneInput
-                              id="cart-recipient-phone"
-                              value={draft.recipientPhone}
-                              onChange={(value) => syncDraft({ recipientPhone: value })}
-                              autoComplete="off"
-                            />
-                          </div>
-                        </div>
-                      )}
+                        {draft.orderForSomeoneElse && (
+                          <Stack gap={3}>
+                            <Field label="Имя получателя" htmlFor="cart-recipient-name" required>
+                              <Input
+                                autoComplete="off"
+                                value={draft.recipientName}
+                                onChange={(e) => syncDraft({ recipientName: e.target.value })}
+                                placeholder="Имя получателя"
+                              />
+                            </Field>
+                            <Field label="Телефон получателя" htmlFor="cart-recipient-phone" required>
+                              <PhoneInput
+                                id="cart-recipient-phone"
+                                value={draft.recipientPhone}
+                                onChange={(value) => syncDraft({ recipientPhone: value })}
+                                autoComplete="off"
+                              />
+                            </Field>
+                          </Stack>
+                        )}
+                      </Stack>
                     </CartDetailRow>
                   )}
                   </div>
@@ -709,7 +710,7 @@ export function RestaurantCartModal({
                   )}
 
                   {error && <p className="restaurant-cart-modal__error">{error}</p>}
-                </div>
+                </Stack>
               ) : (
                 <>
                   {enabledFulfillment.length > 1 && (
@@ -740,7 +741,7 @@ export function RestaurantCartModal({
                         className="restaurant-cart-modal__list-header"
                         justify="space-between"
                         align="center"
-                        data-testid="cart-items-header"
+                        testId="cart-items-header"
                       >
                         <span className="restaurant-cart-modal__list-header-title">
                           {formatCartItemsCount(items.length)}
@@ -865,6 +866,5 @@ export function RestaurantCartModal({
               )}
         </div>
       </Modal>
-    </RestaurantStylingPortalRoot>
   );
 }
