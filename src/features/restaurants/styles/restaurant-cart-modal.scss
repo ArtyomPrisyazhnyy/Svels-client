@@ -36,6 +36,46 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   }
 }
 
+.ui-modal--cart-sheet {
+  align-items: flex-end;
+  padding: var(--space-3) var(--space-3) 0;
+  box-sizing: border-box;
+
+  @media (min-width: 768px) {
+    align-items: center;
+    padding: var(--space-8);
+  }
+}
+
+.cart-checkout-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--rs-border);
+  border-radius: var(--rs-card-radius, var(--radius-lg));
+  background: var(--rs-cart-surface, var(--rs-surface));
+}
+
+.cart-checkout-rows--inset {
+  margin-inline: calc(var(--space-4) * -1);
+  margin-bottom: calc(var(--space-4) * -1);
+  border-inline: none;
+  border-bottom: none;
+  border-radius: 0;
+  border-top: 1px solid var(--rs-border);
+}
+
+.restaurant-cart-modal__list-header-title {
+  font-size: var(--text-sm);
+  color: var(--rs-text-muted);
+}
+
+.restaurant-cart-modal__clear-prompt {
+  font-size: var(--text-sm);
+  color: var(--rs-text-muted);
+}
+
 .restaurant-cart-modal__panel.ui-overlay-panel {
   --cart-footer-block: 7.5rem;
   --cart-section-gap: var(--space-4);
@@ -80,27 +120,12 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   min-width: 0;
 }
 
-.restaurant-cart-modal__list-header-title {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: color-mix(in srgb, var(--rs-text) 72%, transparent);
-}
-
 .restaurant-cart-modal__checkout {
   display: flex;
   flex-direction: column;
-  gap: var(--cart-section-gap, 0.875rem);
-}
-
-.restaurant-cart-modal__contacts-card {
-  padding: 0.85rem;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
-  background-color: var(--rs-cart-item-surface, var(--rs-cart-surface, #f8fafc));
-
-  .restaurant-cart-modal__field:last-child {
-    margin-bottom: 0;
-  }
+  gap: var(--space-3);
+  padding: var(--space-4);
+  min-width: 0;
 }
 
 .restaurant-cart-modal__inline-error {
@@ -588,7 +613,7 @@ $modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
   .restaurant-cart-modal__panel.ui-overlay-panel {
     max-width: none;
     width: 100%;
-    max-height: min(96vh, 100dvh);
+    max-height: min(calc(100dvh - var(--space-3)), 96dvh);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     --cart-footer-block: 8.25rem;
   }

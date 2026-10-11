@@ -29,6 +29,7 @@ export interface ModalProps {
   panelClassName?: string;
   headerTestId?: string;
   titleTestId?: string;
+  modalClassName?: string;
   children: ReactNode;
 }
 
@@ -48,6 +49,7 @@ function ModalInner({
   panelClassName,
   headerTestId,
   titleTestId,
+  modalClassName,
   children,
 }: Omit<ModalProps, 'open'>) {
   const { mounted, isActive, handleClose } = useModalPresence(onClose, MODAL_ANIMATION_MS);
@@ -74,7 +76,7 @@ function ModalInner({
         onClick={onBackdropClick}
       />
       <div
-        className="ui-modal"
+        className={cn('ui-modal', modalClassName)}
         data-testid={rootTestId ?? (testId ? `${testId}-root` : undefined)}
       >
         <ModalPanel

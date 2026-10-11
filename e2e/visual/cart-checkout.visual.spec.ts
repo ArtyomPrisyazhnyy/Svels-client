@@ -18,6 +18,7 @@ type CheckoutScenario =
   | 'step2-delivery'
   | 'step2-pickup'
   | 'row-time'
+  | 'row-time-slot'
   | 'row-payment'
   | 'row-comment'
   | 'row-address-extra'
@@ -90,11 +91,13 @@ async function applyTheme(
   adminToken: string,
   theme: RestaurantColorTheme,
 ) {
+  const switcherStyle =
+    theme === 'midnight' ? 'segmented' : theme === 'warm' ? 'tabs' : 'pill';
   await apiClient.patchStyling(restaurantId, adminToken, {
     colorTheme: theme,
     cardStyle: 'classic',
     headerStyle: 'solid',
-    switcherStyle: 'pill',
+    switcherStyle,
   });
   await revalidateRestaurantPublicPage(restaurantId);
 }
@@ -124,6 +127,15 @@ async function openScenario(
     return panel;
   }
 
+  if (scenario === 'row-time-slot') {
+    const timeRow = page.getByTestId('cart-time-row');
+    await timeRow.getByRole('button').first().click();
+    await page.getByTestId('requested-time-slot-mode').click();
+    await expect(page.getByTestId('requested-time-slot-select')).toBeVisible();
+    await assertExpandedRowContentGap(timeRow);
+    return panel;
+  }
+
   const rowMap: Record<string, string> = {
     'row-time': 'cart-time-row',
     'row-payment': 'cart-payment-row',
@@ -145,6 +157,7 @@ test.describe('Cart checkout visual', () => {
     'step2-delivery',
     'step2-pickup',
     'row-time',
+    'row-time-slot',
     'row-payment',
     'row-comment',
     'row-address-extra',
@@ -188,6 +201,7 @@ test.describe('Cart checkout visual', () => {
         await seedCart(page, seed.restaurantId, 'fulfillmentDelivery');
         const panel = await openScenario(page, seed.restaurantId, 'step2-delivery');
         await page.getByTestId('cart-time-row').getByRole('button').first().click();
+        await page.getByTestId('requested-time-slot-mode').click();
         await page.getByTestId('cart-payment-row').getByRole('button').first().click();
         await assertCartTitleCentered(panel);
         await snapCartCrop(

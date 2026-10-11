@@ -98,6 +98,7 @@ test.describe('Cart modal behavior', () => {
     await expect(page.getByTestId('cart-clear')).toBeVisible();
     await expect(page.getByTestId('cart-header-bar').getByTestId('cart-clear')).toHaveCount(0);
     await page.getByTestId('cart-clear').click();
+    await page.getByTestId('cart-clear-confirm-yes').click();
     await expect(page.getByTestId('cart-empty')).toBeVisible();
   });
 

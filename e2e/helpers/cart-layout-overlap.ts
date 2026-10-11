@@ -119,7 +119,7 @@ export async function assertCartStep1SectionSpacing(page: Page): Promise<void> {
 export async function assertCartStep2SectionSpacing(page: Page): Promise<void> {
   const checkout = page.getByTestId('cart-checkout-step');
   await expect(checkout).toBeVisible();
-  const contacts = checkout.locator('.restaurant-cart-modal__contacts-card');
+  const contacts = checkout.getByTestId('cart-contacts-section');
   const timeRow = checkout.getByTestId('cart-time-row');
   await assertMinVerticalGap(
     contacts,
