@@ -444,10 +444,11 @@
         const browser = root.querySelector('.browser');
         const phone = root.querySelector('.hero-phone .iphone');
         const browserHeight = browser.offsetHeight;
-        const scale = (browserHeight * 0.45) / 882;
-        const visualW = 433 * scale;
-        const extend = Math.round(visualW * 0.18);
+        const scale = (browserHeight * 0.72) / 882;
+        const extend = 40;
+        const drop = Math.round(browserHeight * 0.06);
         compose.style.paddingRight = `${extend}px`;
+        compose.style.paddingBottom = `${drop}px`;
         phone.style.transform = `scale(${scale})`;
       }
 

@@ -334,16 +334,16 @@ html:has(.landing) {
 .landing__hero {
   position: relative;
   display: grid;
-  gap: 3rem;
-  align-items: center;
-  padding-block: 4.5rem 3.5rem;
+  gap: 1.25rem;
+  align-items: start;
+  padding-block: 1.25rem 1.5rem;
   overflow: hidden;
 
   @media (min-width: 980px) {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: 1.5rem;
-    padding-block: 5.5rem 4rem;
-    align-items: center;
+    padding-block: 2rem 1.25rem;
+    align-items: start;
   }
 }
 
@@ -358,6 +358,7 @@ html:has(.landing) {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  margin: 0;
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
   background: $landing-surface;
@@ -376,16 +377,16 @@ html:has(.landing) {
 }
 
 .landing__hero-title {
-  margin: 1.35rem 0 0;
+  margin: 0.85rem 0 0;
   font-size: clamp(2.25rem, 5.2vw, 3.5rem);
   font-weight: 800;
   line-height: 1.11;
   letter-spacing: -0.02em;
   color: $landing-ink;
 
-  @media (min-width: 768px) {
-    font-size: clamp(3.25rem, 4.5vw, 3.75rem);
-    line-height: 1.07;
+  @media (min-width: 980px) {
+    font-size: clamp(2.75rem, 3.9vw, 3.5rem);
+    line-height: 1.05;
   }
 }
 
@@ -397,7 +398,7 @@ html:has(.landing) {
 }
 
 .landing__hero-text {
-  margin: 1.25rem 0 0;
+  margin: 0.85rem 0 0;
   max-width: 40rem;
   font-size: clamp(1rem, 1.5vw, 1.125rem);
   line-height: 1.55;
@@ -408,7 +409,7 @@ html:has(.landing) {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin: 1.35rem 0 0;
+  margin: 0.85rem 0 0;
 }
 
 .landing__hero-chip {
@@ -426,7 +427,7 @@ html:has(.landing) {
   flex-wrap: wrap;
   align-items: stretch;
   gap: 12px;
-  margin: 2rem 0 0;
+  margin: 1.15rem 0 0;
 
   .landing-cta {
     flex: 1 1 auto;
