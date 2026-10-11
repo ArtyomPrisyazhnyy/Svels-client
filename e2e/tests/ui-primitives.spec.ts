@@ -34,14 +34,15 @@ test.describe('UI primitives playground', () => {
 
   test('tab focus stays inside modal', async ({ page }) => {
     await page.getByTestId('ui-open-modal').click();
-    await expect(page.getByTestId('ui-live-modal')).toBeVisible();
+    const modal = page.getByTestId('ui-live-modal');
+    await expect(modal).toBeVisible();
     await page.keyboard.press('Tab');
-    const focused = page.locator(':focus');
-    await expect(focused).toBeVisible();
-    const inside = await focused.evaluate((el) => {
-      return Boolean(el.closest('[data-testid="ui-live-modal"]'));
-    });
-    expect(inside).toBe(true);
+    await expect.poll(async () => {
+      return modal.evaluate((el) => {
+        const active = document.activeElement;
+        return Boolean(active && el.contains(active));
+      });
+    }).toBe(true);
   });
 
   test('nested modal and sheet: escape closes only top layer', async ({ page }) => {
