@@ -114,11 +114,27 @@ for (const theme of THEMES) {
         await expect(page.getByTestId('restaurant-public-page')).toBeVisible({ timeout: 30_000 });
         await expect(page.getByTestId('venue-home-category-nav')).toBeVisible();
         await page.evaluate(() => {
-          const heading = document.querySelector('.restaurant-public__main h1');
-          if (heading instanceof HTMLElement) {
-            window.scrollTo(0, heading.offsetTop + heading.offsetHeight + 8);
+          const nav = document.querySelector('[data-testid="venue-home-category-nav"]');
+          const header = document.querySelector('[data-testid="venue-header"]');
+          if (!(nav instanceof HTMLElement) || !(header instanceof HTMLElement)) {
+            return;
           }
+          const headerH = header.getBoundingClientRect().height;
+          const navTop = nav.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo(0, Math.max(0, navTop - headerH));
         });
+        await expect
+          .poll(async () =>
+            page.evaluate(() => {
+              const nav = document.querySelector('[data-testid="venue-home-category-nav"]');
+              const header = document.querySelector('[data-testid="venue-header"]');
+              if (!(nav instanceof HTMLElement) || !(header instanceof HTMLElement)) {
+                return 999;
+              }
+              return Math.abs(nav.getBoundingClientRect().top - header.getBoundingClientRect().bottom);
+            }),
+          )
+          .toBeLessThanOrEqual(1);
         await expect(page.getByTestId('venue-home-category-nav')).toBeInViewport();
         await assertHeaderHeight(page, viewportKey);
         await snapHeaderClip(

@@ -2,6 +2,12 @@
   min-width: 0;
 }
 
+.guest-booking__disabled,
+.guest-booking__panel,
+.guest-booking__success {
+  margin: 0;
+}
+
 .guest-booking__disabled {
   padding: 2rem;
   text-align: center;

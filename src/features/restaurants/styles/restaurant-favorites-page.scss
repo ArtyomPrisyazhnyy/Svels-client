@@ -1,12 +1,4 @@
-.restaurant-favorites-page.venue-subpage .venue-subpage__main {
-  max-width: 1200px;
-}
-
 .restaurant-favorites-page {
-  &__main {
-    padding-block-end: var(--space-8);
-  }
-
   &__catalog-link {
     color: var(--rs-accent);
     font-weight: 600;

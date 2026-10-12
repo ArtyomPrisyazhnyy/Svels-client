@@ -23,7 +23,7 @@ export function VenueHeader({
 }: VenueHeaderProps) {
   return (
     <header
-      className="venue-header venue-header--tenant"
+      className="venue-header venue-header--tenant glass-header glass-header--tenant"
       data-testid="venue-header"
     >
       <VenueHeaderLeft
@@ -32,7 +32,6 @@ export function VenueHeader({
         logoUrl={logoUrl}
         logoWebpUrl={logoWebpUrl}
       />
-      <div aria-hidden="true" />
       <VenueHeaderActions
         restaurantId={restaurantId}
         flameDisplayEnabled={flameDisplayEnabled}
