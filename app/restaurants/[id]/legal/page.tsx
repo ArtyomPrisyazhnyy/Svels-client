@@ -3,6 +3,7 @@ import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
 import { RestaurantLegalPage } from '@/views/RestaurantLegalPage';
 import type { RestaurantLegalFields } from '@/shared/types/restaurant-legal';
 import { serverFetch } from '@/shared/api/server-api';
+import { publicPageFetchOptions } from '@/server/restaurant-public';
 import '@/views/privacy-policy.scss';
 
 type RestaurantLegalResponse = PublicRestaurant & RestaurantLegalFields;
@@ -13,7 +14,11 @@ interface RestaurantLegalRouteProps {
 
 async function fetchRestaurantLegal(id: string): Promise<RestaurantLegalResponse | null> {
   try {
-    return await serverFetch<RestaurantLegalResponse>(`/restaurants/${id}`);
+    return await serverFetch<RestaurantLegalResponse>(
+      `/restaurants/${id}`,
+      undefined,
+      publicPageFetchOptions(id),
+    );
   } catch {
     return null;
   }

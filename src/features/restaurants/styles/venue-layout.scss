@@ -1,0 +1,42 @@
+.venue-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--rs-bg);
+  color: var(--rs-text);
+  min-width: 0;
+}
+
+.venue-layout__content {
+  min-width: 0;
+}
+
+.venue-subpage {
+  min-width: 0;
+}
+
+.venue-subpage__main {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  padding: var(--space-4);
+  box-sizing: border-box;
+  min-width: 0;
+
+  > .ui-page-title:first-child {
+    padding-block-start: 0;
+  }
+}
+
+.venue-home__category-nav {
+  position: sticky;
+  top: var(--header-h);
+  z-index: var(--z-sticky);
+  margin: 0 0 var(--space-4);
+  padding-block: var(--space-2);
+  background: color-mix(in srgb, var(--rs-bg) 88%, transparent);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border-bottom: 1px solid color-mix(in srgb, var(--rs-border) 70%, transparent);
+  min-width: 0;
+}

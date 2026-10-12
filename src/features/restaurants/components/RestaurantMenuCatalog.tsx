@@ -6,7 +6,6 @@ import { useHydrateFavorites } from '@/hooks/useHydrateFavorites';
 import { useRestaurantStylingOptional } from '../context/RestaurantStylingContext';
 import { useMenuCategoryNavOptional } from '../context/MenuCategoryNavContext';
 import { getAvailableMenuCategories } from '../utils/menu-catalog.util';
-import { RestaurantMenuInlineCategoryNav } from './RestaurantMenuInlineCategoryNav';
 import { MenuCategoryNav } from './MenuCategoryNav';
 import { MenuProductCard } from './MenuProductCard';
 import { MenuProductDetailModal } from './MenuProductDetailModal';
@@ -47,8 +46,6 @@ export function RestaurantMenuCatalog({
 
   return (
     <section className="restaurant-menu" aria-label="Меню" data-testid="restaurant-menu">
-      {navContext && <RestaurantMenuInlineCategoryNav />}
-
       {showStandaloneNav && (
         <MenuCategoryNav
           categories={categories.map((category) => ({

@@ -5,6 +5,7 @@ import {
   loadLegalMarkdown,
 } from '../../content/legal/load-legal-markdown';
 import type { RestaurantLegalFields } from '@/shared/types/restaurant-legal';
+import { PageTitle } from '@/shared/ui/PageTitle/PageTitle';
 
 interface RestaurantLegalPageProps {
   restaurantName: string;
@@ -15,7 +16,6 @@ interface RestaurantLegalPageProps {
 export async function RestaurantLegalPage({
   restaurantName,
   legal,
-  homePath,
 }: RestaurantLegalPageProps) {
   const template = await loadLegalMarkdown('guest-terms-template.md');
   const source = applyGuestTermsPlaceholders(template, {
@@ -28,16 +28,9 @@ export async function RestaurantLegalPage({
   });
 
   return (
-    <div className="privacy-policy restaurant-legal-page" data-testid="restaurant-legal-page">
-      <header className="restaurant-legal-page__header">
-        <div className="privacy-policy__container restaurant-legal-page__header-inner">
-          <Link href={homePath} className="restaurant-legal-page__back">
-            ← {restaurantName}
-          </Link>
-        </div>
-      </header>
-
-      <main className="privacy-policy__main privacy-policy__container legal-doc">
+    <div className="venue-subpage privacy-policy restaurant-legal-page" data-testid="restaurant-legal-page">
+      <main className="venue-subpage__main privacy-policy__main legal-doc">
+        <PageTitle title="Реквизиты и условия" testId="restaurant-legal-page-title" />
         <LegalMarkdownBody source={source} />
         <p className="restaurant-legal-page__platform">
           <Link href="/privacypolicy">Политика конфиденциальности Svels</Link>
