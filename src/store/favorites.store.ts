@@ -7,12 +7,15 @@ import {
   removeFavorite,
 } from '@/features/restaurants/api/favorites.api';
 import { ApiError } from '@/shared/api/api-client';
+import { useAuthStore } from '@/store/auth.store';
 import { commerceEpoch, registerFavoritesReset } from './commerce-session';
 
 type FavoritesState = {
   restaurantId: string | null;
   menuItemIds: string[];
   hydrated: boolean;
+  /** Guest token the last successful list belonged to. Null means anonymous. */
+  hydratedAccessToken: string | null;
   hydrate: (restaurantId: string) => Promise<void>;
   isFavorite: (menuItemId: string) => boolean;
   toggle: (restaurantId: string, menuItemId: string) => Promise<void>;
@@ -26,12 +29,26 @@ function uniqueIds(ids: string[]): string[] {
   return [...new Set(ids)];
 }
 
+function currentAccessToken(): string | null {
+  return useAuthStore.getState().accessToken ?? null;
+}
+
+/** Token actually attached to favorites calls. Admin sessions are anonymous. */
+function guestTokenForFavorites(): string | null {
+  const { accessToken, user } = useAuthStore.getState();
+  if (!accessToken || user?.role !== 'user') {
+    return null;
+  }
+  return accessToken;
+}
+
 export const useFavoritesStore = create<FavoritesState>()(
   persist(
     (set, get) => ({
       restaurantId: null,
       menuItemIds: [],
       hydrated: false,
+      hydratedAccessToken: null,
 
       hydrate: async (restaurantId) => {
         const started = writeGeneration;
@@ -50,8 +67,20 @@ export const useFavoritesStore = create<FavoritesState>()(
             return;
           }
           try {
+            const tokenAtStart = currentAccessToken();
+            const requestToken = guestTokenForFavorites();
+            if (tokenAtStart !== requestToken) {
+              if (attempt === retryDelaysMs.length - 1) {
+                return;
+              }
+              continue;
+            }
             const response = await fetchFavorites(restaurantId);
-            if (started !== writeGeneration) {
+            if (
+              started !== writeGeneration ||
+              currentAccessToken() !== tokenAtStart ||
+              guestTokenForFavorites() !== requestToken
+            ) {
               return;
             }
             const extras = localIds.filter((id) => !response.menuItemIds.includes(id));
@@ -59,18 +88,28 @@ export const useFavoritesStore = create<FavoritesState>()(
               restaurantId,
               menuItemIds: uniqueIds([...response.menuItemIds, ...extras]),
               hydrated: true,
+              hydratedAccessToken: tokenAtStart,
             });
             return;
           } catch (error) {
             if (started !== writeGeneration) {
               return;
             }
-            const rateLimited = error instanceof ApiError && error.status === 429;
+            const retryable =
+              error instanceof ApiError && (error.status === 429 || error.status === 0);
             const lastAttempt = attempt === retryDelaysMs.length - 1;
-            if (!rateLimited || lastAttempt) {
-              set({ restaurantId, menuItemIds: localIds, hydrated: true });
-              return;
+            if (retryable && !lastAttempt) {
+              continue;
             }
+            if (localIds.length > 0) {
+              set({
+                restaurantId,
+                menuItemIds: localIds,
+                hydrated: true,
+                hydratedAccessToken: currentAccessToken(),
+              });
+            }
+            return;
           }
         }
       },
@@ -109,7 +148,12 @@ export const useFavoritesStore = create<FavoritesState>()(
           if (started !== writeGeneration) {
             return;
           }
-          set({ restaurantId, menuItemIds: response.menuItemIds, hydrated: true });
+          set({
+            restaurantId,
+            menuItemIds: response.menuItemIds,
+            hydrated: true,
+            hydratedAccessToken: currentAccessToken(),
+          });
         } catch {
           await get().hydrate(restaurantId);
         }
@@ -117,7 +161,7 @@ export const useFavoritesStore = create<FavoritesState>()(
 
       reset: () => {
         writeGeneration += 1;
-        set({ restaurantId: null, menuItemIds: [], hydrated: false });
+        set({ restaurantId: null, menuItemIds: [], hydrated: false, hydratedAccessToken: null });
       },
     }),
     {

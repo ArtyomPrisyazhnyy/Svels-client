@@ -1,6 +1,18 @@
-.ui-skeleton {
-  --ui-skeleton-fill: color-mix(in srgb, var(--rs-text) 32%, var(--rs-surface));
-  background: var(--ui-skeleton-fill);
+.venue-subpage .ui-skeleton {
+  background: color-mix(in srgb, var(--rs-text) 12%, var(--rs-surface));
+}
+
+.venue-subpage .ui-skeleton.guest-page-skeleton__page-heading {
+  background: color-mix(in srgb, var(--rs-text) 10%, var(--rs-bg));
+}
+
+.venue-subpage .ui-skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--rs-text) 6%, transparent),
+    transparent
+  );
 }
 
 .guest-page-skeleton__page-heading {

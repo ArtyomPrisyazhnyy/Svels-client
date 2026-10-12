@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
+import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useFavoritesPersistReady, useHydrateFavorites } from '@/hooks/useHydrateFavorites';
 import { MenuProductCard } from '@/features/restaurants/components/MenuProductCard';
 import { GuestFavoritesPageSkeleton } from '@/features/restaurants/components/guest-page-skeletons/GuestPageSkeletons';
@@ -9,6 +10,7 @@ import { getAvailableMenuCategories } from '@/features/restaurants/utils/menu-ca
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { useRestaurantStylingOptional } from '@/features/restaurants/context/RestaurantStylingContext';
 import { resolveImageUrl, type MenuItem, type MenuResponse } from '@/shared/types/menu';
+import { useAuthStore } from '@/store/auth.store';
 import { useFavoritesStore } from '@/store/favorites.store';
 import { PageTitle } from '@/shared/ui/PageTitle/PageTitle';
 import { Stack } from '@/shared/ui/Stack/Stack';
@@ -56,7 +58,14 @@ export function RestaurantGuestFavoritesPage({
   const paths = useRestaurantGuestPaths(restaurantId);
   const favoriteIds = useFavoritesStore((s) => s.menuItemIds);
   const favoritesHydrated = useFavoritesStore((s) => s.hydrated);
+  const hydratedAccessToken = useFavoritesStore((s) => s.hydratedAccessToken);
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const authHydrated = useAuthHydrated();
   const persistReady = useFavoritesPersistReady();
+  const listReady =
+    authHydrated &&
+    favoritesHydrated &&
+    hydratedAccessToken === (accessToken ?? null);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const { styling } = useRestaurantStylingOptional();
   useHydrateFavorites(restaurantId, styling.favoritesEnabled !== false);
@@ -74,35 +83,66 @@ export function RestaurantGuestFavoritesPage({
   }, [favoriteIds, menu.categories]);
 
   const imageUrls = useMemo(() => {
-    if (!persistReady || !favoritesHydrated) {
+    if (!persistReady || !listReady) {
       return null;
     }
     return favoriteItems.flatMap((item) => {
-      const sources = [item.imageUrl, item.imageWebpUrl].filter(
-        (url): url is string => Boolean(url),
-      );
-      return sources.map((url) => resolveImageUrl(url));
+      const fallback = item.imageUrl ? resolveImageUrl(item.imageUrl) : null;
+      const webp = item.imageWebpUrl ? resolveImageUrl(item.imageWebpUrl) : null;
+      const painted = webp && webp !== fallback ? webp : fallback;
+      return painted ? [painted] : [];
     });
-  }, [favoriteItems, favoritesHydrated, persistReady]);
+  }, [favoriteItems, listReady, persistReady]);
   const imagesReady = useImagesDecoded(imageUrls);
 
   useEffect(() => {
     if (!imageUrls) {
       return;
     }
-    for (const url of imageUrls) {
-      if (decodedImageUrls.has(url)) {
-        continue;
+    let cancelled = false;
+    const timers: number[] = [];
+
+    const load = (url: string, attempt: number) => {
+      if (cancelled || decodedImageUrls.has(url)) {
+        return;
       }
       const image = new Image();
-      const done = () => markImageDecoded(url);
-      image.onload = done;
-      image.onerror = done;
+      image.onload = () => {
+        const decoded = typeof image.decode === 'function' ? image.decode() : Promise.resolve();
+        decoded
+          .then(() => {
+            if (!cancelled) {
+              markImageDecoded(url);
+            }
+          })
+          .catch(() => {
+            if (!cancelled && image.naturalWidth > 0) {
+              markImageDecoded(url);
+            }
+          });
+      };
+      image.onerror = () => {
+        if (cancelled || attempt >= 4) {
+          return;
+        }
+        timers.push(window.setTimeout(() => load(url, attempt + 1), 200 * (attempt + 1)));
+      };
       image.src = url;
+    };
+
+    for (const url of imageUrls) {
+      load(url, 0);
     }
+
+    return () => {
+      cancelled = true;
+      for (const timer of timers) {
+        window.clearTimeout(timer);
+      }
+    };
   }, [imageUrls]);
 
-  if (!persistReady || !favoritesHydrated || !imagesReady) {
+  if (!persistReady || !listReady || !imagesReady) {
     return <GuestFavoritesPageSkeleton />;
   }
 

@@ -30,6 +30,12 @@ async function ensureStableVenue(restaurantId: string, adminToken: string) {
   stableVenueApplied = true;
 }
 
+const THEME_BG: Record<(typeof THEMES)[number], string> = {
+  classic: '#f8fafc',
+  midnight: '#0f172a',
+  warm: '#fff7ed',
+};
+
 async function applyTheme(restaurantId: string, adminToken: string, theme: RestaurantColorTheme) {
   if (appliedTheme === theme) {
     return;
@@ -44,6 +50,16 @@ async function applyTheme(restaurantId: string, adminToken: string, theme: Resta
   });
   await revalidateRestaurantPublicPage(restaurantId);
   appliedTheme = theme;
+}
+
+async function assertSkeletonTheme(
+  page: import('@playwright/test').Page,
+  theme: (typeof THEMES)[number],
+) {
+  const root = page.locator('[data-rs-theme]');
+  await expect(root).toHaveAttribute('data-rs-theme', theme);
+  const style = (await root.getAttribute('style'))?.toLowerCase().replace(/\s+/g, '') ?? '';
+  expect(style).toContain(`--rs-bg:${THEME_BG[theme]}`);
 }
 
 for (const theme of THEMES) {
@@ -67,6 +83,7 @@ for (const theme of THEMES) {
         await page.goto(`/restaurants/${seed.restaurantId}${pageDef.slug}`);
 
         await expect(page.getByTestId(pageDef.skeletonTestId)).toBeVisible();
+        await assertSkeletonTheme(page, theme);
         await page.waitForLoadState('load');
 
         const slugLabel = pageDef.slug.replace('/', '');

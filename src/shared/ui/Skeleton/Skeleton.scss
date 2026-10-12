@@ -1,6 +1,5 @@
 .ui-skeleton {
-  --ui-skeleton-fill: color-mix(in srgb, var(--rs-text) 32%, var(--rs-surface));
-  background: var(--ui-skeleton-fill);
+  background: color-mix(in srgb, var(--rs-surface) 88%, var(--rs-border));
   position: relative;
   overflow: hidden;
 }
@@ -13,7 +12,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    color-mix(in srgb, var(--rs-text) 6%, transparent),
+    color-mix(in srgb, var(--rs-border) 55%, transparent),
     transparent
   );
   animation: ui-skeleton-shimmer 1.2s ease-in-out infinite;
