@@ -74,6 +74,7 @@ export function RestaurantGuestBookingPage({
   }, [bookingSettings.bookingEnabled, restaurantId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- refetch slots when date changes
     void loadAvailability(date);
   }, [date, loadAvailability]);
 
