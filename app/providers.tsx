@@ -16,12 +16,6 @@ function AuthProfileSync({ children }: { children: React.ReactNode }) {
 export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     void useAuthStore.persist.rehydrate();
-    void import('@/store/cart.store').then(({ useCartStore }) => {
-      void useCartStore.persist.rehydrate();
-    });
-    void import('@/store/favorites.store').then(({ useFavoritesStore }) => {
-      void useFavoritesStore.persist.rehydrate();
-    });
   }, []);
 
   return (
