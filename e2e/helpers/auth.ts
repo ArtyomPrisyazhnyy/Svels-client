@@ -17,10 +17,28 @@ export function toAuthStoragePayload(auth: AuthResponse): string {
  * чтобы logout в UI реально очищал доступ.
  */
 export async function injectAuth(page: Page, auth: AuthResponse): Promise<void> {
-  await page.goto('/');
+  const restaurantId = auth.user.restaurantId;
+  const landingPath =
+    auth.user.role === 'user' && restaurantId ? `/restaurants/${restaurantId}` : '/';
+
+  await page.goto(landingPath);
   await page.evaluate((payload: string) => {
     window.localStorage.setItem('svels-auth', payload);
   }, toAuthStoragePayload(auth));
+  await page.reload({ waitUntil: 'domcontentloaded' });
+
+  if (auth.user.role === 'user') {
+    await page
+      .getByTestId('guest-profile-button')
+      .waitFor({ state: 'visible', timeout: 30_000 });
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector('[data-testid="guest-profile-button"]')
+          ?.getAttribute('aria-label') === 'Личный кабинет',
+      { timeout: 30_000 },
+    );
+  }
 }
 
 export async function clearAuthStorage(page: Page): Promise<void> {

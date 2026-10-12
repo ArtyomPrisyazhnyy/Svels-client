@@ -103,7 +103,11 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
   }, [selectedId, hasActiveOrders, accessToken]);
 
   if (loading) {
-    return <GuestOrdersListSkeleton />;
+    return (
+      <div data-testid="guest-page-first-block">
+        <GuestOrdersListSkeleton />
+      </div>
+    );
   }
 
   if (error) {
@@ -112,14 +116,17 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
 
   if (orders.length === 0) {
     return (
-      <p className="guest-orders-list__hint" data-testid="guest-orders-empty">
-        Пока нет заказов. Добавьте блюда из меню и оформите заказ в корзине.
-      </p>
+      <div data-testid="guest-page-first-block">
+        <p className="guest-orders-list__hint" data-testid="guest-orders-empty">
+          Пока нет заказов. Добавьте блюда из меню и оформите заказ в корзине.
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="guest-orders-list" data-testid="guest-orders-list">
+      <div data-testid="guest-page-first-block">
       <ul className="guest-orders-list__items">
         {orders.map((order) => (
           <li key={order.id}>
@@ -146,6 +153,7 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
           </li>
         ))}
       </ul>
+      </div>
 
       {detail && selectedId === detail.id && (
         <article className="guest-orders-list__detail" data-testid="guest-order-detail">

@@ -249,6 +249,25 @@ export const apiClient = {
     );
   },
 
+  updateBookingSettings(
+    restaurantId: string,
+    token: string,
+    payload: { bookingEnabled?: boolean },
+  ) {
+    return api<{ bookingEnabled: boolean }>('PATCH', `/restaurants/${restaurantId}/booking-settings`, {
+      token,
+      body: payload,
+    });
+  },
+
+  addGuestFavorite(restaurantId: string, token: string, menuItemId: string) {
+    return api<{ menuItemIds: string[] }>(
+      'POST',
+      `/restaurants/${restaurantId}/favorites/${menuItemId}`,
+      { token },
+    );
+  },
+
   async guestOtpLogin(restaurantId: string, phone: string): Promise<AuthResponse> {
     await this.sendGuestOtp(restaurantId, phone);
     await sleep(200);

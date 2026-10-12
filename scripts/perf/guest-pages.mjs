@@ -25,14 +25,69 @@ if (!restaurantId || !authJsonPath) {
 }
 
 const routes = [
-  { path: '', label: 'home', header: 'venue-header', content: 'restaurant-public-page' },
-  { path: '/account', label: 'account', header: 'venue-header', content: 'guest-account-page' },
-  { path: '/booking', label: 'booking', header: 'venue-header', content: 'guest-booking-page' },
-  { path: '/pre-order', label: 'preorder', header: 'venue-header', content: 'guest-orders-list' },
-  { path: '/favorites', label: 'favorites', header: 'venue-header', content: 'guest-favorites-page' },
+  {
+    path: '',
+    label: 'home',
+    header: 'venue-header',
+    skeleton: null,
+    content: 'restaurant-public-page',
+  },
+  {
+    path: '/account',
+    label: 'account',
+    header: 'venue-header',
+    skeleton: 'guest-account-skeleton',
+    content: 'guest-account-page',
+  },
+  {
+    path: '/booking',
+    label: 'booking',
+    header: 'venue-header',
+    skeleton: 'guest-booking-skeleton',
+    content: 'guest-booking-page',
+  },
+  {
+    path: '/pre-order',
+    label: 'preorder',
+    header: 'venue-header',
+    skeleton: 'guest-preorder-skeleton',
+    content: 'preorder-page',
+    dataTestIds: ['guest-orders-list', 'guest-orders-empty'],
+  },
+  {
+    path: '/favorites',
+    label: 'favorites',
+    header: 'venue-header',
+    skeleton: 'guest-favorites-skeleton',
+    content: 'guest-favorites-page',
+  },
 ];
 
 const authState = JSON.parse(readFileSync(authJsonPath, 'utf8'));
+const authPayload =
+  authState.origins?.[0]?.localStorage?.find((entry) => entry.name === 'svels-auth')?.value ??
+  null;
+
+if (!authPayload) {
+  console.error('auth-json must include svels-auth in localStorage for the base URL origin');
+  process.exit(1);
+}
+
+async function waitForData(page, route) {
+  if (route.dataTestIds) {
+    const locator = route.dataTestIds
+      .map((id) => page.getByTestId(id))
+      .reduce((acc, next) => acc.or(next));
+    try {
+      await locator.waitFor({ state: 'visible', timeout: 90_000 });
+      return;
+    } catch {
+      await page.getByTestId(route.content).waitFor({ state: 'visible', timeout: 10_000 });
+      return;
+    }
+  }
+  await page.getByTestId(route.content).waitFor({ state: 'visible', timeout: 90_000 });
+}
 
 async function measureRoute(page, route) {
   const url = `${baseUrl}/restaurants/${restaurantId}${route.path}`;
@@ -45,22 +100,39 @@ async function measureRoute(page, route) {
     .waitFor({ state: 'visible', timeout: 60_000 })
     .then(() => Date.now() - started);
 
-  const skeleton = page.locator('[data-testid$="-skeleton"]').first();
-  const skeletonVisibleMs = await skeleton
-    .waitFor({ state: 'visible', timeout: 5_000 })
-    .then(() => Date.now() - started)
-    .catch(() => null);
+  let skeletonOrContentMs = null;
+  if (route.skeleton) {
+    skeletonOrContentMs = await page
+      .getByTestId(route.skeleton)
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .then(() => Date.now() - started)
+      .catch(() => null);
+  }
 
-  const contentVisibleMs = await page
-    .getByTestId(route.content)
-    .waitFor({ state: 'visible', timeout: 60_000 })
-    .then(() => Date.now() - started);
+  if (skeletonOrContentMs === null) {
+    skeletonOrContentMs = await page
+      .locator('[data-testid$="-skeleton"]')
+      .first()
+      .waitFor({ state: 'visible', timeout: 5_000 })
+      .then(() => Date.now() - started)
+      .catch(() => null);
+  }
+
+  if (skeletonOrContentMs === null) {
+    skeletonOrContentMs = await page
+      .getByTestId(route.content)
+      .waitFor({ state: 'visible', timeout: 60_000 })
+      .then(() => Date.now() - started);
+  }
+
+  await waitForData(page, route);
+  const dataVisibleMs = Date.now() - started;
 
   return {
     route: route.label,
     headerVisibleMs,
-    skeletonOrContentMs: skeletonVisibleMs ?? contentVisibleMs,
-    dataVisibleMs: contentVisibleMs,
+    skeletonOrContentMs,
+    dataVisibleMs,
   };
 }
 
@@ -75,6 +147,30 @@ const context = await browser.newContext({
 });
 
 const page = await context.newPage();
+await page.goto(`${baseUrl}/restaurants/${restaurantId}`, { waitUntil: 'domcontentloaded' });
+await page.reload({ waitUntil: 'domcontentloaded' });
+await page.getByTestId('venue-header').waitFor({ state: 'visible', timeout: 60_000 });
+await page.waitForFunction(() => {
+  const raw = window.localStorage.getItem('svels-auth');
+  if (!raw) {
+    return false;
+  }
+  try {
+    return Boolean(JSON.parse(raw).state?.accessToken);
+  } catch {
+    return false;
+  }
+});
+await page
+  .getByTestId('guest-profile-button')
+  .waitFor({ state: 'visible', timeout: 60_000 });
+await page.waitForFunction(
+  () =>
+    document
+      .querySelector('[data-testid="guest-profile-button"]')
+      ?.getAttribute('aria-label') === 'Личный кабинет',
+  { timeout: 60_000 },
+);
 const client = await context.newCDPSession(page);
 await client.send('Emulation.setCPUThrottlingRate', { rate: 4 });
 await client.send('Network.enable');

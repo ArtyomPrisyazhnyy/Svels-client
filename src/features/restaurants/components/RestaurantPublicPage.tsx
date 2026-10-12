@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
@@ -19,16 +20,22 @@ import {
   getAvailableMenuCategories,
   toMenuCategoryNavItems,
 } from '../utils/menu-catalog.util';
-import { PromoBannersHost } from './PromoBanners';
+import { PromoBannersHost } from './promo-banners.lazy';
 import {
   RestaurantCartModal,
   RestaurantGuestAuthModal,
 } from './lazy-venue-modals';
-import { RestaurantMenuCatalog } from './RestaurantMenuCatalog';
-import { RestaurantMenuInlineCategoryNav } from './RestaurantMenuInlineCategoryNav';
+import { RestaurantMenuCatalog } from './restaurant-menu-catalog.lazy';
+const RestaurantMenuInlineCategoryNav = dynamic(
+  () =>
+    import('./RestaurantMenuInlineCategoryNav').then((module) => ({
+      default: module.RestaurantMenuInlineCategoryNav,
+    })),
+  { ssr: false, loading: () => null },
+);
 import { VenueNavHeightSync } from './VenueNavHeightSync';
 import { RestaurantPublicHeader } from './RestaurantPublicHeader';
-import { RestaurantSocialLinks } from './RestaurantSocialLinks';
+import { RestaurantSocialLinks } from './restaurant-social-links.lazy';
 import '../styles/restaurant-public.scss';
 
 interface RestaurantPublicPageProps {

@@ -168,7 +168,7 @@ export function RestaurantGuestBookingPage({
           </section>
         ) : (
           <>
-            <section className="guest-booking__panel">
+            <section className="guest-booking__panel" data-testid="guest-page-first-block">
               <h2 className="guest-booking__title">Параметры</h2>
               <div className="guest-booking__row">
                 <label className="guest-booking__field">

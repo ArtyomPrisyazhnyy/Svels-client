@@ -8,6 +8,7 @@ import { useFavoritesStore } from '@/store/favorites.store';
 import { useRestaurantStylingOptional } from '../context/RestaurantStylingContext';
 import { hasPriceAffectingModifiers } from '../utils/menu-modifiers.util';
 import { FavoriteHeartButton } from './FavoriteHeartButton';
+import { preloadMenuProductDetailModal } from './menu-product-detail-modal.lazy';
 import '../styles/menu-product-card.scss';
 
 interface MenuProductCardProps {
@@ -57,6 +58,8 @@ export function MenuProductCard({ restaurantId, item, onSelect }: MenuProductCar
       tabIndex={0}
       className="menu-product-card"
       onClick={handleCardClick}
+      onPointerEnter={preloadMenuProductDetailModal}
+      onTouchStart={preloadMenuProductDetailModal}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();

@@ -1,6 +1,5 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useFavoritesPersistReady, useHydrateFavorites } from '@/hooks/useHydrateFavorites';
@@ -16,13 +15,7 @@ import { Stack } from '@/shared/ui/Stack/Stack';
 import '@/features/restaurants/styles/restaurant-menu.scss';
 import '@/features/restaurants/styles/restaurant-favorites-page.scss';
 
-const MenuProductDetailModal = dynamic(
-  () =>
-    import('@/features/restaurants/components/MenuProductDetailModal').then((module) => ({
-      default: module.MenuProductDetailModal,
-    })),
-  { ssr: false, loading: () => null },
-);
+import { MenuProductDetailModal } from '@/features/restaurants/components/menu-product-detail-modal.lazy';
 
 interface RestaurantGuestFavoritesPageProps {
   restaurantId: string;
@@ -68,10 +61,10 @@ export function RestaurantGuestFavoritesPage({
           />
 
           {favoriteItems.length === 0 ? (
-            <div
-              className="restaurant-favorites-page__empty"
-              data-testid="guest-favorites-empty"
-            >
+          <div
+            className="restaurant-favorites-page__empty"
+            data-testid="guest-favorites-empty"
+          >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
@@ -82,7 +75,7 @@ export function RestaurantGuestFavoritesPage({
               </Link>
             </div>
           ) : (
-            <div className="restaurant-menu__grid">
+            <div className="restaurant-menu__grid" data-testid="guest-page-first-block">
               {favoriteItems.map((item) => (
                 <MenuProductCard
                   key={item.id}

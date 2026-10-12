@@ -3,8 +3,8 @@ import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-pag
 import { VIEWPORTS, type VisualViewportKey } from '../helpers/visual';
 import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
 
-const THEMES = ['classic', 'midnight'] as const;
-const VIEWPORT_KEYS: VisualViewportKey[] = ['m390', 'd1280'];
+const THEMES = ['classic', 'midnight', 'warm'] as const;
+const VIEWPORT_KEYS: VisualViewportKey[] = ['m360', 'm390', 'd1280'];
 
 const PAGES = [
   { slug: '/account', skeletonTestId: 'guest-account-skeleton' },
@@ -19,7 +19,8 @@ async function applyTheme(restaurantId: string, adminToken: string, theme: Resta
   if (appliedTheme === theme) {
     return;
   }
-  const switcherStyle = theme === 'midnight' ? 'segmented' : 'pill';
+  const switcherStyle =
+    theme === 'midnight' ? 'segmented' : theme === 'warm' ? 'tabs' : 'pill';
   await apiClient.patchStyling(restaurantId, adminToken, {
     colorTheme: theme,
     cardStyle: 'classic',
