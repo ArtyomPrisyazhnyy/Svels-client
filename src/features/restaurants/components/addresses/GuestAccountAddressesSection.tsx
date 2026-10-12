@@ -78,49 +78,47 @@ export function GuestAccountAddressesSection({
 
   return (
     <section
-      className="restaurant-guest-account__section"
+      className="restaurant-guest-account__section guest-account-addresses"
       data-testid="account-addresses"
     >
       <h2>Мои адреса</h2>
-      <div className="guest-account-addresses__card">
-        {loading ? (
-          <Stack gap={2}>
-            <Skeleton />
-            <Skeleton />
-          </Stack>
-        ) : addresses.length === 0 ? (
-          <Stack gap={3}>
-            <p className="guest-account-addresses__empty">Сохранённых адресов пока нет</p>
-            <Button
-              type="button"
-              variant="secondary"
-              fullWidth
-              onClick={() => openSheet({ view: 'create', addressId: null })}
-              testId="account-address-add"
-            >
-              Добавить адрес
-            </Button>
-          </Stack>
-        ) : (
-          <Stack gap={3}>
-            <GuestAddressList
-              layout="profile"
-              addresses={addresses}
-              onRowPress={(addressId) => openSheet({ view: 'edit', addressId })}
-              onOpenMenu={(addressId) => openSheet({ view: 'menu', addressId })}
-            />
-            <Button
-              type="button"
-              variant="secondary"
-              fullWidth
-              onClick={() => openSheet({ view: 'create', addressId: null })}
-              testId="address-add"
-            >
-              + Добавить адрес
-            </Button>
-          </Stack>
-        )}
-      </div>
+      {loading ? (
+        <Stack gap={2}>
+          <Skeleton />
+          <Skeleton />
+        </Stack>
+      ) : addresses.length === 0 ? (
+        <>
+          <p className="guest-account-addresses__empty">Сохранённых адресов пока нет</p>
+          <Button
+            type="button"
+            variant="secondary"
+            fullWidth
+            onClick={() => openSheet({ view: 'create', addressId: null })}
+            testId="account-address-add"
+          >
+            Добавить адрес
+          </Button>
+        </>
+      ) : (
+        <>
+          <GuestAddressList
+            layout="profile"
+            addresses={addresses}
+            onRowPress={(addressId) => openSheet({ view: 'edit', addressId })}
+            onOpenMenu={(addressId) => openSheet({ view: 'menu', addressId })}
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            fullWidth
+            onClick={() => openSheet({ view: 'create', addressId: null })}
+            testId="address-add"
+          >
+            + Добавить адрес
+          </Button>
+        </>
+      )}
 
       {sheetOpen && (
         <GuestAddressSheet

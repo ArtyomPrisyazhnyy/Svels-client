@@ -11,8 +11,11 @@ const VIEWPORT_KEYS: VisualViewportKey[] = ['m360', 'm390', 't768', 'd1280'];
 
 type AddressScenario =
   | 'delivery-0'
+  | 'delivery-saved'
+  | 'delivery-saved-skeleton'
   | 'sheet-list'
   | 'sheet-menu'
+  | 'sheet-menu-open'
   | 'sheet-limit'
   | 'address-form'
   | 'profile-list';
@@ -175,8 +178,11 @@ test.describe('Addresses visual', () => {
     for (const viewportKey of VIEWPORT_KEYS) {
       for (const scenario of [
         'delivery-0',
+        'delivery-saved',
+        'delivery-saved-skeleton',
         'sheet-list',
         'sheet-menu',
+        'sheet-menu-open',
         'sheet-limit',
         'address-form',
       ] as AddressScenario[]) {
@@ -200,10 +206,28 @@ test.describe('Addresses visual', () => {
             return;
           }
 
-          if (scenario === 'delivery-0') {
+          if (scenario === 'delivery-0' || scenario === 'delivery-saved' || scenario === 'delivery-saved-skeleton') {
+            if (scenario !== 'delivery-0') {
+              await seedAddresses(seed.restaurantId, seed.guest.accessToken, 1);
+            }
+            if (scenario === 'delivery-saved-skeleton') {
+              await page.route('**/me/addresses', async (route) => {
+                if (route.request().method() === 'GET') {
+                  await new Promise(() => {});
+                  return;
+                }
+                await route.continue();
+              });
+            }
             await seedCart(page, seed.restaurantId);
             await page.goto(`/restaurants/${seed.restaurantId}`);
             await openDeliveryCheckout(page);
+            if (scenario === 'delivery-saved') {
+              await expect(page.getByTestId('checkout-address-row')).toContainText('Короткая');
+            }
+            if (scenario === 'delivery-saved-skeleton') {
+              await expect(page.locator('.guest-address-checkout-row__skeleton')).toBeVisible();
+            }
             const panel = page.getByTestId('cart-modal-panel');
             await assertCartTitleCentered(panel);
             await snapCartPanel(
@@ -237,18 +261,25 @@ test.describe('Addresses visual', () => {
             return;
           }
 
-          if (scenario === 'sheet-menu') {
+          if (scenario === 'sheet-menu' || scenario === 'sheet-menu-open') {
             await openAddressSheetFromCheckout(page);
             const addresses = await apiClient.listGuestAddresses(
               seed.restaurantId,
               seed.guest.accessToken,
             );
-            const work = addresses.find((row) => row.label === 'Работа');
-            expect(work).toBeTruthy();
-            await page.getByTestId(`address-menu-${work!.id}`).click();
+            const targetLabel = scenario === 'sheet-menu' ? 'Дом' : 'Работа';
+            const target = addresses.find((row) => row.label === targetLabel);
+            expect(target).toBeTruthy();
+            await page.getByTestId(`address-menu-${target!.id}`).click();
             await expect(page.getByTestId('address-action-menu')).toBeVisible();
-            await page.getByTestId('address-delete-start').click();
-            await expect(page.getByTestId('address-delete-confirm')).toBeVisible();
+            if (scenario === 'sheet-menu') {
+              await page.getByTestId('address-delete-start').click();
+              await expect(page.getByTestId('address-delete-confirm')).toContainText('Дом');
+            } else {
+              await expect(page.getByRole('button', { name: 'Изменить' })).toBeVisible();
+              await expect(page.getByTestId('address-make-default')).toBeVisible();
+              await expect(page.getByTestId('address-delete-start')).toBeVisible();
+            }
             const panel = page.getByTestId('address-sheet');
             await snapOverlayPanel(
               page,

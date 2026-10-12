@@ -115,6 +115,10 @@
   background: var(--rs-surface);
 }
 
+.guest-address-form .ui-textarea {
+  resize: none;
+}
+
 .guest-address-list--profile {
   gap: 0;
 
@@ -122,12 +126,24 @@
     border: none;
     border-radius: 0;
     min-height: 64px;
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-3) 0;
     background: transparent;
+    box-shadow: none;
 
     &:not(:last-child) {
       border-bottom: 1px solid var(--rs-border);
     }
+  }
+}
+
+.restaurant-guest-account__section.guest-account-addresses {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+
+  h2 {
+    margin: 0;
   }
 }
 
@@ -148,14 +164,28 @@
 .guest-address-menu__confirm {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-2);
   font-size: var(--text-sm);
   color: var(--rs-text);
 }
 
+.guest-address-menu__confirm-title,
+.guest-address-menu__confirm-line {
+  margin: 0;
+}
+
+.guest-address-menu__confirm-line {
+  color: var(--rs-text-muted);
+}
+
 .guest-address-menu__confirm-actions {
   display: flex;
   gap: var(--space-2);
+}
+
+.guest-address-menu__confirm-actions .ui-btn {
+  min-height: var(--control-h-md);
 }
 
 .guest-address-limit-hint {
@@ -168,17 +198,6 @@
 .guest-address-checkout-row__skeleton {
   flex: 1 1 auto;
   max-width: 60%;
-}
-
-.guest-account-addresses__card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border: 1px solid var(--rs-border);
-  border-radius: var(--rs-card-radius, var(--radius-lg));
-  background: var(--rs-surface);
-  min-width: 0;
 }
 
 .guest-account-addresses__empty {

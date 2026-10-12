@@ -6,7 +6,11 @@ import { Sheet, Stack, Button, IconButton } from '@/shared/ui';
 import { IconBack } from '@/shared/ui/icons/icons';
 import type { GuestAddress } from '@/shared/types/guest-address';
 import { EMPTY_DELIVERY_ADDRESS } from '@/shared/types/cart';
-import { guestAddressToDeliveryAddress } from '../../utils/guest-address.util';
+import {
+  formatGuestAddressPrimaryLine,
+  formatGuestAddressSecondaryLine,
+  guestAddressToDeliveryAddress,
+} from '../../utils/guest-address.util';
 import { GuestAddressList } from './GuestAddressList';
 import { GuestAddressForm, type GuestAddressFormValues } from './GuestAddressForm';
 import { RestaurantStylingPortalRoot } from '../../context/RestaurantStylingContext';
@@ -103,9 +107,11 @@ export function GuestAddressSheet({
       ? 'Новый адрес'
       : view === 'edit'
         ? 'Изменить адрес'
-        : view === 'menu'
-          ? 'Адрес'
-          : 'Адрес доставки';
+        : view === 'menu' && confirmDelete
+          ? 'Удалить адрес'
+          : view === 'menu'
+            ? menuAddress?.label?.trim() || 'Адрес'
+            : 'Адрес доставки';
 
   const atLimit = addresses.length >= ADDRESS_LIMIT;
 
@@ -227,12 +233,17 @@ export function GuestAddressSheet({
               </>
             ) : (
               <div className="guest-address-menu__confirm" data-testid="address-delete-confirm">
-                <span>Удалить адрес?</span>
+                <p className="guest-address-menu__confirm-title">
+                  Удалить адрес «{formatGuestAddressPrimaryLine(menuAddress)}»?
+                </p>
+                <p className="guest-address-menu__confirm-line">
+                  {formatGuestAddressSecondaryLine(menuAddress)}
+                </p>
                 <div className="guest-address-menu__confirm-actions">
                   <Button
                     type="button"
                     variant="primary"
-                    size="sm"
+                    size="md"
                     onClick={() =>
                       void onDeleteAddress(menuAddress.id).then(() => {
                         setView('list');
@@ -247,7 +258,7 @@ export function GuestAddressSheet({
                   <Button
                     type="button"
                     variant="secondary"
-                    size="sm"
+                    size="md"
                     onClick={() => setConfirmDelete(false)}
                     testId="address-delete-no"
                   >
