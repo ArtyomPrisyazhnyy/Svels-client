@@ -10,9 +10,9 @@
 }
 
 .guest-order-status-badge--new {
-  background: color-mix(in srgb, #0369a1 14%, var(--rs-surface, #fff));
-  color: #0369a1;
-  border-color: color-mix(in srgb, #0369a1 22%, transparent);
+  background: color-mix(in srgb, var(--rs-accent) 18%, var(--rs-surface));
+  color: var(--rs-text);
+  border-color: color-mix(in srgb, var(--rs-accent) 40%, var(--rs-border));
 }
 
 .guest-order-status-badge--accepted,

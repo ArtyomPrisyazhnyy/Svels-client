@@ -96,11 +96,11 @@ test.describe('Restaurant public page', () => {
 
     await page.getByTestId(`menu-item-${firstItem!.id}`).click();
     await expect(page.getByTestId('menu-add-to-cart')).toBeVisible();
-    const headerStack = page.getByTestId('restaurant-public-header-stack');
-    await expect(headerStack).toBeAttached();
-    await expect(headerStack).toBeInViewport();
+    const venueHeader = page.getByTestId('venue-header');
+    await expect(venueHeader).toBeAttached();
+    await expect(venueHeader).toBeInViewport();
     await expect
-      .poll(async () => headerStack.evaluate((el) => el.getBoundingClientRect().top))
+      .poll(async () => venueHeader.evaluate((el) => el.getBoundingClientRect().top))
       .toBeGreaterThanOrEqual(-1);
   });
 

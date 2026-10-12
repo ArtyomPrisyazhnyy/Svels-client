@@ -4,18 +4,35 @@ function getCategoryElementId(categoryId: string): string {
   return `menu-category-${categoryId}`;
 }
 
+function readVenueNavHeight(): number {
+  const venueNav = document.querySelector('[data-testid="venue-home-category-nav"]');
+  if (venueNav instanceof HTMLElement) {
+    return venueNav.getBoundingClientRect().height;
+  }
+
+  return 0;
+}
+
+/** Header plus the sticky category nav, so scroll-spy lines up under the chips. */
 export function getMenuCategoryHeaderOffset(): number {
-  const stack = document.querySelector('.restaurant-public__header-stack');
-  if (stack instanceof HTMLElement) {
-    return stack.getBoundingClientRect().height;
+  const header =
+    document.querySelector('[data-testid="venue-header"]') ??
+    document.querySelector('.glass-header');
+  if (!(header instanceof HTMLElement)) {
+    return 68;
   }
 
-  const header = document.querySelector('.glass-header');
-  if (header instanceof HTMLElement) {
-    return header.getBoundingClientRect().height;
+  return header.getBoundingClientRect().height + readVenueNavHeight();
+}
+
+function isScrolledToBottom(): boolean {
+  const scrollingElement = document.scrollingElement ?? document.documentElement;
+  const scrollHeight = scrollingElement.scrollHeight;
+  if (scrollHeight <= window.innerHeight + 2) {
+    return false;
   }
 
-  return 68;
+  return window.innerHeight + window.scrollY >= scrollHeight - 2;
 }
 
 /** Последняя категория, чей блок пересёк линию под шапкой (scroll-spy). */
@@ -23,6 +40,11 @@ export function resolveActiveMenuCategoryId(
   categories: MenuCategoryNavItem[],
   headerOffset = getMenuCategoryHeaderOffset(),
 ): string {
+  const lastId = categories[categories.length - 1]?.id ?? '';
+  if (lastId && isScrolledToBottom()) {
+    return lastId;
+  }
+
   const marker = headerOffset + 24;
   let activeId = categories[0]?.id ?? '';
 

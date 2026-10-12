@@ -13,6 +13,7 @@ import type { SocialLink } from '@/shared/types/social-link';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { RestaurantStylingShell } from '../context/RestaurantStylingContext';
+import { useVenueOverlayOptional } from '../context/VenueOverlayContext';
 import { MenuCategoryNavProvider } from '../context/MenuCategoryNavContext';
 import {
   getAvailableMenuCategories,
@@ -22,8 +23,9 @@ import { PromoBannersHost } from './PromoBanners';
 import { RestaurantCartModal } from './RestaurantCartModal';
 import { RestaurantGuestAuthModal } from './RestaurantGuestAuthModal';
 import { RestaurantMenuCatalog } from './RestaurantMenuCatalog';
+import { RestaurantMenuInlineCategoryNav } from './RestaurantMenuInlineCategoryNav';
+import { VenueNavHeightSync } from './VenueNavHeightSync';
 import { RestaurantPublicHeader } from './RestaurantPublicHeader';
-import { RestaurantPublicHeaderStack } from './RestaurantPublicHeaderStack';
 import { RestaurantSocialLinks } from './RestaurantSocialLinks';
 import '../styles/restaurant-public.scss';
 
@@ -52,6 +54,7 @@ function RestaurantPublicPageBody({
   categoryNavEnabled,
 }: RestaurantPublicPageProps & { categoryNavEnabled: boolean }) {
   const paths = useRestaurantGuestPaths(restaurant.id, embedded);
+  const venueOverlay = useVenueOverlayOptional();
   const legalPath = paths.tenantMode
     ? '/legal'
     : `/restaurants/${restaurant.id}/legal`;
@@ -60,13 +63,16 @@ function RestaurantPublicPageBody({
   const bookingEnabled = bookingSettings?.bookingEnabled ?? false;
   const favoritesEnabled = styling.favoritesEnabled !== false;
 
+  const openCart = embedded ? () => setCartOpen(true) : () => venueOverlay?.openCart();
+  const openAuth = embedded ? () => setAuthOpen(true) : () => venueOverlay?.openAuth();
+
   const headerProps = {
     restaurantId: restaurant.id,
     restaurantName: restaurant.name,
     logoUrl: restaurant.logoUrl,
     logoWebpUrl: restaurant.logoWebpUrl,
-    onOpenCart: embedded ? undefined : () => setCartOpen(true),
-    onOpenAuth: embedded ? undefined : () => setAuthOpen(true),
+    onOpenCart: embedded ? () => setCartOpen(true) : openCart,
+    onOpenAuth: embedded ? () => setAuthOpen(true) : openAuth,
     flameDisplayEnabled: loyaltySettings?.flameDisplayEnabled ?? false,
     favoritesEnabled: embedded ? false : favoritesEnabled,
   };
@@ -76,11 +82,7 @@ function RestaurantPublicPageBody({
       className={`restaurant-public${embedded ? ' restaurant-public--embedded' : ''}`}
       data-testid="restaurant-public-page"
     >
-      {categoryNavEnabled ? (
-        <RestaurantPublicHeaderStack {...headerProps} />
-      ) : (
-        <RestaurantPublicHeader {...headerProps} />
-      )}
+      {embedded ? <RestaurantPublicHeader {...headerProps} /> : null}
 
       <main className="restaurant-public__main">
         <h1>{restaurant.name}</h1>
@@ -91,6 +93,13 @@ function RestaurantPublicPageBody({
         )}
 
         <PromoBannersHost banners={promoBanners} persistSeen={!embedded} />
+
+        {!embedded && categoryNavEnabled ? (
+          <div className="venue-home__category-nav" data-testid="venue-home-category-nav">
+            <VenueNavHeightSync />
+            <RestaurantMenuInlineCategoryNav />
+          </div>
+        ) : null}
 
         <RestaurantMenuCatalog restaurantId={restaurant.id} menu={menu} />
 
@@ -168,7 +177,7 @@ function RestaurantPublicPageBody({
         </div>
       </footer>
 
-      {!embedded && authOpen && (
+      {embedded && authOpen && (
         <RestaurantGuestAuthModal
           restaurantId={restaurant.id}
           restaurantName={restaurant.name}
@@ -176,7 +185,7 @@ function RestaurantPublicPageBody({
         />
       )}
 
-      {!embedded && cartOpen && (
+      {embedded && cartOpen && (
         <RestaurantCartModal
           restaurantId={restaurant.id}
           orderSettings={orderSettings}
@@ -211,37 +220,45 @@ export function RestaurantPublicPage({
   const categoryNavEnabled =
     styling.menuCategoryNavEnabled && navCategories.length > 1;
 
-  return (
-    <RestaurantStylingShell styling={styling}>
-      {categoryNavEnabled ? (
-        <MenuCategoryNavProvider categories={navCategories} mode="dock_in_header">
-          <RestaurantPublicPageBody
-            restaurant={restaurant}
-            menu={menu}
-            orderSettings={orderSettings}
-            styling={styling}
-            bookingSettings={bookingSettings}
-            socialLinks={socialLinks}
-            promoBanners={promoBanners}
-            loyaltySettings={loyaltySettings}
-            embedded={embedded}
-            categoryNavEnabled
-          />
-        </MenuCategoryNavProvider>
-      ) : (
-        <RestaurantPublicPageBody
-          restaurant={restaurant}
-          menu={menu}
-          orderSettings={orderSettings}
-          styling={styling}
-          bookingSettings={bookingSettings}
-          socialLinks={socialLinks}
-          promoBanners={promoBanners}
-          loyaltySettings={loyaltySettings}
-          embedded={embedded}
-          categoryNavEnabled={false}
-        />
-      )}
-    </RestaurantStylingShell>
+  const navMode = embedded ? 'dock_in_header' : 'inline_only';
+
+  const body = categoryNavEnabled ? (
+    <MenuCategoryNavProvider categories={navCategories} mode={navMode}>
+      <RestaurantPublicPageBody
+        restaurant={restaurant}
+        menu={menu}
+        orderSettings={orderSettings}
+        styling={styling}
+        bookingSettings={bookingSettings}
+        socialLinks={socialLinks}
+        promoBanners={promoBanners}
+        loyaltySettings={loyaltySettings}
+        embedded={embedded}
+        categoryNavEnabled
+      />
+    </MenuCategoryNavProvider>
+  ) : (
+    <RestaurantPublicPageBody
+      restaurant={restaurant}
+      menu={menu}
+      orderSettings={orderSettings}
+      styling={styling}
+      bookingSettings={bookingSettings}
+      socialLinks={socialLinks}
+      promoBanners={promoBanners}
+      loyaltySettings={loyaltySettings}
+      embedded={embedded}
+      categoryNavEnabled={false}
+    />
   );
+
+  if (embedded) {
+    return (
+      <RestaurantStylingShell styling={styling}>
+        {body}
+      </RestaurantStylingShell>
+    );
+  }
+
+  return body;
 }

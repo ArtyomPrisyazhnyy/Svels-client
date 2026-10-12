@@ -5,22 +5,13 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-width: 0;
+  overflow: visible;
   /* Не ставить overflow-x: clip — ось Y станет auto, sticky-шапка окажется
      под системным scrollbar и padding справа «съестся». Горизонтальный clip — на html. */
 
   &--embedded {
     min-height: auto;
     display: block;
-  }
-}
-
-.restaurant-public__header-stack {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-
-  .glass-header {
-    position: static;
   }
 }
 
@@ -42,6 +33,7 @@
   margin: 0 auto;
   padding: 2rem 1.5rem;
   min-width: 0;
+  overflow: visible;
 
   h1 {
     margin: 0 0 0.5rem;

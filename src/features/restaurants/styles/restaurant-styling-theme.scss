@@ -35,6 +35,7 @@
   .restaurant-menu__category-title,
   .glass-header--tenant .glass-header__brand-name,
   .glass-header--tenant .glass-header__title,
+  .venue-header--tenant .venue-header__brand-name,
   .menu-product-card__title,
   .menu-product-modal__title,
   .restaurant-cart-modal__panel .ui-overlay-panel__title,
@@ -398,6 +399,18 @@
     }
   }
 
+  .venue-header {
+    a:any-link,
+    a:any-link:hover,
+    a:any-link:focus-visible {
+      text-decoration: none;
+    }
+
+    .venue-header__brand-name {
+      text-decoration: none;
+    }
+  }
+
   .restaurant-favorites-page {
     background: var(--rs-bg);
     color: var(--rs-text);
@@ -430,7 +443,8 @@
     color: var(--rs-accent);
   }
 
-  .glass-header--tenant {
+  .glass-header--tenant,
+  .venue-header--tenant {
     border-bottom-color: color-mix(in srgb, var(--rs-border) 80%, transparent);
 
     &::before {
@@ -440,11 +454,14 @@
     }
 
     .glass-header__brand,
-    .glass-header__title {
+    .glass-header__title,
+    .venue-header__brand,
+    .venue-header__brand-name {
       color: var(--rs-text);
     }
 
-    .glass-header__logo {
+    .glass-header__logo,
+    .venue-header__logo {
       background: color-mix(in srgb, var(--rs-surface) 60%, transparent);
     }
 
@@ -1206,33 +1223,7 @@
 
   &[data-rs-menu-category-nav='true'] {
     .restaurant-menu__category {
-      scroll-margin-top: var(--rs-header-stack-height, 4.25rem);
-    }
-
-    .restaurant-menu__category-nav:not(.restaurant-menu__category-nav--header) {
-      position: sticky;
-      top: var(--rs-header-stack-height, 4.25rem);
-      z-index: 9;
-      margin-inline: -0.25rem;
-      padding: 0.5rem 0.25rem 0.75rem;
-      background: color-mix(in srgb, var(--rs-bg) 88%, transparent);
-      backdrop-filter: blur(10px) saturate(140%);
-      -webkit-backdrop-filter: blur(10px) saturate(140%);
-      border-bottom: 1px solid color-mix(in srgb, var(--rs-border) 70%, transparent);
-    }
-
-    .restaurant-public__header-stack ~ .restaurant-public__main {
-      .restaurant-menu__category-nav:not(.restaurant-menu__category-nav--header) {
-        position: static;
-        top: auto;
-        z-index: auto;
-        margin-inline: 0;
-        padding: 0;
-        background: transparent;
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        border-bottom: none;
-      }
+      scroll-margin-top: calc(var(--header-h) + var(--venue-nav-h, 64px) + var(--space-4));
     }
 
     .restaurant-menu__category-nav-btn {

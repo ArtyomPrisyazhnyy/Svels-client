@@ -1,28 +1,13 @@
 .restaurant-favorites-page {
-  min-height: 100vh;
-  background: var(--rs-bg, #f8fafc);
-  color: var(--rs-text, #0f172a);
+  &__catalog-link {
+    color: var(--rs-accent);
+    font-weight: 600;
+    text-decoration: none;
 
-  &__header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-  }
-
-  &__header-spacer {
-    flex-shrink: 0;
-    min-width: 5.5rem;
-  }
-
-  &__main {
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 2rem 1.5rem 3rem;
-    min-width: 0;
-
-    @media (max-width: 640px) {
-      padding: 1.25rem 1rem 3rem;
+    @media (hover: hover) {
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 
