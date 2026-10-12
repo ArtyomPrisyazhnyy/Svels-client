@@ -214,9 +214,15 @@ test.describe('Addresses visual', () => {
             return;
           }
 
-          const addressCount =
-            scenario === 'sheet-limit' ? ADDRESS_LIMIT : 3;
-          await seedAddresses(seed.restaurantId, seed.guest.accessToken, addressCount);
+          if (scenario === 'sheet-limit') {
+            await apiClient.seedGuestAddresses(
+              seed.restaurantId,
+              seed.guest.accessToken,
+              ADDRESS_LIMIT,
+            );
+          } else {
+            await seedAddresses(seed.restaurantId, seed.guest.accessToken, 3);
+          }
           await seedCart(page, seed.restaurantId);
           await page.goto(`/restaurants/${seed.restaurantId}`);
 
