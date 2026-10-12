@@ -133,22 +133,16 @@ async function ensureCheckoutOrderSettings(restaurantId: string, adminToken: str
   orderSettingsApplied = true;
 }
 
-async function waitForDeliveryCheckoutReady(
-  page: import('@playwright/test').Page,
-  mode: 'logged-in-save' | 'anonymous',
-) {
-  if (mode === 'logged-in-save') {
-    await expect(page.getByTestId('address-save-checkbox')).toBeVisible({ timeout: 15_000 });
-    return;
-  }
+async function expandGuestSaveAddressBlock(page: import('@playwright/test').Page) {
   await expect(page.getByTestId('delivery-address-fields')).toBeVisible({ timeout: 15_000 });
+  await page.getByTestId('cart-address-extra-row').getByRole('button').first().click();
+  await expect(page.getByTestId('address-save-checkbox')).toBeVisible();
 }
 
 async function openScenario(
   page: import('@playwright/test').Page,
   restaurantId: string,
   scenario: CheckoutScenario,
-  deliveryReady: 'logged-in-save' | 'anonymous' = 'anonymous',
 ) {
   await page.goto(`/restaurants/${restaurantId}`);
   await page.getByTestId('cart-button').click();
@@ -171,7 +165,7 @@ async function openScenario(
   }
 
   if (scenario === 'step2-delivery') {
-    await waitForDeliveryCheckoutReady(page, deliveryReady);
+    await expandGuestSaveAddressBlock(page);
     return panel;
   }
 
@@ -218,17 +212,17 @@ test.describe('Cart checkout visual', () => {
     'row-recipient',
   ];
 
-  test.beforeEach(async ({ seed }) => {
+  test.beforeEach(async ({ seed, asGuest }) => {
+    void asGuest;
     await ensureCheckoutOrderSettings(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
     await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
   });
 
-  const scenariosWithoutLoggedInDelivery = scenarios.filter((s) => s !== 'step2-delivery');
-
   for (const theme of THEMES) {
     for (const viewportKey of VIEWPORT_KEYS) {
-      for (const scenario of scenariosWithoutLoggedInDelivery) {
-        test(`${scenario} ${theme} @${viewportKey}`, async ({ page, seed }) => {
+      for (const scenario of scenarios) {
+        test(`${scenario} ${theme} @${viewportKey}`, async ({ page, seed, asGuest }) => {
+          void asGuest;
           await page.setViewportSize(VIEWPORTS[viewportKey]);
           await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
           const fulfillment =
@@ -239,7 +233,7 @@ test.describe('Cart checkout visual', () => {
             fulfillment,
             scenario === 'step1' ? 3 : 1,
           );
-          const panel = await openScenario(page, seed.restaurantId, scenario, 'anonymous');
+          const panel = await openScenario(page, seed.restaurantId, scenario);
           await assertCartTitleCentered(panel);
           if (viewportKey === 't768') {
             const panelBox = await panel.boundingBox();
@@ -251,29 +245,12 @@ test.describe('Cart checkout visual', () => {
         });
       }
 
-      for (const scenario of ['step2-delivery'] as const) {
-        test(`${scenario} ${theme} @${viewportKey}`, async ({ page, seed, asGuest }) => {
-          void asGuest;
-          await page.setViewportSize(VIEWPORTS[viewportKey]);
-          await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
-          await seedCart(page, seed.restaurantId, 'fulfillmentDelivery', 1);
-          const panel = await openScenario(page, seed.restaurantId, scenario, 'logged-in-save');
-          await assertCartTitleCentered(panel);
-          if (viewportKey === 't768') {
-            const panelBox = await panel.boundingBox();
-            expect(panelBox).not.toBeNull();
-            expect(panelBox!.width).toBeGreaterThanOrEqual(500);
-            expect(panelBox!.width).toBeLessThanOrEqual(540);
-          }
-          await snapCartPanel(page, panel, `cart-${scenario}-${theme}-${viewportKey}`);
-        });
-      }
-
-      test(`crops header+selectors ${theme} @${viewportKey}`, async ({ page, seed }) => {
+      test(`crops header+selectors ${theme} @${viewportKey}`, async ({ page, seed, asGuest }) => {
+        void asGuest;
         await page.setViewportSize(VIEWPORTS[viewportKey]);
         await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
         await seedCart(page, seed.restaurantId, 'fulfillmentDelivery');
-        const panel = await openScenario(page, seed.restaurantId, 'step2-delivery', 'anonymous');
+        const panel = await openScenario(page, seed.restaurantId, 'step2-delivery');
         await page.getByTestId('cart-time-row').getByRole('button').first().click();
         await page.getByTestId('requested-time-slot-mode').click();
         await page.getByTestId('cart-payment-row').getByRole('button').first().click();
@@ -298,30 +275,15 @@ test.describe('Cart checkout visual', () => {
   }
 
   for (const theme of THEMES) {
-    for (const scenario of DESKTOP_SCENARIOS.filter((s) => s !== 'step2-delivery')) {
-      test(`${scenario} ${theme} @d1280`, async ({ page, seed }) => {
+    for (const scenario of DESKTOP_SCENARIOS) {
+      test(`${scenario} ${theme} @d1280`, async ({ page, seed, asGuest }) => {
+        void asGuest;
         await page.setViewportSize(VIEWPORTS.d1280);
         await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
         const fulfillment =
           scenario === 'step2-pickup' ? 'fulfillmentTakeaway' : 'fulfillmentDelivery';
         await seedCart(page, seed.restaurantId, fulfillment, scenario === 'step1' ? 3 : 1);
-        const panel = await openScenario(page, seed.restaurantId, scenario, 'anonymous');
-        await assertCartTitleCentered(panel);
-        const panelBox = await panel.boundingBox();
-        expect(panelBox).not.toBeNull();
-        expect(panelBox!.width).toBeGreaterThanOrEqual(500);
-        expect(panelBox!.width).toBeLessThanOrEqual(540);
-        await snapCartPanel(page, panel, `cart-${scenario}-${theme}-d1280`);
-      });
-    }
-
-    for (const scenario of ['step2-delivery'] as const) {
-      test(`${scenario} ${theme} @d1280`, async ({ page, seed, asGuest }) => {
-        void asGuest;
-        await page.setViewportSize(VIEWPORTS.d1280);
-        await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
-        await seedCart(page, seed.restaurantId, 'fulfillmentDelivery', 1);
-        const panel = await openScenario(page, seed.restaurantId, scenario, 'logged-in-save');
+        const panel = await openScenario(page, seed.restaurantId, scenario);
         await assertCartTitleCentered(panel);
         const panelBox = await panel.boundingBox();
         expect(panelBox).not.toBeNull();
