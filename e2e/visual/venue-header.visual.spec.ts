@@ -83,7 +83,7 @@ async function snapHeaderClip(
       x: 0,
       y: 0,
       width: box.width,
-      height: box.height + 120,
+      height: box.height,
     },
     maxDiffPixelRatio: 0.01,
   });
