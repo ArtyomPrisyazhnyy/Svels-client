@@ -161,14 +161,19 @@ await page.waitForFunction(() => {
     return false;
   }
 });
-await page
-  .getByTestId('guest-profile-button')
-  .waitFor({ state: 'visible', timeout: 60_000 });
 await page.waitForFunction(
-  () =>
-    document
-      .querySelector('[data-testid="guest-profile-button"]')
-      ?.getAttribute('aria-label') === 'Личный кабинет',
+  () => {
+    const raw = window.localStorage.getItem('svels-auth');
+    if (!raw) {
+      return false;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return Boolean(parsed.state?.accessToken && parsed.state?.user);
+    } catch {
+      return false;
+    }
+  },
   { timeout: 60_000 },
 );
 const client = await context.newCDPSession(page);

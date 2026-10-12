@@ -6,14 +6,9 @@ import { useHydrateFavorites } from '@/hooks/useHydrateFavorites';
 import { useRestaurantStylingOptional } from '../context/RestaurantStylingContext';
 import { useMenuCategoryNavOptional } from '../context/MenuCategoryNavContext';
 import { getAvailableMenuCategories } from '../utils/menu-catalog.util';
-import dynamic from 'next/dynamic';
-
-const MenuCategoryNav = dynamic(
-  () => import('./MenuCategoryNav').then((module) => ({ default: module.MenuCategoryNav })),
-  { ssr: true, loading: () => null },
-);
+import { MenuCategoryNav } from './MenuCategoryNav';
 import { MenuProductCard } from './MenuProductCard';
-import { MenuProductDetailModal } from './menu-product-detail-modal.lazy';
+import { MenuProductDetailModal } from './MenuProductDetailModal';
 import '../styles/restaurant-menu.scss';
 
 interface RestaurantMenuCatalogProps {
@@ -26,6 +21,7 @@ export function RestaurantMenuCatalog({
   menu,
 }: RestaurantMenuCatalogProps) {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+
   const { styling } = useRestaurantStylingOptional();
   const favoritesEnabled = styling.favoritesEnabled !== false;
   const navContext = useMenuCategoryNavOptional();

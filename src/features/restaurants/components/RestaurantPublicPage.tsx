@@ -25,7 +25,7 @@ import {
   RestaurantCartModal,
   RestaurantGuestAuthModal,
 } from './lazy-venue-modals';
-import { RestaurantMenuCatalog } from './restaurant-menu-catalog.lazy';
+import { RestaurantMenuCatalog } from './RestaurantMenuCatalog';
 const RestaurantMenuInlineCategoryNav = dynamic(
   () =>
     import('./RestaurantMenuInlineCategoryNav').then((module) => ({

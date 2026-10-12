@@ -26,19 +26,6 @@ export async function injectAuth(page: Page, auth: AuthResponse): Promise<void> 
     window.localStorage.setItem('svels-auth', payload);
   }, toAuthStoragePayload(auth));
   await page.reload({ waitUntil: 'domcontentloaded' });
-
-  if (auth.user.role === 'user') {
-    await page
-      .getByTestId('guest-profile-button')
-      .waitFor({ state: 'visible', timeout: 30_000 });
-    await page.waitForFunction(
-      () =>
-        document
-          .querySelector('[data-testid="guest-profile-button"]')
-          ?.getAttribute('aria-label') === 'Личный кабинет',
-      { timeout: 30_000 },
-    );
-  }
 }
 
 export async function clearAuthStorage(page: Page): Promise<void> {

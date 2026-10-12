@@ -15,7 +15,7 @@ import { Stack } from '@/shared/ui/Stack/Stack';
 import '@/features/restaurants/styles/restaurant-menu.scss';
 import '@/features/restaurants/styles/restaurant-favorites-page.scss';
 
-import { MenuProductDetailModal } from '@/features/restaurants/components/menu-product-detail-modal.lazy';
+import { MenuProductDetailModal } from '@/features/restaurants/components/MenuProductDetailModal';
 
 interface RestaurantGuestFavoritesPageProps {
   restaurantId: string;
