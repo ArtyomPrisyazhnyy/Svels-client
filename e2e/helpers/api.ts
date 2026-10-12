@@ -6,6 +6,10 @@ import type {
   PreOrderResponse,
 } from '../../src/shared/types/pre-order';
 import type {
+  CreateGuestAddressPayload,
+  GuestAddress,
+} from '../../src/shared/types/guest-address';
+import type {
   RestaurantOrderSettings,
   UpdateRestaurantOrderSettingsPayload,
 } from '../../src/shared/types/order-settings';
@@ -400,5 +404,48 @@ export const apiClient = {
       defaultMenuItemId: defaultItem.id,
       modifierMenuItemId: modifierItem.id,
     };
+  },
+
+  listGuestAddresses(restaurantId: string, token: string) {
+    return api<GuestAddress[]>('GET', `/restaurants/${restaurantId}/me/addresses`, {
+      token,
+    });
+  },
+
+  createGuestAddress(
+    restaurantId: string,
+    token: string,
+    payload: CreateGuestAddressPayload,
+  ) {
+    return api<GuestAddress>('POST', `/restaurants/${restaurantId}/me/addresses`, {
+      token,
+      body: payload,
+    });
+  },
+
+  deleteGuestAddress(restaurantId: string, token: string, addressId: string) {
+    return api<void>('DELETE', `/restaurants/${restaurantId}/me/addresses/${addressId}`, {
+      token,
+    });
+  },
+
+  async seedGuestAddresses(
+    restaurantId: string,
+    token: string,
+    count: number,
+  ): Promise<GuestAddress[]> {
+    const created: GuestAddress[] = [];
+    for (let index = 0; index < count; index += 1) {
+      created.push(
+        await this.createGuestAddress(restaurantId, token, {
+          label: index === 0 ? 'Дом' : `Адрес ${index + 1}`,
+          street: `Улица ${index + 1}`,
+          house: String(index + 10),
+          apartment: index % 2 === 0 ? String(index + 1) : undefined,
+          isDefault: index === 0,
+        }),
+      );
+    }
+    return created;
   },
 };

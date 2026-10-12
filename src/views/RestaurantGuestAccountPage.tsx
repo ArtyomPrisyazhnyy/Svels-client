@@ -13,9 +13,14 @@ import {
   type Booking,
   type BookingStatus,
 } from '@/shared/types/booking';
+<<<<<<< HEAD
 import { PageTitle } from '@/shared/ui/PageTitle/PageTitle';
 import { Button } from '@/shared/ui/Button/Button';
 import { Stack } from '@/shared/ui/Stack/Stack';
+=======
+import type { RestaurantStyling } from '@/shared/types/restaurant-styling';
+import { GuestAccountAddressesSection } from '@/features/restaurants/components/addresses/GuestAccountAddressesSection';
+>>>>>>> ea7c1d3 (feat(C-ADDR): saved delivery addresses in checkout and profile)
 import '@/features/restaurants/styles/restaurant-guest-account-page.scss';
 
 interface RestaurantGuestAccountPageProps {
@@ -119,6 +124,7 @@ export function RestaurantGuestAccountPage({
           </div>
         </section>
 
+<<<<<<< HEAD
         <section className="restaurant-guest-account__section">
           <h2>Мои брони</h2>
           {error && <p className="restaurant-guest-account__hint">{error}</p>}
@@ -154,6 +160,21 @@ export function RestaurantGuestAccountPage({
               ))}
             </ul>
           )}
+=======
+          {accessToken && (
+            <GuestAccountAddressesSection
+              restaurantId={restaurantId}
+              accessToken={accessToken}
+            />
+          )}
+
+          <section className="restaurant-guest-account__section">
+            <h2>Действия</h2>
+            <div className="restaurant-guest-account__links">
+              <Link href={paths.booking}>Бронирование</Link>
+              <Link href={paths.preOrder}>Мои заказы</Link>
+            </div>
+>>>>>>> ea7c1d3 (feat(C-ADDR): saved delivery addresses in checkout and profile)
           </section>
         </Stack>
       </main>

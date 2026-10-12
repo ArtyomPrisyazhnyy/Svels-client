@@ -29,10 +29,14 @@ interface CartState extends CartPersistedV1 {
 }
 
 function normalizeCheckoutDraft(draft: CartCheckoutDraft): CartCheckoutDraft {
+  const defaults = createDefaultCheckoutDraft(draft.fulfillment);
   return {
+    ...defaults,
     ...draft,
     phone: normalizePhoneForPhoneInput(draft.phone),
     recipientPhone: normalizePhoneForPhoneInput(draft.recipientPhone),
+    saveDeliveryAddress: draft.saveDeliveryAddress ?? defaults.saveDeliveryAddress,
+    deliveryAddressLabel: draft.deliveryAddressLabel ?? defaults.deliveryAddressLabel,
   };
 }
 

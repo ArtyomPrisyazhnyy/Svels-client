@@ -65,6 +65,18 @@
   visibility: hidden;
 }
 
+.cart-detail-row__value--ellipsis {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-detail-row__trigger--static {
+  cursor: default;
+}
+
 .cart-detail-row__chevron {
   flex: 0 0 20px;
   display: inline-flex;

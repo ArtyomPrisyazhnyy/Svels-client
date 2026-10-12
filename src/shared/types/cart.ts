@@ -37,6 +37,8 @@ export interface CartCheckoutDraft {
   recipientName: string;
   recipientPhone: string;
   comment: string;
+  saveDeliveryAddress: boolean;
+  deliveryAddressLabel: string;
 }
 
 export const EMPTY_DELIVERY_ADDRESS: DeliveryAddress = {
@@ -64,5 +66,7 @@ export function createDefaultCheckoutDraft(
     recipientName: '',
     recipientPhone: '',
     comment: '',
+    saveDeliveryAddress: true,
+    deliveryAddressLabel: '',
   };
 }
