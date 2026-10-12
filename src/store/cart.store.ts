@@ -37,6 +37,8 @@ function normalizeCheckoutDraft(draft: CartCheckoutDraft): CartCheckoutDraft {
     recipientPhone: normalizePhoneForPhoneInput(draft.recipientPhone),
     saveDeliveryAddress: draft.saveDeliveryAddress ?? defaults.saveDeliveryAddress,
     deliveryAddressLabel: draft.deliveryAddressLabel ?? defaults.deliveryAddressLabel,
+    saveAddressPromptVisible:
+      draft.saveAddressPromptVisible ?? defaults.saveAddressPromptVisible,
   };
 }
 

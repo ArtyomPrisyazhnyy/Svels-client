@@ -48,7 +48,6 @@ export function CartCheckoutDeliveryAddress({
   const makeDefault = useGuestAddressesStore((s) => s.makeDefault);
 
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [saveRowExpanded, setSaveRowExpanded] = useState(false);
 
   useEffect(() => {
     void loadAddresses(restaurantId, accessToken);
@@ -156,29 +155,8 @@ export function CartCheckoutDeliveryAddress({
           {addressError}
         </p>
       )}
-      <div className="cart-checkout-rows cart-checkout-rows--inset">
-        <CartDetailRow
-          label="Уточнить адрес"
-          value=""
-          grouped
-          expanded={addressExtraExpanded}
-          onToggle={onToggleAddressExtra}
-          testId="cart-address-extra-row"
-        >
-          <DeliveryAddressFields
-            value={draft.deliveryAddress}
-            onChange={(deliveryAddress) => onDraftChange({ deliveryAddress })}
-            variant="extended"
-          />
-        </CartDetailRow>
-        <CartDetailRow
-          label="Сохранить адрес"
-          value={draft.saveDeliveryAddress ? 'Да' : 'Нет'}
-          grouped
-          expanded={saveRowExpanded}
-          onToggle={() => setSaveRowExpanded((open) => !open)}
-          testId="cart-save-address-row"
-        >
+      {draft.saveAddressPromptVisible && (
+        <>
           <Checkbox
             label="Сохранить адрес для следующих заказов"
             checked={draft.saveDeliveryAddress}
@@ -199,6 +177,22 @@ export function CartCheckoutDeliveryAddress({
               </button>
             ))}
           </div>
+        </>
+      )}
+      <div className="cart-checkout-rows cart-checkout-rows--inset">
+        <CartDetailRow
+          label="Уточнить адрес"
+          value=""
+          grouped
+          expanded={addressExtraExpanded}
+          onToggle={onToggleAddressExtra}
+          testId="cart-address-extra-row"
+        >
+          <DeliveryAddressFields
+            value={draft.deliveryAddress}
+            onChange={(deliveryAddress) => onDraftChange({ deliveryAddress })}
+            variant="extended"
+          />
         </CartDetailRow>
       </div>
     </Stack>
