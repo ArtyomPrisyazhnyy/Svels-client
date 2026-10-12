@@ -6,6 +6,7 @@ import {
   mergeFavorites,
   removeFavorite,
 } from '@/features/restaurants/api/favorites.api';
+import { ApiError } from '@/shared/api/api-client';
 import { commerceEpoch, registerFavoritesReset } from './commerce-session';
 
 type FavoritesState = {
@@ -36,22 +37,41 @@ export const useFavoritesStore = create<FavoritesState>()(
         const started = writeGeneration;
         const localIds =
           get().restaurantId === restaurantId ? get().menuItemIds : [];
-        try {
-          const response = await fetchFavorites(restaurantId);
+        const retryDelaysMs = [0, 500, 1000, 2000, 4000, 8000, 8000];
+
+        for (let attempt = 0; attempt < retryDelaysMs.length; attempt += 1) {
+          const delay = retryDelaysMs[attempt];
+          if (delay > 0) {
+            await new Promise((resolve) => {
+              setTimeout(resolve, delay);
+            });
+          }
           if (started !== writeGeneration) {
             return;
           }
-          const extras = localIds.filter((id) => !response.menuItemIds.includes(id));
-          set({
-            restaurantId,
-            menuItemIds: uniqueIds([...response.menuItemIds, ...extras]),
-            hydrated: true,
-          });
-        } catch {
-          if (started !== writeGeneration) {
+          try {
+            const response = await fetchFavorites(restaurantId);
+            if (started !== writeGeneration) {
+              return;
+            }
+            const extras = localIds.filter((id) => !response.menuItemIds.includes(id));
+            set({
+              restaurantId,
+              menuItemIds: uniqueIds([...response.menuItemIds, ...extras]),
+              hydrated: true,
+            });
             return;
+          } catch (error) {
+            if (started !== writeGeneration) {
+              return;
+            }
+            const rateLimited = error instanceof ApiError && error.status === 429;
+            const lastAttempt = attempt === retryDelaysMs.length - 1;
+            if (!rateLimited || lastAttempt) {
+              set({ restaurantId, menuItemIds: localIds, hydrated: true });
+              return;
+            }
           }
-          set({ restaurantId, menuItemIds: localIds, hydrated: true });
         }
       },
 
