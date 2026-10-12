@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test';
 import { test, expect } from '../fixtures/test';
 
 const VIEWPORTS = [
@@ -5,7 +6,17 @@ const VIEWPORTS = [
   { width: 1280, height: 800 },
 ] as const;
 
-async function readChipLanding(page: import('@playwright/test').Page, categoryId: string) {
+function chip(page: Page, categoryId: string) {
+  return page.locator(
+    `.restaurant-menu__category-nav-btn[data-category-id="${categoryId}"]`,
+  );
+}
+
+async function expectActiveChip(page: Page, categoryId: string) {
+  await expect(chip(page, categoryId)).toHaveClass(/restaurant-menu__category-nav-btn--active/);
+}
+
+async function readChipLanding(page: Page, categoryId: string) {
   return page.evaluate((id) => {
     const nav = document.querySelector('[data-testid="venue-home-category-nav"]');
     const heading = document.querySelector(
@@ -75,6 +86,24 @@ for (const viewport of VIEWPORTS) {
           return first.fullyVisible ? first.delta : 999;
         })
         .toBeLessThanOrEqual(2);
+      await expectActiveChip(page, categoryId);
+
+      const chips = page.locator('.restaurant-menu__category-nav-btn');
+      expect(await chips.count()).toBeGreaterThanOrEqual(3);
+      const thirdChip = chips.nth(2);
+      const thirdId = await thirdChip.getAttribute('data-category-id');
+      expect(thirdId).toBeTruthy();
+      if (!thirdId) {
+        return;
+      }
+
+      await page.evaluate((id) => {
+        document.getElementById(`menu-category-${id}`)?.scrollIntoView({
+          block: 'start',
+          behavior: 'auto',
+        });
+      }, thirdId);
+      await expectActiveChip(page, thirdId);
     });
   });
 }

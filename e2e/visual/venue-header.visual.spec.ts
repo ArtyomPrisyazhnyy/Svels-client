@@ -172,6 +172,15 @@ for (const theme of THEMES) {
             }),
           )
           .toBeLessThanOrEqual(2);
+        await expect
+          .poll(async () =>
+            page.evaluate(() => {
+              const buttons = document.querySelectorAll('.restaurant-menu__category-nav-btn');
+              const active = document.querySelector('.restaurant-menu__category-nav-btn--active');
+              return buttons.length > 1 && active === buttons[1];
+            }),
+          )
+          .toBe(true);
         await expect(page.getByTestId('venue-home-category-nav')).toBeInViewport();
         await assertHeaderHeight(page, viewportKey);
         await snapHeaderClip(
