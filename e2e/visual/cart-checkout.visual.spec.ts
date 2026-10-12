@@ -135,7 +135,7 @@ async function ensureCheckoutOrderSettings(restaurantId: string, adminToken: str
 
 async function expandGuestSaveAddressBlock(page: import('@playwright/test').Page) {
   await expect(page.getByTestId('delivery-address-fields')).toBeVisible({ timeout: 15_000 });
-  await page.getByTestId('cart-address-extra-row').getByRole('button').first().click();
+  await page.getByTestId('cart-save-address-row').getByRole('button').first().click();
   await expect(page.getByTestId('address-save-checkbox')).toBeVisible();
 }
 
@@ -143,6 +143,7 @@ async function openScenario(
   page: import('@playwright/test').Page,
   restaurantId: string,
   scenario: CheckoutScenario,
+  options?: { deliverySnapshot?: boolean },
 ) {
   await page.goto(`/restaurants/${restaurantId}`);
   await page.getByTestId('cart-button').click();
@@ -165,7 +166,11 @@ async function openScenario(
   }
 
   if (scenario === 'step2-delivery') {
-    await expandGuestSaveAddressBlock(page);
+    if (options?.deliverySnapshot) {
+      await expandGuestSaveAddressBlock(page);
+    } else {
+      await expect(page.getByTestId('delivery-address-fields')).toBeVisible({ timeout: 15_000 });
+    }
     return panel;
   }
 
@@ -233,7 +238,9 @@ test.describe('Cart checkout visual', () => {
             fulfillment,
             scenario === 'step1' ? 3 : 1,
           );
-          const panel = await openScenario(page, seed.restaurantId, scenario);
+          const panel = await openScenario(page, seed.restaurantId, scenario, {
+            deliverySnapshot: scenario === 'step2-delivery',
+          });
           await assertCartTitleCentered(panel);
           if (viewportKey === 't768') {
             const panelBox = await panel.boundingBox();
@@ -283,7 +290,9 @@ test.describe('Cart checkout visual', () => {
         const fulfillment =
           scenario === 'step2-pickup' ? 'fulfillmentTakeaway' : 'fulfillmentDelivery';
         await seedCart(page, seed.restaurantId, fulfillment, scenario === 'step1' ? 3 : 1);
-        const panel = await openScenario(page, seed.restaurantId, scenario);
+        const panel = await openScenario(page, seed.restaurantId, scenario, {
+          deliverySnapshot: scenario === 'step2-delivery',
+        });
         await assertCartTitleCentered(panel);
         const panelBox = await panel.boundingBox();
         expect(panelBox).not.toBeNull();

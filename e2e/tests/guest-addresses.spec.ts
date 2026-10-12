@@ -48,7 +48,7 @@ test.describe('Guest saved addresses', () => {
     await goToDeliveryCheckout(page);
 
     await expect(page.getByTestId('delivery-address-fields')).toBeVisible();
-    await page.getByTestId('cart-address-extra-row').getByRole('button').first().click();
+    await page.getByTestId('cart-save-address-row').getByRole('button').first().click();
     await page.getByTestId('delivery-street').fill('Пушкина');
     await page.getByTestId('delivery-house').fill('10');
     await expect(page.getByTestId('address-save-checkbox')).toBeChecked();

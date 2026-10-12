@@ -48,6 +48,7 @@ export function CartCheckoutDeliveryAddress({
   const makeDefault = useGuestAddressesStore((s) => s.makeDefault);
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [saveRowExpanded, setSaveRowExpanded] = useState(false);
 
   useEffect(() => {
     void loadAddresses(restaurantId, accessToken);
@@ -169,6 +170,15 @@ export function CartCheckoutDeliveryAddress({
             onChange={(deliveryAddress) => onDraftChange({ deliveryAddress })}
             variant="extended"
           />
+        </CartDetailRow>
+        <CartDetailRow
+          label="Сохранить адрес"
+          value={draft.saveDeliveryAddress ? 'Да' : 'Нет'}
+          grouped
+          expanded={saveRowExpanded}
+          onToggle={() => setSaveRowExpanded((open) => !open)}
+          testId="cart-save-address-row"
+        >
           <Checkbox
             label="Сохранить адрес для следующих заказов"
             checked={draft.saveDeliveryAddress}
