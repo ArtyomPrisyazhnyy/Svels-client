@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { NutritionBadges } from '@/features/restaurant-admin/components/NutritionBadges';
 import { MenuItemPriceDisplay } from '@/shared/components/MenuItemPriceDisplay';
 import { Carousel } from '@/shared/components/Carousel';
@@ -25,6 +25,27 @@ import { useCartStore } from '@/store/cart.store';
 import { useFavoritesStore } from '@/store/favorites.store';
 import { FavoriteHeartButton } from './FavoriteHeartButton';
 import '../styles/menu-product-modal.scss';
+
+function MenuModalPhoto({
+  src,
+  webpSrc,
+}: {
+  src: string;
+  webpSrc?: string | null;
+}): ReactNode {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return <div className="menu-product-modal__placeholder" aria-hidden="true" />;
+  }
+  return (
+    <ResponsiveImage
+      src={src}
+      webpSrc={webpSrc}
+      alt=""
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 interface MenuProductDetailModalProps {
   item: MenuItem;
@@ -167,31 +188,25 @@ export function MenuProductDetailModal({
       }
     >
           <div className="menu-product-modal__media">
-            {images.length > 0 ? (
-              hasGallery ? (
-                <Carousel
-                  className="menu-product-modal__carousel"
-                  slides={images.map((image, index) => (
-                    <ResponsiveImage
-                      key={`${image.url}-${index}`}
-                      src={image.url}
-                      webpSrc={image.webpUrl}
-                      alt={`${item.name}${index > 0 ? ` — фото ${index + 1}` : ''}`}
-                      loading={index === 0 ? 'eager' : 'lazy'}
-                    />
-                  ))}
-                  options={{ loop: true }}
-                  showArrows
-                  showDots
-                />
-              ) : (
-                <ResponsiveImage
-                  src={images[0].url}
-                  webpSrc={images[0].webpUrl}
-                  alt={item.name}
-                />
-              )
-            ) : null}
+            {images.length === 0 ? (
+              <div className="menu-product-modal__placeholder" aria-hidden="true" />
+            ) : hasGallery ? (
+              <Carousel
+                className="menu-product-modal__carousel"
+                slides={images.map((image, index) => (
+                  <MenuModalPhoto
+                    key={`${image.url}-${index}`}
+                    src={image.url}
+                    webpSrc={image.webpUrl}
+                  />
+                ))}
+                options={{ loop: true }}
+                showArrows
+                showDots
+              />
+            ) : (
+              <MenuModalPhoto src={images[0].url} webpSrc={images[0].webpUrl} />
+            )}
             {favoritesEnabled ? (
               <FavoriteHeartButton
                 active={isFavorite}

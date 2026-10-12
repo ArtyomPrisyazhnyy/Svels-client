@@ -118,6 +118,10 @@
   justify-content: flex-end;
 }
 
+.ui-overlay-panel__header .ui-icon-btn {
+  color: var(--rs-text);
+}
+
 .ui-overlay-panel__title {
   margin: 0;
   min-width: 0;

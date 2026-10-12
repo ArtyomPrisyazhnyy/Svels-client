@@ -38,13 +38,61 @@ export async function assertExpandedRowContentGap(row: Locator): Promise<void> {
   }
 }
 
+/**
+ * Centred modals sit on a half pixel. Drop the enter transform and nudge with
+ * relative positioning so the border box is on whole CSS pixels. Margin would
+ * change flex centring and miss the integer.
+ */
+async function alignPanelToDevicePixels(panel: Locator): Promise<void> {
+  await panel.evaluate((el) => {
+    const initial = el.getBoundingClientRect();
+    const fullBleed = initial.left <= 1 && window.innerWidth - initial.right <= 1;
+    if (fullBleed) {
+      return;
+    }
+    el.style.transition = 'none';
+    el.style.transform = 'none';
+    const rect = el.getBoundingClientRect();
+    const dx = Math.round(rect.left) - rect.left;
+    const dy = Math.round(rect.top) - rect.top;
+    el.style.position = 'relative';
+    if (Math.abs(dx) >= 0.01) {
+      el.style.left = `${dx}px`;
+    }
+    if (Math.abs(dy) >= 0.01) {
+      el.style.top = `${dy}px`;
+    }
+  });
+}
+
 export async function snapCartPanel(
   page: Page,
   panel: Locator,
   name: string,
 ): Promise<void> {
   await prepareForScreenshot(page);
-  await expect(panel).toHaveScreenshot(`${name}.png`, { maxDiffPixelRatio: 0.01 });
+  await alignPanelToDevicePixels(panel);
+  const box = await panel.boundingBox();
+  if (!box) {
+    throw new Error(`Panel for ${name} has no bounding box`);
+  }
+  const viewport = page.viewportSize();
+  const fullBleed = box.x <= 1 && !!viewport && viewport.width - (box.x + box.width) <= 1;
+  // Element screenshots antialias the rounded clip into a 1px page fringe.
+  // A viewport clip of the border box matches the opaque pixels on screen.
+  if (fullBleed) {
+    await expect(panel).toHaveScreenshot(`${name}.png`, { maxDiffPixelRatio: 0.01 });
+    return;
+  }
+  await expect(page).toHaveScreenshot(`${name}.png`, {
+    clip: {
+      x: Math.round(box.x),
+      y: Math.round(box.y),
+      width: Math.round(box.width),
+      height: Math.round(box.height),
+    },
+    maxDiffPixelRatio: 0.01,
+  });
 }
 
 export async function snapCartCrop(

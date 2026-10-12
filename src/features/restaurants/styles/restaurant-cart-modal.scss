@@ -68,8 +68,6 @@
 
 .restaurant-cart-modal__panel.ui-overlay-panel {
   --cart-footer-block: 0px;
-  width: 100%;
-  max-width: none;
   max-height: calc(100dvh - var(--space-4));
   background-color: var(--rs-cart-surface, var(--rs-surface));
   backdrop-filter: none;

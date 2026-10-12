@@ -345,7 +345,7 @@ export const apiClient = {
       name: 'E2E Вода',
       price: 2,
       description: 'Playwright seed drink',
-      imageUrl: 'https://example.com/e2e-drink.jpg',
+      imageUrl: '/e2e/menu-dish.png',
     });
 
     await api('PATCH', `/restaurants/${restaurantId}/styling`, {
@@ -358,7 +358,7 @@ export const apiClient = {
       name: 'E2E Блюдо 9.90',
       price: 9.9,
       description: 'Playwright seed item',
-      imageUrl: 'https://example.com/e2e-item.jpg',
+      imageUrl: '/e2e/menu-dish.png',
     })) as { id: string };
 
     const modifierItem = (await this.createMenuItem(restaurantId, adminToken, {
@@ -366,7 +366,7 @@ export const apiClient = {
       name: 'E2E С модификатором',
       price: 12.5,
       description: 'Playwright seed item with modifiers',
-      imageUrl: 'https://example.com/e2e-item-mod.jpg',
+      imageUrl: '/e2e/menu-dish.png',
       modifierGroups: [
         {
           name: 'Добавка',

@@ -222,6 +222,12 @@ test.describe('Cart checkout visual', () => {
           );
           const panel = await openScenario(page, seed.restaurantId, scenario);
           await assertCartTitleCentered(panel);
+          if (viewportKey === 't768') {
+            const panelBox = await panel.boundingBox();
+            expect(panelBox).not.toBeNull();
+            expect(panelBox!.width).toBeGreaterThanOrEqual(500);
+            expect(panelBox!.width).toBeLessThanOrEqual(540);
+          }
           await snapCartPanel(page, panel, `cart-${scenario}-${theme}-${viewportKey}`);
         });
       }
@@ -266,6 +272,10 @@ test.describe('Cart checkout visual', () => {
         await seedCart(page, seed.restaurantId, fulfillment, scenario === 'step1' ? 3 : 1);
         const panel = await openScenario(page, seed.restaurantId, scenario);
         await assertCartTitleCentered(panel);
+        const panelBox = await panel.boundingBox();
+        expect(panelBox).not.toBeNull();
+        expect(panelBox!.width).toBeGreaterThanOrEqual(500);
+        expect(panelBox!.width).toBeLessThanOrEqual(540);
         await snapCartPanel(page, panel, `cart-${scenario}-${theme}-d1280`);
       });
     }
@@ -285,6 +295,11 @@ test.describe('Product and auth modal visual', () => {
       const panel = page.getByTestId('menu-product-modal-panel');
       await expect(panel).toBeVisible();
       await expect(page.getByTestId('menu-product-modal-title')).toBeVisible();
+      const photo = panel.locator('.menu-product-modal__media img');
+      await expect(photo).toBeVisible();
+      await expect
+        .poll(() => photo.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0))
+        .toBe(true);
       await snapCartPanel(page, panel, `product-modal-classic-${viewportKey}`);
     });
 
