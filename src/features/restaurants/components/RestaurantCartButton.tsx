@@ -50,17 +50,9 @@ export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartBut
       };
       if (persist && !persist.hasHydrated()) {
         void persist.rehydrate();
-        unsubscribe = persist.onFinishHydration(() => {
-          sync();
-        });
       }
       sync();
-      const storeUnsub = useCartStore.subscribe(sync);
-      const previous = unsubscribe;
-      unsubscribe = () => {
-        previous();
-        storeUnsub();
-      };
+      unsubscribe = useCartStore.subscribe(sync);
     });
 
     return () => {

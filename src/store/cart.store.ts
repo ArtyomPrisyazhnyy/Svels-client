@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CartCheckoutDraft, CartLineItem } from '@/shared/types/cart';
 import { createDefaultCheckoutDraft } from '@/shared/types/cart';
-import { getCartTotals } from '@/features/restaurants/utils/cart.util';
 import { normalizePhoneForPhoneInput } from '@/shared/utils/phone.util';
+import { registerCartReset } from './commerce-session';
 
 const CART_PERSIST_VERSION = 2;
 
@@ -141,7 +141,11 @@ export const useCartStore = create<CartState>()(
       },
 
       getRestaurantTotals: (restaurantId) => {
-        return getCartTotals(get().getRestaurantItems(restaurantId));
+        const items = get().getRestaurantItems(restaurantId);
+        return {
+          itemCount: items.reduce((sum, line) => sum + line.quantity, 0),
+          totalAmount: items.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0),
+        };
       },
 
       getCheckoutDraft: (restaurantId, defaultFulfillment = 'fulfillmentTakeaway') => {
@@ -179,3 +183,7 @@ export const useCartStore = create<CartState>()(
     },
   ),
 );
+
+registerCartReset(() => {
+  useCartStore.getState().clearCart();
+});

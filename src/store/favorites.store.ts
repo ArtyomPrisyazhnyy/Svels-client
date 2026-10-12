@@ -6,6 +6,7 @@ import {
   mergeFavorites,
   removeFavorite,
 } from '@/features/restaurants/api/favorites.api';
+import { registerFavoritesReset } from './commerce-session';
 
 type FavoritesState = {
   restaurantId: string | null;
@@ -109,3 +110,7 @@ export const useFavoritesStore = create<FavoritesState>()(
     },
   ),
 );
+
+registerFavoritesReset(() => {
+  useFavoritesStore.getState().reset();
+});
