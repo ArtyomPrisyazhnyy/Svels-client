@@ -1,3 +1,11 @@
 .ui-sheet {
   z-index: var(--z-sheet);
 }
+
+.ui-sheet--stacked {
+  z-index: var(--z-stacked);
+}
+
+.ui-sheet__backdrop--stacked {
+  z-index: var(--z-stacked);
+}

@@ -27,6 +27,8 @@ interface GuestAddressSheetProps {
   onMakeDefault: (addressId: string) => Promise<unknown>;
   initialView?: SheetView;
   initialEditAddressId?: string | null;
+  /** When opened from cart modal, stack above modal backdrop. */
+  stacked?: boolean;
 }
 
 export function GuestAddressSheet({
@@ -41,6 +43,7 @@ export function GuestAddressSheet({
   onMakeDefault,
   initialView = 'list',
   initialEditAddressId = null,
+  stacked = false,
 }: GuestAddressSheetProps) {
   const [view, setView] = useState<SheetView>(initialView);
   const [menuAddressId, setMenuAddressId] = useState<string | null>(initialEditAddressId);
@@ -111,6 +114,7 @@ export function GuestAddressSheet({
       onClose={handleClose}
       title={title}
       testId="address-sheet"
+      stacked={stacked}
       headerStart={
         view === 'create' || view === 'edit' ? (
           <IconButton

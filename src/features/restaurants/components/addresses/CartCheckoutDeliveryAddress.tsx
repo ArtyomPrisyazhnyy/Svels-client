@@ -124,6 +124,7 @@ export function CartCheckoutDeliveryAddress({
         </div>
         <GuestAddressSheet
           open={sheetOpen}
+          stacked
           onClose={() => setSheetOpen(false)}
           addresses={addresses}
           selectedId={selectedId}

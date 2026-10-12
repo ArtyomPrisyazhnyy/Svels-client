@@ -63,7 +63,7 @@ test.describe('Guest saved addresses', () => {
 
     await page.getByTestId('checkout-address-row').getByRole('button').first().click();
     await expect(page.getByTestId('address-sheet')).toBeVisible();
-    await page.getByTestId('address-add').click();
+    await page.getByTestId('address-sheet').getByTestId('address-add').click();
     await page.getByTestId('delivery-street').fill('Ленина');
     await page.getByTestId('delivery-house').fill('5');
     await page.getByTestId('address-label-chips').getByRole('button', { name: 'Работа' }).click();

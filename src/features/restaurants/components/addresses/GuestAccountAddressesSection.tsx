@@ -121,19 +121,21 @@ export function GuestAccountAddressesSection({
         )}
       </div>
 
-      <GuestAddressSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        addresses={addresses}
-        selectedId={null}
-        onSelectAddress={() => setSheetOpen(false)}
-        onCreateAddress={handleCreate}
-        onUpdateAddress={handleUpdate}
-        onDeleteAddress={(id) => removeAddress(restaurantId, accessToken, id)}
-        onMakeDefault={(id) => makeDefault(restaurantId, accessToken, id)}
-        initialView={sheetLaunch.view}
-        initialEditAddressId={sheetLaunch.addressId}
-      />
+      {sheetOpen && (
+        <GuestAddressSheet
+          open
+          onClose={() => setSheetOpen(false)}
+          addresses={addresses}
+          selectedId={null}
+          onSelectAddress={() => setSheetOpen(false)}
+          onCreateAddress={handleCreate}
+          onUpdateAddress={handleUpdate}
+          onDeleteAddress={(id) => removeAddress(restaurantId, accessToken, id)}
+          onMakeDefault={(id) => makeDefault(restaurantId, accessToken, id)}
+          initialView={sheetLaunch.view}
+          initialEditAddressId={sheetLaunch.addressId}
+        />
+      )}
     </section>
   );
 }
