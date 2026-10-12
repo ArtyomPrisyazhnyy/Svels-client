@@ -73,6 +73,20 @@ export function CartCheckoutDeliveryAddress({
     [accessToken, createAddress, restaurantId],
   );
 
+  const revealSaveAddressPrompt = useCallback(() => {
+    if (!draft.saveAddressPromptVisible) {
+      onDraftChange({ saveAddressPromptVisible: true });
+    }
+  }, [draft.saveAddressPromptVisible, onDraftChange]);
+
+  const handleDeliveryChange = useCallback(
+    (deliveryAddress: CartCheckoutDraft['deliveryAddress']) => {
+      revealSaveAddressPrompt();
+      onDraftChange({ deliveryAddress });
+    },
+    [onDraftChange, revealSaveAddressPrompt],
+  );
+
   const handleUpdate = useCallback(
     async (addressId: string, values: GuestAddressFormValues) => {
       const payload = createGuestAddressPayloadFromForm(values);
@@ -147,7 +161,7 @@ export function CartCheckoutDeliveryAddress({
     >
       <DeliveryAddressFields
         value={draft.deliveryAddress}
-        onChange={(deliveryAddress) => onDraftChange({ deliveryAddress })}
+        onChange={handleDeliveryChange}
         variant="required"
       />
       {addressError && (
@@ -190,7 +204,7 @@ export function CartCheckoutDeliveryAddress({
         >
           <DeliveryAddressFields
             value={draft.deliveryAddress}
-            onChange={(deliveryAddress) => onDraftChange({ deliveryAddress })}
+            onChange={handleDeliveryChange}
             variant="extended"
           />
         </CartDetailRow>

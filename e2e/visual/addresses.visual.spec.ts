@@ -68,6 +68,7 @@ async function seedCart(page: import('@playwright/test').Page, restaurantId: str
                 comment: '',
                 saveDeliveryAddress: true,
                 deliveryAddressLabel: '',
+                saveAddressPromptVisible: false,
               },
             },
           },

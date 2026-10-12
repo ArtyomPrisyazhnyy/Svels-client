@@ -21,24 +21,7 @@ async function addMenuItemToCart(page: import('@playwright/test').Page, menuItem
   await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
 }
 
-async function goToDeliveryCheckout(page: import('@playwright/test').Page, restaurantId: string) {
-  await page.evaluate(
-    ({ rid }) => {
-      const raw = window.localStorage.getItem('svels-cart');
-      if (!raw) {
-        return;
-      }
-      const parsed = JSON.parse(raw) as {
-        state: { checkoutByRestaurant: Record<string, { saveAddressPromptVisible?: boolean }> };
-      };
-      const draft = parsed.state.checkoutByRestaurant[rid];
-      if (draft) {
-        draft.saveAddressPromptVisible = true;
-        window.localStorage.setItem('svels-cart', JSON.stringify(parsed));
-      }
-    },
-    { rid: restaurantId },
-  );
+async function goToDeliveryCheckout(page: import('@playwright/test').Page) {
   await page.getByTestId('cart-go-to-checkout').click();
   await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
 }
@@ -62,7 +45,7 @@ test.describe('Guest saved addresses', () => {
     await enableDeliveryOnly(restaurantId, adminToken);
     await page.goto(`/restaurants/${restaurantId}`);
     await addMenuItemToCart(page, seed.menu.defaultMenuItemId);
-    await goToDeliveryCheckout(page, restaurantId);
+    await goToDeliveryCheckout(page);
 
     await expect(page.getByTestId('delivery-address-fields')).toBeVisible();
     await page.getByTestId('delivery-street').fill('Пушкина');
@@ -74,7 +57,7 @@ test.describe('Guest saved addresses', () => {
     await expect(page.getByTestId('restaurant-cart-modal')).toHaveCount(0);
 
     await addMenuItemToCart(page, seed.menu.defaultMenuItemId);
-    await goToDeliveryCheckout(page, restaurantId);
+    await goToDeliveryCheckout(page);
     await expect(page.getByTestId('checkout-address-row')).toBeVisible();
     await expect(page.getByTestId('checkout-address-row')).toContainText('Пушкина');
 
@@ -150,7 +133,7 @@ test.describe('Guest saved addresses', () => {
     await enableDeliveryOnly(restaurantId, adminToken);
     await page.goto(`/restaurants/${restaurantId}`);
     await addMenuItemToCart(page, seed.menu.defaultMenuItemId);
-    await goToDeliveryCheckout(page, restaurantId);
+    await goToDeliveryCheckout(page);
     await page.getByTestId('checkout-address-row').getByRole('button').first().click();
     await expect(page.getByTestId('address-limit-hint')).toBeVisible();
   });
