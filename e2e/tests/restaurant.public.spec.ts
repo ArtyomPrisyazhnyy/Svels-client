@@ -153,6 +153,12 @@ test.describe('Restaurant public page', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}/favorites`);
     await expect(page.getByTestId('guest-favorites-empty')).toBeVisible();
+
+    await apiClient.removeGuestFavorite(
+      seed.restaurantId,
+      seed.guest.accessToken,
+      secondItem!.id,
+    );
   });
 
   test('авторизованный гость видит страницу аккаунта', async ({ page, seed, asGuest }) => {

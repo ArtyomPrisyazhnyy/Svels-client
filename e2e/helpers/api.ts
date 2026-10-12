@@ -281,6 +281,14 @@ export const apiClient = {
     );
   },
 
+  removeGuestFavorite(restaurantId: string, token: string, menuItemId: string) {
+    return api<{ menuItemIds: string[] }>(
+      'DELETE',
+      `/restaurants/${restaurantId}/favorites/${menuItemId}`,
+      { token },
+    );
+  },
+
   async guestOtpLogin(restaurantId: string, phone: string): Promise<AuthResponse> {
     await this.sendGuestOtp(restaurantId, phone);
     await sleep(200);
