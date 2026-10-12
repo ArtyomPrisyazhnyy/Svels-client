@@ -157,6 +157,13 @@ export const apiClient = {
     });
   },
 
+  patchMenuCategory(restaurantId: string, token: string, categoryId: string, name: string) {
+    return api('PATCH', `/restaurants/${restaurantId}/menu/categories/${categoryId}`, {
+      token,
+      body: { name },
+    });
+  },
+
   getRestaurant(id: string) {
     return api<PublicRestaurant>('GET', `/restaurants/${id}`);
   },

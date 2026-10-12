@@ -38,15 +38,22 @@ async function applyTheme(
   appliedTheme = theme;
 }
 
-async function ensureVenueLogo(restaurantId: string, adminToken: string) {
+async function ensureStableVenue(restaurantId: string, adminToken: string) {
   if (venueLogoApplied) {
     return;
   }
   const logoUrl = `${getBaseUrl()}/e2e/venue-logo.png`;
   await apiClient.patchRestaurant(restaurantId, adminToken, {
+    name: 'E2E Cafe',
     logoUrl,
     logoWebpUrl: null,
   });
+  const menu = await apiClient.getMenu(restaurantId);
+  for (const category of menu.categories) {
+    if (category.name.startsWith('Full ')) {
+      await apiClient.patchMenuCategory(restaurantId, adminToken, category.id, 'E2E Допы');
+    }
+  }
   await revalidateRestaurantPublicPage(restaurantId);
   venueLogoApplied = true;
 }
@@ -86,7 +93,7 @@ for (const theme of THEMES) {
   test.describe(`venue header visual — ${theme}`, () => {
     test.beforeEach(async ({ seed }) => {
       await applyTheme(seed.restaurantId, seed.superAdmin.auth.accessToken, theme);
-      await ensureVenueLogo(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
+      await ensureStableVenue(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
     });
 
     for (const viewportKey of VIEWPORT_KEYS) {
@@ -149,7 +156,7 @@ for (const theme of THEMES) {
 test.describe('venue header self-review sequence @ m390 classic', () => {
   test.beforeEach(async ({ seed }) => {
     await applyTheme(seed.restaurantId, seed.superAdmin.auth.accessToken, 'classic');
-    await ensureVenueLogo(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
+    await ensureStableVenue(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
   });
 
   for (const step of [
