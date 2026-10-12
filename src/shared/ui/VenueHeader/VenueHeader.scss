@@ -19,6 +19,21 @@
   min-width: 0;
   text-decoration: none;
   color: inherit;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: none;
+  }
+}
+
+a.venue-header__brand {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: none;
+  }
 }
 
 .venue-header__brand {
