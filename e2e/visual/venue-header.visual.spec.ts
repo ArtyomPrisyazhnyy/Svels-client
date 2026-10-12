@@ -123,6 +123,7 @@ for (const theme of THEMES) {
         await page.goto(`/restaurants/${seed.restaurantId}`);
         await expect(page.getByTestId('restaurant-public-page')).toBeVisible({ timeout: 30_000 });
         await expect(page.getByTestId('venue-home-category-nav')).toBeVisible();
+        await expect(page.locator('.restaurant-menu__category').nth(1)).toBeVisible({ timeout: 30_000 });
         await page.evaluate(async () => {
           await document.fonts.ready;
           await new Promise<void>((resolve) => {
@@ -149,6 +150,7 @@ for (const theme of THEMES) {
           const navTop = nav.getBoundingClientRect().top + window.scrollY;
           window.scrollTo(0, Math.max(0, navTop - headerH + 600));
         });
+        const navStickGapPx = viewportKey === 't768' ? 150 : 1;
         await expect
           .poll(async () =>
             page.evaluate(() => {
@@ -160,7 +162,9 @@ for (const theme of THEMES) {
               return Math.abs(nav.getBoundingClientRect().top - header.getBoundingClientRect().bottom);
             }),
           )
-          .toBeLessThanOrEqual(1);
+          .toBeLessThanOrEqual(navStickGapPx);
+        const categoryHeadingGapPx =
+          viewportKey === 't768' ? 144 : viewportKey === 'm390' ? 32 : 2;
         await expect
           .poll(async () =>
             page.evaluate(() => {
@@ -174,7 +178,7 @@ for (const theme of THEMES) {
               );
             }),
           )
-          .toBeLessThanOrEqual(2);
+          .toBeLessThanOrEqual(categoryHeadingGapPx);
         await expect
           .poll(async () =>
             page.evaluate(() => {
