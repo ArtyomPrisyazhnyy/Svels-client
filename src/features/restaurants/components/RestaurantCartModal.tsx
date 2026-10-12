@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import { PhoneInput } from '@/shared/components/PhoneInput';
 import { Modal, Cluster, Stack } from '@/shared/ui';
@@ -117,8 +117,6 @@ export function RestaurantCartModal({
   const [submitting, setSubmitting] = useState(false);
   const [locations, setLocations] = useState<RestaurantLocation[]>([]);
   const [locationId, setLocationId] = useState<string | null>(draft.locationId);
-  const draftLocationIdRef = useRef(draft.locationId);
-  draftLocationIdRef.current = draft.locationId;
   const [expandedRows, setExpandedRows] = useState<Partial<Record<CartDetailRowKey, boolean>>>(
     {},
   );
@@ -261,7 +259,7 @@ export function RestaurantCartModal({
           setLocations(rows);
           const fallback = rows[0]?.id ?? null;
           setLocationId((current) => current ?? fallback);
-          if (!draftLocationIdRef.current && fallback) {
+          if (!getCheckoutDraft(restaurantId).locationId && fallback) {
             syncDraft({ locationId: fallback });
           }
           return;
@@ -282,7 +280,7 @@ export function RestaurantCartModal({
     return () => {
       cancelled = true;
     };
-  }, [restaurantId, syncDraft]);
+  }, [restaurantId, syncDraft, getCheckoutDraft]);
 
   const requestedAtIso =
     draft.requestedAtMode === 'slot' ? draft.requestedAtSlotIso : null;
