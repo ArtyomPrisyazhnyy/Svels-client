@@ -158,7 +158,12 @@ async function openScenario(
     await expect(page.getByTestId('cart-location-row')).toBeVisible({ timeout: 30_000 });
   }
 
-  if (scenario === 'step2-delivery' || scenario === 'step2-pickup') {
+  if (scenario === 'step2-delivery') {
+    await expect(page.getByTestId('address-save-checkbox')).toBeVisible({ timeout: 15_000 });
+    return panel;
+  }
+
+  if (scenario === 'step2-pickup') {
     return panel;
   }
 
