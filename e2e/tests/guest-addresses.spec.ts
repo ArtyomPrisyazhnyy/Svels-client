@@ -84,9 +84,6 @@ test.describe('Guest saved addresses', () => {
       .first()
       .click();
     await expect(page.getByTestId('address-sheet')).toHaveCount(0);
-
-    await addMenuItemToCart(page, seed.menu.defaultMenuItemId);
-    await goToDeliveryCheckout(page);
     await expect(page.getByTestId('checkout-address-row')).toContainText('Работа');
 
     const home = addresses.find((row) => row.street === 'Пушкина');
