@@ -1,5 +1,6 @@
 import { test, expect, apiClient } from '../fixtures/test';
 import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
+import { clearGuestAddresses } from '../helpers/guest-addresses';
 async function enableDeliveryOnly(restaurantId: string, adminToken: string) {
   await apiClient.setOrderSettings(restaurantId, adminToken, {
     fulfillmentDelivery: true,
@@ -106,6 +107,10 @@ test.describe('Guest saved addresses', () => {
     await page.goto(`/restaurants/${restaurantId}/account`);
     await expect(page.getByTestId('account-addresses')).toBeVisible();
     await expect(page.getByTestId('guest-address-list')).toBeVisible();
+  });
+
+  test.afterAll(async ({ seed }) => {
+    await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
   });
 
   test('лимит 10 адресов — подсказка в sheet', async ({ page, seed, asGuest }) => {
