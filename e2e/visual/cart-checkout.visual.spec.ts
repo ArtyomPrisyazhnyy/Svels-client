@@ -14,6 +14,10 @@ const THEMES = ['classic', 'midnight', 'warm'] as const;
 const VIEWPORT_KEYS: VisualViewportKey[] = ['m360', 'm390', 't768'];
 const DESKTOP_SCENARIOS: CheckoutScenario[] = ['step1', 'step2-delivery', 'step2-pickup'];
 
+/** One styling/settings write per worker. Repeating them on every shot trips the API rate limit and drops the pickup row. */
+let orderSettingsApplied = false;
+let appliedTheme: RestaurantColorTheme | null = null;
+
 type CheckoutScenario =
   | 'step1'
   | 'step2-delivery'
@@ -97,6 +101,9 @@ async function applyTheme(
   adminToken: string,
   theme: RestaurantColorTheme,
 ) {
+  if (appliedTheme === theme) {
+    return;
+  }
   const switcherStyle =
     theme === 'midnight' ? 'segmented' : theme === 'warm' ? 'tabs' : 'pill';
   await apiClient.patchStyling(restaurantId, adminToken, {
@@ -106,6 +113,23 @@ async function applyTheme(
     switcherStyle,
   });
   await revalidateRestaurantPublicPage(restaurantId);
+  appliedTheme = theme;
+}
+
+async function ensureCheckoutOrderSettings(restaurantId: string, adminToken: string) {
+  if (orderSettingsApplied) {
+    return;
+  }
+  await apiClient.setOrderSettings(restaurantId, adminToken, {
+    fulfillmentDelivery: true,
+    fulfillmentTakeaway: true,
+    fulfillmentDineIn: false,
+    paymentCash: true,
+    paymentCardOnSite: true,
+    deliveryForSomeoneElse: true,
+  });
+  await revalidateRestaurantPublicPage(restaurantId);
+  orderSettingsApplied = true;
 }
 
 async function openScenario(
@@ -128,6 +152,10 @@ async function openScenario(
 
   await page.getByTestId('cart-go-to-checkout').click();
   await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
+
+  if (scenario === 'step2-pickup') {
+    await expect(page.getByTestId('cart-location-row')).toBeVisible({ timeout: 30_000 });
+  }
 
   if (scenario === 'step2-delivery' || scenario === 'step2-pickup') {
     return panel;
@@ -174,16 +202,7 @@ test.describe('Cart checkout visual', () => {
 
   test.beforeEach(async ({ seed, asGuest }) => {
     void asGuest;
-    const adminToken = seed.restaurantAdmin.auth.accessToken;
-    await apiClient.setOrderSettings(seed.restaurantId, adminToken, {
-      fulfillmentDelivery: true,
-      fulfillmentTakeaway: true,
-      fulfillmentDineIn: false,
-      paymentCash: true,
-      paymentCardOnSite: true,
-      deliveryForSomeoneElse: true,
-    });
-    await revalidateRestaurantPublicPage(seed.restaurantId);
+    await ensureCheckoutOrderSettings(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
   });
 
   for (const theme of THEMES) {

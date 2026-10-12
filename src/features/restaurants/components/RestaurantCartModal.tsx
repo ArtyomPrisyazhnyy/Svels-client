@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import { PhoneInput } from '@/shared/components/PhoneInput';
 import { Modal, Cluster, Stack } from '@/shared/ui';
@@ -14,6 +14,7 @@ import { IconBack } from '@/shared/ui/icons/icons';
 import { formatCartItemsCount } from '../utils/cart-items-label.util';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useCartStore } from '@/store/cart.store';
+import { ApiError } from '@/shared/api/api-client';
 import { fetchRestaurantLocations } from '../api/locations.api';
 import {
   formatRestaurantLocationLine,
@@ -116,6 +117,8 @@ export function RestaurantCartModal({
   const [submitting, setSubmitting] = useState(false);
   const [locations, setLocations] = useState<RestaurantLocation[]>([]);
   const [locationId, setLocationId] = useState<string | null>(draft.locationId);
+  const draftLocationIdRef = useRef(draft.locationId);
+  draftLocationIdRef.current = draft.locationId;
   const [expandedRows, setExpandedRows] = useState<Partial<Record<CartDetailRowKey, boolean>>>(
     {},
   );
@@ -237,26 +240,49 @@ export function RestaurantCartModal({
 
   useEffect(() => {
     let cancelled = false;
-    void fetchRestaurantLocations(restaurantId)
-      .then((rows) => {
-        if (!cancelled) {
+    const retryDelaysMs = [0, 500, 1000, 2000, 4000, 8000, 8000];
+
+    const load = async () => {
+      for (let attempt = 0; attempt < retryDelaysMs.length; attempt += 1) {
+        const delay = retryDelaysMs[attempt];
+        if (delay > 0) {
+          await new Promise((resolve) => {
+            window.setTimeout(resolve, delay);
+          });
+        }
+        if (cancelled) {
+          return;
+        }
+        try {
+          const rows = await fetchRestaurantLocations(restaurantId);
+          if (cancelled) {
+            return;
+          }
           setLocations(rows);
           const fallback = rows[0]?.id ?? null;
           setLocationId((current) => current ?? fallback);
-          if (!draft.locationId && fallback) {
+          if (!draftLocationIdRef.current && fallback) {
             syncDraft({ locationId: fallback });
           }
+          return;
+        } catch (error) {
+          const rateLimited = error instanceof ApiError && error.status === 429;
+          const lastAttempt = attempt === retryDelaysMs.length - 1;
+          if (!rateLimited || lastAttempt) {
+            if (!cancelled) {
+              setLocations([]);
+            }
+            return;
+          }
         }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setLocations([]);
-        }
-      });
+      }
+    };
+
+    void load();
     return () => {
       cancelled = true;
     };
-  }, [restaurantId, draft.locationId, syncDraft]);
+  }, [restaurantId, syncDraft]);
 
   const requestedAtIso =
     draft.requestedAtMode === 'slot' ? draft.requestedAtSlotIso : null;
