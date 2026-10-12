@@ -7,6 +7,7 @@ import {
   snapCartPanel,
 } from '../helpers/cart-visual';
 import { VIEWPORTS, type VisualViewportKey } from '../helpers/visual';
+import { clearGuestAddresses } from '../helpers/guest-addresses';
 import type { CartLineItem } from '../../src/shared/types/cart';
 import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
 
@@ -50,9 +51,10 @@ async function seedCart(
   restaurantId: string,
   fulfillment: 'fulfillmentDelivery' | 'fulfillmentTakeaway' = 'fulfillmentDelivery',
   itemCount = 1,
+  saveAddressPrompt = false,
 ) {
   await page.addInitScript(
-    ({ rid, cartItems, fulfillmentKey }) => {
+    ({ rid, cartItems, fulfillmentKey, showSavePrompt }) => {
       window.localStorage.setItem(
         'svels-cart',
         JSON.stringify({
@@ -81,6 +83,9 @@ async function seedCart(
                 recipientName: '',
                 recipientPhone: '',
                 comment: '',
+                saveDeliveryAddress: true,
+                deliveryAddressLabel: '',
+                saveAddressPromptVisible: showSavePrompt,
               },
             },
           },
@@ -92,6 +97,7 @@ async function seedCart(
       rid: restaurantId,
       cartItems: Array.from({ length: itemCount }, (_, index) => buildLine(index + 1)),
       fulfillmentKey: fulfillment,
+      showSavePrompt: saveAddressPrompt,
     },
   );
 }
@@ -132,10 +138,16 @@ async function ensureCheckoutOrderSettings(restaurantId: string, adminToken: str
   orderSettingsApplied = true;
 }
 
+async function waitForSaveAddressPrompt(page: import('@playwright/test').Page) {
+  await expect(page.getByTestId('delivery-address-fields')).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId('address-save-checkbox')).toBeVisible();
+}
+
 async function openScenario(
   page: import('@playwright/test').Page,
   restaurantId: string,
   scenario: CheckoutScenario,
+  options?: { deliverySnapshot?: boolean },
 ) {
   await page.goto(`/restaurants/${restaurantId}`);
   await page.getByTestId('cart-button').click();
@@ -157,7 +169,16 @@ async function openScenario(
     await expect(page.getByTestId('cart-location-row')).toBeVisible({ timeout: 30_000 });
   }
 
-  if (scenario === 'step2-delivery' || scenario === 'step2-pickup') {
+  if (scenario === 'step2-delivery') {
+    if (options?.deliverySnapshot) {
+      await waitForSaveAddressPrompt(page);
+    } else {
+      await expect(page.getByTestId('delivery-address-fields')).toBeVisible({ timeout: 15_000 });
+    }
+    return panel;
+  }
+
+  if (scenario === 'step2-pickup') {
     return panel;
   }
 
@@ -203,6 +224,7 @@ test.describe('Cart checkout visual', () => {
   test.beforeEach(async ({ seed, asGuest }) => {
     void asGuest;
     await ensureCheckoutOrderSettings(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
+    await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
   });
 
   for (const theme of THEMES) {
@@ -219,8 +241,11 @@ test.describe('Cart checkout visual', () => {
             seed.restaurantId,
             fulfillment,
             scenario === 'step1' ? 3 : 1,
+            scenario === 'step2-delivery',
           );
-          const panel = await openScenario(page, seed.restaurantId, scenario);
+          const panel = await openScenario(page, seed.restaurantId, scenario, {
+            deliverySnapshot: scenario === 'step2-delivery',
+          });
           await assertCartTitleCentered(panel);
           if (viewportKey === 't768') {
             const panelBox = await panel.boundingBox();
@@ -269,8 +294,16 @@ test.describe('Cart checkout visual', () => {
         await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
         const fulfillment =
           scenario === 'step2-pickup' ? 'fulfillmentTakeaway' : 'fulfillmentDelivery';
-        await seedCart(page, seed.restaurantId, fulfillment, scenario === 'step1' ? 3 : 1);
-        const panel = await openScenario(page, seed.restaurantId, scenario);
+        await seedCart(
+          page,
+          seed.restaurantId,
+          fulfillment,
+          scenario === 'step1' ? 3 : 1,
+          scenario === 'step2-delivery',
+        );
+        const panel = await openScenario(page, seed.restaurantId, scenario, {
+          deliverySnapshot: scenario === 'step2-delivery',
+        });
         await assertCartTitleCentered(panel);
         const panelBox = await panel.boundingBox();
         expect(panelBox).not.toBeNull();

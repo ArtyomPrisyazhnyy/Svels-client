@@ -65,12 +65,12 @@ async function alignPanelToDevicePixels(panel: Locator): Promise<void> {
   });
 }
 
-export async function snapCartPanel(
+async function snapPanelBoundingBox(
   page: Page,
   panel: Locator,
   name: string,
+  widthMode: 'round' | 'floor',
 ): Promise<void> {
-  await prepareForScreenshot(page);
   await alignPanelToDevicePixels(panel);
   const box = await panel.boundingBox();
   if (!box) {
@@ -78,6 +78,10 @@ export async function snapCartPanel(
   }
   const viewport = page.viewportSize();
   const fullBleed = box.x <= 1 && !!viewport && viewport.width - (box.x + box.width) <= 1;
+  const rawWidth = widthMode === 'floor' ? Math.floor(box.width) : Math.round(box.width);
+  const maxWidth = viewport ? viewport.width - Math.round(box.x) : rawWidth;
+  const clipWidth = Math.min(rawWidth, maxWidth);
+  const clipHeight = Math.round(box.height);
   // Element screenshots antialias the rounded clip into a 1px page fringe.
   // A viewport clip of the border box matches the opaque pixels on screen.
   if (fullBleed) {
@@ -88,11 +92,29 @@ export async function snapCartPanel(
     clip: {
       x: Math.round(box.x),
       y: Math.round(box.y),
-      width: Math.round(box.width),
-      height: Math.round(box.height),
+      width: clipWidth,
+      height: clipHeight,
     },
     maxDiffPixelRatio: 0.01,
   });
+}
+
+export async function snapCartPanel(
+  page: Page,
+  panel: Locator,
+  name: string,
+): Promise<void> {
+  await prepareForScreenshot(page);
+  await snapPanelBoundingBox(page, panel, name, 'round');
+}
+
+export async function snapOverlayPanel(
+  page: Page,
+  panel: Locator,
+  name: string,
+): Promise<void> {
+  await prepareForScreenshot(page);
+  await snapPanelBoundingBox(page, panel, name, 'floor');
 }
 
 export async function snapCartCrop(

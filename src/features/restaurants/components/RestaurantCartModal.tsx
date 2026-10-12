@@ -24,6 +24,16 @@ import { FulfillmentSelector } from './FulfillmentSelector';
 import { CartLocationPicker } from './CartLocationPicker';
 import { PaymentSelector } from './PaymentSelector';
 import { DeliveryAddressFields } from './DeliveryAddressFields';
+import {
+  CartCheckoutDeliveryAddressInline,
+  CartCheckoutGuestAddressLoader,
+  CartCheckoutGuestAddressSheet,
+  CartCheckoutSavedAddressRow,
+  CartCheckoutSavedAddressRowSkeleton,
+  selectCheckoutSelectedAddressId,
+  selectCheckoutUsesSavedAddresses,
+} from './addresses/CartCheckoutDeliveryAddress';
+import { useGuestAddressesStore } from '@/store/guest-addresses.store';
 import { RequestedTimePicker } from './RequestedTimePicker';
 import { OrderSuccessView } from './OrderSuccessView';
 import { CartDetailRow } from './CartDetailRow';
@@ -122,11 +132,32 @@ export function RestaurantCartModal({
   );
   const [showValidationHints, setShowValidationHints] = useState(false);
   const [clearPromptOpen, setClearPromptOpen] = useState(false);
+  const [addressSheetOpen, setAddressSheetOpen] = useState(false);
 
   const ordersPaused = orderSettings.ordersPaused === true;
 
   const isGuestOfRestaurant =
     user?.role === 'user' && user.restaurantId === restaurantId;
+
+  const guestAddressesStatus = useGuestAddressesStore(
+    (s) => s.byRestaurant[restaurantId]?.status ?? 'idle',
+  );
+  const guestAddressesCount = useGuestAddressesStore(
+    (s) => s.byRestaurant[restaurantId]?.addresses.length ?? 0,
+  );
+  const selectedGuestAddressId = useGuestAddressesStore(
+    (s) => s.byRestaurant[restaurantId]?.selectedId ?? null,
+  );
+  const deliveryAddressesLoading =
+    isGuestOfRestaurant &&
+    Boolean(accessToken) &&
+    (guestAddressesStatus === 'loading' || guestAddressesStatus === 'idle');
+
+  const deliveryUsesSavedAddresses =
+    isGuestOfRestaurant &&
+    Boolean(accessToken) &&
+    guestAddressesStatus === 'ready' &&
+    guestAddressesCount > 0;
 
   const totalAmount = useMemo(
     () => items.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0),
@@ -308,6 +339,9 @@ export function RestaurantCartModal({
         multipleLocations,
         locationId,
         showSomeoneElseOption,
+        deliveryUsesSavedAddresses,
+        selectedGuestAddressId,
+        deliveryAddressesLoading,
       }),
     [
       items,
@@ -325,6 +359,9 @@ export function RestaurantCartModal({
       multipleLocations,
       locationId,
       showSomeoneElseOption,
+      deliveryUsesSavedAddresses,
+      selectedGuestAddressId,
+      deliveryAddressesLoading,
     ],
   );
 
@@ -371,6 +408,14 @@ export function RestaurantCartModal({
     setSubmitting(true);
 
     try {
+      const usesSavedAddresses =
+        fulfillment === 'fulfillmentDelivery' &&
+        isGuestOfRestaurant &&
+        selectCheckoutUsesSavedAddresses(restaurantId);
+
+      const inlineLabel =
+        draft.deliveryAddressLabel.trim() || draft.deliveryAddress.street.trim();
+
       const payload = buildCreatePreOrderPayload({
         fulfillment,
         payment,
@@ -379,7 +424,18 @@ export function RestaurantCartModal({
         customerPhone: draft.phone,
         locationId,
         deliveryAddress:
-          fulfillment === 'fulfillmentDelivery' ? draft.deliveryAddress : null,
+          fulfillment === 'fulfillmentDelivery' && !usesSavedAddresses
+            ? draft.deliveryAddress
+            : null,
+        addressId:
+          fulfillment === 'fulfillmentDelivery' && usesSavedAddresses
+            ? selectCheckoutSelectedAddressId(restaurantId)
+            : null,
+        saveAddress:
+          fulfillment === 'fulfillmentDelivery' &&
+          !usesSavedAddresses &&
+          draft.saveDeliveryAddress,
+        addressLabel: inlineLabel || undefined,
         requestedAtIso,
         orderForSomeoneElse: draft.orderForSomeoneElse,
         recipientName: draft.recipientName,
@@ -399,6 +455,9 @@ export function RestaurantCartModal({
       }
 
       setSuccessOrderNumber(order.orderNumber);
+      if (accessToken && fulfillment === 'fulfillmentDelivery') {
+        void useGuestAddressesStore.getState().loadAddresses(restaurantId, accessToken);
+      }
       clearCart();
     } catch (err) {
       setError(getPreOrderErrorMessage(err));
@@ -547,45 +606,78 @@ export function RestaurantCartModal({
                     )}
                   </Stack>
 
-                  {fulfillment === 'fulfillmentDelivery' && (
-                    <Stack
-                      gap={3}
-                      as="section"
-                      className="cart-checkout-section cart-checkout-section--address"
-                      testId="cart-address-section"
-                    >
-                      <DeliveryAddressFields
-                        value={draft.deliveryAddress}
-                        onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
-                        variant="required"
-                      />
-                      {fieldErrors.address && (
-                        <p className="restaurant-cart-modal__inline-error" role="alert">
-                          {fieldErrors.address}
-                        </p>
-                      )}
-                      <div className="cart-checkout-rows cart-checkout-rows--inset">
-                        <CartDetailRow
-                          label="Уточнить адрес"
-                          value=""
-                          grouped
-                          expanded={Boolean(expandedRows.addressExtra)}
-                          onToggle={() =>
-                            setExpandedRows((prev) => toggleRowKey(prev, 'addressExtra'))
-                          }
-                          testId="cart-address-extra-row"
-                        >
-                          <DeliveryAddressFields
-                            value={draft.deliveryAddress}
-                            onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
-                            variant="extended"
+                  {fulfillment === 'fulfillmentDelivery' &&
+                    (isGuestOfRestaurant && accessToken ? (
+                      <>
+                        <CartCheckoutGuestAddressLoader
+                          restaurantId={restaurantId}
+                          accessToken={accessToken}
+                        />
+                        {!deliveryUsesSavedAddresses && !deliveryAddressesLoading && (
+                          <CartCheckoutDeliveryAddressInline
+                            draft={draft}
+                            onDraftChange={syncDraft}
+                            addressError={fieldErrors.address}
+                            addressExtraExpanded={Boolean(expandedRows.addressExtra)}
+                            onToggleAddressExtra={() =>
+                              setExpandedRows((prev) => toggleRowKey(prev, 'addressExtra'))
+                            }
                           />
-                        </CartDetailRow>
-                      </div>
-                    </Stack>
-                  )}
+                        )}
+                      </>
+                    ) : (
+                      <Stack
+                        gap={3}
+                        as="section"
+                        className="cart-checkout-section cart-checkout-section--address"
+                        testId="cart-address-section"
+                      >
+                        <DeliveryAddressFields
+                          value={draft.deliveryAddress}
+                          onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
+                          variant="required"
+                        />
+                        {fieldErrors.address && (
+                          <p className="restaurant-cart-modal__inline-error" role="alert">
+                            {fieldErrors.address}
+                          </p>
+                        )}
+                        <div className="cart-checkout-rows cart-checkout-rows--inset">
+                          <CartDetailRow
+                            label="Уточнить адрес"
+                            value=""
+                            grouped
+                            expanded={Boolean(expandedRows.addressExtra)}
+                            onToggle={() =>
+                              setExpandedRows((prev) => toggleRowKey(prev, 'addressExtra'))
+                            }
+                            testId="cart-address-extra-row"
+                          >
+                            <DeliveryAddressFields
+                              value={draft.deliveryAddress}
+                              onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
+                              variant="extended"
+                            />
+                          </CartDetailRow>
+                        </div>
+                      </Stack>
+                    ))}
 
                   <div className="cart-checkout-rows" data-testid="cart-checkout-rows">
+                    {fulfillment === 'fulfillmentDelivery' &&
+                      isGuestOfRestaurant &&
+                      accessToken &&
+                      deliveryAddressesLoading && <CartCheckoutSavedAddressRowSkeleton />}
+                    {fulfillment === 'fulfillmentDelivery' &&
+                      isGuestOfRestaurant &&
+                      accessToken &&
+                      deliveryUsesSavedAddresses && (
+                        <CartCheckoutSavedAddressRow
+                          restaurantId={restaurantId}
+                          addressError={fieldErrors.address}
+                          onOpenSheet={() => setAddressSheetOpen(true)}
+                        />
+                      )}
                     {needsVenue && multipleLocations && (
                       <CartDetailRow
                         label="Точка"
@@ -889,6 +981,14 @@ export function RestaurantCartModal({
                 </>
               )}
         </div>
+        {isGuestOfRestaurant && accessToken && deliveryUsesSavedAddresses && (
+          <CartCheckoutGuestAddressSheet
+            open={addressSheetOpen}
+            onClose={() => setAddressSheetOpen(false)}
+            restaurantId={restaurantId}
+            accessToken={accessToken}
+          />
+        )}
       </Modal>
   );
 }

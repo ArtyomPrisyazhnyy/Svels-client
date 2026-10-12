@@ -1,0 +1,229 @@
+.guest-address-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.guest-address-option {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 64px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--rs-border);
+  border-radius: var(--rs-card-radius, var(--radius-lg));
+  background: var(--rs-surface);
+  color: var(--rs-text);
+
+  &--selected {
+    border-color: transparent;
+    box-shadow: inset 0 0 0 2px var(--rs-accent);
+  }
+
+  &--static {
+    cursor: default;
+    grid-template-columns: 1fr auto;
+  }
+
+  &--pressable {
+    cursor: pointer;
+    width: 100%;
+    border: 1px solid var(--rs-border);
+    font: inherit;
+    text-align: left;
+  }
+}
+
+.guest-address-option__select {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.guest-address-option__radio {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--rs-accent);
+}
+
+.guest-address-option__main {
+  min-width: 0;
+}
+
+.guest-address-option__title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--rs-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.guest-address-option__subtitle {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  color: var(--rs-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.guest-address-option__chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--space-1);
+  padding: 0 var(--space-2);
+  min-height: 20px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--rs-accent) 18%, var(--rs-surface));
+  font-size: var(--text-xs);
+  color: var(--rs-text);
+}
+
+.guest-address-form__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.guest-address-form__chip-btn.ui-btn--secondary {
+  min-height: var(--control-h-md);
+
+  &.guest-address-form__chip-btn--active {
+    border-color: var(--rs-accent);
+    box-shadow: inset 0 0 0 1px var(--rs-accent);
+  }
+}
+
+.guest-address-form-card {
+  padding: var(--space-4);
+  border: 1px solid var(--rs-border);
+  border-radius: var(--rs-card-radius, var(--radius-lg));
+  background: var(--rs-surface);
+}
+
+.guest-address-form-card .ui-textarea {
+  resize: none;
+}
+
+.guest-address-list--profile {
+  gap: 0;
+
+  .guest-address-option {
+    border: none;
+    border-radius: 0;
+    min-height: 64px;
+    padding: var(--space-3) 0;
+    background: transparent;
+    box-shadow: none;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--rs-border);
+    }
+  }
+}
+
+.restaurant-guest-account__section.guest-account-addresses {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.guest-address-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.guest-address-menu__action.ui-btn {
+  justify-content: flex-start;
+  width: calc(100% + 2 * var(--space-4));
+  min-height: 48px;
+  margin-inline: calc(var(--space-4) * -1);
+  padding-inline: var(--space-4);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--rs-border);
+  }
+}
+
+.guest-address-menu__action--danger {
+  color: var(--rs-danger);
+}
+
+.guest-address-menu__confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--rs-text);
+}
+
+.guest-address-menu__confirm-title,
+.guest-address-menu__confirm-line {
+  margin: 0;
+}
+
+.guest-address-menu__confirm-line {
+  color: var(--rs-text-muted);
+}
+
+.guest-address-menu__confirm-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.guest-address-menu__confirm-actions .ui-btn {
+  min-height: var(--control-h-md);
+}
+
+.guest-address-limit-hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--rs-text-muted);
+  text-align: center;
+}
+
+.guest-address-checkout-row__value {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.cart-detail-row__trigger--static .cart-detail-row__label {
+  flex: 0 0 auto;
+}
+
+.guest-address-checkout-row__skeleton.ui-skeleton {
+  flex: 0 0 auto;
+  background: color-mix(in srgb, var(--rs-border) 70%, var(--rs-surface));
+}
+
+.guest-account-addresses__empty {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--rs-text-muted);
+}

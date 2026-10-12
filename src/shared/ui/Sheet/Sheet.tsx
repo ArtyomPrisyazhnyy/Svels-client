@@ -25,6 +25,10 @@ export interface SheetProps {
   headerStart?: ReactNode;
   headerEnd?: ReactNode;
   testId?: string;
+  /** Render above an open modal (e.g. sheet opened from cart checkout). */
+  stacked?: boolean;
+  /** Wraps the portaled tree so venue tokens apply outside the page shell. */
+  wrap?: (node: ReactNode) => ReactNode;
   children: ReactNode;
 }
 
@@ -39,6 +43,8 @@ function SheetInner({
   headerStart,
   headerEnd,
   testId,
+  stacked = false,
+  wrap,
   children,
 }: Omit<SheetProps, 'open'>) {
   const { mounted, isActive, handleClose } = useModalPresence(onClose, SHEET_ANIMATION_MS);
@@ -52,9 +58,14 @@ function SheetInner({
     return null;
   }
 
-  const backdropClass = cn('ui-sheet__backdrop', isActive && 'ui-sheet__backdrop--active');
+  const backdropClass = cn(
+    'ui-sheet__backdrop',
+    stacked && 'ui-sheet__backdrop--stacked',
+    isActive && 'ui-sheet__backdrop--active',
+  );
+  const sheetClass = cn('ui-sheet', stacked && 'ui-sheet--stacked');
 
-  return createPortal(
+  const tree = (
     <>
       <button
         type="button"
@@ -64,7 +75,7 @@ function SheetInner({
         onPointerDown={onBackdropPointerDown}
         onClick={onBackdropClick}
       />
-      <div className="ui-sheet" data-testid={testId ? `${testId}-root` : undefined}>
+      <div className={sheetClass} data-testid={testId ? `${testId}-root` : undefined}>
         <ModalPanel
           ref={panelRef}
           variant="sheet"
@@ -82,9 +93,10 @@ function SheetInner({
           {children}
         </ModalPanel>
       </div>
-    </>,
-    document.body,
+    </>
   );
+
+  return createPortal(wrap ? wrap(tree) : tree, document.body);
 }
 
 export function Sheet({ open, onClose, ...rest }: SheetProps) {

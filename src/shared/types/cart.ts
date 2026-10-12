@@ -37,6 +37,10 @@ export interface CartCheckoutDraft {
   recipientName: string;
   recipientPhone: string;
   comment: string;
+  saveDeliveryAddress: boolean;
+  deliveryAddressLabel: string;
+  /** When true, logged-in guest sees save-address controls on delivery checkout. */
+  saveAddressPromptVisible: boolean;
 }
 
 export const EMPTY_DELIVERY_ADDRESS: DeliveryAddress = {
@@ -64,5 +68,8 @@ export function createDefaultCheckoutDraft(
     recipientName: '',
     recipientPhone: '',
     comment: '',
+    saveDeliveryAddress: true,
+    deliveryAddressLabel: '',
+    saveAddressPromptVisible: true,
   };
 }

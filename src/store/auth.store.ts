@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { AuthUser } from '../shared/types/auth';
+import { resetGuestAddressesStore } from './guest-addresses.store';
 
 interface AuthState {
   accessToken: string | null;
@@ -17,7 +18,10 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       setAuth: (accessToken, user) => set({ accessToken, user }),
       updateUser: (user) => set({ user }),
-      logout: () => set({ accessToken: null, user: null }),
+      logout: () => {
+        resetGuestAddressesStore();
+        set({ accessToken: null, user: null });
+      },
     }),
     {
       name: 'svels-auth',
