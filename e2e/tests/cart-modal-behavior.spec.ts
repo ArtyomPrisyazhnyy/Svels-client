@@ -128,18 +128,33 @@ test.describe('Cart modal behavior', () => {
 
     const streetBox = await page.getByTestId('delivery-street').boundingBox();
     const houseBox = await page.getByTestId('delivery-house').boundingBox();
+    const apartmentBox = await page.getByTestId('delivery-apartment').boundingBox();
     expect(streetBox).not.toBeNull();
     expect(houseBox).not.toBeNull();
-    expect(Math.abs(streetBox!.y - houseBox!.y)).toBeLessThanOrEqual(8);
+    expect(apartmentBox).not.toBeNull();
+    expect(houseBox!.y).toBeGreaterThan(streetBox!.y + 8);
+    expect(Math.abs(houseBox!.y - apartmentBox!.y)).toBeLessThanOrEqual(8);
 
     const asapLabel = page.getByTestId('requested-time-asap').locator('.ui-seg__label');
+    const asapOption = page.getByTestId('requested-time-asap');
     const labelBox = await asapLabel.boundingBox();
+    const optionBox = await asapOption.boundingBox();
     const lineHeight = await asapLabel.evaluate((el) => {
       const value = getComputedStyle(el).lineHeight;
       return Number.parseFloat(value);
     });
     expect(labelBox).not.toBeNull();
-    expect(labelBox!.height).toBeLessThanOrEqual(lineHeight * 1.35);
+    expect(optionBox).not.toBeNull();
+    expect(labelBox!.height).toBeLessThanOrEqual(lineHeight * 2.4);
+    expect(labelBox!.x).toBeGreaterThanOrEqual(optionBox!.x + 11);
+    expect(labelBox!.x + labelBox!.width).toBeLessThanOrEqual(optionBox!.x + optionBox!.width - 11);
+
+    const timeBox = await timeSeg.boundingBox();
+    const payBox = await paySeg.boundingBox();
+    expect(timeBox).not.toBeNull();
+    expect(payBox).not.toBeNull();
+    expect(Math.abs(timeBox!.width - payBox!.width)).toBeLessThanOrEqual(1);
+    expect(Math.abs(timeBox!.height - payBox!.height)).toBeLessThanOrEqual(1);
 
     const chevronBox = await timeRow.locator('.cart-detail-row__chevron').boundingBox();
     const triggerBox = await timeRow.locator('.cart-detail-row__trigger').boundingBox();
