@@ -2,8 +2,10 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import type { RestaurantOrderSettings } from '@/shared/types/order-settings';
-import { RestaurantCartModal } from '../components/RestaurantCartModal';
-import { RestaurantGuestAuthModal } from '../components/RestaurantGuestAuthModal';
+import {
+  RestaurantCartModal,
+  RestaurantGuestAuthModal,
+} from '../components/lazy-venue-modals';
 
 interface VenueOverlayContextValue {
   openCart: () => void;

@@ -1,0 +1,36 @@
+{
+  "baseUrl": "http://127.0.0.1:3001",
+  "restaurantId": "01a12fc0-3b06-71ad-89dc-00be94548977",
+  "results": [
+    {
+      "route": "home",
+      "headerVisibleMs": 308,
+      "skeletonOrContentMs": 5316,
+      "dataVisibleMs": 5325
+    },
+    {
+      "route": "account",
+      "headerVisibleMs": 283,
+      "skeletonOrContentMs": 300,
+      "dataVisibleMs": 489
+    },
+    {
+      "route": "booking",
+      "headerVisibleMs": 254,
+      "skeletonOrContentMs": 257,
+      "dataVisibleMs": 441
+    },
+    {
+      "route": "preorder",
+      "headerVisibleMs": 290,
+      "skeletonOrContentMs": 300,
+      "dataVisibleMs": 599
+    },
+    {
+      "route": "favorites",
+      "headerVisibleMs": 334,
+      "skeletonOrContentMs": 346,
+      "dataVisibleMs": 385
+    }
+  ]
+}

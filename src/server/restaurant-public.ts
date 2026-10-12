@@ -3,6 +3,7 @@ import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
 import type { MenuResponse } from '@/shared/types/menu';
 import type { RestaurantOrderSettings } from '@/shared/types/order-settings';
 import type { RestaurantStyling } from '@/shared/types/restaurant-styling';
+import type { BookingAvailability } from '@/shared/types/booking';
 import type { BookingSettings } from '@/shared/types/booking-settings';
 import { DEFAULT_BOOKING_SETTINGS } from '@/shared/types/booking-settings';
 import type { SocialLink } from '@/shared/types/social-link';
@@ -85,6 +86,20 @@ export const getRestaurantOrderSettings = cache(
       );
     } catch {
       return DEFAULT_ORDER_SETTINGS(restaurantId);
+    }
+  },
+);
+
+export const getRestaurantBookingAvailability = cache(
+  async (restaurantId: string, date: string): Promise<BookingAvailability | null> => {
+    try {
+      return await serverFetch<BookingAvailability>(
+        `/restaurants/${restaurantId}/bookings/availability?date=${encodeURIComponent(date)}`,
+        undefined,
+        publicPageFetchOptions(restaurantId),
+      );
+    } catch {
+      return null;
     }
   },
 );

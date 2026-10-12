@@ -1,12 +1,10 @@
 import { resetGuestId } from '@/shared/utils/guest-id';
 import { useAuthStore } from '@/store/auth.store';
-import { useCartStore } from '@/store/cart.store';
-import { useFavoritesStore } from '@/store/favorites.store';
+import { resetCommerceMemory } from '@/store/commerce-session';
 
 /** Корзина, избранное и guest id живут в localStorage отдельно от JWT. */
 export function clearLocalCommerceSession(): void {
-  useCartStore.getState().clearCart();
-  useFavoritesStore.getState().reset();
+  resetCommerceMemory();
   resetGuestId();
 }
 

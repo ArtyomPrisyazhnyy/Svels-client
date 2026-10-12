@@ -1,13 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { useAuthStore } from '@/store/auth.store';
-import {
-  fetchBookingAvailability,
-  createBooking,
-} from '@/features/restaurants/api/bookings.api';
+import { createBooking } from '@/features/restaurants/api/bookings.api';
+import { GuestBookingSlotsSkeleton } from '@/features/restaurants/components/guest-page-skeletons/GuestPageSkeletons';
+import { useBookingAvailability } from '@/features/restaurants/hooks/useBookingAvailability';
 import { FloorPlanViewer } from '@/features/floor-plan/components/FloorPlanViewer';
 import type { PublicFloorPlanTable } from '@/shared/types/floor-plan';
 import { ApiError } from '@/shared/api/api-client';
@@ -26,6 +25,8 @@ interface RestaurantGuestBookingPageProps {
   restaurantId: string;
   restaurantName: string;
   bookingSettings: BookingSettings;
+  initialAvailability?: BookingAvailability | null;
+  initialDate?: string;
 }
 
 function todayString(): string {
@@ -39,45 +40,43 @@ function maxDateString(advanceDays: number): string {
 export function RestaurantGuestBookingPage({
   restaurantId,
   bookingSettings,
+  initialAvailability = null,
+  initialDate,
 }: RestaurantGuestBookingPageProps) {
   const accessToken = useAuthStore((s) => s.accessToken);
   const paths = useRestaurantGuestPaths(restaurantId);
 
-  const [date, setDate] = useState<string>(todayString());
+  const [date, setDate] = useState<string>(initialDate ?? todayString());
   const [guests, setGuests] = useState<number>(2);
-  const [availability, setAvailability] = useState<BookingAvailability | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [selectedTableDeposit, setSelectedTableDeposit] = useState<number>(0);
   const [notes, setNotes] = useState('');
-  const [loadingAvail, setLoadingAvail] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [successBooking, setSuccessBooking] = useState<Booking | null>(null);
 
   const minDate = todayString();
   const maxDate = useMemo(() => maxDateString(bookingSettings.advanceDays), [bookingSettings.advanceDays]);
 
-  const loadAvailability = useCallback(async (selectedDate: string) => {
-    if (!bookingSettings.bookingEnabled) return;
-    setLoadingAvail(true);
-    setError(null);
-    try {
-      const result = await fetchBookingAvailability(restaurantId, selectedDate);
-      setAvailability(result);
-      setSelectedSlot(null);
-      setSelectedTableId(null);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось загрузить слоты');
-    } finally {
-      setLoadingAvail(false);
-    }
-  }, [bookingSettings.bookingEnabled, restaurantId]);
+  const {
+    availability,
+    loading: loadingAvail,
+    error: availabilityError,
+  } = useBookingAvailability({
+    restaurantId,
+    date,
+    enabled: bookingSettings.bookingEnabled,
+    initialAvailability,
+  });
+
+  const error = submitError ?? availabilityError;
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- refetch slots when date changes
-    void loadAvailability(date);
-  }, [date, loadAvailability]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset selection when date changes
+    setSelectedSlot(null);
+    setSelectedTableId(null);
+  }, [date]);
 
   function isSlotEnabled(slot: string): boolean {
     if (!availability) return false;
@@ -92,20 +91,20 @@ export function RestaurantGuestBookingPage({
 
   async function handleSubmit() {
     if (!accessToken) {
-      setError('Войдите, чтобы забронировать стол');
+      setSubmitError('Войдите, чтобы забронировать стол');
       return;
     }
     if (!selectedSlot) {
-      setError('Выберите время');
+      setSubmitError('Выберите время');
       return;
     }
     if (bookingSettings.mode === 'specific_table' && !selectedTableId) {
-      setError('Выберите стол на планировке');
+      setSubmitError('Выберите стол на планировке');
       return;
     }
 
     setSubmitting(true);
-    setError(null);
+    setSubmitError(null);
     try {
       const booking = await createBooking(restaurantId, accessToken, {
         bookingDate: date,
@@ -117,7 +116,7 @@ export function RestaurantGuestBookingPage({
       setSuccessBooking(booking);
       void revalidateRestaurantPublicPage(restaurantId);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось создать бронь');
+      setSubmitError(err instanceof ApiError ? err.message : 'Не удалось создать бронь');
     } finally {
       setSubmitting(false);
     }
@@ -139,7 +138,7 @@ export function RestaurantGuestBookingPage({
           />
 
           {!bookingSettings.bookingEnabled ? (
-          <p className="guest-booking__disabled">
+          <p className="guest-booking__disabled" data-testid="guest-page-first-block">
             Бронирование столов в этом заведении недоступно.
           </p>
         ) : successBooking ? (
@@ -169,7 +168,7 @@ export function RestaurantGuestBookingPage({
           </section>
         ) : (
           <>
-            <section className="guest-booking__panel">
+            <section className="guest-booking__panel" data-testid="guest-page-first-block">
               <h2 className="guest-booking__title">Параметры</h2>
               <div className="guest-booking__row">
                 <label className="guest-booking__field">
@@ -222,7 +221,7 @@ export function RestaurantGuestBookingPage({
               <section className="guest-booking__panel">
                 <h2 className="guest-booking__title">Время</h2>
                 {loadingAvail ? (
-                  <p className="guest-booking__muted">Загрузка слотов…</p>
+                  <GuestBookingSlotsSkeleton />
                 ) : (availability?.slots ?? []).length === 0 ? (
                   <p className="guest-booking__muted">
                     На выбранную дату нет свободных слотов. Возможно, заведение закрыто.

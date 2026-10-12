@@ -18,6 +18,7 @@ const DESKTOP_SCENARIOS: CheckoutScenario[] = ['step1', 'step2-delivery', 'step2
 /** One styling/settings write per worker. Repeating them on every shot trips the API rate limit and drops the pickup row. */
 let orderSettingsApplied = false;
 let appliedTheme: RestaurantColorTheme | null = null;
+let guestAddressesCleared = false;
 
 type CheckoutScenario =
   | 'step1'
@@ -224,7 +225,10 @@ test.describe('Cart checkout visual', () => {
   test.beforeEach(async ({ seed, asGuest }) => {
     void asGuest;
     await ensureCheckoutOrderSettings(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
-    await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
+    if (!guestAddressesCleared) {
+      await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
+      guestAddressesCleared = true;
+    }
   });
 
   for (const theme of THEMES) {

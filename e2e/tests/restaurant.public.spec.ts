@@ -111,15 +111,27 @@ test.describe('Restaurant public page', () => {
   }) => {
     void asGuest;
     const menu = await apiClient.getMenu(seed.restaurantId);
-    const firstItem = menu.categories.flatMap((c) => c.items)[0];
-    test.skip(!firstItem, 'Need a menu item');
+    const items = menu.categories.flatMap((c) => c.items);
+    const firstItem = items[0];
+    const secondItem = items.find((item) => item.id !== firstItem?.id);
+    test.skip(!firstItem || !secondItem, 'Need two menu items');
+
+    await apiClient.addGuestFavorite(
+      seed.restaurantId,
+      seed.guest.accessToken,
+      firstItem!.id,
+    );
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     const heart = page
       .getByTestId(`menu-item-${firstItem!.id}`)
       .locator('.favorite-heart-button');
-    await heart.click();
-    await expect(heart).toHaveClass(/favorite-heart-button--active/);
+    const heart2 = page
+      .getByTestId(`menu-item-${secondItem!.id}`)
+      .locator('.favorite-heart-button');
+    await expect(heart).toHaveAttribute('aria-pressed', 'true');
+    await heart2.click();
+    await expect(heart2).toHaveAttribute('aria-pressed', 'true');
 
     await page.getByTestId(`menu-item-${firstItem!.id}`).click();
     await expect(page.getByTestId('menu-add-to-cart')).toBeVisible();
@@ -136,12 +148,17 @@ test.describe('Restaurant public page', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await expect(page.getByTestId('cart-button')).toHaveAttribute('aria-label', 'Корзина');
-    await expect(
-      page.getByTestId(`menu-item-${firstItem!.id}`).locator('.favorite-heart-button'),
-    ).not.toHaveClass(/favorite-heart-button--active/);
+    await expect(heart).not.toHaveAttribute('aria-pressed', 'true');
+    await expect(heart2).not.toHaveAttribute('aria-pressed', 'true');
 
     await page.goto(`/restaurants/${seed.restaurantId}/favorites`);
     await expect(page.getByTestId('guest-favorites-empty')).toBeVisible();
+
+    await apiClient.removeGuestFavorite(
+      seed.restaurantId,
+      seed.guest.accessToken,
+      secondItem!.id,
+    );
   });
 
   test('авторизованный гость видит страницу аккаунта', async ({ page, seed, asGuest }) => {

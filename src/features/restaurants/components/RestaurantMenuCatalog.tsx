@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useMemo, useState } from 'react';
 import type { MenuItem, MenuResponse } from '@/shared/types/menu';
 import { useHydrateFavorites } from '@/hooks/useHydrateFavorites';
@@ -8,8 +9,16 @@ import { useMenuCategoryNavOptional } from '../context/MenuCategoryNavContext';
 import { getAvailableMenuCategories } from '../utils/menu-catalog.util';
 import { MenuCategoryNav } from './MenuCategoryNav';
 import { MenuProductCard } from './MenuProductCard';
-import { MenuProductDetailModal } from './MenuProductDetailModal';
 import '../styles/restaurant-menu.scss';
+
+const MenuProductDetailModal = dynamic(
+  () => import('./MenuProductDetailModal').then((module) => module.MenuProductDetailModal),
+  { ssr: false, loading: () => null },
+);
+
+function preloadMenuProductDetailModal() {
+  void import('./MenuProductDetailModal');
+}
 
 interface RestaurantMenuCatalogProps {
   restaurantId: string;
@@ -21,6 +30,7 @@ export function RestaurantMenuCatalog({
   menu,
 }: RestaurantMenuCatalogProps) {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+
   const { styling } = useRestaurantStylingOptional();
   const favoritesEnabled = styling.favoritesEnabled !== false;
   const navContext = useMenuCategoryNavOptional();
@@ -69,6 +79,7 @@ export function RestaurantMenuCatalog({
                 restaurantId={restaurantId}
                 item={item}
                 onSelect={setSelectedItem}
+                onPreload={preloadMenuProductDetailModal}
               />
             ))}
           </div>

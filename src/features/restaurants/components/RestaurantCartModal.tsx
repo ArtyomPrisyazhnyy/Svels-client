@@ -13,6 +13,7 @@ import { Textarea } from '@/shared/ui/Textarea/Textarea';
 import { IconBack } from '@/shared/ui/icons/icons';
 import { formatCartItemsCount } from '../utils/cart-items-label.util';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useCartStore } from '@/store/cart.store';
 import { ApiError } from '@/shared/api/api-client';
 import { fetchRestaurantLocations } from '../api/locations.api';
@@ -97,6 +98,7 @@ export function RestaurantCartModal({
   onClose,
   onOpenAuth,
 }: RestaurantCartModalProps) {
+  const authHydrated = useAuthHydrated();
   const user = useAuthStore((s) => s.user);
   const accessToken = useAuthStore((s) => s.accessToken);
   const paths = useRestaurantGuestPaths(restaurantId);
@@ -367,7 +369,8 @@ export function RestaurantCartModal({
 
   const canSubmit = checkoutValidation.canSubmit;
 
-  const canContinueToStep2 = items.length > 0 && !ordersPaused && successOrderNumber === null;
+  const canContinueToStep2 =
+    authHydrated && items.length > 0 && !ordersPaused && successOrderNumber === null;
 
   function expandRows(keys: CartDetailRowKey[]) {
     setExpandedRows((prev) => {

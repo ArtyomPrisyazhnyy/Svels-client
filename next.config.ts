@@ -13,9 +13,10 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
+    // Keep client router prefetched RSC payloads warm (guest subpages revisit without full refetch).
     staleTimes: {
-      dynamic: 0,
-      static: 0,
+      dynamic: 30,
+      static: 180,
     },
   },
   // Доступ к dev-серверу с телефона/другого ПК в локальной сети

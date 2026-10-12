@@ -41,6 +41,8 @@ interface GuestAddressesState {
   reset: () => void;
 }
 
+const addressLoadInflight = new Map<string, Promise<void>>();
+
 function emptyRestaurantState(): RestaurantGuestAddresses {
   return { addresses: [], status: 'idle', selectedId: null };
 }
@@ -96,44 +98,59 @@ export const useGuestAddressesStore = create<GuestAddressesState>()((set) => ({
     });
   },
 
-  loadAddresses: async (restaurantId, token) => {
-    set((state) => ({
-      byRestaurant: {
-        ...state.byRestaurant,
-        [restaurantId]: {
-          ...getRestaurantState(state.byRestaurant, restaurantId),
-          status: 'loading',
-        },
-      },
-    }));
+  loadAddresses: (restaurantId, token) => {
+    const inflight = addressLoadInflight.get(restaurantId);
+    if (inflight) {
+      return inflight;
+    }
 
-    try {
-      const rows = sortAddresses(await fetchGuestAddresses(restaurantId, token));
-      set((state) => {
-        const previous = getRestaurantState(state.byRestaurant, restaurantId);
-        const selectedId = withSelectedAfterListChange(rows, previous.selectedId);
-        return {
-          byRestaurant: {
-            ...state.byRestaurant,
-            [restaurantId]: {
-              addresses: rows,
-              status: 'ready',
-              selectedId,
-            },
-          },
-        };
-      });
-    } catch {
+    const job = (async () => {
       set((state) => ({
         byRestaurant: {
           ...state.byRestaurant,
           [restaurantId]: {
             ...getRestaurantState(state.byRestaurant, restaurantId),
-            status: 'error',
+            status: 'loading',
           },
         },
       }));
-    }
+
+      try {
+        const rows = sortAddresses(await fetchGuestAddresses(restaurantId, token));
+        set((state) => {
+          const previous = getRestaurantState(state.byRestaurant, restaurantId);
+          const selectedId = withSelectedAfterListChange(rows, previous.selectedId);
+          return {
+            byRestaurant: {
+              ...state.byRestaurant,
+              [restaurantId]: {
+                addresses: rows,
+                status: 'ready',
+                selectedId,
+              },
+            },
+          };
+        });
+      } catch {
+        set((state) => ({
+          byRestaurant: {
+            ...state.byRestaurant,
+            [restaurantId]: {
+              ...getRestaurantState(state.byRestaurant, restaurantId),
+              status: 'error',
+            },
+          },
+        }));
+      }
+    })();
+
+    addressLoadInflight.set(restaurantId, job);
+    void job.finally(() => {
+      if (addressLoadInflight.get(restaurantId) === job) {
+        addressLoadInflight.delete(restaurantId);
+      }
+    });
+    return job;
   },
 
   createAddress: async (restaurantId, token, payload) => {

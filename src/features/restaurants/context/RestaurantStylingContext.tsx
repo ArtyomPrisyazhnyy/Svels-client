@@ -46,7 +46,12 @@ function RestaurantStylingRoot({
     .join(' ');
 
   return (
-    <div className={rootClassName} style={cssVars} {...domProps}>
+    <div
+      className={rootClassName}
+      style={cssVars}
+      data-rs-theme={styling.colorTheme}
+      {...domProps}
+    >
       {children}
     </div>
   );

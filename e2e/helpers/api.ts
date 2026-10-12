@@ -39,6 +39,16 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/** Shared pause so a 429 does not turn into a retry storm against the 100/min limiter. */
+let rateLimitedUntil = 0;
+
+async function waitOutRateLimit(): Promise<void> {
+  const delay = rateLimitedUntil - Date.now();
+  if (delay > 0) {
+    await sleep(delay);
+  }
+}
+
 async function api<T>(
   method: string,
   pathname: string,
@@ -49,9 +59,11 @@ async function api<T>(
   } = {},
 ): Promise<T> {
   const retries = options.retries ?? 5;
+  const throttleRetries = Math.min(retries, 2);
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
+    await waitOutRateLimit();
     const headers: Record<string, string> = {
       Accept: 'application/json',
     };
@@ -72,8 +84,9 @@ async function api<T>(
     const text = await response.text();
     const data = text ? (JSON.parse(text) as unknown) : null;
 
-    if (response.status === 429 && attempt < retries) {
-      await sleep(1500 * (attempt + 1));
+    if (response.status === 429 && attempt < throttleRetries) {
+      rateLimitedUntil = Math.max(rateLimitedUntil, Date.now() + 10_000);
+      await waitOutRateLimit();
       continue;
     }
 
@@ -246,6 +259,33 @@ export const apiClient = {
     return api<{ bookingEnabled: boolean; mode: string }>(
       'GET',
       `/restaurants/${restaurantId}/booking-settings`,
+    );
+  },
+
+  updateBookingSettings(
+    restaurantId: string,
+    token: string,
+    payload: { bookingEnabled?: boolean },
+  ) {
+    return api<{ bookingEnabled: boolean }>('PATCH', `/restaurants/${restaurantId}/booking-settings`, {
+      token,
+      body: payload,
+    });
+  },
+
+  addGuestFavorite(restaurantId: string, token: string, menuItemId: string) {
+    return api<{ menuItemIds: string[] }>(
+      'POST',
+      `/restaurants/${restaurantId}/favorites/${menuItemId}`,
+      { token },
+    );
+  },
+
+  removeGuestFavorite(restaurantId: string, token: string, menuItemId: string) {
+    return api<{ menuItemIds: string[] }>(
+      'DELETE',
+      `/restaurants/${restaurantId}/favorites/${menuItemId}`,
+      { token },
     );
   },
 

@@ -1,0 +1,215 @@
+.venue-subpage .ui-skeleton {
+  background: color-mix(in srgb, var(--rs-text) 12%, var(--rs-surface));
+}
+
+.venue-subpage .ui-skeleton.guest-page-skeleton__page-heading {
+  background: color-mix(in srgb, var(--rs-text) 10%, var(--rs-bg));
+}
+
+.venue-subpage .ui-skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--rs-text) 6%, transparent),
+    transparent
+  );
+}
+
+.guest-page-skeleton__page-heading {
+  display: inline-block;
+  width: 11rem;
+  max-width: 55%;
+  height: 1.25em;
+  vertical-align: top;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__greeting-bar {
+  display: block;
+  width: 72%;
+  height: 1.35rem;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__contact-bar {
+  display: block;
+  width: 48%;
+  height: 1rem;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__hint-bar {
+  display: block;
+  width: 92%;
+  height: 2.6rem;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__logout-bar {
+  display: block;
+  width: 5.5rem;
+  height: var(--control-h-sm, 2.5rem);
+  margin-top: var(--space-3);
+  border-radius: var(--rs-btn-radius, 12px);
+}
+
+.guest-page-skeleton__section-title {
+  display: inline-block;
+  width: 6.5rem;
+  height: 1.05rem;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__address-row {
+  display: block;
+  width: 100%;
+  min-height: 64px;
+  border-radius: var(--rs-card-radius, var(--radius-lg));
+}
+
+.guest-page-skeleton__action-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.guest-page-skeleton__action-link {
+  display: block;
+  width: 100%;
+  height: 3rem;
+  border-radius: var(--rs-btn-radius, 12px);
+}
+
+.guest-page-skeleton__booking-line {
+  display: block;
+  width: 70%;
+  height: 0.95rem;
+  border-radius: var(--radius-sm);
+
+  &--short {
+    width: 45%;
+    height: 0.9rem;
+  }
+}
+
+.guest-page-skeleton__booking-badge {
+  display: inline-block;
+  width: 4.5rem;
+  height: 1.25rem;
+  border-radius: 999px;
+}
+
+.guest-page-skeleton__order-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.guest-page-skeleton__order-row {
+  pointer-events: none;
+  cursor: default;
+}
+
+.guest-page-skeleton__order-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.guest-page-skeleton__order-row-title {
+  display: block;
+  width: 4rem;
+  height: 1rem;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__order-row-badge {
+  display: block;
+  width: 4.5rem;
+  height: 1.25rem;
+  border-radius: 999px;
+}
+
+.guest-page-skeleton__order-row-meta {
+  display: block;
+  width: 80%;
+  height: 0.85rem;
+  margin-bottom: 0.25rem;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__order-row-date {
+  display: block;
+  width: 55%;
+  height: 0.8rem;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__field-label {
+  display: block;
+  width: 3rem;
+  height: 0.85rem;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__field-input {
+  display: block;
+  width: 100%;
+  height: 2.75rem;
+  border-radius: 10px;
+}
+
+.guest-page-skeleton__field-textarea {
+  display: block;
+  width: 100%;
+  height: 5.5rem;
+  border-radius: 10px;
+}
+
+.guest-page-skeleton__slot {
+  display: block;
+  width: 100%;
+  min-height: 2.5rem;
+  border-radius: 10px;
+}
+
+.guest-page-skeleton__submit {
+  display: block;
+  width: 100%;
+  height: 3rem;
+  border-radius: var(--rs-btn-radius, 12px);
+}
+
+.guest-page-skeleton__product-grid {
+  width: 100%;
+}
+
+.guest-page-skeleton__product-card {
+  pointer-events: none;
+  cursor: default;
+}
+
+.guest-page-skeleton__product-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border-radius: 0;
+}
+
+.guest-page-skeleton__product-title {
+  display: block;
+  width: 85%;
+  height: 0.8125rem;
+  border-radius: var(--radius-sm);
+}
+
+.guest-page-skeleton__product-price {
+  display: block;
+  width: 45%;
+  height: 1.05rem;
+  margin-top: auto;
+  border-radius: var(--radius-sm);
+}
