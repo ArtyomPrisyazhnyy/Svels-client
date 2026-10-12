@@ -1,6 +1,7 @@
 import { test, expect, apiClient } from '../fixtures/test';
 import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
 import { clearGuestAddresses } from '../helpers/guest-addresses';
+import { readSeed } from '../helpers/env';
 async function enableDeliveryOnly(restaurantId: string, adminToken: string) {
   await apiClient.setOrderSettings(restaurantId, adminToken, {
     fulfillmentDelivery: true,
@@ -55,7 +56,7 @@ test.describe('Guest saved addresses', () => {
     await page.getByTestId('cart-close').click();
     await expect(page.getByTestId('restaurant-cart-modal')).toHaveCount(0);
 
-    await page.getByTestId('cart-button').click();
+    await addMenuItemToCart(page, seed.menu.defaultMenuItemId);
     await goToDeliveryCheckout(page);
     await expect(page.getByTestId('checkout-address-row')).toBeVisible();
     await expect(page.getByTestId('checkout-address-row')).toContainText('Пушкина');
@@ -80,7 +81,7 @@ test.describe('Guest saved addresses', () => {
     await page.getByTestId(`address-option-${work!.id}`).getByRole('button').first().click();
     await expect(page.getByTestId('address-sheet')).toHaveCount(0);
 
-    await page.getByTestId('cart-button').click();
+    await addMenuItemToCart(page, seed.menu.defaultMenuItemId);
     await goToDeliveryCheckout(page);
     await expect(page.getByTestId('checkout-address-row')).toContainText('Работа');
 
@@ -109,7 +110,8 @@ test.describe('Guest saved addresses', () => {
     await expect(page.getByTestId('guest-address-list')).toBeVisible();
   });
 
-  test.afterAll(async ({ seed }) => {
+  test.afterAll(async () => {
+    const seed = readSeed();
     await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
   });
 

@@ -185,7 +185,11 @@ test.describe('Addresses visual', () => {
             await page.getByTestId('address-add').click();
             const panel = page.getByTestId('address-sheet');
             await expect(panel).toBeVisible();
-            await expect(page.getByTestId('guest-address-form')).toBeVisible();
+            const footerAdd = panel.getByTestId('address-add');
+            if (await footerAdd.isVisible()) {
+              await footerAdd.click();
+            }
+            await expect(page.getByTestId('address-save')).toBeVisible();
             await prepareForScreenshot(page);
             await expect(panel).toHaveScreenshot(
               `addresses-${scenario}-${theme}-${viewportKey}.png`,
