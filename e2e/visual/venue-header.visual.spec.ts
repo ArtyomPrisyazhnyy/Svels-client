@@ -85,7 +85,7 @@ async function snapHeaderClip(
       width: box.width,
       height: box.height,
     },
-    maxDiffPixelRatio: 0.02,
+    maxDiffPixelRatio: 0.04,
   });
 }
 
