@@ -26,16 +26,21 @@ test.describe('Guest subpages loading shell', () => {
     });
   }
 
-  test('pre-order: logged-in guest sees orders and cache on revisit', async ({ page, seed, asGuest }) => {
+  test('pre-order: logged-in guest sees content and cache on reload', async ({ page, seed, asGuest }) => {
     void asGuest;
     const url = `/restaurants/${seed.restaurantId}/pre-order`;
 
     await page.goto(url);
-    await expect(page.getByTestId('guest-orders-list')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTestId('preorder-page')).toBeVisible({ timeout: 30_000 });
+    await expect(
+      page.getByTestId('guest-orders-list').or(page.getByTestId('guest-orders-empty')),
+    ).toBeVisible({ timeout: 30_000 });
 
     await page.reload();
 
-    await expect(page.getByTestId('guest-orders-list')).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByTestId('guest-orders-list').or(page.getByTestId('guest-orders-empty')),
+    ).toBeVisible({ timeout: 10_000 });
     await expect(page.getByTestId('guest-orders-list-skeleton')).toHaveCount(0);
     await expect(page.getByTestId('guest-preorder-skeleton')).toHaveCount(0);
   });

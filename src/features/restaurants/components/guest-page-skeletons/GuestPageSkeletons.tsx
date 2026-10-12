@@ -3,6 +3,7 @@ import { Stack } from '@/shared/ui/Stack/Stack';
 import '@/features/restaurants/styles/guest-orders-page.scss';
 import '@/features/restaurants/styles/restaurant-favorites-page.scss';
 import '@/features/restaurants/styles/restaurant-guest-account-page.scss';
+import '@/features/restaurants/styles/guest-addresses.scss';
 import '@/features/restaurants/styles/restaurant-menu.scss';
 import '@/views/restaurant-guest-booking.scss';
 import './guest-page-skeletons.scss';
@@ -24,20 +25,34 @@ export function GuestAccountPageSkeleton() {
       <main className="venue-subpage__main restaurant-guest-account__main">
         <Stack gap={4} className="venue-subpage__stack">
           <GuestPageTitleSkeleton testId="guest-account-skeleton-title" />
-          <section className="restaurant-guest-account__profile-card guest-page-skeleton__card">
+          <section
+            className="restaurant-guest-account__profile-card guest-page-skeleton__card"
+            data-testid="guest-page-first-block"
+          >
             <Skeleton variant="text" height={22} width="70%" />
             <Skeleton variant="text" height={16} width="45%" />
             <Skeleton variant="text" lines={2} />
             <Skeleton variant="rect" height={40} width={96} radius="var(--rs-btn-radius, 12px)" />
           </section>
-          <section className="restaurant-guest-account__section guest-page-skeleton__card">
+          <section
+            className="restaurant-guest-account__section guest-account-addresses guest-page-skeleton__card"
+            data-testid="guest-account-addresses-skeleton"
+            aria-hidden
+          >
+            <h2>Мои адреса</h2>
+            <Stack gap={2}>
+              <Skeleton variant="rect" height={64} radius="var(--rs-card-radius, var(--radius-lg))" />
+              <Skeleton variant="rect" height={64} radius="var(--rs-card-radius, var(--radius-lg))" />
+            </Stack>
+          </section>
+          <section className="restaurant-guest-account__section guest-page-skeleton__card" aria-hidden>
             <Skeleton variant="text" height={18} width="35%" />
             <div className="guest-page-skeleton__action-links">
               <Skeleton variant="rect" height={48} radius="var(--rs-btn-radius, 12px)" />
               <Skeleton variant="rect" height={48} radius="var(--rs-btn-radius, 12px)" />
             </div>
           </section>
-          <section className="restaurant-guest-account__section guest-page-skeleton__card">
+          <section className="restaurant-guest-account__section guest-page-skeleton__card" aria-hidden>
             <Skeleton variant="text" height={18} width="40%" />
             <SkeletonList rows={2} testId="guest-account-skeleton-bookings" />
           </section>
