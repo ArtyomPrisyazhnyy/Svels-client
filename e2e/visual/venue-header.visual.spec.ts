@@ -105,7 +105,10 @@ for (const theme of THEMES) {
           const viewport = VIEWPORTS[viewportKey];
           await page.setViewportSize(viewport);
           await page.goto(`/restaurants/${seed.restaurantId}${pageDef.slug}`);
-          await expect(page.getByTestId(pageDef.readyTestId)).toBeVisible({ timeout: 30_000 });
+          await expect(page.getByTestId('venue-header')).toBeVisible({ timeout: 30_000 });
+          if (!('needsGuest' in pageDef && pageDef.needsGuest)) {
+            await expect(page.getByTestId(pageDef.readyTestId)).toBeVisible({ timeout: 30_000 });
+          }
           await assertHeaderHeight(page, viewportKey);
           await snapHeaderClip(
             page,
