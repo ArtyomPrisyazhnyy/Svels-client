@@ -31,6 +31,8 @@ export interface SegmentedControlProps<T extends string> {
   switcherStyle?: SegmentedSwitcherStyle;
   /** Adds legacy `fulfillment-selector*` classes for cart selectors only. */
   legacyFulfillmentClasses?: boolean;
+  /** Tighter option padding so two-line labels stay on one line inside cart cards. */
+  compact?: boolean;
   className?: string;
   testId?: string;
 }
@@ -50,6 +52,7 @@ export function SegmentedControl<T extends string>({
   fullWidth = true,
   switcherStyle = 'pill',
   legacyFulfillmentClasses = false,
+  compact = false,
   className,
   testId,
 }: SegmentedControlProps<T>) {
@@ -161,6 +164,7 @@ export function SegmentedControl<T extends string>({
     'ui-seg',
     'ui-segmented',
     `ui-seg--${size}`,
+    compact && 'ui-seg--compact',
     !legacyFulfillmentClasses && `ui-seg--style-${switcherStyle}`,
     legacyFulfillmentClasses && 'ui-seg--legacy',
     fullWidth ? 'ui-seg--full' : 'ui-seg--fit',

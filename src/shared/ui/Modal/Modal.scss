@@ -28,6 +28,14 @@
   transition: opacity var(--duration-base) var(--ease-standard);
 }
 
+.ui-modal__backdrop {
+  z-index: var(--z-modal);
+}
+
+.ui-sheet__backdrop {
+  z-index: var(--z-sheet);
+}
+
 .ui-modal__backdrop--active,
 .ui-sheet__backdrop--active {
   opacity: 1;
@@ -51,6 +59,7 @@
     opacity var(--duration-base) var(--ease-standard),
     transform var(--duration-base) var(--ease-standard);
   min-width: 0;
+  overflow: hidden;
 }
 
 .ui-overlay-panel--active {
@@ -107,6 +116,10 @@
 
 .ui-overlay-panel__header-end {
   justify-content: flex-end;
+}
+
+.ui-overlay-panel__header .ui-icon-btn {
+  color: var(--rs-text);
 }
 
 .ui-overlay-panel__title {

@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useMemo, useState } from 'react';
 import { Carousel } from '@/shared/components/Carousel';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
-import { useModalPresence } from '@/hooks/useModalPresence';
+import { Modal } from '@/shared/ui/Modal/Modal';
 import {
   resolvePromoBannerAspectRatio,
   type PromoBanner,
@@ -15,8 +14,6 @@ import {
   markPromoBannerSeen,
 } from '../utils/promo-banner-seen.util';
 import '../styles/promo-banner-modal.scss';
-
-const MODAL_ANIMATION_MS = 200;
 
 interface PromoBannersHostProps {
   banners: PromoBanner[];
@@ -65,56 +62,26 @@ function PromoBannerModal({
   banner: PromoBanner;
   onClose: () => void;
 }) {
-  const { mounted, isActive, handleClose } = useModalPresence(onClose, MODAL_ANIMATION_MS);
+  const title = banner.title?.trim() || 'Акция';
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleClose();
-      }
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [handleClose]);
-
-  if (!mounted || typeof document === 'undefined') {
-    return null;
-  }
-
-  return createPortal(
-    <RestaurantStylingPortalRoot>
-      <button
-        type="button"
-        className={`promo-banner-modal__backdrop${isActive ? ' promo-banner-modal--active' : ''}`}
-        aria-label="Закрыть"
-        onClick={handleClose}
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title={title}
+      rootTestId="promo-banner-modal"
+      testId="promo-banner-modal-panel"
+      closeTestId="promo-banner-modal-close"
+      panelClassName="promo-banner-modal__panel"
+      size="sm"
+      wrap={(node) => <RestaurantStylingPortalRoot>{node}</RestaurantStylingPortalRoot>}
+    >
+      <BannerMedia
+        banner={banner}
+        imageClassName="promo-banner-modal__image"
+        linkClassName="promo-banner-modal__link"
       />
-      <div className="promo-banner-modal" role="presentation">
-        <div
-          className={`promo-banner-modal__panel${isActive ? ' promo-banner-modal--active' : ''}`}
-          role="dialog"
-          aria-modal="true"
-          aria-label={banner.title?.trim() || 'Акция'}
-        >
-          <button
-            type="button"
-            className="promo-banner-modal__close"
-            aria-label="Закрыть"
-            onClick={handleClose}
-          >
-            ×
-          </button>
-          <BannerMedia
-            banner={banner}
-            imageClassName="promo-banner-modal__image"
-            linkClassName="promo-banner-modal__link"
-          />
-          {banner.title && <p className="promo-banner-modal__title">{banner.title}</p>}
-        </div>
-      </div>
-    </RestaurantStylingPortalRoot>,
-    document.body,
+    </Modal>
   );
 }
 
@@ -184,17 +151,23 @@ export function PromoBannersHost({ banners, persistSeen = true }: PromoBannersHo
     [banners],
   );
 
-  const [modalBanner, setModalBanner] = useState<PromoBanner | null>(null);
-
-  useEffect(() => {
-    setModalBanner(pickModalBanner(modalCandidates));
-  }, [modalCandidates]);
+  const candidateKey = modalCandidates.map((banner) => banner.id).join('|');
+  const [bannerState, setBannerState] = useState<{ key: string; banner: PromoBanner | null }>({
+    key: candidateKey,
+    banner: pickModalBanner(modalCandidates),
+  });
+  if (bannerState.key !== candidateKey) {
+    setBannerState({ key: candidateKey, banner: pickModalBanner(modalCandidates) });
+  }
+  const modalBanner = bannerState.key === candidateKey
+    ? bannerState.banner
+    : pickModalBanner(modalCandidates);
 
   function handleModalClose() {
     if (modalBanner && persistSeen && modalBanner.displayFrequency === 'once') {
       markPromoBannerSeen(modalBanner.id);
     }
-    setModalBanner(null);
+    setBannerState({ key: candidateKey, banner: null });
   }
 
   return (

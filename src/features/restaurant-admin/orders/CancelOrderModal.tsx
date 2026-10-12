@@ -1,6 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/shared/ui/Button/Button';
+import { Field } from '@/shared/ui/Field/Field';
+import { Modal } from '@/shared/ui/Modal/Modal';
+import { Textarea } from '@/shared/ui/Textarea/Textarea';
 
 interface CancelOrderModalProps {
   open: boolean;
@@ -24,29 +28,40 @@ export function CancelOrderModal({
     onClose();
   }
 
-  if (!open) {
-    return null;
-  }
-
   const trimmed = reason.trim();
   const valid = trimmed.length >= 1 && trimmed.length <= 300;
 
   return (
-    <div className="orders-admin__modal-backdrop" role="presentation" onClick={handleClose}>
-      <div
-        className="orders-admin__modal"
-        role="dialog"
-        aria-labelledby="cancel-order-title"
-        onClick={(e) => e.stopPropagation()}
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title={`Отменить заказ${orderNumber != null ? ` №${orderNumber}` : ''}?`}
+      titleId="cancel-order-title"
+      testId="cancel-order-modal"
+      closeTestId="cancel-order-close"
+      size="sm"
+      footer={
+        <div className="orders-admin__modal-actions">
+          <Button type="button" variant="ghost" onClick={handleClose} disabled={busy}>
+            Назад
+          </Button>
+          <Button
+            type="button"
+            variant="danger"
+            onClick={() => onConfirm(trimmed)}
+            disabled={!valid || busy}
+          >
+            {busy ? 'Отмена…' : 'Отменить заказ'}
+          </Button>
+        </div>
+      }
+    >
+      <Field
+        label="Причина отмены"
+        htmlFor="cancel-order-reason"
+        hint="Для гостя и персонала, 1–300 символов"
       >
-        <h3 id="cancel-order-title" className="orders-admin__modal-title">
-          Отменить заказ{orderNumber != null ? ` №${orderNumber}` : ''}?
-        </h3>
-        <p className="orders-admin__modal-hint">
-          Укажите причину отмены для гостя и персонала (1–300 символов).
-        </p>
-        <textarea
-          className="orders-admin__modal-textarea"
+        <Textarea
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           maxLength={300}
@@ -54,26 +69,8 @@ export function CancelOrderModal({
           placeholder="Например: нет ингредиентов"
           disabled={busy}
         />
-        <p className="orders-admin__modal-counter">{trimmed.length}/300</p>
-        <div className="orders-admin__modal-actions">
-          <button
-            type="button"
-            className="orders-admin__btn orders-admin__btn--ghost"
-            onClick={handleClose}
-            disabled={busy}
-          >
-            Назад
-          </button>
-          <button
-            type="button"
-            className="orders-admin__btn orders-admin__btn--danger"
-            onClick={() => onConfirm(trimmed)}
-            disabled={!valid || busy}
-          >
-            {busy ? 'Отмена…' : 'Отменить заказ'}
-          </button>
-        </div>
-      </div>
-    </div>
+      </Field>
+      <p className="orders-admin__modal-counter">{trimmed.length}/300</p>
+    </Modal>
   );
 }

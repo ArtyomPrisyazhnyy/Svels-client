@@ -45,6 +45,13 @@
   font-size: var(--text-lg);
 }
 
+.ui-icon-btn svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 .ui-icon-btn--surface {
   background: color-mix(in srgb, var(--rs-text) 6%, var(--rs-surface));
   color: var(--rs-text);

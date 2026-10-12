@@ -5,7 +5,7 @@ import {
   type PaymentKey,
   type RestaurantOrderSettings,
 } from '@/shared/types/order-settings';
-import { SegmentedSwitcher } from './SegmentedSwitcher';
+import { SegmentedControl } from '@/shared/ui';
 
 interface PaymentSelectorProps {
   settings: RestaurantOrderSettings;
@@ -21,11 +21,15 @@ export function PaymentSelector({ settings, value, onChange }: PaymentSelectorPr
   }
 
   return (
-    <SegmentedSwitcher
-      options={options}
+    <SegmentedControl
+      options={options.map((option) => ({ value: option.key, label: option.title }))}
       value={value}
       onChange={onChange}
       ariaLabel="Способ оплаты"
+      legacyFulfillmentClasses
+      compact
+      fullWidth
+      testId="cart-payment-segmented"
     />
   );
 }

@@ -70,9 +70,8 @@ test.describe('Restaurant public page', () => {
     await page.getByTestId('cart-go-to-checkout').click();
     await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
     const locationRow = page.getByTestId('cart-location-row');
-    if (await locationRow.isVisible()) {
-      await locationRow.getByRole('button').click();
-    }
+    await expect(locationRow).toBeVisible({ timeout: 20_000 });
+    await locationRow.getByRole('button').click();
     await expect(page.getByTestId('cart-location-picker')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('cart-location-address')).toBeVisible();
     await expect(page.getByTestId('location-map')).toBeVisible();

@@ -12,6 +12,8 @@ import { useAuthStore } from '@/store/auth.store';
 import { useFavoritesStore } from '@/store/favorites.store';
 import { ApiError } from '@/shared/api/api-client';
 import { PhoneInput } from '@/shared/components/PhoneInput';
+import { Button } from '@/shared/ui/Button/Button';
+import { Field } from '@/shared/ui/Field/Field';
 import type { OtpDeliveryChannel } from '@/shared/types/auth';
 import { toPhoneApiValue, isCompleteBelarusPhone } from '@/shared/utils/phone.util';
 import { useRestaurantStylingOptional } from '@/features/restaurants/context/RestaurantStylingContext';
@@ -279,8 +281,7 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
     <form className="auth-form" onSubmit={handleSendPhone} data-testid="guest-otp-phone-form">
       {error && <p className="auth-error" data-testid="auth-error">{error}</p>}
 
-      <div className="auth-field">
-        <label htmlFor="otp-phone">Телефон</label>
+      <Field label="Телефон" htmlFor="otp-phone">
         <PhoneInput
           id="otp-phone"
           required
@@ -288,7 +289,7 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
           onChange={setPhone}
           data-testid="otp-phone"
         />
-      </div>
+      </Field>
 
       <label className="auth-hint" style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
         <input
@@ -306,14 +307,15 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
         </span>
       </label>
 
-      <button
-        className="auth-submit"
+      <Button
         type="submit"
+        variant="primary"
+        fullWidth
         disabled={loading || !privacyConsent}
-        data-testid="otp-send-submit"
+        testId="otp-send-submit"
       >
         {loading ? 'Отправка…' : 'Получить код'}
-      </button>
+      </Button>
     </form>
   );
 }

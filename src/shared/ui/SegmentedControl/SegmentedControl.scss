@@ -44,6 +44,12 @@
   padding: 6px 8px;
 }
 
+.ui-seg.ui-seg--compact .ui-seg__option {
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3);
+  min-height: calc(var(--control-h-md) + var(--space-2));
+}
+
 .ui-seg__thumb {
   position: absolute;
   top: 0;

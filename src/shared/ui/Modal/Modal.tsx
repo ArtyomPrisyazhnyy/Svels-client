@@ -24,6 +24,14 @@ export interface ModalProps {
   headerStart?: ReactNode;
   headerEnd?: ReactNode;
   testId?: string;
+  rootTestId?: string;
+  closeTestId?: string;
+  panelClassName?: string;
+  headerTestId?: string;
+  titleTestId?: string;
+  modalClassName?: string;
+  /** Wraps the portaled tree so venue tokens / focus styles apply outside the page shell. */
+  wrap?: (node: ReactNode) => ReactNode;
   children: ReactNode;
 }
 
@@ -38,6 +46,13 @@ function ModalInner({
   headerStart,
   headerEnd,
   testId,
+  rootTestId,
+  closeTestId,
+  panelClassName,
+  headerTestId,
+  titleTestId,
+  modalClassName,
+  wrap,
   children,
 }: Omit<ModalProps, 'open'>) {
   const { mounted, isActive, handleClose } = useModalPresence(onClose, MODAL_ANIMATION_MS);
@@ -53,7 +68,7 @@ function ModalInner({
 
   const backdropClass = cn('ui-modal__backdrop', isActive && 'ui-modal__backdrop--active');
 
-  return createPortal(
+  const tree = (
     <>
       <button
         type="button"
@@ -63,7 +78,10 @@ function ModalInner({
         onPointerDown={onBackdropPointerDown}
         onClick={onBackdropClick}
       />
-      <div className="ui-modal" data-testid={testId ? `${testId}-root` : undefined}>
+      <div
+        className={cn('ui-modal', modalClassName)}
+        data-testid={rootTestId ?? (testId ? `${testId}-root` : undefined)}
+      >
         <ModalPanel
           ref={panelRef}
           variant="modal"
@@ -77,13 +95,18 @@ function ModalInner({
           onRequestClose={handleClose}
           active={isActive}
           testId={testId}
+          closeTestId={closeTestId}
+          panelClassName={panelClassName}
+          headerTestId={headerTestId}
+          titleTestId={titleTestId}
         >
           {children}
         </ModalPanel>
       </div>
-    </>,
-    document.body,
+    </>
   );
+
+  return createPortal(wrap ? wrap(tree) : tree, document.body);
 }
 
 export function Modal({ open, onClose, ...rest }: ModalProps) {

@@ -50,20 +50,33 @@ export async function assertSegmentedControlStyled(page: Page): Promise<void> {
 
   const computed = await segmented.evaluate((el) => {
     const style = getComputedStyle(el);
+    const styledRoot = el.closest('.restaurant-styled');
     return {
       display: style.display,
       position: style.position,
       backgroundColor: style.backgroundColor,
+      switcher: styledRoot?.getAttribute('data-rs-switcher-style') ?? '',
     };
   });
 
-  if (
-    computed.display !== 'grid' ||
-    computed.position !== 'relative' ||
-    computed.backgroundColor === 'rgba(0, 0, 0, 0)' ||
-    computed.backgroundColor === 'transparent'
-  ) {
+  const tabs = computed.switcher === 'tabs';
+  const transparent =
+    computed.backgroundColor === 'rgba(0, 0, 0, 0)' || computed.backgroundColor === 'transparent';
+
+  if (computed.display !== 'grid' || computed.position !== 'relative' || (!tabs && transparent)) {
     throw new Error(`Segmented control is unstyled: ${JSON.stringify(computed)}`);
+  }
+
+  if (tabs) {
+    await page.waitForFunction(() => {
+      const option = document.querySelector('.ui-segmented .ui-seg__option[aria-checked="true"]');
+      if (!(option instanceof HTMLElement)) {
+        return false;
+      }
+      const border = getComputedStyle(option).borderBottomColor;
+      return border !== 'rgba(0, 0, 0, 0)' && border !== 'transparent';
+    });
+    return;
   }
 
   await page.waitForFunction(() => {
@@ -86,6 +99,7 @@ export async function assertSegmentedControlStyled(page: Page): Promise<void> {
 }
 
 export async function prepareForScreenshot(page: Page): Promise<void> {
+  await page.mouse.move(8, 8);
   await stylesheetsAccessible(page);
   await page.evaluate(async () => {
     document.documentElement.setAttribute('data-visual-test', 'true');

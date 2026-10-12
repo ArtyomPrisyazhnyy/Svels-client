@@ -2,6 +2,9 @@
 
 import { useMemo } from 'react';
 import type { RequestedAtMode } from '@/shared/types/cart';
+import { SegmentedControl } from '@/shared/ui';
+import { Field } from '@/shared/ui/Field/Field';
+import { Select } from '@/shared/ui/Select/Select';
 import { buildRequestedTimeSlots } from '../utils/requested-time.util';
 import '../styles/requested-time-picker.scss';
 
@@ -24,52 +27,51 @@ export function RequestedTimePicker({
     ? slotIso
     : slots[0]?.id ?? null;
 
+  const segmentedValue = mode === 'asap' ? 'asap' : 'slot';
+
   return (
     <div className="requested-time-picker" data-testid="requested-time-picker">
-      <div className="requested-time-picker__modes">
-        <button
-          type="button"
-          className={`requested-time-picker__mode${
-            mode === 'asap' ? ' requested-time-picker__mode--active' : ''
-          }`}
-          onClick={() => onModeChange('asap')}
-          data-testid="requested-time-asap"
-        >
-          Как можно скорее
-        </button>
-        <button
-          type="button"
-          className={`requested-time-picker__mode${
-            mode === 'slot' ? ' requested-time-picker__mode--active' : ''
-          }`}
-          onClick={() => {
-            onModeChange('slot');
-            if (!slotIso && effectiveSlot) {
-              onSlotChange(effectiveSlot);
-            }
-          }}
-          data-testid="requested-time-slot-mode"
-        >
-          Ко времени
-        </button>
-      </div>
+      <SegmentedControl
+        options={[
+          { value: 'asap', label: 'Как можно скорее', testId: 'requested-time-asap' },
+          { value: 'slot', label: 'Ко времени', testId: 'requested-time-slot-mode' },
+        ]}
+        value={segmentedValue}
+        onChange={(next) => {
+          if (next === 'asap') {
+            onModeChange('asap');
+            return;
+          }
+          onModeChange('slot');
+          if (!slotIso && effectiveSlot) {
+            onSlotChange(effectiveSlot);
+          }
+        }}
+        ariaLabel="Время доставки"
+        fullWidth
+        legacyFulfillmentClasses
+        compact
+        testId="cart-requested-time-segmented"
+      />
 
       {mode === 'slot' && (
-        <label className="requested-time-picker__select-wrap">
-          <span className="requested-time-picker__label">Время</span>
-          <select
-            className="requested-time-picker__select"
+        <Field
+          label="Время доставки/получения"
+          htmlFor="cart-requested-time-slot"
+          className="requested-time-picker__slot-field"
+        >
+          <Select
             value={effectiveSlot ?? ''}
             onChange={(e) => onSlotChange(e.target.value || null)}
-            data-testid="requested-time-slot-select"
+            testId="requested-time-slot-select"
           >
             {slots.map((slot) => (
               <option key={slot.id} value={slot.id}>
                 {slot.label}
               </option>
             ))}
-          </select>
-        </label>
+          </Select>
+        </Field>
       )}
     </div>
   );

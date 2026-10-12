@@ -1,12 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { NutritionBadges } from '@/features/restaurant-admin/components/NutritionBadges';
 import { MenuItemPriceDisplay } from '@/shared/components/MenuItemPriceDisplay';
 import { Carousel } from '@/shared/components/Carousel';
-import { useModalPresence } from '@/hooks/useModalPresence';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import { Button } from '@/shared/ui/Button/Button';
+import { Modal } from '@/shared/ui/Modal/Modal';
 import { getMenuItemImages, type MenuItem } from '@/shared/types/menu';
 import { MenuProductModifiers } from './MenuProductModifiers';
 import {
@@ -26,7 +26,26 @@ import { useFavoritesStore } from '@/store/favorites.store';
 import { FavoriteHeartButton } from './FavoriteHeartButton';
 import '../styles/menu-product-modal.scss';
 
-const MODAL_ANIMATION_MS = 200;
+function MenuModalPhoto({
+  src,
+  webpSrc,
+}: {
+  src: string;
+  webpSrc?: string | null;
+}): ReactNode {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return <div className="menu-product-modal__placeholder" aria-hidden="true" />;
+  }
+  return (
+    <ResponsiveImage
+      src={src}
+      webpSrc={webpSrc}
+      alt=""
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 interface MenuProductDetailModalProps {
   item: MenuItem;
@@ -39,9 +58,10 @@ export function MenuProductDetailModal({
   restaurantId,
   onClose,
 }: MenuProductDetailModalProps) {
-  const { mounted, isActive, handleClose } = useModalPresence(onClose, MODAL_ANIMATION_MS);
   const [quantity, setQuantity] = useState(1);
-  const [modifierSelections, setModifierSelections] = useState<ModifierSelections>({});
+  const [modifierSelections, setModifierSelections] = useState<ModifierSelections>(() =>
+    createEmptyModifierSelections(getValidModifierGroups(item.modifierGroups ?? [])),
+  );
   const addLine = useCartStore((s) => s.addLine);
   const { styling } = useRestaurantStylingOptional();
   const favoritesEnabled = styling.favoritesEnabled !== false;
@@ -77,12 +97,13 @@ export function MenuProductDetailModal({
     [modifierGroups, modifierSelections],
   );
 
-  useEffect(() => {
+  const modifierResetKey = `${item.id}:${modifierGroups.map((group) => group.id).join(',')}`;
+  const [appliedResetKey, setAppliedResetKey] = useState(modifierResetKey);
+  if (appliedResetKey !== modifierResetKey) {
+    setAppliedResetKey(modifierResetKey);
     setQuantity(1);
-    setModifierSelections(
-      createEmptyModifierSelections(getValidModifierGroups(item.modifierGroups ?? [])),
-    );
-  }, [item.id, item.modifierGroups]);
+    setModifierSelections(createEmptyModifierSelections(modifierGroups));
+  }
 
   const handleAdd = useCallback(() => {
     if (!canAdd) {
@@ -93,11 +114,11 @@ export function MenuProductDetailModal({
       restaurantId,
       buildCartLineItem(item, quantity, modifierGroups, modifierSelections),
     );
-    handleClose();
+    onClose();
   }, [
     addLine,
     canAdd,
-    handleClose,
+    onClose,
     item,
     modifierGroups,
     modifierSelections,
@@ -105,74 +126,87 @@ export function MenuProductDetailModal({
     restaurantId,
   ]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleClose]);
-
-  if (!mounted) {
-    return null;
-  }
-
   const title = item.variantLabel ? `${item.name} ${item.variantLabel}` : item.name;
-  const activeClass = isActive ? ' menu-product-modal--active' : '';
 
-  return createPortal(
-    <RestaurantStylingPortalRoot>
-      <>
-        <button
-        type="button"
-        className={`menu-product-modal__backdrop${activeClass}`}
-        onClick={handleClose}
-        aria-label="Закрыть"
-      />
-
-      <div
-        className={`menu-product-modal${activeClass}`}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="menu-product-modal-title"
-      >
-        <div className={`menu-product-modal__panel${activeClass}`}>
-          <button type="button" className="menu-product-modal__close" onClick={handleClose} aria-label="Закрыть">
-            ×
-          </button>
-
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title={title}
+      titleId="menu-product-modal-title"
+      titleTestId="menu-product-modal-title"
+      rootTestId="menu-product-modal"
+      testId="menu-product-modal-panel"
+      closeTestId="menu-product-modal-close"
+      panelClassName="menu-product-modal__panel"
+      size="md"
+      wrap={(node) => <RestaurantStylingPortalRoot>{node}</RestaurantStylingPortalRoot>}
+      footer={
+        <div className="menu-product-modal__footer">
+          <p className="menu-product-modal__price">
+            <MenuItemPriceDisplay
+              price={unitPrice}
+              oldPrice={oldUnitPrice}
+              quantity={quantity}
+            />
+          </p>
+          <div className="menu-product-modal__actions">
+            <div className="menu-product-modal__counter" aria-label="Количество">
+              <button
+                type="button"
+                className="menu-product-modal__counter-btn"
+                onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                disabled={quantity <= 1}
+                aria-label="Уменьшить количество"
+              >
+                −
+              </button>
+              <span className="menu-product-modal__counter-value" aria-live="polite">
+                {quantity}
+              </span>
+              <button
+                type="button"
+                className="menu-product-modal__counter-btn"
+                onClick={() => setQuantity((value) => value + 1)}
+                aria-label="Увеличить количество"
+              >
+                +
+              </button>
+            </div>
+            <Button
+              type="button"
+              variant="primary"
+              disabled={!canAdd}
+              onClick={handleAdd}
+              testId="menu-add-to-cart"
+              className="menu-product-modal__add"
+            >
+              Добавить
+            </Button>
+          </div>
+        </div>
+      }
+    >
           <div className="menu-product-modal__media">
-            {images.length > 0 ? (
-              hasGallery ? (
-                <Carousel
-                  className="menu-product-modal__carousel"
-                  slides={images.map((image, index) => (
-                    <ResponsiveImage
-                      key={`${image.url}-${index}`}
-                      src={image.url}
-                      webpSrc={image.webpUrl}
-                      alt={`${item.name}${index > 0 ? ` — фото ${index + 1}` : ''}`}
-                      loading={index === 0 ? 'eager' : 'lazy'}
-                    />
-                  ))}
-                  options={{ loop: true }}
-                  showArrows
-                  showDots
-                />
-              ) : (
-                <ResponsiveImage
-                  src={images[0].url}
-                  webpSrc={images[0].webpUrl}
-                  alt={item.name}
-                />
-              )
-            ) : null}
+            {images.length === 0 ? (
+              <div className="menu-product-modal__placeholder" aria-hidden="true" />
+            ) : hasGallery ? (
+              <Carousel
+                className="menu-product-modal__carousel"
+                slides={images.map((image, index) => (
+                  <MenuModalPhoto
+                    key={`${image.url}-${index}`}
+                    src={image.url}
+                    webpSrc={image.webpUrl}
+                  />
+                ))}
+                options={{ loop: true }}
+                showArrows
+                showDots
+              />
+            ) : (
+              <MenuModalPhoto src={images[0].url} webpSrc={images[0].webpUrl} />
+            )}
             {favoritesEnabled ? (
               <FavoriteHeartButton
                 active={isFavorite}
@@ -188,10 +222,6 @@ export function MenuProductDetailModal({
           </div>
 
           <div className="menu-product-modal__body">
-            <h2 id="menu-product-modal-title" className="menu-product-modal__title">
-              {title}
-            </h2>
-
             {item.description && (
               <p className="menu-product-modal__description">{item.description}</p>
             )}
@@ -218,55 +248,6 @@ export function MenuProductDetailModal({
               </div>
             )}
           </div>
-
-          <footer className="menu-product-modal__footer">
-            <p className="menu-product-modal__price">
-              <MenuItemPriceDisplay
-                price={unitPrice}
-                oldPrice={oldUnitPrice}
-                quantity={quantity}
-              />
-            </p>
-
-            <div className="menu-product-modal__actions">
-              <div className="menu-product-modal__counter" aria-label="Количество">
-                <button
-                  type="button"
-                  className="menu-product-modal__counter-btn"
-                  onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-                  disabled={quantity <= 1}
-                  aria-label="Уменьшить количество"
-                >
-                  −
-                </button>
-                <span className="menu-product-modal__counter-value" aria-live="polite">
-                  {quantity}
-                </span>
-                <button
-                  type="button"
-                  className="menu-product-modal__counter-btn"
-                  onClick={() => setQuantity((value) => value + 1)}
-                  aria-label="Увеличить количество"
-                >
-                  +
-                </button>
-              </div>
-
-              <button
-                type="button"
-                className="menu-product-modal__add"
-                disabled={!canAdd}
-                onClick={handleAdd}
-                data-testid="menu-add-to-cart"
-              >
-                Добавить
-              </button>
-            </div>
-          </footer>
-        </div>
-      </div>
-      </>
-    </RestaurantStylingPortalRoot>,
-    document.body,
+    </Modal>
   );
 }
