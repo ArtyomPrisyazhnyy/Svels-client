@@ -70,6 +70,6 @@ export function createDefaultCheckoutDraft(
     comment: '',
     saveDeliveryAddress: true,
     deliveryAddressLabel: '',
-    saveAddressPromptVisible: false,
+    saveAddressPromptVisible: true,
   };
 }

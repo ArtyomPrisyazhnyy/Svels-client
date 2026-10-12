@@ -69,28 +69,32 @@ export function CartCheckoutDeliveryAddressInline({
           {addressError}
         </p>
       )}
-      <Checkbox
-        label="Сохранить адрес для следующих заказов"
-        checked={draft.saveDeliveryAddress}
-        onChange={(e) => onDraftChange({ saveDeliveryAddress: e.target.checked })}
-        testId="address-save-checkbox"
-      />
-      <div className="guest-address-form__chips" data-testid="address-label-chips-inline">
-        {['Дом', 'Работа'].map((chip) => (
-          <Button
-            key={chip}
-            type="button"
-            variant="secondary"
-            size="md"
-            className={`guest-address-form__chip-btn${
-              draft.deliveryAddressLabel === chip ? ' guest-address-form__chip-btn--active' : ''
-            }`}
-            onClick={() => onDraftChange({ deliveryAddressLabel: chip })}
-          >
-            {chip}
-          </Button>
-        ))}
-      </div>
+      {draft.saveAddressPromptVisible && (
+        <>
+          <Checkbox
+            label="Сохранить адрес для следующих заказов"
+            checked={draft.saveDeliveryAddress}
+            onChange={(e) => onDraftChange({ saveDeliveryAddress: e.target.checked })}
+            testId="address-save-checkbox"
+          />
+          <div className="guest-address-form__chips" data-testid="address-label-chips-inline">
+            {['Дом', 'Работа'].map((chip) => (
+              <Button
+                key={chip}
+                type="button"
+                variant="secondary"
+                size="md"
+                className={`guest-address-form__chip-btn${
+                  draft.deliveryAddressLabel === chip ? ' guest-address-form__chip-btn--active' : ''
+                }`}
+                onClick={() => onDraftChange({ deliveryAddressLabel: chip })}
+              >
+                {chip}
+              </Button>
+            ))}
+          </div>
+        </>
+      )}
       <div className="cart-checkout-rows cart-checkout-rows--inset">
         <CartDetailRow
           label="Уточнить адрес"
