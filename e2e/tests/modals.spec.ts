@@ -129,9 +129,10 @@ test.describe('Modals', () => {
     await page.goto(`/restaurants/${seed.restaurantId}`);
     const opener = page.locator('[data-testid^="menu-item-"]').first();
     await expect(opener).toBeVisible();
+    await opener.hover();
     await opener.click();
     const root = page.getByTestId('menu-product-modal');
-    await expect(root).toBeVisible();
+    await expect(root).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('menu-product-modal-title')).toBeVisible();
 
     await page.keyboard.press('Escape');
@@ -139,11 +140,13 @@ test.describe('Modals', () => {
     await expect(opener).toBeFocused();
 
     await opener.click();
+    await expect(root).toBeVisible({ timeout: 15_000 });
     await page.getByTestId('menu-product-modal-close').click();
     await expect(root).toBeHidden();
     await expect(opener).toBeFocused();
 
     await opener.click();
+    await expect(root).toBeVisible({ timeout: 15_000 });
     await clickBackdrop(page, 'menu-product-modal');
     await expect(root).toBeHidden();
     await expect(opener).toBeFocused();

@@ -25,13 +25,14 @@ import {
   RestaurantCartModal,
   RestaurantGuestAuthModal,
 } from './lazy-venue-modals';
-import { RestaurantMenuCatalog } from './RestaurantMenuCatalog';
+const RestaurantMenuCatalog = dynamic(
+  () => import('./RestaurantMenuCatalog').then((module) => module.RestaurantMenuCatalog),
+);
 const RestaurantMenuInlineCategoryNav = dynamic(
   () =>
     import('./RestaurantMenuInlineCategoryNav').then((module) => ({
       default: module.RestaurantMenuInlineCategoryNav,
     })),
-  { ssr: false, loading: () => null },
 );
 import { VenueNavHeightSync } from './VenueNavHeightSync';
 import { RestaurantPublicHeader } from './RestaurantPublicHeader';

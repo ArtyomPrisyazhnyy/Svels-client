@@ -14,9 +14,10 @@ interface MenuProductCardProps {
   restaurantId?: string;
   item: MenuItem;
   onSelect: (item: MenuItem) => void;
+  onPreload?: () => void;
 }
 
-export function MenuProductCard({ restaurantId, item, onSelect }: MenuProductCardProps) {
+export function MenuProductCard({ restaurantId, item, onSelect, onPreload }: MenuProductCardProps) {
   const showFromPrice = hasPriceAffectingModifiers(item.modifierGroups);
   const { styling } = useRestaurantStylingOptional();
   const favoritesEnabled = styling.favoritesEnabled !== false;
@@ -56,6 +57,9 @@ export function MenuProductCard({ restaurantId, item, onSelect }: MenuProductCar
       role="button"
       tabIndex={0}
       className="menu-product-card"
+      onPointerEnter={onPreload}
+      onFocus={onPreload}
+      onTouchStart={onPreload}
       onClick={handleCardClick}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {

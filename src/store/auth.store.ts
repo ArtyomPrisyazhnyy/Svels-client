@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { AuthUser } from '../shared/types/auth';
-import { resetGuestAddressesStore } from './guest-addresses.store';
 
 interface AuthState {
   accessToken: string | null;
@@ -19,8 +18,10 @@ export const useAuthStore = create<AuthState>()(
       setAuth: (accessToken, user) => set({ accessToken, user }),
       updateUser: (user) => set({ user }),
       logout: () => {
-        resetGuestAddressesStore();
         set({ accessToken: null, user: null });
+        void import('./guest-addresses.store').then(({ resetGuestAddressesStore }) => {
+          resetGuestAddressesStore();
+        });
       },
     }),
     {

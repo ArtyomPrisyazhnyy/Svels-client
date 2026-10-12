@@ -3,12 +3,7 @@
 import { Suspense, useEffect } from 'react';
 import { useAuthProfileSync } from '@/hooks/useAuthProfileSync';
 import { ScrollToTopButton } from '@/shared/components/ScrollToTopButton';
-import { subscribeAuthLogoutCleanup } from '@/features/restaurants/session/clear-local-commerce-session';
 import { useAuthStore } from '@/store/auth.store';
-import { useCartStore } from '@/store/cart.store';
-import { useFavoritesStore } from '@/store/favorites.store';
-
-subscribeAuthLogoutCleanup();
 
 function AuthProfileSync({ children }: { children: React.ReactNode }) {
   useAuthProfileSync();
@@ -18,8 +13,17 @@ function AuthProfileSync({ children }: { children: React.ReactNode }) {
 export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     void useAuthStore.persist.rehydrate();
-    void useCartStore.persist.rehydrate();
-    void useFavoritesStore.persist.rehydrate();
+    void import('@/store/cart.store').then(({ useCartStore }) => {
+      void useCartStore.persist.rehydrate();
+    });
+    void import('@/store/favorites.store').then(({ useFavoritesStore }) => {
+      void useFavoritesStore.persist.rehydrate();
+    });
+    void import('@/features/restaurants/session/clear-local-commerce-session').then(
+      ({ subscribeAuthLogoutCleanup }) => {
+        subscribeAuthLogoutCleanup();
+      },
+    );
   }, []);
 
   return (

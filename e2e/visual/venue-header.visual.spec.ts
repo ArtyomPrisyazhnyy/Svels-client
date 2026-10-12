@@ -70,7 +70,6 @@ async function assertHeaderHeight(
 async function snapHeaderClip(
   page: import('@playwright/test').Page,
   name: string,
-  maxDiffPixelRatio = 0.04,
 ) {
   const header = page.getByTestId('venue-header');
   await expect(header).toBeVisible();
@@ -84,9 +83,9 @@ async function snapHeaderClip(
       x: 0,
       y: 0,
       width: box.width,
-      height: box.height,
+      height: box.height + 120,
     },
-    maxDiffPixelRatio,
+    maxDiffPixelRatio: 0.01,
   });
 }
 
@@ -106,10 +105,7 @@ for (const theme of THEMES) {
           const viewport = VIEWPORTS[viewportKey];
           await page.setViewportSize(viewport);
           await page.goto(`/restaurants/${seed.restaurantId}${pageDef.slug}`);
-          await expect(page.getByTestId('venue-header')).toBeVisible({ timeout: 30_000 });
-          if (!('needsGuest' in pageDef && pageDef.needsGuest)) {
-            await expect(page.getByTestId(pageDef.readyTestId)).toBeVisible({ timeout: 30_000 });
-          }
+          await expect(page.getByTestId(pageDef.readyTestId)).toBeVisible({ timeout: 30_000 });
           await assertHeaderHeight(page, viewportKey);
           await snapHeaderClip(
             page,
@@ -124,7 +120,6 @@ for (const theme of THEMES) {
         await page.goto(`/restaurants/${seed.restaurantId}`);
         await expect(page.getByTestId('restaurant-public-page')).toBeVisible({ timeout: 30_000 });
         await expect(page.getByTestId('venue-home-category-nav')).toBeVisible();
-        await expect(page.locator('.restaurant-menu__category').nth(1)).toBeVisible({ timeout: 30_000 });
         await page.evaluate(async () => {
           await document.fonts.ready;
           await new Promise<void>((resolve) => {
@@ -151,7 +146,6 @@ for (const theme of THEMES) {
           const navTop = nav.getBoundingClientRect().top + window.scrollY;
           window.scrollTo(0, Math.max(0, navTop - headerH + 600));
         });
-        const navStickGapPx = viewportKey === 't768' ? 150 : 1;
         await expect
           .poll(async () =>
             page.evaluate(() => {
@@ -163,9 +157,7 @@ for (const theme of THEMES) {
               return Math.abs(nav.getBoundingClientRect().top - header.getBoundingClientRect().bottom);
             }),
           )
-          .toBeLessThanOrEqual(navStickGapPx);
-        const categoryHeadingGapPx =
-          viewportKey === 't768' ? 144 : viewportKey === 'm390' ? 32 : 2;
+          .toBeLessThanOrEqual(1);
         await expect
           .poll(async () =>
             page.evaluate(() => {
@@ -179,7 +171,7 @@ for (const theme of THEMES) {
               );
             }),
           )
-          .toBeLessThanOrEqual(categoryHeadingGapPx);
+          .toBeLessThanOrEqual(2);
         await expect
           .poll(async () =>
             page.evaluate(() => {
@@ -194,7 +186,6 @@ for (const theme of THEMES) {
         await snapHeaderClip(
           page,
           `venue-header-home-sticky-${theme}-${viewportKey}.png`,
-          0.1,
         );
       });
     }
