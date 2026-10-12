@@ -48,9 +48,10 @@ test.describe('Guest saved addresses', () => {
     await goToDeliveryCheckout(page);
 
     await expect(page.getByTestId('delivery-address-fields')).toBeVisible();
+    await expect(page.getByTestId('address-save-checkbox')).toBeVisible();
+    await expect(page.getByTestId('address-save-checkbox')).toBeChecked();
     await page.getByTestId('delivery-street').fill('Пушкина');
     await page.getByTestId('delivery-house').fill('10');
-    await expect(page.getByTestId('address-save-checkbox')).toBeChecked();
     await page.getByTestId('cart-submit').click();
     await expect(page.getByTestId('cart-order-success')).toBeVisible({ timeout: 20_000 });
     await page.getByTestId('cart-close').click();

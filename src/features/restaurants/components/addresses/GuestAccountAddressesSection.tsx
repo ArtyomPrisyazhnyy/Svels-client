@@ -104,6 +104,7 @@ export function GuestAccountAddressesSection({
         ) : (
           <Stack gap={3}>
             <GuestAddressList
+              layout="profile"
               addresses={addresses}
               onRowPress={(addressId) => openSheet({ view: 'edit', addressId })}
               onOpenMenu={(addressId) => openSheet({ view: 'menu', addressId })}

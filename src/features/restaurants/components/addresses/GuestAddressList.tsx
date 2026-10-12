@@ -12,6 +12,8 @@ interface GuestAddressListProps {
   addresses: GuestAddress[];
   selectedId?: string | null;
   selectable?: boolean;
+  /** Profile card: plain rows with dividers, no per-row border. */
+  layout?: 'cards' | 'profile';
   onSelect?: (addressId: string) => void;
   onOpenMenu?: (addressId: string) => void;
   onRowPress?: (addressId: string) => void;
@@ -21,12 +23,18 @@ export function GuestAddressList({
   addresses,
   selectedId,
   selectable = false,
+  layout = 'cards',
   onSelect,
   onOpenMenu,
   onRowPress,
 }: GuestAddressListProps) {
   return (
-    <div className="guest-address-list" data-testid="guest-address-list">
+    <div
+      className={`guest-address-list${
+        layout === 'profile' ? ' guest-address-list--profile' : ''
+      }`}
+      data-testid="guest-address-list"
+    >
       {addresses.map((address) => {
         const selected = selectable && selectedId === address.id;
         const staticRow = !selectable;

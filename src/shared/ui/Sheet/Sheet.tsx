@@ -27,6 +27,8 @@ export interface SheetProps {
   testId?: string;
   /** Render above an open modal (e.g. sheet opened from cart checkout). */
   stacked?: boolean;
+  /** Wraps the portaled tree so venue tokens apply outside the page shell. */
+  wrap?: (node: ReactNode) => ReactNode;
   children: ReactNode;
 }
 
@@ -42,6 +44,7 @@ function SheetInner({
   headerEnd,
   testId,
   stacked = false,
+  wrap,
   children,
 }: Omit<SheetProps, 'open'>) {
   const { mounted, isActive, handleClose } = useModalPresence(onClose, SHEET_ANIMATION_MS);
@@ -62,7 +65,7 @@ function SheetInner({
   );
   const sheetClass = cn('ui-sheet', stacked && 'ui-sheet--stacked');
 
-  return createPortal(
+  const tree = (
     <>
       <button
         type="button"
@@ -90,9 +93,10 @@ function SheetInner({
           {children}
         </ModalPanel>
       </div>
-    </>,
-    document.body,
+    </>
   );
+
+  return createPortal(wrap ? wrap(tree) : tree, document.body);
 }
 
 export function Sheet({ open, onClose, ...rest }: SheetProps) {

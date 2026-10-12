@@ -9,6 +9,7 @@ import { EMPTY_DELIVERY_ADDRESS } from '@/shared/types/cart';
 import { guestAddressToDeliveryAddress } from '../../utils/guest-address.util';
 import { GuestAddressList } from './GuestAddressList';
 import { GuestAddressForm, type GuestAddressFormValues } from './GuestAddressForm';
+import { RestaurantStylingPortalRoot } from '../../context/RestaurantStylingContext';
 import '../../styles/guest-addresses.scss';
 
 const ADDRESS_LIMIT = 10;
@@ -115,6 +116,7 @@ export function GuestAddressSheet({
       title={title}
       testId="address-sheet"
       stacked={stacked}
+      wrap={(node) => <RestaurantStylingPortalRoot>{node}</RestaurantStylingPortalRoot>}
       headerStart={
         view === 'create' || view === 'edit' ? (
           <IconButton
@@ -257,30 +259,33 @@ export function GuestAddressSheet({
           </div>
         )}
 
-        {view === 'create' && (
-          <GuestAddressForm
-            mode="create"
-            initialValues={{
-              label: '',
-              delivery: { ...EMPTY_DELIVERY_ADDRESS },
-              isDefault: addresses.length === 0,
-            }}
-            onSubmit={handleCreate}
-            submitError={formError}
-          />
-        )}
-
-        {view === 'edit' && editAddress && (
-          <GuestAddressForm
-            mode="edit"
-            initialValues={{
-              label: editAddress.label ?? '',
-              delivery: guestAddressToDeliveryAddress(editAddress),
-              isDefault: editAddress.isDefault,
-            }}
-            onSubmit={handleUpdate}
-            submitError={formError}
-          />
+        {(view === 'create' || view === 'edit') && (
+          <div className="guest-address-form-card">
+            {view === 'create' && (
+              <GuestAddressForm
+                mode="create"
+                initialValues={{
+                  label: '',
+                  delivery: { ...EMPTY_DELIVERY_ADDRESS },
+                  isDefault: addresses.length === 0,
+                }}
+                onSubmit={handleCreate}
+                submitError={formError}
+              />
+            )}
+            {view === 'edit' && editAddress && (
+              <GuestAddressForm
+                mode="edit"
+                initialValues={{
+                  label: editAddress.label ?? '',
+                  delivery: guestAddressToDeliveryAddress(editAddress),
+                  isDefault: editAddress.isDefault,
+                }}
+                onSubmit={handleUpdate}
+                submitError={formError}
+              />
+            )}
+          </div>
         )}
       </Stack>
     </Sheet>

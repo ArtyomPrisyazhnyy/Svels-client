@@ -70,16 +70,18 @@ export function GuestAddressForm({
       </Field>
       <div className="guest-address-form__chips" data-testid="address-label-chips">
         {QUICK_LABELS.map((chip) => (
-          <button
+          <Button
             key={chip}
             type="button"
-            className={`guest-address-form__chip${
-              label.trim() === chip ? ' guest-address-form__chip--active' : ''
+            variant="secondary"
+            size="md"
+            className={`guest-address-form__chip-btn${
+              label.trim() === chip ? ' guest-address-form__chip-btn--active' : ''
             }`}
             onClick={() => setLabel(chip)}
           >
             {chip}
-          </button>
+          </Button>
         ))}
       </div>
       <Checkbox

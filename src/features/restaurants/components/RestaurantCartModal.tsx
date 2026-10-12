@@ -25,7 +25,11 @@ import { CartLocationPicker } from './CartLocationPicker';
 import { PaymentSelector } from './PaymentSelector';
 import { DeliveryAddressFields } from './DeliveryAddressFields';
 import {
-  CartCheckoutDeliveryAddress,
+  CartCheckoutDeliveryAddressInline,
+  CartCheckoutGuestAddressLoader,
+  CartCheckoutGuestAddressSheet,
+  CartCheckoutSavedAddressRow,
+  CartCheckoutSavedAddressRowSkeleton,
   selectCheckoutSelectedAddressId,
   selectCheckoutUsesSavedAddresses,
 } from './addresses/CartCheckoutDeliveryAddress';
@@ -128,6 +132,7 @@ export function RestaurantCartModal({
   );
   const [showValidationHints, setShowValidationHints] = useState(false);
   const [clearPromptOpen, setClearPromptOpen] = useState(false);
+  const [addressSheetOpen, setAddressSheetOpen] = useState(false);
 
   const ordersPaused = orderSettings.ordersPaused === true;
 
@@ -603,17 +608,23 @@ export function RestaurantCartModal({
 
                   {fulfillment === 'fulfillmentDelivery' &&
                     (isGuestOfRestaurant && accessToken ? (
-                      <CartCheckoutDeliveryAddress
-                        restaurantId={restaurantId}
-                        accessToken={accessToken}
-                        draft={draft}
-                        onDraftChange={syncDraft}
-                        addressError={fieldErrors.address}
-                        addressExtraExpanded={Boolean(expandedRows.addressExtra)}
-                        onToggleAddressExtra={() =>
-                          setExpandedRows((prev) => toggleRowKey(prev, 'addressExtra'))
-                        }
-                      />
+                      <>
+                        <CartCheckoutGuestAddressLoader
+                          restaurantId={restaurantId}
+                          accessToken={accessToken}
+                        />
+                        {!deliveryUsesSavedAddresses && !deliveryAddressesLoading && (
+                          <CartCheckoutDeliveryAddressInline
+                            draft={draft}
+                            onDraftChange={syncDraft}
+                            addressError={fieldErrors.address}
+                            addressExtraExpanded={Boolean(expandedRows.addressExtra)}
+                            onToggleAddressExtra={() =>
+                              setExpandedRows((prev) => toggleRowKey(prev, 'addressExtra'))
+                            }
+                          />
+                        )}
+                      </>
                     ) : (
                       <Stack
                         gap={3}
@@ -653,6 +664,20 @@ export function RestaurantCartModal({
                     ))}
 
                   <div className="cart-checkout-rows" data-testid="cart-checkout-rows">
+                    {fulfillment === 'fulfillmentDelivery' &&
+                      isGuestOfRestaurant &&
+                      accessToken &&
+                      deliveryAddressesLoading && <CartCheckoutSavedAddressRowSkeleton />}
+                    {fulfillment === 'fulfillmentDelivery' &&
+                      isGuestOfRestaurant &&
+                      accessToken &&
+                      deliveryUsesSavedAddresses && (
+                        <CartCheckoutSavedAddressRow
+                          restaurantId={restaurantId}
+                          addressError={fieldErrors.address}
+                          onOpenSheet={() => setAddressSheetOpen(true)}
+                        />
+                      )}
                     {needsVenue && multipleLocations && (
                       <CartDetailRow
                         label="Точка"
@@ -956,6 +981,14 @@ export function RestaurantCartModal({
                 </>
               )}
         </div>
+        {isGuestOfRestaurant && accessToken && deliveryUsesSavedAddresses && (
+          <CartCheckoutGuestAddressSheet
+            open={addressSheetOpen}
+            onClose={() => setAddressSheetOpen(false)}
+            restaurantId={restaurantId}
+            accessToken={accessToken}
+          />
+        )}
       </Modal>
   );
 }
