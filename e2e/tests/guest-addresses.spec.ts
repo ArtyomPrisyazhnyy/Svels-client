@@ -104,7 +104,9 @@ test.describe('Guest saved addresses', () => {
     await expect(page.getByTestId('cart-order-success')).toBeVisible({ timeout: 20_000 });
 
     await page.goto(`/restaurants/${restaurantId}/pre-order`);
-    await expect(page.getByText('Ленина')).toBeVisible();
+    await expect(page.getByTestId('guest-orders-list')).toBeVisible();
+    await page.locator('[data-testid^="guest-order-row-"]').first().click();
+    await expect(page.getByTestId('guest-order-detail')).toContainText('Ленина');
 
     await page.goto(`/restaurants/${restaurantId}/account`);
     await expect(page.getByTestId('account-addresses')).toBeVisible();
