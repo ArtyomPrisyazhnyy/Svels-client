@@ -1223,7 +1223,7 @@
 
   &[data-rs-menu-category-nav='true'] {
     .restaurant-menu__category {
-      scroll-margin-top: calc(var(--header-h) + var(--space-8));
+      scroll-margin-top: calc(var(--header-h) + var(--venue-nav-h, 64px) + var(--space-4));
     }
 
     .restaurant-menu__category-nav-btn {

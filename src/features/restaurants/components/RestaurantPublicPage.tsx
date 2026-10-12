@@ -24,6 +24,7 @@ import { RestaurantCartModal } from './RestaurantCartModal';
 import { RestaurantGuestAuthModal } from './RestaurantGuestAuthModal';
 import { RestaurantMenuCatalog } from './RestaurantMenuCatalog';
 import { RestaurantMenuInlineCategoryNav } from './RestaurantMenuInlineCategoryNav';
+import { VenueNavHeightSync } from './VenueNavHeightSync';
 import { RestaurantPublicHeader } from './RestaurantPublicHeader';
 import { RestaurantSocialLinks } from './RestaurantSocialLinks';
 import '../styles/restaurant-public.scss';
@@ -95,6 +96,7 @@ function RestaurantPublicPageBody({
 
         {!embedded && categoryNavEnabled ? (
           <div className="venue-home__category-nav" data-testid="venue-home-category-nav">
+            <VenueNavHeightSync />
             <RestaurantMenuInlineCategoryNav />
           </div>
         ) : null}

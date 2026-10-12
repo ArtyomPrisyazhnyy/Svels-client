@@ -120,15 +120,31 @@ for (const theme of THEMES) {
         await page.goto(`/restaurants/${seed.restaurantId}`);
         await expect(page.getByTestId('restaurant-public-page')).toBeVisible({ timeout: 30_000 });
         await expect(page.getByTestId('venue-home-category-nav')).toBeVisible();
-        await page.evaluate(() => {
+        await page.evaluate(async () => {
+          await document.fonts.ready;
+          await new Promise<void>((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+          });
           const nav = document.querySelector('[data-testid="venue-home-category-nav"]');
+          if (nav instanceof HTMLElement) {
+            document.documentElement.style.setProperty(
+              '--venue-nav-h',
+              `${nav.getBoundingClientRect().height}px`,
+            );
+          }
+          const categories = document.querySelectorAll('.restaurant-menu__category');
+          const target = categories[1];
+          if (target instanceof HTMLElement) {
+            target.scrollIntoView({ block: 'start', behavior: 'auto' });
+            return;
+          }
           const header = document.querySelector('[data-testid="venue-header"]');
           if (!(nav instanceof HTMLElement) || !(header instanceof HTMLElement)) {
             return;
           }
           const headerH = header.getBoundingClientRect().height;
           const navTop = nav.getBoundingClientRect().top + window.scrollY;
-          window.scrollTo(0, Math.max(0, navTop - headerH));
+          window.scrollTo(0, Math.max(0, navTop - headerH + 600));
         });
         await expect
           .poll(async () =>
@@ -142,6 +158,20 @@ for (const theme of THEMES) {
             }),
           )
           .toBeLessThanOrEqual(1);
+        await expect
+          .poll(async () =>
+            page.evaluate(() => {
+              const nav = document.querySelector('[data-testid="venue-home-category-nav"]');
+              const heading = document.querySelectorAll('.restaurant-menu__category-title')[1];
+              if (!(nav instanceof HTMLElement) || !(heading instanceof HTMLElement)) {
+                return 999;
+              }
+              return Math.abs(
+                heading.getBoundingClientRect().top - (nav.getBoundingClientRect().bottom + 16),
+              );
+            }),
+          )
+          .toBeLessThanOrEqual(2);
         await expect(page.getByTestId('venue-home-category-nav')).toBeInViewport();
         await assertHeaderHeight(page, viewportKey);
         await snapHeaderClip(
