@@ -43,6 +43,13 @@
   border-radius: var(--radius-sm);
 }
 
+.guest-page-skeleton__address-row {
+  display: block;
+  width: 100%;
+  min-height: 64px;
+  border-radius: var(--rs-card-radius, var(--radius-lg));
+}
+
 .guest-page-skeleton__action-links {
   display: flex;
   flex-direction: column;
