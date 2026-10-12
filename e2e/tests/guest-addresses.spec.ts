@@ -76,9 +76,13 @@ test.describe('Guest saved addresses', () => {
     expect(work).toBeTruthy();
     expect(work!.isDefault).toBe(true);
 
-    await page.getByTestId('checkout-address-row').getByRole('button').first().click();
     await expect(page.getByTestId(`address-option-${work!.id}`)).toBeVisible();
-    await page.getByTestId(`address-option-${work!.id}`).getByRole('button').first().click();
+    await page
+      .getByTestId('address-sheet')
+      .getByTestId(`address-option-${work!.id}`)
+      .getByRole('button')
+      .first()
+      .click();
     await expect(page.getByTestId('address-sheet')).toHaveCount(0);
 
     await addMenuItemToCart(page, seed.menu.defaultMenuItemId);
