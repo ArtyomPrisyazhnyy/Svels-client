@@ -84,12 +84,6 @@ function RestaurantPublicPageBody({
       {embedded ? <RestaurantPublicHeader {...headerProps} /> : null}
 
       <main className="restaurant-public__main">
-        {!embedded && categoryNavEnabled ? (
-          <div className="venue-home__category-nav" data-testid="venue-home-category-nav">
-            <RestaurantMenuInlineCategoryNav />
-          </div>
-        ) : null}
-
         <h1>{restaurant.name}</h1>
         <p className="restaurant-public__address">{restaurant.address}</p>
 
@@ -98,6 +92,12 @@ function RestaurantPublicPageBody({
         )}
 
         <PromoBannersHost banners={promoBanners} persistSeen={!embedded} />
+
+        {!embedded && categoryNavEnabled ? (
+          <div className="venue-home__category-nav" data-testid="venue-home-category-nav">
+            <RestaurantMenuInlineCategoryNav />
+          </div>
+        ) : null}
 
         <RestaurantMenuCatalog restaurantId={restaurant.id} menu={menu} />
 

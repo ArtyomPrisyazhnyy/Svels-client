@@ -19,6 +19,7 @@ import type {
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
 import { CurrencySign } from '@/shared/components/CurrencySign';
 import { PageTitle } from '@/shared/ui/PageTitle/PageTitle';
+import { Stack } from '@/shared/ui/Stack/Stack';
 import '@/views/restaurant-guest-booking.scss';
 
 interface RestaurantGuestBookingPageProps {
@@ -130,9 +131,14 @@ export function RestaurantGuestBookingPage({
   return (
     <div className="venue-subpage guest-booking" data-testid="guest-booking-page">
       <main className="venue-subpage__main guest-booking__main">
-        <PageTitle title="Бронирование" testId="guest-booking-page-title" />
+        <Stack gap={4} className="venue-subpage__stack">
+          <PageTitle
+            title="Бронирование"
+            testId="guest-booking-page-title"
+            className="ui-page-title--venue"
+          />
 
-        {!bookingSettings.bookingEnabled ? (
+          {!bookingSettings.bookingEnabled ? (
           <p className="guest-booking__disabled">
             Бронирование столов в этом заведении недоступно.
           </p>
@@ -277,7 +283,8 @@ export function RestaurantGuestBookingPage({
               )}
             </button>
           </>
-        )}
+          )}
+        </Stack>
       </main>
     </div>
   );

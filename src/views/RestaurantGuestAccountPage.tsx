@@ -15,6 +15,7 @@ import {
 } from '@/shared/types/booking';
 import { PageTitle } from '@/shared/ui/PageTitle/PageTitle';
 import { Button } from '@/shared/ui/Button/Button';
+import { Stack } from '@/shared/ui/Stack/Stack';
 import '@/features/restaurants/styles/restaurant-guest-account-page.scss';
 
 interface RestaurantGuestAccountPageProps {
@@ -83,9 +84,14 @@ export function RestaurantGuestAccountPage({
   return (
     <div className="venue-subpage restaurant-guest-account" data-testid="guest-account-page">
       <main className="venue-subpage__main restaurant-guest-account__main">
-        <PageTitle title="Личный кабинет" testId="guest-account-page-title" />
+        <Stack gap={4} className="venue-subpage__stack">
+          <PageTitle
+            title="Личный кабинет"
+            testId="guest-account-page-title"
+            className="ui-page-title--venue"
+          />
 
-        <section className="restaurant-guest-account__profile-card">
+          <section className="restaurant-guest-account__profile-card">
           <p className="restaurant-guest-account__greeting">
             Здравствуйте, {user.firstName} {user.lastName}
           </p>
@@ -148,8 +154,9 @@ export function RestaurantGuestAccountPage({
               ))}
             </ul>
           )}
-        </section>
+          </section>
+        </Stack>
       </main>
-    </div>
+      </div>
   );
 }

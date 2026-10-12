@@ -23,7 +23,7 @@ export function VenueHeader({
 }: VenueHeaderProps) {
   return (
     <header
-      className="venue-header glass-header glass-header--tenant"
+      className="venue-header venue-header--tenant"
       data-testid="venue-header"
     >
       <VenueHeaderLeft

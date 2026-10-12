@@ -35,6 +35,7 @@
   .restaurant-menu__category-title,
   .glass-header--tenant .glass-header__brand-name,
   .glass-header--tenant .glass-header__title,
+  .venue-header--tenant .venue-header__brand-name,
   .menu-product-card__title,
   .menu-product-modal__title,
   .restaurant-cart-modal__panel .ui-overlay-panel__title,
@@ -398,6 +399,18 @@
     }
   }
 
+  .venue-header {
+    a:any-link,
+    a:any-link:hover,
+    a:any-link:focus-visible {
+      text-decoration: none;
+    }
+
+    .venue-header__brand-name {
+      text-decoration: none;
+    }
+  }
+
   .restaurant-favorites-page {
     background: var(--rs-bg);
     color: var(--rs-text);
@@ -430,7 +443,8 @@
     color: var(--rs-accent);
   }
 
-  .glass-header--tenant {
+  .glass-header--tenant,
+  .venue-header--tenant {
     border-bottom-color: color-mix(in srgb, var(--rs-border) 80%, transparent);
 
     &::before {
@@ -440,11 +454,14 @@
     }
 
     .glass-header__brand,
-    .glass-header__title {
+    .glass-header__title,
+    .venue-header__brand,
+    .venue-header__brand-name {
       color: var(--rs-text);
     }
 
-    .glass-header__logo {
+    .glass-header__logo,
+    .venue-header__logo {
       background: color-mix(in srgb, var(--rs-surface) 60%, transparent);
     }
 

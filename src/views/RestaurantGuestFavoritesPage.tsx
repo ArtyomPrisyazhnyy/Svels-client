@@ -11,6 +11,7 @@ import { useRestaurantStylingOptional } from '@/features/restaurants/context/Res
 import type { MenuItem, MenuResponse } from '@/shared/types/menu';
 import { useFavoritesStore } from '@/store/favorites.store';
 import { PageTitle } from '@/shared/ui/PageTitle/PageTitle';
+import { Stack } from '@/shared/ui/Stack/Stack';
 import '@/features/restaurants/styles/restaurant-menu.scss';
 import '@/features/restaurants/styles/restaurant-favorites-page.scss';
 
@@ -45,9 +46,14 @@ export function RestaurantGuestFavoritesPage({
   return (
     <div className="venue-subpage restaurant-favorites-page" data-testid="guest-favorites-page">
       <main className="venue-subpage__main restaurant-favorites-page__main">
-        <PageTitle title="Избранное" testId="guest-favorites-page-title" />
+        <Stack gap={4} className="venue-subpage__stack">
+          <PageTitle
+            title="Избранное"
+            testId="guest-favorites-page-title"
+            className="ui-page-title--venue"
+          />
 
-        {favoriteItems.length === 0 ? (
+          {favoriteItems.length === 0 ? (
           <div
             className="restaurant-favorites-page__empty"
             data-testid="guest-favorites-empty"
@@ -72,7 +78,8 @@ export function RestaurantGuestFavoritesPage({
               />
             ))}
           </div>
-        )}
+          )}
+        </Stack>
       </main>
 
       {selectedItem ? (

@@ -161,6 +161,17 @@ export const apiClient = {
     return api<PublicRestaurant>('GET', `/restaurants/${id}`);
   },
 
+  patchRestaurant(
+    restaurantId: string,
+    token: string,
+    payload: { logoUrl?: string | null; logoWebpUrl?: string | null; name?: string },
+  ) {
+    return api<PublicRestaurant>('PATCH', `/restaurants/${restaurantId}`, {
+      token,
+      body: payload,
+    });
+  },
+
   sendGuestOtp(restaurantId: string, phone: string) {
     return api<{ maskedPhone: string; channel: string }>(
       'POST',
