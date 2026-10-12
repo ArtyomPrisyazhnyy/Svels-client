@@ -162,7 +162,14 @@ export function CartCheckoutSavedAddressRowSkeleton() {
     <div className="cart-detail-row cart-detail-row--grouped" data-testid="checkout-address-row">
       <div className="cart-detail-row__trigger cart-detail-row__trigger--static">
         <span className="cart-detail-row__label">Адрес</span>
-        <Skeleton className="guest-address-checkout-row__skeleton" />
+        <span className="guest-address-checkout-row__value">
+          <Skeleton
+            variant="text"
+            width="60%"
+            height={14}
+            className="guest-address-checkout-row__skeleton"
+          />
+        </span>
       </div>
     </div>
   );

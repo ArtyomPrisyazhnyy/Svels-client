@@ -150,11 +150,22 @@
 .guest-address-menu {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 0;
 }
 
-.guest-address-menu__action {
+.guest-address-menu__action.ui-btn {
   justify-content: flex-start;
+  width: calc(100% + 2 * var(--space-4));
+  min-height: 48px;
+  margin-inline: calc(var(--space-4) * -1);
+  padding-inline: var(--space-4);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--rs-border);
+  }
 }
 
 .guest-address-menu__action--danger {
@@ -195,9 +206,20 @@
   text-align: center;
 }
 
-.guest-address-checkout-row__skeleton {
-  flex: 1 1 auto;
-  max-width: 60%;
+.guest-address-checkout-row__value {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.cart-detail-row__trigger--static .cart-detail-row__label {
+  flex: 0 0 auto;
+}
+
+.guest-address-checkout-row__skeleton.ui-skeleton {
+  flex: 0 0 auto;
+  background: color-mix(in srgb, var(--rs-border) 70%, var(--rs-surface));
 }
 
 .guest-account-addresses__empty {
