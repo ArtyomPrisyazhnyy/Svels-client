@@ -15,9 +15,16 @@ interface MenuProductCardProps {
   item: MenuItem;
   onSelect: (item: MenuItem) => void;
   onPreload?: () => void;
+  imageLoading?: 'eager' | 'lazy';
 }
 
-export function MenuProductCard({ restaurantId, item, onSelect, onPreload }: MenuProductCardProps) {
+export function MenuProductCard({
+  restaurantId,
+  item,
+  onSelect,
+  onPreload,
+  imageLoading = 'lazy',
+}: MenuProductCardProps) {
   const showFromPrice = hasPriceAffectingModifiers(item.modifierGroups);
   const { styling } = useRestaurantStylingOptional();
   const favoritesEnabled = styling.favoritesEnabled !== false;
@@ -74,7 +81,7 @@ export function MenuProductCard({ restaurantId, item, onSelect, onPreload }: Men
           src={item.imageUrl}
           webpSrc={item.imageWebpUrl}
           alt={item.name}
-          loading="lazy"
+          loading={imageLoading}
         />
         {!isMagazine ? favoriteButton : null}
       </div>

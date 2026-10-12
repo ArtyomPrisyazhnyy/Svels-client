@@ -1,3 +1,8 @@
+.ui-skeleton {
+  --ui-skeleton-fill: color-mix(in srgb, var(--rs-text) 32%, var(--rs-surface));
+  background: var(--ui-skeleton-fill);
+}
+
 .guest-page-skeleton__page-heading {
   display: inline-block;
   width: 11rem;

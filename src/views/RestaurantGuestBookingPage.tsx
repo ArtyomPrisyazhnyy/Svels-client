@@ -138,7 +138,7 @@ export function RestaurantGuestBookingPage({
           />
 
           {!bookingSettings.bookingEnabled ? (
-          <p className="guest-booking__disabled">
+          <p className="guest-booking__disabled" data-testid="guest-page-first-block">
             Бронирование столов в этом заведении недоступно.
           </p>
         ) : successBooking ? (

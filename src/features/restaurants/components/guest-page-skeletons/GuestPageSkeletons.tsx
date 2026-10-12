@@ -1,4 +1,4 @@
-import { Skeleton } from '@/shared/ui/Skeleton/Skeleton';
+import '@/shared/ui/Skeleton/Skeleton.scss';
 import { Stack } from '@/shared/ui/Stack/Stack';
 import '@/shared/ui/PageTitle/PageTitle.scss';
 import '@/features/restaurants/styles/guest-orders-page.scss';

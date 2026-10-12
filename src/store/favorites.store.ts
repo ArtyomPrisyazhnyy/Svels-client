@@ -6,7 +6,7 @@ import {
   mergeFavorites,
   removeFavorite,
 } from '@/features/restaurants/api/favorites.api';
-import { registerFavoritesReset } from './commerce-session';
+import { commerceEpoch, registerFavoritesReset } from './commerce-session';
 
 type FavoritesState = {
   restaurantId: string | null;
@@ -114,3 +114,16 @@ export const useFavoritesStore = create<FavoritesState>()(
 registerFavoritesReset(() => {
   useFavoritesStore.getState().reset();
 });
+
+export function rehydrateFavoritesStore(): Promise<void> {
+  const ticket = commerceEpoch();
+  return Promise.resolve(useFavoritesStore.persist.rehydrate()).then(() => {
+    if (ticket !== commerceEpoch()) {
+      useFavoritesStore.getState().reset();
+    }
+  });
+}
+
+if (typeof window !== 'undefined') {
+  void rehydrateFavoritesStore();
+}

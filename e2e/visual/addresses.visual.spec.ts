@@ -24,6 +24,8 @@ const ADDRESS_LIMIT = 10;
 
 let orderSettingsApplied = false;
 let appliedTheme: RestaurantColorTheme | null = null;
+/** One seed per address count. Repeating it on every viewport blows the API rate limit. */
+let preparedAddressCount: number | null = null;
 
 function buildLine(): CartLineItem {
   return {
@@ -102,6 +104,23 @@ async function applyTheme(restaurantId: string, adminToken: string, theme: Resta
   appliedTheme = theme;
 }
 
+async function ensureAddressCount(
+  restaurantId: string,
+  guestToken: string,
+  count: number,
+) {
+  if (preparedAddressCount === count) {
+    return;
+  }
+  await clearGuestAddresses(restaurantId, guestToken);
+  if (count === ADDRESS_LIMIT) {
+    await apiClient.seedGuestAddresses(restaurantId, guestToken, ADDRESS_LIMIT);
+  } else if (count > 0) {
+    await seedAddresses(restaurantId, guestToken, count);
+  }
+  preparedAddressCount = count;
+}
+
 async function ensureDeliverySettings(restaurantId: string, adminToken: string) {
   if (orderSettingsApplied) {
     return;
@@ -171,28 +190,27 @@ test.describe('Addresses visual', () => {
   test.beforeEach(async ({ seed, asGuest }) => {
     void asGuest;
     await ensureDeliverySettings(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
-    await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
   });
 
   for (const theme of THEMES) {
-    for (const viewportKey of VIEWPORT_KEYS) {
-      for (const scenario of [
-        'delivery-0',
-        'delivery-saved',
-        'delivery-saved-skeleton',
-        'sheet-list',
-        'sheet-menu',
-        'sheet-menu-open',
-        'sheet-limit',
-        'address-form',
-      ] as AddressScenario[]) {
+    for (const scenario of [
+      'delivery-0',
+      'delivery-saved',
+      'delivery-saved-skeleton',
+      'sheet-list',
+      'sheet-menu',
+      'sheet-menu-open',
+      'sheet-limit',
+      'address-form',
+    ] as AddressScenario[]) {
+      for (const viewportKey of VIEWPORT_KEYS) {
         test(`${scenario} ${theme} @${viewportKey}`, async ({ page, seed, asGuest }) => {
           void asGuest;
           await page.setViewportSize(VIEWPORTS[viewportKey]);
           await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
 
           if (scenario === 'address-form') {
-            await seedAddresses(seed.restaurantId, seed.guest.accessToken, 1);
+            await ensureAddressCount(seed.restaurantId, seed.guest.accessToken, 1);
             await page.goto(`/restaurants/${seed.restaurantId}/account`);
             await page.getByTestId('address-add').click();
             const panel = page.getByTestId('address-sheet');
@@ -207,9 +225,11 @@ test.describe('Addresses visual', () => {
           }
 
           if (scenario === 'delivery-0' || scenario === 'delivery-saved' || scenario === 'delivery-saved-skeleton') {
-            if (scenario !== 'delivery-0') {
-              await seedAddresses(seed.restaurantId, seed.guest.accessToken, 1);
-            }
+            await ensureAddressCount(
+              seed.restaurantId,
+              seed.guest.accessToken,
+              scenario === 'delivery-0' ? 0 : 1,
+            );
             if (scenario === 'delivery-saved-skeleton') {
               await page.route('**/me/addresses', async (route) => {
                 if (route.request().method() === 'GET') {
@@ -238,15 +258,11 @@ test.describe('Addresses visual', () => {
             return;
           }
 
-          if (scenario === 'sheet-limit') {
-            await apiClient.seedGuestAddresses(
-              seed.restaurantId,
-              seed.guest.accessToken,
-              ADDRESS_LIMIT,
-            );
-          } else {
-            await seedAddresses(seed.restaurantId, seed.guest.accessToken, 3);
-          }
+          await ensureAddressCount(
+            seed.restaurantId,
+            seed.guest.accessToken,
+            scenario === 'sheet-limit' ? ADDRESS_LIMIT : 3,
+          );
           await seedCart(page, seed.restaurantId);
           await page.goto(`/restaurants/${seed.restaurantId}`);
 
@@ -301,12 +317,14 @@ test.describe('Addresses visual', () => {
           }
         });
       }
+    }
 
+    for (const viewportKey of VIEWPORT_KEYS) {
       test(`profile-list ${theme} @${viewportKey}`, async ({ page, seed, asGuest }) => {
         void asGuest;
         await page.setViewportSize(VIEWPORTS[viewportKey]);
         await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
-        await seedAddresses(seed.restaurantId, seed.guest.accessToken, 3);
+        await ensureAddressCount(seed.restaurantId, seed.guest.accessToken, 3);
         await page.goto(`/restaurants/${seed.restaurantId}/account`);
         const section = page.getByTestId('account-addresses');
         await expect(section).toBeVisible();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { useFavoritesPersistReady, useHydrateFavorites } from '@/hooks/useHydrateFavorites';
 import { MenuProductCard } from '@/features/restaurants/components/MenuProductCard';
@@ -8,7 +8,7 @@ import { GuestFavoritesPageSkeleton } from '@/features/restaurants/components/gu
 import { getAvailableMenuCategories } from '@/features/restaurants/utils/menu-catalog.util';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { useRestaurantStylingOptional } from '@/features/restaurants/context/RestaurantStylingContext';
-import type { MenuItem, MenuResponse } from '@/shared/types/menu';
+import { resolveImageUrl, type MenuItem, type MenuResponse } from '@/shared/types/menu';
 import { useFavoritesStore } from '@/store/favorites.store';
 import { PageTitle } from '@/shared/ui/PageTitle/PageTitle';
 import { Stack } from '@/shared/ui/Stack/Stack';
@@ -16,6 +16,32 @@ import '@/features/restaurants/styles/restaurant-menu.scss';
 import '@/features/restaurants/styles/restaurant-favorites-page.scss';
 
 import { MenuProductDetailModal } from '@/features/restaurants/components/MenuProductDetailModal';
+
+const decodedImageUrls = new Set<string>();
+const imageListeners = new Set<() => void>();
+
+function subscribeDecodedImages(listener: () => void): () => void {
+  imageListeners.add(listener);
+  return () => {
+    imageListeners.delete(listener);
+  };
+}
+
+function markImageDecoded(url: string): void {
+  if (decodedImageUrls.has(url)) {
+    return;
+  }
+  decodedImageUrls.add(url);
+  imageListeners.forEach((listener) => listener());
+}
+
+function useImagesDecoded(urls: string[] | null): boolean {
+  return useSyncExternalStore(
+    subscribeDecodedImages,
+    () => urls !== null && urls.every((url) => decodedImageUrls.has(url)),
+    () => false,
+  );
+}
 
 interface RestaurantGuestFavoritesPageProps {
   restaurantId: string;
@@ -29,6 +55,7 @@ export function RestaurantGuestFavoritesPage({
 }: RestaurantGuestFavoritesPageProps) {
   const paths = useRestaurantGuestPaths(restaurantId);
   const favoriteIds = useFavoritesStore((s) => s.menuItemIds);
+  const favoritesHydrated = useFavoritesStore((s) => s.hydrated);
   const persistReady = useFavoritesPersistReady();
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const { styling } = useRestaurantStylingOptional();
@@ -46,7 +73,36 @@ export function RestaurantGuestFavoritesPage({
       .filter((item): item is MenuItem => Boolean(item));
   }, [favoriteIds, menu.categories]);
 
-  if (!persistReady) {
+  const imageUrls = useMemo(() => {
+    if (!persistReady || !favoritesHydrated) {
+      return null;
+    }
+    return favoriteItems.flatMap((item) => {
+      const sources = [item.imageUrl, item.imageWebpUrl].filter(
+        (url): url is string => Boolean(url),
+      );
+      return sources.map((url) => resolveImageUrl(url));
+    });
+  }, [favoriteItems, favoritesHydrated, persistReady]);
+  const imagesReady = useImagesDecoded(imageUrls);
+
+  useEffect(() => {
+    if (!imageUrls) {
+      return;
+    }
+    for (const url of imageUrls) {
+      if (decodedImageUrls.has(url)) {
+        continue;
+      }
+      const image = new Image();
+      const done = () => markImageDecoded(url);
+      image.onload = done;
+      image.onerror = done;
+      image.src = url;
+    }
+  }, [imageUrls]);
+
+  if (!persistReady || !favoritesHydrated || !imagesReady) {
     return <GuestFavoritesPageSkeleton />;
   }
 
@@ -82,6 +138,7 @@ export function RestaurantGuestFavoritesPage({
                   restaurantId={restaurantId}
                   item={item}
                   onSelect={setSelectedItem}
+                  imageLoading="eager"
                 />
               ))}
             </div>

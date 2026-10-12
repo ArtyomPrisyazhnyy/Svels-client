@@ -8,8 +8,14 @@ function removeKey(key: string) {
   }
 }
 
+let epoch = 0;
+
 let resetCart: Reset = () => removeKey('svels-cart');
 let resetFavorites: Reset = () => removeKey('svels-favorites');
+
+export function commerceEpoch(): number {
+  return epoch;
+}
 
 export function registerCartReset(reset: Reset) {
   resetCart = reset;
@@ -21,6 +27,9 @@ export function registerFavoritesReset(reset: Reset) {
 
 /** Sync clear. Store modules replace the localStorage fallback once they load. */
 export function resetCommerceMemory() {
+  epoch += 1;
   resetCart();
   resetFavorites();
+  removeKey('svels-cart');
+  removeKey('svels-favorites');
 }

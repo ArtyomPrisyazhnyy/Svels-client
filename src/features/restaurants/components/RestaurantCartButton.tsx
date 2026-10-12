@@ -34,10 +34,11 @@ export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartBut
   const [itemCount, setItemCount] = useState(0);
 
   useEffect(() => {
+    preloadRestaurantCartModal();
     let unsubscribe = () => {};
     let cancelled = false;
 
-    void import('@/store/cart.store').then(({ useCartStore }) => {
+    void import('@/store/cart.store').then(({ useCartStore, rehydrateCartStore }) => {
       if (cancelled) {
         return;
       }
@@ -48,9 +49,7 @@ export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartBut
         setItemCount(items.reduce((sum, line) => sum + line.quantity, 0));
         setHydrated(!persist?.hasHydrated || persist.hasHydrated());
       };
-      if (persist && !persist.hasHydrated()) {
-        void persist.rehydrate();
-      }
+      void rehydrateCartStore().finally(sync);
       sync();
       unsubscribe = useCartStore.subscribe(sync);
     });

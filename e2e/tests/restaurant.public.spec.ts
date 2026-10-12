@@ -114,12 +114,17 @@ test.describe('Restaurant public page', () => {
     const firstItem = menu.categories.flatMap((c) => c.items)[0];
     test.skip(!firstItem, 'Need a menu item');
 
+    await apiClient.addGuestFavorite(
+      seed.restaurantId,
+      seed.guest.accessToken,
+      firstItem!.id,
+    );
+
     await page.goto(`/restaurants/${seed.restaurantId}`);
     const heart = page
       .getByTestId(`menu-item-${firstItem!.id}`)
       .locator('.favorite-heart-button');
-    await heart.click();
-    await expect(heart).toHaveClass(/favorite-heart-button--active/);
+    await expect(heart).toHaveAttribute('aria-pressed', 'true');
 
     await page.getByTestId(`menu-item-${firstItem!.id}`).click();
     await expect(page.getByTestId('menu-add-to-cart')).toBeVisible();

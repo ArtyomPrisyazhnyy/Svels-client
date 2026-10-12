@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useAuthStore } from '@/store/auth.store';
-import { useFavoritesStore } from '@/store/favorites.store';
+import { rehydrateFavoritesStore, useFavoritesStore } from '@/store/favorites.store';
 
 export function useFavoritesPersistReady(): boolean {
   const [ready, setReady] = useState(false);
@@ -20,7 +20,7 @@ export function useFavoritesPersistReady(): boolean {
       return;
     }
     const unsubscribe = persist.onFinishHydration(() => setReady(true));
-    void persist.rehydrate();
+    void rehydrateFavoritesStore();
     return unsubscribe;
   }, []);
 

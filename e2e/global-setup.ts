@@ -91,10 +91,6 @@ export default async function globalSetup(): Promise<void> {
 
   const menu = await apiClient.seedDefaultMenu(restaurantId, adminAuth.accessToken);
 
-  await apiClient.updateBookingSettings(restaurantId, adminAuth.accessToken, {
-    bookingEnabled: true,
-  });
-
   const seededLocations = await apiClient.listRestaurantLocations(
     restaurantId,
     adminAuth.accessToken,
