@@ -20,8 +20,10 @@ import {
   toMenuCategoryNavItems,
 } from '../utils/menu-catalog.util';
 import { PromoBannersHost } from './PromoBanners';
-import { RestaurantCartModal } from './RestaurantCartModal';
-import { RestaurantGuestAuthModal } from './RestaurantGuestAuthModal';
+import {
+  RestaurantCartModal,
+  RestaurantGuestAuthModal,
+} from './lazy-venue-modals';
 import { RestaurantMenuCatalog } from './RestaurantMenuCatalog';
 import { RestaurantMenuInlineCategoryNav } from './RestaurantMenuInlineCategoryNav';
 import { VenueNavHeightSync } from './VenueNavHeightSync';

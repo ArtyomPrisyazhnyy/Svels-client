@@ -1,0 +1,33 @@
+.guest-page-skeleton__title {
+  min-height: 2.75rem;
+}
+
+.guest-page-skeleton__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.guest-page-skeleton__action-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.guest-page-skeleton__order-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.guest-page-skeleton__booking-fields {
+  margin-top: var(--space-2);
+}
+
+.guest-page-skeleton__slots {
+  margin-top: var(--space-2);
+}
+
+.guest-page-skeleton__product-grid {
+  width: 100%;
+}

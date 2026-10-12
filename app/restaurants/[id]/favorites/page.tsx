@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { RestaurantGuestFavoritesPage } from '@/views/RestaurantGuestFavoritesPage';
 import {
@@ -6,21 +5,18 @@ import {
   getRestaurantPublic,
   getRestaurantStyling,
 } from '@/server/restaurant-public';
+import { restaurantVenueStaticParams } from '@/server/restaurant-venue-static-params';
 
 /** Fallback ISR (сек). */
 export const revalidate = 3600;
 export const dynamicParams = true;
 
-interface RestaurantFavoritesPageProps {
-  params: Promise<{ id: string }>;
+export async function generateStaticParams() {
+  return restaurantVenueStaticParams();
 }
 
-function PageLoader() {
-  return (
-    <div className="venue-subpage__main">
-      <div className="ui-skeleton" style={{ minHeight: '40vh' }} />
-    </div>
-  );
+interface RestaurantFavoritesPageProps {
+  params: Promise<{ id: string }>;
 }
 
 export default async function RestaurantFavoritesPageRoute({ params }: RestaurantFavoritesPageProps) {
@@ -40,12 +36,10 @@ export default async function RestaurantFavoritesPageRoute({ params }: Restauran
   }
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <RestaurantGuestFavoritesPage
-        restaurantId={restaurant.id}
-        restaurantName={restaurant.name}
-        menu={menu}
-      />
-    </Suspense>
+    <RestaurantGuestFavoritesPage
+      restaurantId={restaurant.id}
+      restaurantName={restaurant.name}
+      menu={menu}
+    />
   );
 }

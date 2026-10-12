@@ -3,6 +3,7 @@
 import type { CartLineItem } from '@/shared/types/cart';
 import { useCartHydrated } from '@/hooks/useCartHydrated';
 import { useCartStore } from '@/store/cart.store';
+import { preloadRestaurantCartModal } from './lazy-venue-modals';
 import '../styles/restaurant-cart-button.scss';
 
 interface RestaurantCartButtonProps {
@@ -45,6 +46,8 @@ export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartBut
       type="button"
       className="restaurant-cart-button"
       onClick={onOpen}
+      onMouseEnter={preloadRestaurantCartModal}
+      onTouchStart={preloadRestaurantCartModal}
       aria-label={hasItems ? `Корзина, ${itemCount} поз.` : 'Корзина'}
       data-testid="cart-button"
     >

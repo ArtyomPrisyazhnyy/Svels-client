@@ -1,11 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ApiError } from '@/shared/api/api-client';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import type { OrderDto } from '@/shared/types/pre-order';
 import { useAuthStore } from '@/store/auth.store';
 import { fetchMyOrder, fetchMyOrders } from '../api/pre-orders.api';
+import { useGuestDataStore } from '@/store/guest-data.store';
+import { GuestOrdersListSkeleton } from './guest-page-skeletons/GuestPageSkeletons';
+import { useGuestOrders } from '../hooks/useGuestOrders';
 import {
   fulfillmentTypeLabel,
   isTerminalOrderStatus,
@@ -35,33 +37,22 @@ function formatRequestedAt(iso: string | null): string {
 
 export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
   const accessToken = useAuthStore((s) => s.accessToken);
-  const [orders, setOrders] = useState<OrderDto[]>([]);
+  const { orders, loading, error } = useGuestOrders(restaurantId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<OrderDto | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const loadOrders = useCallback(async () => {
     if (!accessToken) {
-      setLoading(false);
       return;
     }
     try {
       const rows = await fetchMyOrders(accessToken);
       const forRestaurant = rows.filter((o) => o.restaurantId === restaurantId);
-      setOrders(forRestaurant);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось загрузить заказы');
-    } finally {
-      setLoading(false);
+      useGuestDataStore.getState().setOrders(restaurantId, forRestaurant);
+    } catch {
+      // polling errors are non-fatal
     }
   }, [accessToken, restaurantId]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
-    void loadOrders();
-  }, [loadOrders]);
 
   const hasActiveOrders = orders.some((o) => !isTerminalOrderStatus(o.status));
 
@@ -112,7 +103,7 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
   }, [selectedId, hasActiveOrders, accessToken]);
 
   if (loading) {
-    return <p className="guest-orders-list__hint">Загрузка заказов…</p>;
+    return <GuestOrdersListSkeleton />;
   }
 
   if (error) {

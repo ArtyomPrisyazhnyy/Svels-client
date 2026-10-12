@@ -1,23 +1,20 @@
-import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { RestaurantGuestProtectedRoute } from '@/components/RestaurantGuestProtectedRoute';
+import { GuestPreOrderPageSkeleton } from '@/features/restaurants/components/guest-page-skeletons/GuestPageSkeletons';
 import { RestaurantGuestPreOrderPage } from '@/views/RestaurantGuestPreOrderPage';
 import { getRestaurantPublic } from '@/server/restaurant-public';
+import { restaurantVenueStaticParams } from '@/server/restaurant-venue-static-params';
 
 /** Fallback ISR (сек). */
 export const revalidate = 3600;
 export const dynamicParams = true;
 
-interface RestaurantPreOrderPageProps {
-  params: Promise<{ id: string }>;
+export async function generateStaticParams() {
+  return restaurantVenueStaticParams();
 }
 
-function PageLoader() {
-  return (
-    <div className="venue-subpage__main">
-      <div className="ui-skeleton" style={{ minHeight: '40vh' }} />
-    </div>
-  );
+interface RestaurantPreOrderPageProps {
+  params: Promise<{ id: string }>;
 }
 
 export default async function RestaurantPreOrderPageRoute({ params }: RestaurantPreOrderPageProps) {
@@ -29,13 +26,14 @@ export default async function RestaurantPreOrderPageRoute({ params }: Restaurant
   }
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <RestaurantGuestProtectedRoute restaurantId={restaurant.id}>
-        <RestaurantGuestPreOrderPage
-          restaurantId={restaurant.id}
-          restaurantName={restaurant.name}
-        />
-      </RestaurantGuestProtectedRoute>
-    </Suspense>
+    <RestaurantGuestProtectedRoute
+      restaurantId={restaurant.id}
+      fallback={<GuestPreOrderPageSkeleton />}
+    >
+      <RestaurantGuestPreOrderPage
+        restaurantId={restaurant.id}
+        restaurantName={restaurant.name}
+      />
+    </RestaurantGuestProtectedRoute>
   );
 }
