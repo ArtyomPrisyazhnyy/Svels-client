@@ -2,8 +2,7 @@ import type { Page } from '@playwright/test';
 import { test, expect } from '../fixtures/test';
 
 const VIEWPORTS = [
-  // Shorter than a phone so the third category can scroll up to the spy line.
-  { width: 390, height: 560 },
+  { width: 390, height: 844 },
   { width: 1280, height: 800 },
 ] as const;
 

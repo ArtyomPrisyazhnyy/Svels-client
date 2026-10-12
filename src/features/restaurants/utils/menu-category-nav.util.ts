@@ -25,11 +25,26 @@ export function getMenuCategoryHeaderOffset(): number {
   return header.getBoundingClientRect().height + readVenueNavHeight();
 }
 
+function isScrolledToBottom(): boolean {
+  const scrollingElement = document.scrollingElement ?? document.documentElement;
+  const scrollHeight = scrollingElement.scrollHeight;
+  if (scrollHeight <= window.innerHeight + 2) {
+    return false;
+  }
+
+  return window.innerHeight + window.scrollY >= scrollHeight - 2;
+}
+
 /** Последняя категория, чей блок пересёк линию под шапкой (scroll-spy). */
 export function resolveActiveMenuCategoryId(
   categories: MenuCategoryNavItem[],
   headerOffset = getMenuCategoryHeaderOffset(),
 ): string {
+  const lastId = categories[categories.length - 1]?.id ?? '';
+  if (lastId && isScrolledToBottom()) {
+    return lastId;
+  }
+
   const marker = headerOffset + 24;
   let activeId = categories[0]?.id ?? '';
 
