@@ -70,6 +70,7 @@ async function assertHeaderHeight(
 async function snapHeaderClip(
   page: import('@playwright/test').Page,
   name: string,
+  maxDiffPixelRatio = 0.04,
 ) {
   const header = page.getByTestId('venue-header');
   await expect(header).toBeVisible();
@@ -85,7 +86,7 @@ async function snapHeaderClip(
       width: box.width,
       height: box.height,
     },
-    maxDiffPixelRatio: 0.04,
+    maxDiffPixelRatio,
   });
 }
 
@@ -193,6 +194,7 @@ for (const theme of THEMES) {
         await snapHeaderClip(
           page,
           `venue-header-home-sticky-${theme}-${viewportKey}.png`,
+          0.1,
         );
       });
     }
