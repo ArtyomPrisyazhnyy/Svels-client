@@ -51,6 +51,8 @@ test.describe('Guest saved addresses', () => {
     await expect(page.getByTestId('address-save-checkbox')).toBeChecked();
     await page.getByTestId('cart-submit').click();
     await expect(page.getByTestId('cart-order-success')).toBeVisible({ timeout: 20_000 });
+    await page.getByTestId('cart-close').click();
+    await expect(page.getByTestId('restaurant-cart-modal')).toHaveCount(0);
 
     await page.getByTestId('cart-button').click();
     await goToDeliveryCheckout(page);
@@ -75,6 +77,7 @@ test.describe('Guest saved addresses', () => {
     await page.getByTestId('checkout-address-row').getByRole('button').first().click();
     await expect(page.getByTestId(`address-option-${work!.id}`)).toBeVisible();
     await page.getByTestId(`address-option-${work!.id}`).getByRole('button').first().click();
+    await expect(page.getByTestId('address-sheet')).toHaveCount(0);
 
     await page.getByTestId('cart-button').click();
     await goToDeliveryCheckout(page);

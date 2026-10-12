@@ -7,6 +7,7 @@ import {
   snapCartPanel,
 } from '../helpers/cart-visual';
 import { VIEWPORTS, type VisualViewportKey } from '../helpers/visual';
+import { clearGuestAddresses } from '../helpers/guest-addresses';
 import type { CartLineItem } from '../../src/shared/types/cart';
 import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
 
@@ -203,6 +204,7 @@ test.describe('Cart checkout visual', () => {
   test.beforeEach(async ({ seed, asGuest }) => {
     void asGuest;
     await ensureCheckoutOrderSettings(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
+    await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
   });
 
   for (const theme of THEMES) {

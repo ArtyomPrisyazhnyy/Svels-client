@@ -4,6 +4,7 @@ import { prepareForScreenshot, VIEWPORTS, type VisualViewportKey } from '../help
 import { assertCartTitleCentered } from '../helpers/cart-visual';
 import type { CartLineItem } from '../../src/shared/types/cart';
 import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
+import { clearGuestAddresses } from '../helpers/guest-addresses';
 
 const THEMES = ['classic', 'midnight', 'warm'] as const;
 const VIEWPORT_KEYS: VisualViewportKey[] = ['m360', 'm390', 'd1280'];
@@ -110,12 +111,6 @@ async function ensureDeliverySettings(restaurantId: string, adminToken: string) 
   orderSettingsApplied = true;
 }
 
-async function resetGuestAddresses(restaurantId: string, guestToken: string) {
-  const rows = await apiClient.listGuestAddresses(restaurantId, guestToken);
-  for (const row of rows) {
-    await apiClient.deleteGuestAddress(restaurantId, guestToken, row.id);
-  }
-}
 
 async function seedAddresses(
   restaurantId: string,
@@ -160,7 +155,7 @@ test.describe('Addresses visual', () => {
   test.beforeEach(async ({ seed, asGuest }) => {
     void asGuest;
     await ensureDeliverySettings(seed.restaurantId, seed.restaurantAdmin.auth.accessToken);
-    await resetGuestAddresses(seed.restaurantId, seed.guest.accessToken);
+    await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
   });
 
   for (const theme of THEMES) {
@@ -184,23 +179,30 @@ test.describe('Addresses visual', () => {
                 : scenario === 'delivery-3'
                   ? 3
                   : 1;
-          await seedAddresses(seed.restaurantId, seed.guest.accessToken, count, true);
-
-          await seedCart(page, seed.restaurantId);
-          await page.goto(`/restaurants/${seed.restaurantId}`);
-          await openDeliveryCheckout(page);
-
           if (scenario === 'address-form') {
-            await page.getByTestId('checkout-address-row').getByRole('button').first().click();
+            await seedAddresses(seed.restaurantId, seed.guest.accessToken, 1, false);
+            await page.goto(`/restaurants/${seed.restaurantId}/account`);
             await page.getByTestId('address-add').click();
             const panel = page.getByTestId('address-sheet');
             await expect(panel).toBeVisible();
+            await expect(page.getByTestId('guest-address-form')).toBeVisible();
             await prepareForScreenshot(page);
             await expect(panel).toHaveScreenshot(
               `addresses-${scenario}-${theme}-${viewportKey}.png`,
             );
             return;
           }
+
+          await seedAddresses(
+            seed.restaurantId,
+            seed.guest.accessToken,
+            count,
+            scenario === 'delivery-3',
+          );
+
+          await seedCart(page, seed.restaurantId);
+          await page.goto(`/restaurants/${seed.restaurantId}`);
+          await openDeliveryCheckout(page);
 
           const panel = page.getByTestId('cart-modal-panel');
           await assertCartTitleCentered(panel);
