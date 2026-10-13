@@ -384,8 +384,9 @@
   }
 
   .restaurant-cart-button__icon,
-  .restaurant-favorites-header-button__icon {
-    color: var(--rs-accent);
+  .restaurant-favorites-header-button__icon,
+  .restaurant-profile-button__icon {
+    color: var(--rs-primary);
   }
 
   .restaurant-favorites-header-button {
@@ -440,7 +441,7 @@
   }
 
   .restaurant-profile-button__icon {
-    color: var(--rs-accent);
+    color: var(--rs-primary);
   }
 
   .glass-header--tenant,
@@ -476,12 +477,12 @@
       }
 
       &.glass-header__link--accent {
-        color: var(--rs-accent);
+        color: var(--rs-primary);
 
         @media (hover: hover) {
           &:hover {
-            background: color-mix(in srgb, var(--rs-accent) 14%, transparent);
-            color: var(--rs-accent);
+            background: color-mix(in srgb, var(--rs-primary) 14%, transparent);
+            color: var(--rs-primary);
           }
         }
       }
@@ -1239,9 +1240,9 @@
       }
 
       &--active {
-        border-color: var(--rs-accent);
-        background: var(--rs-accent);
-        color: var(--rs-on-accent, #ffffff);
+        border-color: var(--rs-primary);
+        background: var(--rs-primary);
+        color: var(--rs-on-primary, #ffffff);
       }
     }
   }
