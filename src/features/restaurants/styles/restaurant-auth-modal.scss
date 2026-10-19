@@ -5,7 +5,31 @@
   line-height: 1.45;
 }
 
+.restaurant-auth-modal__panel.ui-overlay-panel .ui-overlay-panel__body {
+  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+}
+
 .restaurant-auth-modal__body {
+  min-width: 0;
+}
+
+.guest-otp-privacy-consent-label {
+  cursor: pointer;
+
+  &--invalid {
+    color: var(--rs-danger);
+
+    input[type='checkbox'] {
+      outline: 2px solid var(--rs-danger);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.guest-otp-phone-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   min-width: 0;
 }
 
