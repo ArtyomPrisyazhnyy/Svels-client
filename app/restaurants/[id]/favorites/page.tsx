@@ -1,8 +1,11 @@
 import { notFound } from 'next/navigation';
+import { VenueGuestSubpageShell } from '@/features/restaurants/components/VenueGuestSubpageShell';
 import { RestaurantGuestFavoritesPage } from '@/views/RestaurantGuestFavoritesPage';
 import {
+  getRestaurantBookingSettings,
   getRestaurantMenu,
   getRestaurantPublic,
+  getRestaurantSocialLinks,
   getRestaurantStyling,
 } from '@/server/restaurant-public';
 import { restaurantVenueStaticParams } from '@/server/restaurant-venue-static-params';
@@ -21,10 +24,12 @@ interface RestaurantFavoritesPageProps {
 
 export default async function RestaurantFavoritesPageRoute({ params }: RestaurantFavoritesPageProps) {
   const { id } = await params;
-  const [restaurant, menu, styling] = await Promise.all([
+  const [restaurant, menu, styling, socialLinks, bookingSettings] = await Promise.all([
     getRestaurantPublic(id),
     getRestaurantMenu(id),
     getRestaurantStyling(id),
+    getRestaurantSocialLinks(id),
+    getRestaurantBookingSettings(id),
   ]);
 
   if (!restaurant) {
@@ -35,11 +40,21 @@ export default async function RestaurantFavoritesPageRoute({ params }: Restauran
     notFound();
   }
 
+  const bookingEnabled = bookingSettings.bookingEnabled ?? false;
+
   return (
-    <RestaurantGuestFavoritesPage
-      restaurantId={restaurant.id}
-      restaurantName={restaurant.name}
-      menu={menu}
-    />
+    <VenueGuestSubpageShell
+      restaurant={restaurant}
+      socialLinks={socialLinks}
+      bookingEnabled={bookingEnabled}
+      favoritesEnabled={true}
+      pageClassName="restaurant-favorites-page"
+    >
+      <RestaurantGuestFavoritesPage
+        restaurantId={restaurant.id}
+        restaurantName={restaurant.name}
+        menu={menu}
+      />
+    </VenueGuestSubpageShell>
   );
 }

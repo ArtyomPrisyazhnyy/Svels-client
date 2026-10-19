@@ -25,11 +25,10 @@ function GuestPageTitleSkeleton({ testId }: { testId: string }) {
 
 export function GuestAccountPageSkeleton() {
   return (
-    <div
-      className="venue-subpage restaurant-guest-account"
+    <main
+      className="venue-subpage__main restaurant-guest-account__main"
       data-testid="guest-account-skeleton"
     >
-      <main className="venue-subpage__main restaurant-guest-account__main">
         <Stack gap={4} className="venue-subpage__stack">
           <GuestPageTitleSkeleton testId="guest-account-skeleton-title" />
           <section
@@ -75,8 +74,7 @@ export function GuestAccountPageSkeleton() {
             <GuestAccountBookingsSkeleton />
           </section>
         </Stack>
-      </main>
-    </div>
+    </main>
   );
 }
 
@@ -184,29 +182,30 @@ export function GuestBookingPageSkeleton() {
 
 export function GuestFavoritesPageSkeleton() {
   return (
-    <div className="venue-subpage restaurant-favorites-page" data-testid="guest-favorites-skeleton">
-      <main className="venue-subpage__main restaurant-favorites-page__main">
-        <Stack gap={4} className="venue-subpage__stack">
-          <GuestPageTitleSkeleton testId="guest-favorites-skeleton-title" />
-          <div
-            className="restaurant-menu__grid guest-page-skeleton__product-grid"
-            data-testid="guest-page-first-block"
-            aria-hidden
-          >
-            {Array.from({ length: 4 }, (_, index) => (
-              <div key={index} className="menu-product-card guest-page-skeleton__product-card">
-                <div className="menu-product-card__media">
-                  <span className="ui-skeleton guest-page-skeleton__product-media" />
-                </div>
-                <div className="menu-product-card__body">
-                  <span className="ui-skeleton guest-page-skeleton__product-title" />
-                  <span className="ui-skeleton guest-page-skeleton__product-price" />
-                </div>
+    <main
+      className="venue-subpage__main restaurant-favorites-page__main"
+      data-testid="guest-favorites-skeleton"
+    >
+      <Stack gap={4} className="venue-subpage__stack">
+        <GuestPageTitleSkeleton testId="guest-favorites-skeleton-title" />
+        <div
+          className="restaurant-menu__grid guest-page-skeleton__product-grid"
+          data-testid="guest-page-first-block"
+          aria-hidden
+        >
+          {Array.from({ length: 4 }, (_, index) => (
+            <div key={index} className="menu-product-card guest-page-skeleton__product-card">
+              <div className="menu-product-card__media">
+                <span className="ui-skeleton guest-page-skeleton__product-media" />
               </div>
-            ))}
-          </div>
-        </Stack>
-      </main>
-    </div>
+              <div className="menu-product-card__body">
+                <span className="ui-skeleton guest-page-skeleton__product-title" />
+                <span className="ui-skeleton guest-page-skeleton__product-price" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Stack>
+    </main>
   );
 }

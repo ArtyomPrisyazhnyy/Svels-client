@@ -1,7 +1,13 @@
 import { RestaurantGuestProtectedRoute } from '@/components/RestaurantGuestProtectedRoute';
 import { GuestAccountPageSkeleton } from '@/features/restaurants/components/guest-page-skeletons/GuestPageSkeletons';
+import { VenueGuestSubpageShell } from '@/features/restaurants/components/VenueGuestSubpageShell';
 import { RestaurantGuestAccountPage } from '@/views/RestaurantGuestAccountPage';
-import { getRestaurantPublic } from '@/server/restaurant-public';
+import {
+  getRestaurantBookingSettings,
+  getRestaurantPublic,
+  getRestaurantSocialLinks,
+  getRestaurantStyling,
+} from '@/server/restaurant-public';
 import { restaurantVenueStaticParams } from '@/server/restaurant-venue-static-params';
 import { notFound } from 'next/navigation';
 
@@ -19,21 +25,37 @@ interface RestaurantAccountPageProps {
 
 export default async function RestaurantAccountPageRoute({ params }: RestaurantAccountPageProps) {
   const { id } = await params;
-  const restaurant = await getRestaurantPublic(id);
+  const [restaurant, socialLinks, bookingSettings, styling] = await Promise.all([
+    getRestaurantPublic(id),
+    getRestaurantSocialLinks(id),
+    getRestaurantBookingSettings(id),
+    getRestaurantStyling(id),
+  ]);
 
   if (!restaurant) {
     notFound();
   }
 
+  const favoritesEnabled = styling.favoritesEnabled !== false;
+  const bookingEnabled = bookingSettings.bookingEnabled ?? false;
+
   return (
-    <RestaurantGuestProtectedRoute
-      restaurantId={restaurant.id}
-      fallback={<GuestAccountPageSkeleton />}
+    <VenueGuestSubpageShell
+      restaurant={restaurant}
+      socialLinks={socialLinks}
+      bookingEnabled={bookingEnabled}
+      favoritesEnabled={favoritesEnabled}
+      pageClassName="restaurant-guest-account"
     >
-      <RestaurantGuestAccountPage
+      <RestaurantGuestProtectedRoute
         restaurantId={restaurant.id}
-        restaurantName={restaurant.name}
-      />
-    </RestaurantGuestProtectedRoute>
+        fallback={<GuestAccountPageSkeleton />}
+      >
+        <RestaurantGuestAccountPage
+          restaurantId={restaurant.id}
+          restaurantName={restaurant.name}
+        />
+      </RestaurantGuestProtectedRoute>
+    </VenueGuestSubpageShell>
   );
 }
