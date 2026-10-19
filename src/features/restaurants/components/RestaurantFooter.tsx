@@ -7,11 +7,10 @@ import type { SocialLink } from '@/shared/types/social-link';
 import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
 import { RestaurantSocialLinks } from './RestaurantSocialLinks';
 
-export interface RestaurantFooterRestaurant
-  extends Pick<
-    PublicRestaurant,
-    'id' | 'name' | 'address' | 'description' | 'logoUrl' | 'logoWebpUrl'
-  > {}
+export type RestaurantFooterRestaurant = Pick<
+  PublicRestaurant,
+  'id' | 'name' | 'address' | 'description' | 'logoUrl' | 'logoWebpUrl'
+>;
 
 export interface RestaurantFooterProps {
   restaurant: RestaurantFooterRestaurant;
