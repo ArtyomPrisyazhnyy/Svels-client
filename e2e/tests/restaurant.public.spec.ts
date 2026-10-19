@@ -12,6 +12,15 @@ test.describe('Restaurant public page', () => {
     await expect(page.getByTestId('guest-profile-button')).toBeVisible();
   });
 
+  test('в подвале ссылка Svels ведёт на главную', async ({ page, seed }) => {
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+
+    const link = page.getByTestId('restaurant-footer-svels-home');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', '/');
+    await expect(link).toHaveAttribute('aria-label', 'Svels — главная');
+  });
+
   test('добавление в избранное по клику на сердечко', async ({ page, seed }) => {
     const menu = await apiClient.getMenu(seed.restaurantId);
     const firstItem = menu.categories.flatMap((c) => c.items)[0];

@@ -194,6 +194,36 @@
   color: var(--rs-text-soft, #94a3b8);
 }
 
+.restaurant-public__footer-credit-link {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: var(--control-h-md);
+  padding-inline: var(--space-2);
+  margin-inline: calc(-1 * var(--space-2));
+  padding-block: calc((var(--control-h-md) - 1em) / 2);
+  margin-block: calc((1em - var(--control-h-md)) / 2);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-decoration: none;
+  transition: box-shadow var(--duration-fast) var(--ease-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+    text-decoration: underline;
+    box-shadow: 0 0 0 3px var(--rs-focus-ring);
+  }
+}
+
 /* === Footer layout === */
 
 /* По центру: одна колонка, всё выровнено по центру */

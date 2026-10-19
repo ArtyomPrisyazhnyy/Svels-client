@@ -183,7 +183,17 @@ function RestaurantPublicPageBody({
           <span>
             © {new Date().getFullYear()} {restaurant.name} · {restaurant.address}
           </span>
-          <span className="restaurant-public__footer-credit">Работает на Svels</span>
+          <span className="restaurant-public__footer-credit">
+            Работает на{' '}
+            <Link
+              href="/"
+              className="restaurant-public__footer-credit-link"
+              aria-label="Svels — главная"
+              data-testid="restaurant-footer-svels-home"
+            >
+              Svels
+            </Link>
+          </span>
         </div>
       </footer>
 
