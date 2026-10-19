@@ -17,6 +17,7 @@ import { Field } from '@/shared/ui/Field/Field';
 import type { OtpDeliveryChannel } from '@/shared/types/auth';
 import { toPhoneApiValue, isCompleteBelarusPhone } from '@/shared/utils/phone.util';
 import { useRestaurantStylingOptional } from '@/features/restaurants/context/RestaurantStylingContext';
+import { GuestRestaurantOAuthButtons } from './GuestRestaurantOAuthButtons';
 
 type Step = 'phone' | 'code' | 'register';
 
@@ -278,44 +279,51 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSendPhone} data-testid="guest-otp-phone-form">
+    <div className="guest-otp-phone-step">
       {error && <p className="auth-error" data-testid="auth-error">{error}</p>}
+      <form className="auth-form" onSubmit={handleSendPhone} data-testid="guest-otp-phone-form">
+        <Field label="Телефон" htmlFor="otp-phone">
+          <PhoneInput
+            id="otp-phone"
+            required
+            value={phone}
+            onChange={setPhone}
+            data-testid="otp-phone"
+          />
+        </Field>
 
-      <Field label="Телефон" htmlFor="otp-phone">
-        <PhoneInput
-          id="otp-phone"
-          required
-          value={phone}
-          onChange={setPhone}
-          data-testid="otp-phone"
-        />
-      </Field>
+        <label className="auth-hint" style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+          <input
+            type="checkbox"
+            checked={privacyConsent}
+            onChange={(e) => setPrivacyConsent(e.target.checked)}
+            data-testid="guest-otp-privacy-consent"
+          />
+          <span>
+            Я согласен(на) с{' '}
+            <Link href="/privacypolicy" target="_blank" rel="noopener noreferrer">
+              политикой конфиденциальности
+            </Link>{' '}
+            и обработкой персональных данных
+          </span>
+        </label>
 
-      <label className="auth-hint" style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-        <input
-          type="checkbox"
-          checked={privacyConsent}
-          onChange={(e) => setPrivacyConsent(e.target.checked)}
-          data-testid="guest-otp-privacy-consent"
-        />
-        <span>
-          Я согласен(на) с{' '}
-          <Link href="/privacypolicy" target="_blank" rel="noopener noreferrer">
-            политикой конфиденциальности
-          </Link>{' '}
-          и обработкой персональных данных
-        </span>
-      </label>
-
-      <Button
-        type="submit"
-        variant="primary"
-        fullWidth
-        disabled={loading || !privacyConsent}
-        testId="otp-send-submit"
-      >
-        {loading ? 'Отправка…' : 'Получить код'}
-      </Button>
-    </form>
+        <Button
+          type="submit"
+          variant="primary"
+          fullWidth
+          disabled={loading || !privacyConsent}
+          testId="otp-send-submit"
+        >
+          {loading ? 'Отправка…' : 'Получить код'}
+        </Button>
+      </form>
+      <GuestRestaurantOAuthButtons
+        restaurantId={restaurantId}
+        onSuccess={onSuccess}
+        onError={setError}
+        onClearError={() => setError(null)}
+      />
+    </div>
   );
 }

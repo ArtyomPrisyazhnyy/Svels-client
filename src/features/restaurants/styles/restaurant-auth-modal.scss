@@ -9,6 +9,13 @@
   min-width: 0;
 }
 
+.guest-otp-phone-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
 .restaurant-auth-modal__switcher {
   width: 100%;
 

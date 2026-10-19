@@ -464,6 +464,13 @@ export function RestaurantCartModal({
       clearCart();
     } catch (err) {
       setError(getPreOrderErrorMessage(err));
+      if (err instanceof ApiError && err.code === 'phone_required') {
+        setShowValidationHints(true);
+        expandRows(['contacts']);
+        window.setTimeout(() => {
+          document.getElementById('cart-customer-phone')?.focus();
+        }, 0);
+      }
       if (isItemUnavailableError(err) && items.length === 1) {
         setError(
           `${getPreOrderErrorMessage(err)} Вернитесь в корзину и уберите позицию.`,
@@ -600,6 +607,7 @@ export function RestaurantCartModal({
                         id="cart-customer-phone"
                         value={draft.phone}
                         onChange={(value) => syncDraft({ phone: value })}
+                        data-testid="cart-customer-phone"
                       />
                     </Field>
                     {fieldErrors.contacts && (
