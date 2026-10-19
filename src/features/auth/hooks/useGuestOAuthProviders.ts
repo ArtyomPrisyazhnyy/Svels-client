@@ -12,24 +12,19 @@ const EMPTY_PROVIDERS: GuestOAuthProvidersResponse = {
 const providersCache = new Map<string, GuestOAuthProvidersResponse>();
 
 export function useGuestOAuthProviders(restaurantId: string, enabled: boolean) {
-  const [providers, setProviders] = useState<GuestOAuthProvidersResponse | null>(() =>
-    providersCache.get(restaurantId) ?? null,
+  const [providers, setProviders] = useState<GuestOAuthProvidersResponse>(
+    () => providersCache.get(restaurantId) ?? EMPTY_PROVIDERS,
   );
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(
+    () => enabled && !providersCache.has(restaurantId),
+  );
 
   useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    const cached = providersCache.get(restaurantId);
-    if (cached) {
-      setProviders(cached);
+    if (!enabled || providersCache.has(restaurantId)) {
       return;
     }
 
     let cancelled = false;
-    setLoading(true);
 
     void fetchGuestOAuthProviders(restaurantId)
       .then((response) => {
@@ -55,11 +50,10 @@ export function useGuestOAuthProviders(restaurantId: string, enabled: boolean) {
     };
   }, [restaurantId, enabled]);
 
-  const resolved = providers ?? EMPTY_PROVIDERS;
-  const hasEnabledProvider = resolved.google.enabled || resolved.apple.enabled;
+  const hasEnabledProvider = providers.google.enabled || providers.apple.enabled;
 
   return {
-    providers: resolved,
+    providers,
     hasEnabledProvider,
     loading,
   };

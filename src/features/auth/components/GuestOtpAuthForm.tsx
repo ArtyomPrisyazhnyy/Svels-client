@@ -319,6 +319,7 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
         </Button>
       </form>
       <GuestRestaurantOAuthButtons
+        key={restaurantId}
         restaurantId={restaurantId}
         onSuccess={onSuccess}
         onError={setError}
