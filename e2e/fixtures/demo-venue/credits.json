@@ -1,0 +1,58 @@
+{
+  "note": "All images AI-generated for a fictional venue; no Unsplash fallback was needed.",
+  "generator": "Figma MCP generate_image, model gemini-3.1-flash-lite-image, plan team::1400704652842536878",
+  "generatedAt": "2026-10-10",
+  "images": {
+    "espresso": {
+      "source": "figma-generate_image"
+    },
+    "americano": {
+      "source": "figma-generate_image"
+    },
+    "cappuccino": {
+      "source": "figma-generate_image"
+    },
+    "flat-white": {
+      "source": "figma-generate_image"
+    },
+    "latte": {
+      "source": "figma-generate_image"
+    },
+    "raf-lavender": {
+      "source": "figma-generate_image"
+    },
+    "croissant": {
+      "source": "figma-generate_image"
+    },
+    "almond-croissant": {
+      "source": "figma-generate_image"
+    },
+    "pain-au-chocolat": {
+      "source": "figma-generate_image"
+    },
+    "cinnamon-roll": {
+      "source": "figma-generate_image"
+    },
+    "cherry-danish": {
+      "source": "figma-generate_image"
+    },
+    "basque-cheesecake": {
+      "source": "figma-generate_image"
+    },
+    "carrot-cake": {
+      "source": "figma-generate_image"
+    },
+    "tiramisu": {
+      "source": "figma-generate_image"
+    },
+    "medovik": {
+      "source": "figma-generate_image"
+    },
+    "banner": {
+      "source": "figma-generate_image"
+    },
+    "logo": {
+      "source": "figma-generate_image"
+    }
+  }
+}

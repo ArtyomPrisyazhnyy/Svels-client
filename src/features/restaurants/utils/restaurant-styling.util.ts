@@ -243,6 +243,18 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     border: '#4a0e2e',
     surface: '#120818',
   },
+  svelsGuest: {
+    bg: '#ffffff',
+    text: '#0b1a18',
+    textMuted: '#54635f',
+    textSoft: '#8a9a96',
+    accent: '#f2795b',
+    primary: '#0f766e',
+    primaryHover: '#0b5f59',
+    primarySoft: '#ffe6dc',
+    border: '#e3e8e6',
+    surface: '#f6f8f7',
+  },
 };
 
 export function getGoogleFontHref(_fontFamily: RestaurantFontFamily): string | null {

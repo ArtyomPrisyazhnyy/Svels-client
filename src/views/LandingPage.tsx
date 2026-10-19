@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import { ContactButton } from './ContactButton';
-import { LandingHeader } from './LandingHeader';
+import { LandingBenefits } from './LandingBenefits';
 import { LandingFaq } from './LandingFaq';
-import { LandingFeatures } from './LandingFeatures';
-import { LandingHeroScene } from './LandingHeroScene';
+import { LandingForWhom } from './LandingForWhom';
+import { LandingHeader } from './LandingHeader';
+import { LandingHeroVisual } from './LandingHeroVisual';
+import { getHeroPreloadProps } from './landing-scenes';
+import { LandingLiveExample } from './LandingLiveExample';
 import { LandingPricing } from './LandingPricing';
-import { Reveal } from './Reveal';
+import { getDemoRestaurantUrl } from './landing-config';
 
 /**
  * Главная (лендинг) страница Svels.
@@ -27,34 +30,66 @@ const STEPS = [
   },
 ];
 
+const TRUST_CHIPS = ['0% с заказов', 'Дизайн под ваш бренд', 'Гости и данные — ваши'] as const;
+
 export function LandingPage() {
+  const demoUrl = getDemoRestaurantUrl();
+  const heroPreload = getHeroPreloadProps();
+
   return (
     <div className="landing" data-testid="landing-page">
+      <link
+        rel="preload"
+        as="image"
+        href={heroPreload.mobile.href}
+        imageSrcSet={heroPreload.mobile.imageSrcSet}
+        imageSizes={heroPreload.mobile.imageSizes}
+        media="(max-width: 979px)"
+        type="image/avif"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href={heroPreload.desktop.href}
+        imageSrcSet={heroPreload.desktop.imageSrcSet}
+        imageSizes={heroPreload.desktop.imageSizes}
+        media="(min-width: 980px)"
+        type="image/avif"
+        fetchPriority="high"
+      />
       <LandingHeader />
 
       <section className="landing__hero landing__container">
         <div className="landing__hero-copy">
-          <Reveal className="landing__hero-badge">
+          <p className="landing__hero-badge">
             <span className="landing__hero-badge-dot" aria-hidden />
-            Для ресторанов, баров и кофеен
-          </Reveal>
-          <Reveal as="h1" className="landing__hero-title" delay={50}>
+            Для кафе, ресторанов, кофеен и цветочных
+          </p>
+          <h1 className="landing__hero-title">
             Сайт и мобильное приложение
             <br />
             <span className="landing__hero-title-accent">для вашего заведения</span>
-          </Reveal>
-          <Reveal as="p" className="landing__hero-text" delay={100}>
-            Гость бронирует стол, заказывает заранее и открывает вас по адресу
-            заведения — не платформы. Выглядит как ваш продукт, потому что это он и есть.
-          </Reveal>
-          <Reveal className="landing__hero-actions" delay={150}>
+          </h1>
+          <p className="landing__hero-text">
+            Доставка, самовывоз и заказы в зале. Оплата картой онлайн, новые заказы — сразу в
+            Telegram. Запуск за несколько дней.
+          </p>
+          <div className="landing__hero-chips">
+            {TRUST_CHIPS.map((chip) => (
+              <span key={chip} className="landing__hero-chip">{chip}</span>
+            ))}
+          </div>
+          <div className="landing__hero-actions">
             <ContactButton label="Оставить заявку" variant="primary" />
-            <a href="#features" className="landing-cta landing-cta--ghost">Смотреть экраны</a>
-          </Reveal>
+            <Link href={demoUrl} className="landing-cta landing-cta--ghost">
+              Посмотреть живой пример
+            </Link>
+          </div>
         </div>
-        <Reveal className="landing__hero-visual" delay={120}>
-          <LandingHeroScene />
-        </Reveal>
+        <div className="landing__hero-visual">
+          <LandingHeroVisual />
+        </div>
       </section>
 
       <section className="landing__section landing__section--steps" aria-label="Как подключаем">
@@ -71,7 +106,9 @@ export function LandingPage() {
         </div>
       </section>
 
-      <LandingFeatures />
+      <LandingBenefits />
+      <LandingLiveExample />
+      <LandingForWhom />
       <LandingPricing />
       <LandingFaq />
 

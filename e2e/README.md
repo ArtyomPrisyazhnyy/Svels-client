@@ -14,6 +14,10 @@ UI-регрессионные тесты для всего клиентског�
 
 Dev-эндпоинт `GET /dev/last-otp?phone=...` доступен только при **`NODE_ENV=development`** и **`ENABLE_DEV_ENDPOINTS=true`**.
 
+## Демо-заведение лендинга
+
+Фиктивная кофейня «Чайка» (`/restaurants/demo`) отдаётся **`scripts/landing-mock-api.mjs`**: полное меню и фото из `e2e/fixtures/demo-venue/` (контент-пак), картинки в `public/demo-venue/images/`. Съёмка лендинга: `npm run landing:capture` (raw Playwright → `scripts/landing/build-scenes.mjs` → `public/landing/scenes/*` + manifest). Только пересборка растров: `npm run landing:scenes` (нужны raw PNG в `scripts/landing/raw/`). Переменная `NEXT_PUBLIC_DEMO_RESTAURANT_URL` (см. `.env.example`) — CTA «Открыть демо-заведение».
+
 ## Команды
 
 ```bash

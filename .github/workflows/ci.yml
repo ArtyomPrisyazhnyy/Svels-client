@@ -20,9 +20,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Mock API for Next static generation
+      - name: Mock API for Next static generation (landing demo)
         run: |
-          node -e "require('http').createServer((q,r)=>{r.setHeader('Content-Type','application/json');if(q.url==='/restaurants'){r.end('[]');return;}r.writeHead(404);r.end('{}');}).listen(3000,'127.0.0.1')" &
+          node scripts/landing-mock-api.mjs &
           sleep 2
 
       - name: Typecheck
