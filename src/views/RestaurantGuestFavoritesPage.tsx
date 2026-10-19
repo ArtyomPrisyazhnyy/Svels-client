@@ -147,8 +147,11 @@ export function RestaurantGuestFavoritesPage({
   }
 
   return (
-    <div className="venue-subpage restaurant-favorites-page" data-testid="guest-favorites-page">
-      <main className="venue-subpage__main restaurant-favorites-page__main">
+    <>
+      <main
+        className="venue-subpage__main restaurant-favorites-page__main"
+        data-testid="guest-favorites-page"
+      >
         <Stack gap={4} className="venue-subpage__stack">
           <PageTitle
             title="Избранное"
@@ -193,6 +196,6 @@ export function RestaurantGuestFavoritesPage({
           onClose={() => setSelectedItem(null)}
         />
       ) : null}
-    </div>
+    </>
   );
 }

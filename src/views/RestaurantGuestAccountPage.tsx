@@ -69,8 +69,10 @@ export function RestaurantGuestAccountPage({
   }
 
   return (
-    <div className="venue-subpage restaurant-guest-account" data-testid="guest-account-page">
-      <main className="venue-subpage__main restaurant-guest-account__main">
+    <main
+      className="venue-subpage__main restaurant-guest-account__main"
+      data-testid="guest-account-page"
+    >
         <Stack gap={4} className="venue-subpage__stack">
           <PageTitle
             title="Личный кабинет"
@@ -153,7 +155,6 @@ export function RestaurantGuestAccountPage({
             )}
           </section>
         </Stack>
-      </main>
-    </div>
+    </main>
   );
 }
