@@ -174,10 +174,18 @@
 }
 
 .restaurant-public__footer-bottom {
+  --venue-scroll-to-top-size: 3rem;
+  --venue-scroll-to-top-inset-inline: max(1.25rem, env(safe-area-inset-right, 0px));
+  --venue-scroll-to-top-inset-block: max(1.25rem, env(safe-area-inset-bottom, 0px));
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   padding: 1rem 1.5rem;
+  padding-inline-end: calc(
+    1.5rem + var(--venue-scroll-to-top-size) + var(--venue-scroll-to-top-inset-inline) +
+      var(--space-2)
+  );
+  padding-block-end: calc(1rem + var(--venue-scroll-to-top-inset-block));
   display: flex;
   justify-content: space-between;
   align-items: center;

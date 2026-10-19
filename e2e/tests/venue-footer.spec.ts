@@ -30,4 +30,12 @@ test.describe('Venue footer on guest subpages', () => {
     await expect(page.getByTestId('guest-favorites-page')).toBeVisible({ timeout: 30_000 });
     await assertVenueFooterSvelsLink(page);
   });
+
+  test('кнопка «наверх» скрыта у подвала на личном кабинете', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    await page.goto(`/restaurants/${seed.restaurantId}/account`);
+    await expect(page.getByTestId('guest-account-page')).toBeVisible({ timeout: 30_000 });
+    await page.getByTestId('restaurant-footer').scrollIntoViewIfNeeded();
+    await expect(page.getByTestId('scroll-to-top')).not.toHaveClass(/scroll-to-top--visible/);
+  });
 });

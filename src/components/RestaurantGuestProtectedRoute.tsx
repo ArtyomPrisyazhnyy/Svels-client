@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, type ReactNode } from 'react';
+import { Suspense, useEffect, type ReactNode } from 'react';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { getPostAuthPath } from '@/shared/routing/get-post-auth-path';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
@@ -24,7 +24,7 @@ function canAccessRestaurantGuestArea(user: AuthUser, restaurantId: string): boo
   return false;
 }
 
-export function RestaurantGuestProtectedRoute({
+function RestaurantGuestProtectedRouteInner({
   restaurantId,
   children,
   fallback,
@@ -74,4 +74,18 @@ export function RestaurantGuestProtectedRoute({
   }
 
   return children;
+}
+
+export function RestaurantGuestProtectedRoute({
+  restaurantId,
+  children,
+  fallback,
+}: RestaurantGuestProtectedRouteProps) {
+  return (
+    <Suspense fallback={fallback}>
+      <RestaurantGuestProtectedRouteInner restaurantId={restaurantId} fallback={fallback}>
+        {children}
+      </RestaurantGuestProtectedRouteInner>
+    </Suspense>
+  );
 }

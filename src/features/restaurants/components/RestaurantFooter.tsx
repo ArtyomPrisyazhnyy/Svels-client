@@ -5,7 +5,7 @@ import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import type { SocialLink } from '@/shared/types/social-link';
 import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
-import { RestaurantSocialLinks } from './restaurant-social-links.lazy';
+import { RestaurantSocialLinks } from './RestaurantSocialLinks';
 
 export interface RestaurantFooterRestaurant
   extends Pick<
