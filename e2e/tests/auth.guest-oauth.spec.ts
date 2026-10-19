@@ -3,6 +3,7 @@ import {
   DISABLED_OAUTH_PROVIDERS,
   ENABLED_OAUTH_PROVIDERS,
   E2E_MOCK_GOOGLE_ID_TOKEN,
+  blockExternalOAuthScripts,
   installGuestOAuthSdkMocks,
   mockGuestGoogleOAuthLogin,
   mockGuestOAuthProviders,
@@ -20,6 +21,7 @@ test.describe('Guest OAuth in venue auth modal', () => {
 
   test('с провайдерами: divider, кнопки и вход через Google', async ({ page, seed }) => {
     await installGuestOAuthSdkMocks(page);
+    await blockExternalOAuthScripts(page);
     await mockGuestOAuthProviders(page, seed.restaurantId, ENABLED_OAUTH_PROVIDERS);
 
     const oauthUser = {

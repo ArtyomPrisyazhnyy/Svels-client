@@ -32,6 +32,23 @@ export async function mockGuestOAuthProviders(
   });
 }
 
+export async function blockExternalOAuthScripts(page: Page): Promise<void> {
+  await page.route('**/accounts.google.com/**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/javascript',
+      body: '/* e2e: keep window.google mock from addInitScript */',
+    });
+  });
+  await page.route('**/appleid.cdn-apple.com/**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/javascript',
+      body: '/* e2e: keep window.AppleID mock from addInitScript */',
+    });
+  });
+}
+
 export async function installGuestOAuthSdkMocks(page: Page): Promise<void> {
   await page.addInitScript(() => {
     type GsiCallback = (response: { credential?: string }) => void;

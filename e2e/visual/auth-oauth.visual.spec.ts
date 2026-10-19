@@ -4,6 +4,7 @@ import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-pag
 import { prepareForScreenshot, VIEWPORTS } from '../helpers/visual';
 import {
   ENABLED_OAUTH_PROVIDERS,
+  blockExternalOAuthScripts,
   installGuestOAuthSdkMocks,
   mockGuestOAuthProviders,
 } from '../helpers/guest-oauth-mock';
@@ -30,6 +31,7 @@ async function applyTheme(
 test.describe('Auth modal OAuth (providers enabled)', () => {
   test.beforeEach(async ({ page, seed }) => {
     await installGuestOAuthSdkMocks(page);
+    await blockExternalOAuthScripts(page);
     await mockGuestOAuthProviders(page, seed.restaurantId, ENABLED_OAUTH_PROVIDERS);
   });
 
