@@ -174,18 +174,18 @@
 }
 
 .restaurant-public__footer-bottom {
-  --venue-scroll-to-top-size: 3rem;
-  --venue-scroll-to-top-inset-inline: max(1.25rem, env(safe-area-inset-right, 0px));
-  --venue-scroll-to-top-inset-block: max(1.25rem, env(safe-area-inset-bottom, 0px));
+  /* Matches .scroll-to-top: 3rem control, 1.25rem inset, +8px gap. */
+  --venue-scroll-clearance-inline: calc(
+    3rem + max(1.25rem, env(safe-area-inset-right, 0px)) + var(--space-2)
+  );
+  --venue-scroll-clearance-block: calc(
+    3rem + max(1.25rem, env(safe-area-inset-bottom, 0px)) + var(--space-2)
+  );
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   padding: 1rem 1.5rem;
-  padding-inline-end: calc(
-    1.5rem + var(--venue-scroll-to-top-size) + var(--venue-scroll-to-top-inset-inline) +
-      var(--space-2)
-  );
-  padding-block-end: calc(1rem + var(--venue-scroll-to-top-inset-block));
+  padding-block-end: var(--venue-scroll-clearance-block);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -194,6 +194,15 @@
   border-top: 1px solid var(--rs-border, #e2e8f0);
   font-size: 0.8125rem;
   color: var(--rs-text-soft, #94a3b8);
+
+  > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 767px) {
+    padding-inline-end: var(--venue-scroll-clearance-inline);
+  }
 }
 
 .restaurant-public__footer-credit {

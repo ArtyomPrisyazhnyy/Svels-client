@@ -31,11 +31,48 @@ test.describe('Venue footer on guest subpages', () => {
     await assertVenueFooterSvelsLink(page);
   });
 
-  test('кнопка «наверх» скрыта у подвала на личном кабинете', async ({ page, seed, asGuest }) => {
+  test('кнопка «наверх» не перекрывает текст подвала на 390', async ({ page, seed, asGuest }) => {
     void asGuest;
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`/restaurants/${seed.restaurantId}/account`);
     await expect(page.getByTestId('guest-account-page')).toBeVisible({ timeout: 30_000 });
-    await page.getByTestId('restaurant-footer').scrollIntoViewIfNeeded();
-    await expect(page.getByTestId('scroll-to-top')).not.toHaveClass(/scroll-to-top--visible/);
+    await page.evaluate(() => {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    });
+    const button = page.getByTestId('scroll-to-top');
+    await expect(button).toHaveClass(/scroll-to-top--visible/);
+
+    const overlaps = await page.evaluate(() => {
+      const buttonEl = document.querySelector('[data-testid="scroll-to-top"]');
+      const bottom = document.querySelector('.restaurant-public__footer-bottom');
+      if (!(buttonEl instanceof HTMLElement) || !(bottom instanceof HTMLElement)) {
+        return true;
+      }
+      const buttonBox = buttonEl.getBoundingClientRect();
+      const walker = document.createTreeWalker(bottom, NodeFilter.SHOW_TEXT);
+      let node = walker.nextNode();
+      while (node) {
+        const value = node.textContent?.trim() ?? '';
+        if (value.length > 0 && node.parentElement) {
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          for (const rect of range.getClientRects()) {
+            const hits =
+              rect.width > 0 &&
+              rect.height > 0 &&
+              rect.left < buttonBox.right &&
+              rect.right > buttonBox.left &&
+              rect.top < buttonBox.bottom &&
+              rect.bottom > buttonBox.top;
+            if (hits) {
+              return true;
+            }
+          }
+        }
+        node = walker.nextNode();
+      }
+      return false;
+    });
+    expect(overlaps).toBe(false);
   });
 });

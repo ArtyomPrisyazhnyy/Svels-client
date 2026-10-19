@@ -25,11 +25,6 @@ async function applyTheme(
 async function scrollToFooter(page: import('@playwright/test').Page) {
   await page.evaluate(async () => {
     await document.fonts.ready;
-    const footer = document.querySelector('[data-testid="restaurant-footer"]');
-    if (footer instanceof HTMLElement) {
-      footer.scrollIntoView({ block: 'end', behavior: 'auto' });
-      return;
-    }
     window.scrollTo(0, document.documentElement.scrollHeight);
   });
 }
@@ -52,14 +47,12 @@ test.describe('venue footer full-page capture @manual', () => {
       needsGuest: boolean;
     }> = [
       { slug: '', label: 'venue-home', theme: 'classic', viewportKey: 'm390', readyTestId: 'restaurant-public-page', needsGuest: false },
+      { slug: '', label: 'venue-home', theme: 'classic', viewportKey: 'd1280', readyTestId: 'restaurant-public-page', needsGuest: false },
       { slug: '/account', label: 'venue-account', theme: 'classic', viewportKey: 'm390', readyTestId: 'guest-account-page', needsGuest: true },
       { slug: '/account', label: 'venue-account', theme: 'classic', viewportKey: 'd1280', readyTestId: 'guest-account-page', needsGuest: true },
       { slug: '/account', label: 'venue-account', theme: 'midnight', viewportKey: 'm390', readyTestId: 'guest-account-page', needsGuest: true },
-      { slug: '/account', label: 'venue-account', theme: 'midnight', viewportKey: 'd1280', readyTestId: 'guest-account-page', needsGuest: true },
       { slug: '/favorites', label: 'venue-favorites', theme: 'classic', viewportKey: 'm390', readyTestId: 'guest-favorites-page', needsGuest: false },
       { slug: '/favorites', label: 'venue-favorites', theme: 'classic', viewportKey: 'd1280', readyTestId: 'guest-favorites-page', needsGuest: false },
-      { slug: '/favorites', label: 'venue-favorites', theme: 'midnight', viewportKey: 'm390', readyTestId: 'guest-favorites-page', needsGuest: false },
-      { slug: '/favorites', label: 'venue-favorites', theme: 'midnight', viewportKey: 'd1280', readyTestId: 'guest-favorites-page', needsGuest: false },
     ];
 
     for (const shot of captures) {
@@ -69,10 +62,11 @@ test.describe('venue footer full-page capture @manual', () => {
       await page.goto(`/restaurants/${seed.restaurantId}${shot.slug}`);
       await expect(page.getByTestId(shot.readyTestId)).toBeVisible({ timeout: 60_000 });
       await scrollToFooter(page);
+      await expect(page.getByTestId('scroll-to-top')).toHaveClass(/scroll-to-top--visible/);
       const fileName = `${shot.label}-${shot.theme}-${viewport.width}.png`;
       await page.screenshot({
         path: path.join(OUT_DIR, fileName),
-        fullPage: true,
+        fullPage: false,
         animations: 'disabled',
       });
     }

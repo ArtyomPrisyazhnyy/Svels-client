@@ -44,8 +44,7 @@ function ChevronUpIcon() {
 export function ScrollToTopButton({ forRestaurantTheme = false }: { forRestaurantTheme?: boolean }) {
   const pathname = usePathname();
   const tenantMode = useIsTenantDomain();
-  const [scrolled, setScrolled] = useState(false);
-  const [footerInView, setFooterInView] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const hiddenOnAdmin = ADMIN_PREFIXES.some((prefix) => pathname.startsWith(prefix));
   const hiddenOnRestaurantGuest =
@@ -53,12 +52,12 @@ export function ScrollToTopButton({ forRestaurantTheme = false }: { forRestauran
 
   useEffect(() => {
     if (hiddenOnAdmin || hiddenOnRestaurantGuest) {
-      setScrolled(false);
+      setVisible(false);
       return;
     }
 
     const syncVisibility = () => {
-      setScrolled(currentScrollY() > 0);
+      setVisible(currentScrollY() > 0);
     };
 
     syncVisibility();
@@ -68,33 +67,6 @@ export function ScrollToTopButton({ forRestaurantTheme = false }: { forRestauran
       window.removeEventListener('scroll', syncVisibility);
     };
   }, [hiddenOnAdmin, hiddenOnRestaurantGuest]);
-
-  useEffect(() => {
-    if (hiddenOnAdmin || hiddenOnRestaurantGuest || !forRestaurantTheme) {
-      setFooterInView(false);
-      return;
-    }
-
-    const footer = document.querySelector('[data-testid="restaurant-footer"]');
-    if (!(footer instanceof HTMLElement)) {
-      setFooterInView(false);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        setFooterInView(entries.some((entry) => entry.isIntersecting));
-      },
-      { threshold: 0, rootMargin: '0px 0px -1px 0px' },
-    );
-    observer.observe(footer);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [forRestaurantTheme, hiddenOnAdmin, hiddenOnRestaurantGuest, pathname]);
-
-  const visible = scrolled && !footerInView;
 
   const handleClick = () => {
     if (currentScrollY() <= 0) {
