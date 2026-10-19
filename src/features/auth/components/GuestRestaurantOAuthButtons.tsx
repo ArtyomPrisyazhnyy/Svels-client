@@ -21,6 +21,8 @@ type OAuthProvider = 'apple' | 'google';
 
 interface GuestRestaurantOAuthButtonsProps {
   restaurantId: string;
+  hasPrivacyConsent: boolean;
+  onPrivacyConsentRequired: () => void;
   onSuccess: () => void;
   onError: (message: string) => void;
   onClearError: () => void;
@@ -28,6 +30,8 @@ interface GuestRestaurantOAuthButtonsProps {
 
 export function GuestRestaurantOAuthButtons({
   restaurantId,
+  hasPrivacyConsent,
+  onPrivacyConsentRequired,
   onSuccess,
   onError,
   onClearError,
@@ -99,6 +103,11 @@ export function GuestRestaurantOAuthButtons({
       return;
     }
 
+    if (!hasPrivacyConsent) {
+      onPrivacyConsentRequired();
+      return;
+    }
+
     setLoadingProvider('google');
     onClearError();
 
@@ -117,6 +126,11 @@ export function GuestRestaurantOAuthButtons({
 
   async function handleAppleClick() {
     if (loadingProvider || !providers.apple.enabled || !window.AppleID?.auth) {
+      return;
+    }
+
+    if (!hasPrivacyConsent) {
+      onPrivacyConsentRequired();
       return;
     }
 

@@ -17,6 +17,7 @@ import { Field } from '@/shared/ui/Field/Field';
 import type { OtpDeliveryChannel } from '@/shared/types/auth';
 import { toPhoneApiValue, isCompleteBelarusPhone } from '@/shared/utils/phone.util';
 import { useRestaurantStylingOptional } from '@/features/restaurants/context/RestaurantStylingContext';
+import { GUEST_PRIVACY_CONSENT_ERROR } from '../constants/guest-privacy-consent';
 import { GuestRestaurantOAuthButtons } from './GuestRestaurantOAuthButtons';
 
 type Step = 'phone' | 'code' | 'register';
@@ -58,6 +59,25 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [consentInvalid, setConsentInvalid] = useState(false);
+
+  function requirePrivacyConsent(): void {
+    setConsentInvalid(true);
+    setError(GUEST_PRIVACY_CONSENT_ERROR);
+    window.queueMicrotask(() => {
+      document.getElementById('guest-otp-privacy-consent')?.focus();
+    });
+  }
+
+  function handlePrivacyConsentChange(checked: boolean) {
+    setPrivacyConsent(checked);
+    if (checked) {
+      setConsentInvalid(false);
+      if (error === GUEST_PRIVACY_CONSENT_ERROR) {
+        setError(null);
+      }
+    }
+  }
 
   useEffect(() => {
     if (!resendAvailableAt) {
@@ -78,6 +98,7 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
   async function handleSendPhone(event: FormEvent) {
     event.preventDefault();
     setError(null);
+    setConsentInvalid(false);
 
     if (!isCompleteBelarusPhone(phone)) {
       setError('Укажите корректный номер телефона');
@@ -292,11 +313,16 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
           />
         </Field>
 
-        <label className="auth-hint" style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+        <label
+          className={`auth-hint guest-otp-privacy-consent-label${consentInvalid ? ' guest-otp-privacy-consent-label--invalid' : ''}`}
+          style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start' }}
+          data-testid="guest-otp-privacy-consent-label"
+        >
           <input
+            id="guest-otp-privacy-consent"
             type="checkbox"
             checked={privacyConsent}
-            onChange={(e) => setPrivacyConsent(e.target.checked)}
+            onChange={(e) => handlePrivacyConsentChange(e.target.checked)}
             data-testid="guest-otp-privacy-consent"
           />
           <span>
@@ -321,6 +347,8 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
       <GuestRestaurantOAuthButtons
         key={restaurantId}
         restaurantId={restaurantId}
+        hasPrivacyConsent={privacyConsent}
+        onPrivacyConsentRequired={requirePrivacyConsent}
         onSuccess={onSuccess}
         onError={setError}
         onClearError={() => setError(null)}

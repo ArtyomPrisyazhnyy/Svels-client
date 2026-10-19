@@ -32,8 +32,33 @@
   min-width: 0;
 }
 
+.guest-oauth__icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
+
+  svg {
+    display: block;
+  }
+}
+
+.guest-oauth__icon--google svg {
+  width: 20px;
+  height: 20px;
+}
+
+.guest-oauth__icon--apple svg {
+  width: 20px;
+  height: 20px;
+}
+
 .guest-oauth__btn {
   font-family: inherit;
+  gap: var(--space-2);
 
   .ui-btn__icon {
     width: 20px;
@@ -41,6 +66,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    margin: 0;
   }
 }
 
