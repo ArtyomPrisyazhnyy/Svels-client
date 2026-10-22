@@ -5,6 +5,9 @@ out
 .github
 .cursor
 e2e
+e2e-report
+playwright-report
+test-results
 *.md
 !content/**/*.md
 .env
