@@ -20,6 +20,7 @@
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
     "@react-oauth/google": "^0.13.5",
+    "@sentry/nextjs": "^9.47.2",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "konva": "^10.3.0",
