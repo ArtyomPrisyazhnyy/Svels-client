@@ -5,6 +5,7 @@ module.exports = {
     '**/node_modules/**',
     '**/.next/**',
     'src/shared/styles/_tokens.scss',
+    'src/shared/styles/_platform-palette.scss',
     'src/shared/design-tokens/**',
     'src/features/restaurants/styles/restaurant-styling-theme.scss',
   ],
@@ -36,5 +37,6 @@ module.exports = {
     'shorthand-property-no-redundant-values': null,
     'property-no-vendor-prefix': null,
     'declaration-property-value-keyword-no-deprecated': null,
+    'declaration-block-single-line-max-declarations': null,
   },
 };

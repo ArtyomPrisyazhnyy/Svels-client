@@ -19,10 +19,13 @@ export default defineConfig([
   globalIgnores(['.next', 'node_modules']),
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
-    files: ['src/shared/**/*.{ts,tsx}', 'src/features/restaurants/**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
     ignores: [
       'src/shared/design-tokens/**',
+      'src/shared/types/restaurant-styling.ts',
       '**/*.test.ts',
+      '**/*.spec.ts',
+      'e2e/**',
     ],
     rules: {
       'no-restricted-syntax': [

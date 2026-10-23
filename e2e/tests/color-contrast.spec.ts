@@ -77,12 +77,13 @@ test.describe('Color contrast (axe)', () => {
         }
       });
 
-      test('pre-order / orders', async ({ page, seed, asGuest }) => {
+      test('guest order status (pre-order)', async ({ page, seed, asGuest }) => {
         void asGuest;
         await page.goto(`/restaurants/${seed.restaurantId}/pre-order`, {
           waitUntil: 'networkidle',
         });
-        await expectNoColorContrastViolations(page, `pre-order/${theme}`);
+        await expect(page.getByTestId('preorder-page')).toBeVisible();
+        await expectNoColorContrastViolations(page, `order-status/${theme}`);
       });
 
       test('error state playground', async ({ page }) => {
@@ -94,4 +95,35 @@ test.describe('Color contrast (axe)', () => {
       });
     });
   }
+
+  test.describe('admin surfaces @ 390', () => {
+    test('/restaurant-admin/menu', async ({ page, asRestaurantAdmin }) => {
+      void asRestaurantAdmin;
+      await page.setViewportSize(VIEWPORT);
+      await page.goto('/restaurant-admin/menu', { waitUntil: 'networkidle' });
+      await expect(page.getByTestId('restaurant-admin-layout')).toBeVisible();
+      await expectNoColorContrastViolations(page, 'admin/restaurant-admin/menu');
+    });
+
+    test('/restaurant-admin/orders', async ({ page, asRestaurantAdmin }) => {
+      void asRestaurantAdmin;
+      await page.setViewportSize(VIEWPORT);
+      await page.goto('/restaurant-admin/orders', { waitUntil: 'networkidle' });
+      await expectNoColorContrastViolations(page, 'admin/restaurant-admin/orders');
+    });
+
+    test('/restaurant-admin/styling', async ({ page, asRestaurantAdmin }) => {
+      void asRestaurantAdmin;
+      await page.setViewportSize(VIEWPORT);
+      await page.goto('/restaurant-admin/styling', { waitUntil: 'networkidle' });
+      await expectNoColorContrastViolations(page, 'admin/restaurant-admin/styling');
+    });
+
+    test('/admin', async ({ page, asSuperAdmin }) => {
+      void asSuperAdmin;
+      await page.setViewportSize(VIEWPORT);
+      await page.goto('/admin', { waitUntil: 'networkidle' });
+      await expectNoColorContrastViolations(page, 'admin/super-admin');
+    });
+  });
 });

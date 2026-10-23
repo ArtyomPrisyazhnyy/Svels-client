@@ -23,48 +23,48 @@
 
   &__value {
     font-weight: 600;
-    color: #0f172a;
+    color: var(--plat-0f172a);
   }
 
   &__unit {
     margin-left: 0.125rem;
     font-weight: 500;
-    color: #64748b;
+    color: var(--plat-64748b);
   }
 
   &--calories {
-    background: #fff7ed;
-    border-color: #fed7aa;
+    background: var(--plat-fff7ed);
+    border-color: var(--plat-fed7aa);
 
     .nutrition-badge__label {
-      color: #c2410c;
+      color: var(--plat-c2410c);
     }
   }
 
   &--protein {
-    background: #eff6ff;
-    border-color: #bfdbfe;
+    background: var(--plat-eff6ff);
+    border-color: var(--plat-bfdbfe);
 
     .nutrition-badge__label {
-      color: #1d4ed8;
+      color: var(--plat-1d4ed8);
     }
   }
 
   &--fat {
-    background: #fefce8;
-    border-color: #fde047;
+    background: var(--plat-fefce8);
+    border-color: var(--plat-fde047);
 
     .nutrition-badge__label {
-      color: #a16207;
+      color: var(--plat-a16207);
     }
   }
 
   &--carbs {
-    background: #ecfdf5;
-    border-color: #a7f3d0;
+    background: var(--plat-ecfdf5);
+    border-color: var(--plat-a7f3d0);
 
     .nutrition-badge__label {
-      color: #047857;
+      color: var(--plat-047857);
     }
   }
 }

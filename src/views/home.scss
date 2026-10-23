@@ -1,7 +1,7 @@
 .home {
   min-height: 100vh;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--plat-f8fafc);
+  color: var(--plat-0f172a);
 }
 
 .home__main {
@@ -18,7 +18,7 @@
 
 .home__email {
   margin: 0 0 1.5rem;
-  color: #64748b;
+  color: var(--plat-64748b);
 }
 
 .home__links {
@@ -26,7 +26,7 @@
   gap: 1rem;
 
   a {
-    color: #2563eb;
+    color: var(--plat-2563eb);
     font-weight: 600;
   }
 }
@@ -34,18 +34,18 @@
 .home__section {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--plat-e2e8f0);
 
   h2 {
     margin: 0 0 0.75rem;
     font-size: 1rem;
-    color: #334155;
+    color: var(--plat-334155);
   }
 }
 
 .home__hint {
   margin: 0 0 0.75rem;
-  color: #64748b;
+  color: var(--plat-64748b);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -69,37 +69,37 @@
   a {
     display: inline-block;
     margin-top: 0.5rem;
-    color: #2563eb;
+    color: var(--plat-2563eb);
     font-weight: 600;
   }
 
   &--pending {
-    background: #fffbeb;
-    color: #92400e;
+    background: var(--plat-fffbeb);
+    color: var(--plat-92400e);
   }
 
   &--rejected {
-    background: #fef2f2;
-    color: #b91c1c;
+    background: var(--plat-fef2f2);
+    color: var(--plat-b91c1c);
   }
 
   &--info {
-    background: #eff6ff;
-    color: #1d4ed8;
+    background: var(--plat-eff6ff);
+    color: var(--plat-1d4ed8);
   }
 }
 
 .home__panel-link {
   display: inline-block;
   padding: 0.625rem 1rem;
-  background: #0d9488;
-  color: #ffffff;
+  background: var(--plat-0d9488);
+  color: var(--plat-ffffff);
   border-radius: 10px;
   font-weight: 600;
   text-decoration: none;
 
   &:hover {
-    background: #0f766e;
+    background: var(--plat-0f766e);
   }
 }
 
@@ -118,9 +118,9 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 12px;
-  background: #fff;
+  background: var(--plat-ffffff);
 }
 
 .home__booking-info {
@@ -129,12 +129,12 @@
   gap: 0.2rem;
 
   strong {
-    color: #0f172a;
+    color: var(--plat-0f172a);
   }
 
   span {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--plat-64748b);
   }
 }
 
@@ -146,27 +146,27 @@
   font-weight: 600;
 
   &--pending {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--plat-fef3c7);
+    color: var(--plat-92400e);
   }
   &--confirmed {
-    background: #dcfce7;
-    color: #047857;
+    background: var(--plat-dcfce7);
+    color: var(--plat-047857);
   }
   &--cancelled {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--plat-fee2e2);
+    color: var(--plat-b91c1c);
   }
   &--completed {
-    background: #e0e7ff;
-    color: #3730a3;
+    background: var(--plat-e0e7ff);
+    color: var(--plat-3730a3);
   }
 }
 
 .home__booking-cancel {
-  border: 1px solid #fecaca;
-  background: #fff;
-  color: #b91c1c;
+  border: 1px solid var(--plat-fecaca);
+  background: var(--plat-ffffff);
+  color: var(--plat-b91c1c);
   border-radius: 8px;
   padding: 0.4rem 0.75rem;
   font: inherit;
@@ -174,6 +174,6 @@
   cursor: pointer;
 
   &:hover {
-    background: #fef2f2;
+    background: var(--plat-fef2f2);
   }
 }

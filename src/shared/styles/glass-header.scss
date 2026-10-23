@@ -35,11 +35,11 @@
   gap: 0.625rem;
   font-weight: 700;
   font-size: 1.05rem;
-  color: #0f172a;
+  color: var(--plat-0f172a);
   min-width: 0;
 
   .glass-header--dark & {
-    color: #f8fafc;
+    color: var(--plat-f8fafc);
   }
 }
 
@@ -49,7 +49,7 @@
   border-radius: 8px;
   object-fit: contain;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--plat-mix-rgba-255-255-255-0-6);
 }
 
 .glass-header__brand-name {
@@ -126,7 +126,7 @@
 .glass-header__link {
   border: none;
   background: transparent;
-  color: #475569;
+  color: var(--plat-475569);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -137,39 +137,39 @@
 
   @media (hover: hover) {
     &:hover {
-      background: rgba(241, 245, 249, 0.75);
+      background: var(--plat-mix-rgba-241-245-249-0-75);
     }
   }
 
   .glass-header--dark & {
-    color: #94a3b8;
+    color: var(--plat-94a3b8);
 
     @media (hover: hover) {
       &:hover {
-        background: rgba(51, 65, 85, 0.55);
-        color: #f8fafc;
+        background: var(--plat-mix-rgba-51-65-85-0-55);
+        color: var(--plat-f8fafc);
       }
     }
   }
 
   .glass-header--dark &.glass-header__link--accent {
-    color: #93c5fd;
+    color: var(--plat-93c5fd);
 
     @media (hover: hover) {
       &:hover {
-        background: rgba(59, 130, 246, 0.18);
-        color: #dbeafe;
+        background: var(--plat-mix-rgba-59-130-246-0-18);
+        color: var(--plat-dbeafe);
       }
     }
   }
 }
 
 .glass-header__link--accent {
-  color: #2563eb;
+  color: var(--plat-2563eb);
 
   @media (hover: hover) {
     &:hover {
-      background: rgba(239, 246, 255, 0.85);
+      background: var(--plat-mix-rgba-239-246-255-0-85);
     }
   }
 }
@@ -180,11 +180,11 @@
 .restaurant-styled[data-rs-header-style='solid'] .glass-header--tenant::before,
 .restaurant-styled[data-rs-header-style='solid'] .venue-header--tenant::before {
   /* Как страница: иначе белый surface отрывается от --rs-bg (тёплые темы). */
-  background: var(--rs-bg, #ffffff);
+  background: var(--rs-bg, var(--plat-ffffff));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border-bottom: none;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 6px 16px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 1px 3px var(--plat-mix-rgba-15-23-42-0-08), 0 6px 16px var(--plat-mix-rgba-15-23-42-0-06);
 }
 
 .restaurant-styled[data-rs-header-style='bordered'] .glass-header--tenant::before,
@@ -193,5 +193,5 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
-  border-bottom: 1px solid var(--rs-border, #e2e8f0);
+  border-bottom: 1px solid var(--rs-border, var(--plat-e2e8f0));
 }

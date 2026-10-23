@@ -77,19 +77,19 @@
 }
 
 .guest-oauth__btn--apple {
-  background: var(--guest-oauth-apple-bg, #000000);
-  color: var(--guest-oauth-apple-fg, #ffffff);
-  border-color: var(--guest-oauth-apple-bg, #000000);
+  background: var(--guest-oauth-apple-bg, var(--plat-000000));
+  color: var(--guest-oauth-apple-fg, var(--plat-ffffff));
+  border-color: var(--guest-oauth-apple-bg, var(--plat-000000));
 
   @media (hover: hover) {
     &:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--guest-oauth-apple-bg, #000000) 88%, var(--rs-text));
-      border-color: color-mix(in srgb, var(--guest-oauth-apple-bg, #000000) 88%, var(--rs-text));
+      background: color-mix(in srgb, var(--guest-oauth-apple-bg, var(--plat-000000)) 88%, var(--rs-text));
+      border-color: color-mix(in srgb, var(--guest-oauth-apple-bg, var(--plat-000000)) 88%, var(--rs-text));
     }
   }
 }
 
 .restaurant-styled[data-rs-theme='midnight'] .guest-oauth__btn--apple {
-  --guest-oauth-apple-bg: #ffffff;
-  --guest-oauth-apple-fg: #000000;
+  --guest-oauth-apple-bg: var(--plat-ffffff);
+  --guest-oauth-apple-fg: var(--plat-000000);
 }

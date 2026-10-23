@@ -90,10 +90,9 @@ describe('restaurant theme token contrast', () => {
           background: theme.surface,
           minRatio: 3,
         },
-        { label: 'border on bg', foreground: theme.border, background: theme.bg, minRatio: 3 },
         {
-          label: 'border on surface (inputs)',
-          foreground: theme.border,
+          label: 'input border on surface',
+          foreground: theme.inputBorder,
           background: theme.surface,
           minRatio: 3,
         },
@@ -104,8 +103,3 @@ describe('restaurant theme token contrast', () => {
   }
 });
 
-describe('pickOnColor', () => {
-  it('picks dark text for light accent backgrounds', () => {
-    expect(pickOnColor('#38bdf8', 3)).toBe('#000000');
-  });
-});

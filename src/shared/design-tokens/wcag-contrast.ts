@@ -44,13 +44,21 @@ export function contrastRatio(foreground: string, background: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-const ON_COLOR_CANDIDATES = ['#ffffff', '#000000', '#0f172a', '#fafafa', '#171717'] as const;
+const FALLBACK_ON_CANDIDATES = ['#000000', '#0f172a', '#fafafa', '#171717'] as const;
 
-export function pickOnColor(background: string, minRatio = 4.5): string {
-  let best: string = ON_COLOR_CANDIDATES[0];
-  let bestRatio = 0;
+export function pickOnColor(
+  background: string,
+  minRatio = 4.5,
+  preferred = '#ffffff',
+): string {
+  if (contrastRatio(preferred, background) >= minRatio) {
+    return preferred;
+  }
 
-  for (const candidate of ON_COLOR_CANDIDATES) {
+  let best = preferred;
+  let bestRatio = contrastRatio(preferred, background);
+
+  for (const candidate of FALLBACK_ON_CANDIDATES) {
     const ratio = contrastRatio(candidate, background);
     if (ratio >= minRatio) {
       return candidate;

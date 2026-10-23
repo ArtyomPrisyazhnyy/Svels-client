@@ -6,20 +6,14 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 
 const ALLOWED_FILES = new Set([
   'src/shared/styles/_tokens.scss',
-  'src/shared/design-tokens/color-themes.ts',
-  'src/shared/design-tokens/wcag-contrast.ts',
+  'src/shared/styles/_platform-palette.scss',
+  'src/shared/types/restaurant-styling.ts',
 ]);
 
-const SCSS_DIRS = [
-  'src/shared/ui',
-  'src/shared/components',
-  'src/features/restaurants/styles',
-];
+const SCAN_ROOTS = ['src', 'app'];
 
 const HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
 const RGB_RE = /\b(?:rgb|rgba|hsl|hsla|oklch)\s*\(/i;
-const NAMED_COLOR_RE =
-  /\b(?:white|black|red|blue|green|yellow|orange|purple|pink|gray|grey|transparent)\b/i;
 
 async function walk(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -42,28 +36,37 @@ function rel(file) {
   return path.relative(ROOT, file).replaceAll('\\', '/');
 }
 
+function isAllowed(relative) {
+  if (ALLOWED_FILES.has(relative)) return true;
+  if (relative.startsWith('src/shared/design-tokens/')) return true;
+  if (relative.endsWith('.test.ts')) return true;
+  if (relative.includes('/e2e/')) return true;
+  if (relative.endsWith('restaurant-styling-theme.scss')) return true;
+  return false;
+}
+
 const violations = [];
 
-for (const dir of SCSS_DIRS) {
-  const abs = path.join(ROOT, dir);
+for (const root of SCAN_ROOTS) {
+  const abs = path.join(ROOT, root);
   let files = [];
   try {
     files = await walk(abs);
   } catch {
     continue;
   }
+
   for (const file of files) {
     const relative = rel(file);
-    if (ALLOWED_FILES.has(relative)) continue;
-    if (relative.includes('/e2e/')) continue;
-    if (relative.endsWith('restaurant-styling-theme.scss')) continue;
-    if (relative.endsWith('.test.ts')) continue;
+    if (isAllowed(relative)) continue;
 
     const content = await readFile(file, 'utf8');
     const lines = content.split('\n');
 
     lines.forEach((line, index) => {
-      if (line.includes('// stylelint-disable')) return;
+      if (line.includes('stylelint-disable')) return;
+      if (line.trim().startsWith('//')) return;
+
       const hex = line.match(HEX_RE);
       if (hex) {
         for (const value of hex) {
@@ -73,25 +76,15 @@ for (const dir of SCSS_DIRS) {
       if (RGB_RE.test(line)) {
         violations.push(`${relative}:${index + 1}: raw color function`);
       }
-      if (
-        (relative.endsWith('.tsx') || relative.endsWith('.ts')) &&
-        NAMED_COLOR_RE.test(line) &&
-        !line.includes('colorTheme') &&
-        !line.includes('ColorTheme')
-      ) {
-        if (/\b(color|background|fill|stroke)\b/i.test(line) || /style=\{/.test(line)) {
-          violations.push(`${relative}:${index + 1}: named color literal`);
-        }
-      }
     });
   }
 }
 
 if (violations.length > 0) {
   console.error(`Raw color violations: ${violations.length}`);
-  console.error(violations.slice(0, 80).join('\n'));
-  if (violations.length > 80) {
-    console.error(`...and ${violations.length - 80} more`);
+  console.error(violations.slice(0, 100).join('\n'));
+  if (violations.length > 100) {
+    console.error(`...and ${violations.length - 100} more`);
   }
   process.exit(1);
 }

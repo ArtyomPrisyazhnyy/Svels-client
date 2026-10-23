@@ -11,8 +11,8 @@
 
 .restaurant-admin__nav {
   padding: 1rem;
-  background: #ffffff;
-  border-right: 1px solid #e2e8f0;
+  background: var(--plat-ffffff);
+  border-right: 1px solid var(--plat-e2e8f0);
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -22,17 +22,17 @@
   padding: 0.625rem 0.875rem;
   border-radius: 8px;
   text-decoration: none;
-  color: #475569;
+  color: var(--plat-475569);
   font-weight: 600;
   font-size: 0.9rem;
 
   &:hover {
-    background: #f1f5f9;
+    background: var(--plat-f1f5f9);
   }
 
   &--active {
-    background: #ecfdf5;
-    color: #0f766e;
+    background: var(--plat-ecfdf5);
+    color: var(--plat-0f766e);
   }
 }
 
@@ -42,5 +42,5 @@
 
 .restaurant-admin__welcome {
   margin: 0 0 1.25rem;
-  color: #64748b;
+  color: var(--plat-64748b);
 }

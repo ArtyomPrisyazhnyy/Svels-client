@@ -1,5 +1,6 @@
 'use client';
 
+import { DECOR_DEFAULTS } from '@/shared/design-tokens/floor-plan-colors';
 import { useLayoutStore } from '@/store/layout-store';
 import type {
   DecorObject,
@@ -208,7 +209,7 @@ export function DecorInspector() {
       {decor.type === 'decor-icon' && (
         <label className="fp-inspector__field">
           <span>Фон</span>
-          <input type="color" value={decor.color ?? '#f3f4f6'} onChange={(e) => patch({ color: e.target.value })} />
+          <input type="color" value={decor.color ?? DECOR_DEFAULTS.fill} onChange={(e) => patch({ color: e.target.value })} />
         </label>
       )}
 

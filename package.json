@@ -10,7 +10,7 @@
     "clean": "rm -rf .next",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "eslint . && stylelint \"src/shared/ui/**/*.scss\" \"src/shared/components/**/*.scss\" \"src/features/restaurants/styles/**/*.scss\" && node scripts/check-no-raw-colors.mjs",
+    "lint": "eslint . && stylelint \"src/**/*.scss\" \"app/**/*.scss\" && node scripts/check-no-raw-colors.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",

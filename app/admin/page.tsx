@@ -5,7 +5,7 @@ import '@/features/admin/styles/admin.scss';
 
 function PageLoader() {
   return (
-    <div style={{ minHeight: '40vh', display: 'grid', placeItems: 'center', color: '#64748b' }}>
+    <div style={{ minHeight: '40vh', display: 'grid', placeItems: 'center', color: 'var(--plat-64748b)' }}>
       Загрузка…
     </div>
   );

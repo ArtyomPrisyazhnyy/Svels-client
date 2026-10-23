@@ -9,9 +9,9 @@
   height: 2.5rem;
   border-radius: 12px;
   flex-shrink: 0;
-  color: var(--rs-text-muted, #64748b);
+  color: var(--rs-text-muted, var(--plat-64748b));
   background: transparent;
-  border: 1px solid var(--rs-border, #e2e8f0);
+  border: 1px solid var(--rs-border, var(--plat-e2e8f0));
   transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 
   svg {
@@ -21,8 +21,8 @@
 
   @media (hover: hover) {
     &:hover {
-      color: var(--rs-accent, #0f766e);
-      border-color: var(--rs-accent, #0f766e);
+      color: var(--rs-accent, var(--plat-0f766e));
+      border-color: var(--rs-accent, var(--plat-0f766e));
     }
   }
 

@@ -15,6 +15,7 @@ import type { DepositScheme, FloorPlan, FloorPlanZone, LayoutTablePayload, SaveL
 import { DepositSettingsPanel } from './DepositSettingsPanel';
 import { RightInspectorPanel } from './RightInspectorPanel';
 import { LayersPanel } from './LayersPanel';
+import { GRID_COLOR } from '@/shared/design-tokens/floor-plan-colors';
 import { STAGE_HEIGHT, STAGE_WIDTH } from './constants';
 import { Toolbar } from './Toolbar';
 import { useHotkeys } from './useHotkeys';
@@ -91,7 +92,7 @@ export function FloorPlanEditor({ restaurantId, token }: FloorPlanEditorProps) {
         description: t.description ?? undefined,
       }));
       const payload: SaveLayoutPayload = {
-        decorData: zone.decorData ?? { grid: { size: 20, visible: true, color: '#e5e7eb' }, objects: [] },
+        decorData: zone.decorData ?? { grid: { size: 20, visible: true, color: GRID_COLOR }, objects: [] },
         tables,
       };
       await saveLayout(restaurantId, token, activeZoneId, payload);
