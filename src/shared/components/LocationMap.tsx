@@ -259,7 +259,7 @@ export function LocationMap({
         width: '100%',
         borderRadius: 12,
         overflow: 'hidden',
-        background: '#e8eef5',
+        background: 'var(--rs-primary-soft)',
       }}
     >
       {useWidgetFallback ? (

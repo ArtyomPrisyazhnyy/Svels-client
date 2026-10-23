@@ -1,7 +1,7 @@
 .restaurant-public {
   min-height: 100vh;
-  background: var(--rs-bg, #f8fafc);
-  color: var(--rs-text, #0f172a);
+  background: var(--rs-bg, var(--rs-bg));
+  color: var(--rs-text, var(--rs-text));
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-width: 0;
@@ -17,12 +17,12 @@
 
 .restaurant-public__back {
   text-decoration: none;
-  color: var(--rs-text-muted, #64748b);
+  color: var(--rs-text-muted, var(--rs-text-muted));
   font-size: 0.95rem;
 
   @media (hover: hover) {
     &:hover {
-      color: var(--rs-text, #0f172a);
+      color: var(--rs-text, var(--rs-text));
     }
   }
 }
@@ -38,7 +38,7 @@
   h1 {
     margin: 0 0 0.5rem;
     font-size: 2rem;
-    color: var(--rs-text, #0f172a);
+    color: var(--rs-text, var(--rs-text));
   }
 
   @media (max-width: 640px) {
@@ -52,18 +52,18 @@
 
 .restaurant-public__address {
   margin: 0 0 1.5rem;
-  color: var(--rs-text-muted, #64748b);
+  color: var(--rs-text-muted, var(--rs-text-muted));
 }
 
 .restaurant-public__description {
   margin: 0 0 2rem;
   line-height: 1.6;
-  color: var(--rs-text-muted, #334155);
+  color: var(--rs-text-muted, var(--rs-border));
 }
 
 .restaurant-public__footer {
-  background: var(--rs-surface, #ffffff);
-  border-top: 1px solid var(--rs-border, #e2e8f0);
+  background: var(--rs-surface, var(--rs-surface));
+  border-top: 1px solid var(--rs-border, var(--rs-border));
 }
 
 .restaurant-public__footer-inner {
@@ -97,8 +97,8 @@
   border-radius: 12px;
   object-fit: contain;
   padding: 4px;
-  background: var(--rs-bg, #f8fafc);
-  border: 1px solid var(--rs-border, #e2e8f0);
+  background: var(--rs-bg, var(--rs-bg));
+  border: 1px solid var(--rs-border, var(--rs-border));
 }
 
 .restaurant-public__footer-brand-text {
@@ -110,14 +110,14 @@
   font-size: 1.05rem;
   font-weight: 700;
   line-height: 1.3;
-  color: var(--rs-text, #0f172a);
+  color: var(--rs-text, var(--rs-text));
 }
 
 .restaurant-public__footer-tagline {
   margin: 0.3rem 0 0;
   font-size: 0.875rem;
   line-height: 1.5;
-  color: var(--rs-text-muted, #64748b);
+  color: var(--rs-text-muted, var(--rs-text-muted));
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -135,20 +135,20 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--rs-text-soft, #94a3b8);
+  color: var(--rs-text-soft, var(--rs-text-soft));
   margin-bottom: 0.5rem;
 }
 
 .restaurant-public__footer-link {
   width: fit-content;
   font-size: 0.9375rem;
-  color: var(--rs-text-muted, #64748b);
+  color: var(--rs-text-muted, var(--rs-text-muted));
   text-decoration: none;
   transition: color 0.15s ease, transform 0.15s ease;
 
   @media (hover: hover) {
     &:hover {
-      color: var(--rs-accent, #0f766e);
+      color: var(--rs-accent, var(--rs-accent));
       transform: translateX(2px);
     }
   }
@@ -163,7 +163,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--rs-text-soft, #94a3b8);
+  color: var(--rs-text-soft, var(--rs-text-soft));
   margin: 0 0 0.875rem;
 }
 
@@ -191,9 +191,9 @@
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  border-top: 1px solid var(--rs-border, #e2e8f0);
+  border-top: 1px solid var(--rs-border, var(--rs-border));
   font-size: 0.8125rem;
-  color: var(--rs-text-soft, #94a3b8);
+  color: var(--rs-text-soft, var(--rs-text-soft));
 
   > span {
     min-width: 0;
@@ -208,7 +208,7 @@
 .restaurant-public__footer-credit {
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: var(--rs-text-soft, #94a3b8);
+  color: var(--rs-text-soft, var(--rs-text-soft));
 }
 
 .restaurant-public__footer-credit-link {
@@ -298,12 +298,12 @@
 
 /* Тонированный: лёгкий оттенок акцентного цвета на фоне */
 .restaurant-styled[data-rs-footer-accent='tinted'] .restaurant-public__footer {
-  background: color-mix(in srgb, var(--rs-accent, #0f766e) 6%, var(--rs-surface, #ffffff));
+  background: color-mix(in srgb, var(--rs-accent, var(--rs-accent)) 6%, var(--rs-surface, var(--rs-surface)));
 }
 
 /* Акцентная полоса сверху */
 .restaurant-styled[data-rs-footer-accent='top-border'] .restaurant-public__footer {
-  border-top: 3px solid var(--rs-accent, #0f766e);
+  border-top: 3px solid var(--rs-accent, var(--rs-accent));
 }
 
 .restaurant-public__actions {
@@ -317,26 +317,26 @@
   display: inline-block;
   padding: 0.75rem 1.25rem;
   border-radius: var(--rs-btn-radius, 0.5rem);
-  background: var(--rs-primary, #2563eb);
-  color: #fff;
+  background: var(--rs-primary, var(--rs-primary));
+  color: var(--rs-surface);
   text-decoration: none;
   font-weight: 500;
   border: 1px solid transparent;
 
   @media (hover: hover) {
     &:hover {
-      background: var(--rs-primary-hover, #1d4ed8);
+      background: var(--rs-primary-hover, var(--rs-primary-hover));
     }
   }
 
   &--secondary {
-    background: var(--rs-surface, #fff);
-    color: var(--rs-primary, #2563eb);
-    border-color: var(--rs-primary, #2563eb);
+    background: var(--rs-surface, var(--rs-surface));
+    color: var(--rs-primary, var(--rs-primary));
+    border-color: var(--rs-primary, var(--rs-primary));
 
     @media (hover: hover) {
       &:hover {
-        background: var(--rs-primary-soft, #eff6ff);
+        background: var(--rs-primary-soft, var(--rs-primary-soft));
       }
     }
   }

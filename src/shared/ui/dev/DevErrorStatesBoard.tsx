@@ -8,7 +8,9 @@ import { RestaurantStylingShell } from '@/features/restaurants/context/Restauran
 import { FriendlyErrorPanel } from '@/shared/components/FriendlyErrorPanel';
 import { GENERIC_ERROR_COPY, NETWORK_ERROR_COPY } from '@/lib/errors/messages';
 
-const PLAYGROUND_THEMES: RestaurantColorTheme[] = ['classic', 'midnight', 'warm'];
+import { ALL_RESTAURANT_COLOR_THEMES } from '@/shared/design-tokens/color-themes';
+
+const PLAYGROUND_THEMES: RestaurantColorTheme[] = [...ALL_RESTAURANT_COLOR_THEMES];
 
 function resolveTheme(theme: string): RestaurantColorTheme {
   if (PLAYGROUND_THEMES.includes(theme as RestaurantColorTheme)) {

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { E2E_RESTAURANT_COLOR_THEMES } from '../helpers/restaurant-themes';
 
-const THEMES = ['classic', 'midnight'] as const;
 const VARIANTS = ['network', 'server'] as const;
 
 const VIEWPORTS = [
@@ -8,7 +8,7 @@ const VIEWPORTS = [
   { name: 'd1280', width: 1280, height: 800 },
 ] as const;
 
-for (const theme of THEMES) {
+for (const theme of E2E_RESTAURANT_COLOR_THEMES) {
   for (const variant of VARIANTS) {
     for (const viewport of VIEWPORTS) {
       test(`error state ${variant} — ${theme} @ ${viewport.name}`, async ({ page }) => {

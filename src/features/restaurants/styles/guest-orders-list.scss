@@ -1,12 +1,12 @@
 .guest-orders-list__hint,
 .guest-orders-list__error {
   margin: 0;
-  color: var(--rs-text-muted, #64748b);
+  color: var(--rs-text-muted, var(--rs-text-muted));
   font-size: 0.9375rem;
 }
 
 .guest-orders-list__error {
-  color: #fca5a5;
+  color: color-mix(in srgb, var(--rs-danger) 55%, var(--rs-surface));
 }
 
 .guest-orders-list {
@@ -37,17 +37,17 @@
   width: 100%;
   text-align: left;
   padding: 0.85rem 1rem;
-  border: 1px solid var(--rs-border, #e2e8f0);
+  border: 1px solid var(--rs-border, var(--rs-border));
   border-radius: 14px;
-  background: var(--rs-surface, #fff);
+  background: var(--rs-surface, var(--rs-surface));
   color: var(--rs-text);
   font: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--rs-text, #0f172a) 4%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--rs-text, var(--rs-text)) 4%, transparent);
 
   &--active {
-    border-color: var(--rs-accent, #0f172a);
-    box-shadow: 0 0 0 1px var(--rs-accent, #0f172a);
+    border-color: var(--rs-accent, var(--rs-text));
+    box-shadow: 0 0 0 1px var(--rs-accent, var(--rs-text));
   }
 }
 
@@ -67,7 +67,7 @@
 .guest-orders-list__item-date {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--rs-text-muted, #64748b);
+  color: var(--rs-text-muted, var(--rs-text-muted));
 }
 
 .guest-orders-list__detail {
@@ -75,14 +75,14 @@
   min-width: 0;
   padding: 1rem;
   border-radius: 14px;
-  border: 1px solid var(--rs-border, #e2e8f0);
-  background: var(--rs-surface, #fff);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--rs-text, #0f172a) 6%, transparent);
+  border: 1px solid var(--rs-border, var(--rs-border));
+  background: var(--rs-surface, var(--rs-surface));
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--rs-text, var(--rs-text)) 6%, transparent);
 
   h2 {
     margin: 0 0 0.75rem;
     font-size: 1.125rem;
-    color: var(--rs-text, #0f172a);
+    color: var(--rs-text, var(--rs-text));
   }
 }
 
@@ -94,11 +94,11 @@
   font-size: 0.875rem;
 
   span:first-child {
-    color: var(--rs-text-muted, #64748b);
+    color: var(--rs-text-muted, var(--rs-text-muted));
   }
 
   span:last-child {
-    color: var(--rs-text, #0f172a);
+    color: var(--rs-text, var(--rs-text));
   }
 }
 
@@ -121,11 +121,11 @@
 .guest-orders-list__total {
   margin: 0;
   font-weight: 600;
-  color: var(--rs-text, #0f172a);
+  color: var(--rs-text, var(--rs-text));
 }
 
 .guest-orders-list__cancel {
   margin: 0.75rem 0 0;
   font-size: 0.8125rem;
-  color: #fca5a5;
+  color: color-mix(in srgb, var(--rs-danger) 55%, var(--rs-surface));
 }

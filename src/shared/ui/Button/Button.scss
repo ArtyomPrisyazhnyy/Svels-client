@@ -52,13 +52,14 @@
 }
 
 .ui-btn--primary {
-  background: var(--rs-accent);
-  color: var(--rs-on-accent);
-  border-color: var(--rs-accent);
+  background: var(--rs-primary);
+  color: var(--rs-on-primary);
+  border-color: var(--rs-primary);
 
   @media (hover: hover) {
     &:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--rs-accent) 88%, var(--rs-text));
+      background: var(--rs-primary-hover);
+      border-color: var(--rs-primary-hover);
     }
   }
 }
@@ -89,7 +90,7 @@
 
 .ui-btn--danger {
   background: var(--rs-danger);
-  color: var(--rs-on-accent);
+  color: var(--rs-on-danger);
   border-color: var(--rs-danger);
 
   @media (hover: hover) {

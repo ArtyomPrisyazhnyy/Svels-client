@@ -10,7 +10,7 @@
     "clean": "rm -rf .next",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "eslint .",
+    "lint": "eslint . && stylelint \"src/shared/ui/**/*.scss\" \"src/shared/components/**/*.scss\" \"src/features/restaurants/styles/**/*.scss\" && node scripts/check-no-raw-colors.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
@@ -35,6 +35,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/eslintrc": "^3.3.7",
     "@eslint/js": "^9.39.1",
     "@playwright/test": "^1.62.0",
@@ -46,7 +47,10 @@
     "eslint-config-next": "^15.5.4",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.6.0",
+    "postcss-scss": "^4.0.9",
     "sass": "^1.101.0",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard-scss": "^17.0.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vitest": "^3.2.4"

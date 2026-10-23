@@ -55,7 +55,7 @@
   // На ПК — тонкий scrollbar, иначе не понять, что категории можно листать.
   @media (hover: hover) and (pointer: fine) {
     scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
+    scrollbar-color: var(--rs-text-soft) transparent;
 
     &::-webkit-scrollbar {
       display: block;
@@ -67,7 +67,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
+      background: var(--rs-text-soft);
       border-radius: 999px;
     }
   }
@@ -75,11 +75,11 @@
 
 .restaurant-menu__category-nav-btn {
   flex-shrink: 0;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--rs-border);
   border-radius: 999px;
   padding: 0.5rem 1rem;
-  background: #ffffff;
-  color: #475569;
+  background: var(--rs-surface);
+  color: var(--rs-text-muted);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -105,15 +105,15 @@
 
   @media (hover: hover) {
     &:hover:not(.restaurant-menu__category-nav-btn--active) {
-      border-color: #cbd5e1;
-      color: #0f172a;
+      border-color: var(--rs-text-soft);
+      color: var(--rs-text);
     }
   }
 
   &--active {
-    border-color: #0d9488;
-    background: #0d9488;
-    color: #ffffff;
+    border-color: var(--rs-accent);
+    background: var(--rs-accent);
+    color: var(--rs-surface);
   }
 }
 
@@ -121,9 +121,9 @@
   margin: 0;
   padding: 2rem 1rem;
   text-align: center;
-  color: #94a3b8;
-  background: #ffffff;
-  border: 1px dashed #e2e8f0;
+  color: var(--rs-text-soft);
+  background: var(--rs-surface);
+  border: 1px dashed var(--rs-border);
   border-radius: 16px;
 }
 
@@ -135,7 +135,7 @@
   margin: 0 0 1rem;
   font-size: 1.125rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--rs-text);
 }
 
 .restaurant-menu__grid {

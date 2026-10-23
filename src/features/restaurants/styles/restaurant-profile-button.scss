@@ -9,18 +9,18 @@
   border: none;
   border-radius: 10px;
   background: transparent;
-  color: #475569;
+  color: var(--rs-text-muted);
   cursor: pointer;
   flex-shrink: 0;
 
   @media (hover: hover) {
     &:hover {
-      background: rgba(241, 245, 249, 0.75);
+      background: color-mix(in srgb, var(--rs-bg) 75%, transparent);
     }
   }
 
   &--authenticated {
-    color: #0f766e;
+    color: var(--rs-accent);
   }
 }
 

@@ -17,25 +17,25 @@
 
 .guest-order-status-badge--accepted,
 .guest-order-status-badge--preparing {
-  background: color-mix(in srgb, #b45309 14%, var(--rs-surface, #fff));
-  color: #b45309;
-  border-color: color-mix(in srgb, #b45309 22%, transparent);
+  background: color-mix(in srgb, var(--rs-accent) 14%, var(--rs-surface, var(--rs-surface)));
+  color: var(--rs-accent);
+  border-color: color-mix(in srgb, var(--rs-accent) 22%, transparent);
 }
 
 .guest-order-status-badge--ready {
-  background: color-mix(in srgb, #047857 14%, var(--rs-surface, #fff));
-  color: #047857;
-  border-color: color-mix(in srgb, #047857 22%, transparent);
+  background: color-mix(in srgb, var(--rs-accent) 14%, var(--rs-surface, var(--rs-surface)));
+  color: var(--rs-accent);
+  border-color: color-mix(in srgb, var(--rs-accent) 22%, transparent);
 }
 
 .guest-order-status-badge--completed {
-  background: color-mix(in srgb, var(--rs-text-muted, #475569) 12%, var(--rs-surface, #fff));
-  color: var(--rs-text-muted, #475569);
-  border-color: var(--rs-border, #e2e8f0);
+  background: color-mix(in srgb, var(--rs-text-muted, var(--rs-text-muted)) 12%, var(--rs-surface, var(--rs-surface)));
+  color: var(--rs-text-muted, var(--rs-text-muted));
+  border-color: var(--rs-border, var(--rs-border));
 }
 
 .guest-order-status-badge--cancelled {
-  background: color-mix(in srgb, #b91c1c 14%, var(--rs-surface, #fff));
-  color: #b91c1c;
-  border-color: color-mix(in srgb, #b91c1c 22%, transparent);
+  background: color-mix(in srgb, var(--rs-danger) 14%, var(--rs-surface, var(--rs-surface)));
+  color: var(--rs-danger);
+  border-color: color-mix(in srgb, var(--rs-danger) 22%, transparent);
 }

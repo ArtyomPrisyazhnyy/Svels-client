@@ -30,6 +30,10 @@ async function waitForApi(maxAttempts = 30): Promise<void> {
 }
 
 export default async function globalSetup(): Promise<void> {
+  if (process.env.E2E_SKIP_GLOBAL_SETUP === '1') {
+    return;
+  }
+
   await waitForApi();
 
   const superCreds = getSuperAdminCredentials();
