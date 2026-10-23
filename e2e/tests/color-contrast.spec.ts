@@ -54,6 +54,29 @@ test.describe('Color contrast (axe)', () => {
         await expectNoColorContrastViolations(page, `menu/${theme}`);
       });
 
+      test('product modal, cart, and checkout', async ({ page, seed, asGuest }) => {
+        void asGuest;
+        const menu = await apiClient.getMenu(seed.restaurantId);
+        const menuItemId = menu.categories.flatMap((category) => category.items)[0]?.id;
+        test.skip(!menuItemId, 'Need a menu item in seeded restaurant');
+
+        await page.goto(`/restaurants/${seed.restaurantId}`, { waitUntil: 'networkidle' });
+        await page.getByTestId(`menu-item-${menuItemId}`).click();
+        await expect(page.getByTestId('menu-product-modal')).toBeVisible();
+        await expectNoColorContrastViolations(page, `product/${theme}`);
+
+        await page.getByTestId('menu-add-to-cart').click();
+        await page.getByTestId('cart-button').click();
+        await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
+        await expectNoColorContrastViolations(page, `cart/${theme}`);
+
+        const checkoutCta = page.getByTestId('cart-checkout-submit');
+        if (await checkoutCta.isVisible()) {
+          await checkoutCta.click();
+          await expectNoColorContrastViolations(page, `checkout/${theme}`);
+        }
+      });
+
       test('pre-order / orders', async ({ page, seed, asGuest }) => {
         void asGuest;
         await page.goto(`/restaurants/${seed.restaurantId}/pre-order`, {
