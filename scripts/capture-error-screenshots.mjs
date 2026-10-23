@@ -2,25 +2,8 @@ import { chromium } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 
-const themes = [
-  'classic',
-  'ocean',
-  'forest',
-  'warm',
-  'berry',
-  'lavender',
-  'midnight',
-  'ember',
-  'obsidian',
-  'moss',
-  'wine',
-  'sand',
-  'citrus',
-  'graphite',
-  'monochrome',
-  'monochromeDark',
-  'neon',
-];
+// Keep in sync with `E2E_ERROR_VISUAL_THEMES` in e2e/helpers/restaurant-themes.ts
+const themes = ['classic', 'midnight', 'neon', 'citrus'];
 const variants = ['network', 'server'];
 const viewports = [
   { name: 'm390', width: 390, height: 844 },
