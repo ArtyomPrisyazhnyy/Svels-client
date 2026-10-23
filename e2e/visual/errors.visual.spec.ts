@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { E2E_RESTAURANT_COLOR_THEMES } from '../helpers/restaurant-themes';
+import { E2E_ERROR_VISUAL_THEMES } from '../helpers/restaurant-themes';
+import { expectRestaurantThemeApplied } from '../helpers/expect-restaurant-theme';
+import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
 
 const VARIANTS = ['network', 'server'] as const;
 
@@ -8,7 +10,7 @@ const VIEWPORTS = [
   { name: 'd1280', width: 1280, height: 800 },
 ] as const;
 
-for (const theme of E2E_RESTAURANT_COLOR_THEMES) {
+for (const theme of E2E_ERROR_VISUAL_THEMES) {
   for (const variant of VARIANTS) {
     for (const viewport of VIEWPORTS) {
       test(`error state ${variant} — ${theme} @ ${viewport.name}`, async ({ page }) => {
@@ -17,12 +19,12 @@ for (const theme of E2E_RESTAURANT_COLOR_THEMES) {
           waitUntil: 'networkidle',
         });
 
-        const panel = page.getByTestId(`dev-error-${variant}`);
-        await expect(panel).toBeVisible();
+        await expectRestaurantThemeApplied(page, theme as RestaurantColorTheme, `errors/${theme}`);
 
-        await expect(panel).toHaveScreenshot(
-          `error-${variant}-${theme}-${viewport.name}.png`,
-        );
+        const root = page.getByTestId('dev-error-playground-root');
+        await expect(root).toBeVisible();
+
+        await expect(root).toHaveScreenshot(`error-${variant}-${theme}-${viewport.name}.png`);
       });
     }
   }

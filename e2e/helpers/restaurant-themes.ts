@@ -1,22 +1,14 @@
+import { ALL_RESTAURANT_COLOR_THEMES } from '../../src/shared/design-tokens/color-themes';
 import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
 
-/** All restaurant color themes — keep in sync with `RESTAURANT_COLOR_THEME_TOKENS`. */
-export const E2E_RESTAURANT_COLOR_THEMES: RestaurantColorTheme[] = [
+/** Every theme from `color-themes.ts` — used by axe contrast and WCAG unit tests. */
+export const E2E_RESTAURANT_COLOR_THEMES: RestaurantColorTheme[] =
+  ALL_RESTAURANT_COLOR_THEMES as RestaurantColorTheme[];
+
+/** Subset with committed Playwright visual baselines for error playground. */
+export const E2E_ERROR_VISUAL_THEMES: RestaurantColorTheme[] = [
   'classic',
-  'ocean',
-  'forest',
-  'warm',
-  'berry',
-  'lavender',
   'midnight',
-  'ember',
-  'obsidian',
-  'moss',
-  'wine',
-  'sand',
-  'citrus',
-  'graphite',
-  'monochrome',
-  'monochromeDark',
   'neon',
+  'citrus',
 ];

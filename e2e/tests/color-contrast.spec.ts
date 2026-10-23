@@ -4,6 +4,10 @@ import { E2E_RESTAURANT_COLOR_THEMES } from '../helpers/restaurant-themes';
 import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
 import { apiClient } from '../fixtures/test';
 import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
+import {
+  expectRestaurantThemeApplied,
+  expectRestaurantThemeOnVenue,
+} from '../helpers/expect-restaurant-theme';
 
 const VIEWPORT = { width: 390, height: 844 };
 
@@ -51,6 +55,7 @@ test.describe('Color contrast (axe)', () => {
       test('venue menu', async ({ page, seed }) => {
         await page.goto(`/restaurants/${seed.restaurantId}`, { waitUntil: 'networkidle' });
         await expect(page.getByTestId('restaurant-public-page')).toBeVisible();
+        await expectRestaurantThemeOnVenue(page, theme, `menu/${theme}`);
         await expectNoColorContrastViolations(page, `menu/${theme}`);
       });
 
@@ -61,6 +66,7 @@ test.describe('Color contrast (axe)', () => {
         test.skip(!menuItemId, 'Need a menu item in seeded restaurant');
 
         await page.goto(`/restaurants/${seed.restaurantId}`, { waitUntil: 'networkidle' });
+        await expectRestaurantThemeOnVenue(page, theme, `product/${theme}`);
         await page.getByTestId(`menu-item-${menuItemId}`).click();
         await expect(page.getByTestId('menu-product-modal')).toBeVisible();
         await expectNoColorContrastViolations(page, `product/${theme}`);
@@ -83,6 +89,7 @@ test.describe('Color contrast (axe)', () => {
           waitUntil: 'networkidle',
         });
         await expect(page.getByTestId('preorder-page')).toBeVisible();
+        await expectRestaurantThemeOnVenue(page, theme, `order-status/${theme}`);
         await expectNoColorContrastViolations(page, `order-status/${theme}`);
       });
 
@@ -91,6 +98,7 @@ test.describe('Color contrast (axe)', () => {
           waitUntil: 'networkidle',
         });
         await expect(page.getByTestId('dev-error-network')).toBeVisible();
+        await expectRestaurantThemeApplied(page, theme, `error-network/${theme}`);
         await expectNoColorContrastViolations(page, `error-network/${theme}`);
       });
     });

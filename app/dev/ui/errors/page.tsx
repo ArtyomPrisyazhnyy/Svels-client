@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { DevErrorStatesBoard } from '@/shared/ui/dev/DevErrorStatesBoard';
+import { DevErrorPlayground } from '@/shared/ui/dev/DevErrorPlayground';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Error states',
@@ -22,5 +24,5 @@ export default async function DevErrorStatesPage({ searchParams }: DevErrorState
   const { theme = 'classic', variant = 'network' } = await searchParams;
   const resolvedVariant = variant === 'server' ? 'server' : 'network';
 
-  return <DevErrorStatesBoard theme={theme} variant={resolvedVariant} />;
+  return <DevErrorPlayground theme={theme} variant={resolvedVariant} />;
 }

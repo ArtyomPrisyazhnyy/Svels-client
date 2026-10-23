@@ -62,5 +62,9 @@ export default defineConfig({
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: process.env.CI ? 180_000 : 120_000,
+        env: {
+          ...process.env,
+          NEXT_PUBLIC_ENABLE_UI_PLAYGROUND: '1',
+        },
       },
 });

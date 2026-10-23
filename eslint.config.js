@@ -16,8 +16,23 @@ const colorLiteralSelector = [
 ].join(',');
 
 export default defineConfig([
-  globalIgnores(['.next', 'node_modules']),
+  globalIgnores([
+    '.next',
+    'node_modules',
+    'e2e/**',
+    'scripts/**',
+    'next-env.d.ts',
+    '**/*.test.ts',
+  ]),
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  {
+    rules: {
+      // Hydration gates and zustand persist listeners intentionally set state in effects.
+      'react-hooks/set-state-in-effect': 'off',
+      // Konva/Yandex map patterns keep callback refs in sync without re-init.
+      'react-hooks/refs': 'off',
+    },
+  },
   {
     files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
     ignores: [

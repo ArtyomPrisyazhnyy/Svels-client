@@ -30,6 +30,11 @@ function assertPairs(themeName: string, pairs: ContrastPair[]): void {
 }
 
 describe('restaurant theme token contrast', () => {
+  it('covers every theme in RESTAURANT_COLOR_THEME_TOKENS', () => {
+    const tokenKeys = Object.keys(RESTAURANT_COLOR_THEME_TOKENS).sort();
+    expect([...ALL_RESTAURANT_COLOR_THEMES].sort()).toEqual(tokenKeys);
+  });
+
   for (const themeName of ALL_RESTAURANT_COLOR_THEMES) {
     it(`meets WCAG pairs for ${themeName}`, () => {
       const theme = RESTAURANT_COLOR_THEME_TOKENS[themeName];
