@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useModalPresence } from '@/hooks/useModalPresence';
-import { ApiError } from '@/shared/api/api-client';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing';
 import { submitLead, type LeadPayload } from './landing-api';
 import './contact-modal.scss';
 
@@ -71,10 +71,10 @@ export function ContactModal({ onClose }: ContactModalProps) {
       await submitLead(payload);
       setStatus('success');
     } catch (error) {
-      const message =
-        error instanceof ApiError
-          ? error.message
-          : 'Не удалось отправить заявку. Попробуйте позже.';
+      const message = getUserFacingErrorMessage(
+        error,
+        'Не удалось отправить заявку. Попробуйте позже.',
+      );
       setErrorMessage(message);
       setStatus('error');
     }

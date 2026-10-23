@@ -6,6 +6,15 @@ export function isSentryEnabled(): boolean {
   return Boolean(dsn);
 }
 
+function resolveSentryEnvironment(): string {
+  return (
+    process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ??
+    process.env.SENTRY_ENVIRONMENT ??
+    process.env.NODE_ENV ??
+    'development'
+  );
+}
+
 function stripRequestPii<T extends BrowserOptions | NodeOptions | EdgeOptions>(options: T): T {
   return {
     ...options,
@@ -23,18 +32,26 @@ function stripRequestPii<T extends BrowserOptions | NodeOptions | EdgeOptions>(o
   };
 }
 
+function baseOptions(): Pick<BrowserOptions, 'dsn' | 'environment' | 'sendDefaultPii' | 'tracesSampleRate'> {
+  const tracesSampleRate = Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0.1');
+
+  return {
+    dsn,
+    environment: resolveSentryEnvironment(),
+    sendDefaultPii: false,
+    tracesSampleRate: Number.isFinite(tracesSampleRate) ? tracesSampleRate : 0.1,
+  };
+}
+
 export function getSentryClientOptions(): BrowserOptions | null {
   if (!dsn) {
     return null;
   }
 
-  const tracesSampleRate = Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0.1');
-
   return stripRequestPii({
-    dsn,
-    environment: process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
-    sendDefaultPii: false,
-    tracesSampleRate: Number.isFinite(tracesSampleRate) ? tracesSampleRate : 0.1,
+    ...baseOptions(),
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: 0,
   });
 }
 
@@ -43,13 +60,8 @@ export function getSentryServerOptions(): NodeOptions | null {
     return null;
   }
 
-  const tracesSampleRate = Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0.1');
-
   return stripRequestPii({
-    dsn,
-    environment: process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
-    sendDefaultPii: false,
-    tracesSampleRate: Number.isFinite(tracesSampleRate) ? tracesSampleRate : 0.1,
+    ...baseOptions(),
   });
 }
 
@@ -58,12 +70,7 @@ export function getSentryEdgeOptions(): EdgeOptions | null {
     return null;
   }
 
-  const tracesSampleRate = Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0.1');
-
   return stripRequestPii({
-    dsn,
-    environment: process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
-    sendDefaultPii: false,
-    tracesSampleRate: Number.isFinite(tracesSampleRate) ? tracesSampleRate : 0.1,
+    ...baseOptions(),
   });
 }

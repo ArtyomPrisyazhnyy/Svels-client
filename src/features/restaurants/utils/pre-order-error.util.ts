@@ -26,10 +26,6 @@ export function getPreOrderErrorMessage(error: unknown): string {
     return CODE_MESSAGES[error.code];
   }
 
-  if (error.message && error.status >= 400 && error.status < 500) {
-    return error.message;
-  }
-
   return DEFAULT_MESSAGE;
 }
 

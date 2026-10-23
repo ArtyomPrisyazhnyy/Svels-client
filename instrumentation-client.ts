@@ -5,3 +5,5 @@ const options = getSentryClientOptions();
 if (options) {
   Sentry.init(options);
 }
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

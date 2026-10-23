@@ -1,0 +1,26 @@
+.friendly-error-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: min(70vh, 32rem);
+  padding: var(--space-4);
+}
+
+.friendly-error-panel__inner {
+  width: min(100%, 28rem);
+  text-align: center;
+}
+
+.friendly-error-panel__title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--rs-text);
+}
+
+.friendly-error-panel__description {
+  margin: 0;
+  font-size: var(--text-md);
+  color: var(--rs-text-muted);
+  line-height: 1.5;
+}

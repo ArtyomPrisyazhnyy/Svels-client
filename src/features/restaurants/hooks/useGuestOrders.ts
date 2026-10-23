@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ApiError } from '@/shared/api/api-client';
+import { getUserFacingErrorMessage } from '@/lib/errors/user-facing';
 import type { OrderDto } from '@/shared/types/pre-order';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useAuthStore } from '@/store/auth.store';
@@ -47,7 +47,7 @@ export function useGuestOrders(restaurantId: string): UseGuestOrdersResult {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : 'Не удалось загрузить заказы');
+          setError(getUserFacingErrorMessage(err, 'Не удалось загрузить заказы'));
         }
       }
     })();
