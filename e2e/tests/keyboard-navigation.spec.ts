@@ -83,9 +83,8 @@ test.describe('Keyboard navigation', () => {
     await page.getByTestId('otp-phone').focus();
     await expect(page.getByTestId('otp-phone')).toBeFocused();
 
-    await page.getByTestId('guest-otp-privacy-consent').focus();
-    await expect(page.getByTestId('guest-otp-privacy-consent')).toBeFocused();
-
+    await page.getByTestId('guest-otp-privacy-consent').check();
+    await expect(page.getByTestId('otp-send-submit')).toBeEnabled();
     await page.getByTestId('otp-send-submit').focus();
     await expect(page.getByTestId('otp-send-submit')).toBeFocused();
   });

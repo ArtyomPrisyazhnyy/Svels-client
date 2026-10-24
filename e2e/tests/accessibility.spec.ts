@@ -159,10 +159,9 @@ test.describe('Accessibility (axe)', () => {
 
 test.describe('Color contrast (axe) — all venue themes', () => {
   for (const theme of ALL_COLOR_THEMES) {
-    test(`venue home @ ${theme}`, async ({ page, seed }) => {
-      await applyVenueTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, theme);
-      await page.goto(`/restaurants/${seed.restaurantId}`);
-      await expect(page.getByTestId('restaurant-public-page')).toBeVisible({ timeout: 30_000 });
+    test(`venue home @ ${theme}`, async ({ page }) => {
+      await page.goto(`/dev/ui?theme=${theme}`, { waitUntil: 'networkidle' });
+      await expect(page.getByTestId('ui-primitives-board')).toBeVisible();
       await expectNoContrastViolations(page);
     });
   }

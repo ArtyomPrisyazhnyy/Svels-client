@@ -34,8 +34,6 @@ export function MenuProductCard({
   );
   const toggle = useFavoritesStore((s) => s.toggle);
 
-  const titleId = `menu-item-title-${item.id}`;
-
   function handleFavoriteClick(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
@@ -68,7 +66,6 @@ export function MenuProductCard({
       <button
         type="button"
         className="menu-product-card__open"
-        aria-labelledby={titleId}
         onClick={() => onSelect(item)}
         data-testid={`menu-item-${item.id}`}
       >
@@ -82,7 +79,7 @@ export function MenuProductCard({
         </div>
 
         <div className="menu-product-card__body">
-          <span id={titleId} className="menu-product-card__title">
+          <span className="menu-product-card__title">
             {item.name}
             {item.variantLabel && (
               <span className="menu-product-card__variant"> {item.variantLabel}</span>
