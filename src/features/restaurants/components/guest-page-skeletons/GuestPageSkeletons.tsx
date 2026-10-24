@@ -183,8 +183,9 @@ export function GuestBookingPageSkeleton() {
 export function GuestFavoritesPageSkeleton() {
   return (
     <main
-      className="venue-subpage__main restaurant-favorites-page__main"
+      className="venue-menu-frame restaurant-favorites-page__main"
       data-testid="guest-favorites-skeleton"
+      data-venue-menu-frame=""
     >
       <Stack gap={4} className="venue-subpage__stack">
         <GuestPageTitleSkeleton testId="guest-favorites-skeleton-title" />
