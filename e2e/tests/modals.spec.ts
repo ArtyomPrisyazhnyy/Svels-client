@@ -119,6 +119,70 @@ test.describe('Modals', () => {
     await assertCartTitleCentered(page.getByTestId('cart-modal-panel'));
   });
 
+  test('фото блюда вплотную к шапке, без скругления и рамки', async ({ page, seed, asGuest }) => {
+    void asGuest;
+
+    for (const width of [390, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`/restaurants/${seed.restaurantId}`);
+      const opener = page.locator('[data-testid^="menu-item-"]').first();
+      await expect(opener).toBeVisible();
+      await opener.click();
+      const panel = page.getByTestId('menu-product-modal-panel');
+      await expect(panel).toBeVisible();
+      const photo = panel.locator('.menu-product-modal__media img');
+      await expect(photo).toBeVisible();
+      await expect
+        .poll(() => photo.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0))
+        .toBe(true);
+
+      const flush = await panel.evaluate((el) => {
+        const header = el.querySelector('.ui-overlay-panel__header');
+        const media = el.querySelector('.menu-product-modal__media');
+        const img = el.querySelector('.menu-product-modal__media img');
+        if (!header || !media || !(img instanceof HTMLImageElement)) {
+          return null;
+        }
+        const near = (a: number, b: number) => Math.abs(a - b) <= 1;
+        const panelBox = el.getBoundingClientRect();
+        const headerBox = header.getBoundingClientRect();
+        const mediaBox = media.getBoundingClientRect();
+        const imgBox = img.getBoundingClientRect();
+        const mediaStyle = getComputedStyle(media);
+        const imgStyle = getComputedStyle(img);
+        const headerStyle = getComputedStyle(header);
+        const panelStyle = getComputedStyle(el);
+        return {
+          headerBorder: headerStyle.borderBottomWidth,
+          mediaRadius: mediaStyle.borderRadius,
+          mediaBorder: mediaStyle.borderTopWidth,
+          imgRadius: imgStyle.borderRadius,
+          imgBorder: imgStyle.borderTopWidth,
+          panelRadius: panelStyle.borderRadius,
+          edges:
+            near(mediaBox.left, panelBox.left) &&
+            near(mediaBox.right, panelBox.right) &&
+            near(imgBox.left, mediaBox.left) &&
+            near(imgBox.right, mediaBox.right) &&
+            near(imgBox.top, mediaBox.top) &&
+            near(mediaBox.top, headerBox.bottom),
+        };
+      });
+
+      expect(flush).not.toBeNull();
+      expect(flush!.headerBorder).toBe('0px');
+      expect(flush!.mediaBorder).toBe('0px');
+      expect(flush!.imgBorder).toBe('0px');
+      expect(flush!.mediaRadius).toBe('0px');
+      expect(flush!.imgRadius).toBe('0px');
+      expect(flush!.panelRadius).not.toBe('0px');
+      expect(flush!.edges).toBe(true);
+
+      await page.keyboard.press('Escape');
+      await expect(panel).toBeHidden();
+    }
+  });
+
   test('карточка блюда: backdrop, Escape, ×, фокус возвращается', async ({
     page,
     seed,
