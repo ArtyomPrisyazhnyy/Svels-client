@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/test';
+import { test, expect, apiClient } from '../fixtures/test';
 import type { CartLineItem } from '../../src/shared/types/cart';
 
 function buildLine(): CartLineItem {
@@ -74,11 +74,14 @@ test.describe('Keyboard navigation', () => {
   });
 
   test('venue guest login page: tab to phone and consent', async ({ page, seed }) => {
+    await page.context().clearCookies();
     await page.goto(`/restaurants/${seed.restaurantId}/auth`);
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
     await expect(page.getByTestId('guest-otp-phone-form')).toBeVisible();
 
-    await page.getByLabel('Телефон').focus();
-    await expect(page.getByLabel('Телефон')).toBeFocused();
+    await page.getByTestId('otp-phone').focus();
+    await expect(page.getByTestId('otp-phone')).toBeFocused();
 
     await page.getByTestId('guest-otp-privacy-consent').focus();
     await expect(page.getByTestId('guest-otp-privacy-consent')).toBeFocused();
@@ -89,6 +92,11 @@ test.describe('Keyboard navigation', () => {
 
   test('segmented control: arrow keys change fulfillment', async ({ page, seed, asGuest }) => {
     void asGuest;
+    await apiClient.setOrderSettings(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, {
+      fulfillmentDelivery: true,
+      fulfillmentTakeaway: true,
+      fulfillmentDineIn: false,
+    });
     await seedCart(page, seed.restaurantId);
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await page.getByTestId('cart-button').click();

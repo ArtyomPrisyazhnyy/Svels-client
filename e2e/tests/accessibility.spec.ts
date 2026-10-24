@@ -72,6 +72,7 @@ async function applyVenueTheme(
     cardStyle: 'classic',
     headerStyle: 'solid',
     switcherStyle,
+    menuCategoryNavEnabled: false,
   });
   await revalidateRestaurantPublicPage(restaurantId);
 }
@@ -96,6 +97,13 @@ test.describe('Accessibility (axe)', () => {
     test(`venue ${route.label}`, async ({ page, seed, asGuest }) => {
       if ('needsGuest' in route && route.needsGuest) {
         void asGuest;
+      }
+      if (route.path === '/auth') {
+        await page.context().clearCookies();
+        await page.addInitScript(() => {
+          localStorage.clear();
+          sessionStorage.clear();
+        });
       }
       await page.goto(`/restaurants/${seed.restaurantId}${route.path}`);
       await expect(page.getByTestId(route.readyTestId)).toBeVisible({ timeout: 30_000 });

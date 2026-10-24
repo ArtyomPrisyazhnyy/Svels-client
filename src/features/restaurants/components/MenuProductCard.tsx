@@ -34,9 +34,7 @@ export function MenuProductCard({
   );
   const toggle = useFavoritesStore((s) => s.toggle);
 
-  const openLabel = item.variantLabel
-    ? `Подробнее: ${item.name}, ${item.variantLabel}`
-    : `Подробнее: ${item.name}`;
+  const titleId = `menu-item-title-${item.id}`;
 
   function handleFavoriteClick(event: MouseEvent) {
     event.preventDefault();
@@ -66,13 +64,13 @@ export function MenuProductCard({
       onPointerEnter={onPreload}
       onFocus={onPreload}
       onTouchStart={onPreload}
-      data-testid={`menu-item-${item.id}`}
     >
       <button
         type="button"
         className="menu-product-card__open"
-        aria-label={openLabel}
+        aria-labelledby={titleId}
         onClick={() => onSelect(item)}
+        data-testid={`menu-item-${item.id}`}
       >
         <div className="menu-product-card__media">
           <ResponsiveImage
@@ -84,7 +82,7 @@ export function MenuProductCard({
         </div>
 
         <div className="menu-product-card__body">
-          <span className="menu-product-card__title">
+          <span id={titleId} className="menu-product-card__title">
             {item.name}
             {item.variantLabel && (
               <span className="menu-product-card__variant"> {item.variantLabel}</span>
