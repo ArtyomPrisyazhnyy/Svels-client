@@ -1,14 +1,14 @@
 .auth-card__back {
   display: inline-block;
   margin-bottom: 1rem;
-  color: #64748b;
+  color: var(--plat-64748b);
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
 
   @media (hover: hover) {
     &:hover {
-      color: #2563eb;
+      color: var(--plat-2563eb);
     }
   }
 }
@@ -17,10 +17,10 @@
   margin: 1.25rem 0 0;
   text-align: center;
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--plat-64748b);
 
   a {
-    color: #2563eb;
+    color: var(--plat-2563eb);
     font-weight: 600;
   }
 }
@@ -29,7 +29,7 @@
   margin: 0;
   padding: 0.75rem 0.875rem;
   border-radius: 10px;
-  background: #f0fdf4;
-  color: #166534;
+  background: var(--plat-f0fdf4);
+  color: var(--plat-166534);
   font-size: 0.875rem;
 }

@@ -53,11 +53,11 @@
 .restaurant-cart-modal__list-header-title,
 .restaurant-cart-modal__clear-prompt {
   font-size: var(--text-sm);
-  color: var(--rs-text-muted);
+  color: var(--rs-text);
 }
 
 .restaurant-cart-modal__clear-link.ui-btn--link {
-  color: var(--rs-text-muted);
+  color: var(--rs-text);
 
   @media (hover: hover) {
     &:hover:not(:disabled) {

@@ -1,20 +1,20 @@
 $contact-modal-duration: 0.22s;
 $contact-modal-easing: cubic-bezier(0.32, 0.72, 0, 1);
-$contact-primary: #0f766e;
-$contact-primary-strong: #0d5d57;
-$contact-accent: #14b8a6;
-$contact-ink: #0b1a18;
-$contact-ink-muted: #54635f;
-$contact-line: #e3e8e6;
-$contact-surface: #ffffff;
-$contact-error: #dc2626;
+$contact-primary: var(--plat-0f766e);
+$contact-primary-strong: var(--plat-0d5d57);
+$contact-accent: var(--plat-14b8a6);
+$contact-ink: var(--plat-0b1a18);
+$contact-ink-muted: var(--plat-54635f);
+$contact-line: var(--plat-e3e8e6);
+$contact-surface: var(--plat-ffffff);
+$contact-error: var(--plat-dc2626);
 
 .contact-modal__backdrop {
   position: fixed;
   inset: 0;
   z-index: 130;
   border: none;
-  background: rgba(11, 18, 32, 0.55);
+  background: var(--plat-mix-rgba-11-18-32-0-55);
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
@@ -47,7 +47,7 @@ $contact-error: #dc2626;
   overflow: hidden;
   background: $contact-surface;
   border-radius: 22px;
-  box-shadow: 0 28px 60px rgba(11, 18, 32, 0.28);
+  box-shadow: 0 28px 60px var(--plat-mix-rgba-11-18-32-0-28);
   pointer-events: auto;
   opacity: 0;
   transform: scale(0.96) translateY(12px);
@@ -70,16 +70,16 @@ $contact-error: #dc2626;
   height: 2.25rem;
   border: none;
   border-radius: 999px;
-  background: rgba(241, 245, 249, 0.95);
-  color: #475569;
+  background: var(--plat-mix-rgba-241-245-249-0-95);
+  color: var(--plat-475569);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
   transition: background 0.18s ease, color 0.18s ease;
 
   &:hover {
-    background: #e2e8f0;
-    color: #0b1220;
+    background: var(--plat-e2e8f0);
+    color: var(--plat-0b1220);
   }
 
   &:disabled {
@@ -138,23 +138,23 @@ $contact-error: #dc2626;
   padding: 0.8rem 0.95rem;
   border-radius: 12px;
   border: 1px solid $contact-line;
-  background: #ffffff;
+  background: var(--plat-ffffff);
   font-size: 1rem;
   color: $contact-ink;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 
   &::placeholder {
-    color: #9aa6a2;
+    color: var(--plat-9aa6a2);
   }
 
   &:focus {
     outline: none;
     border-color: $contact-accent;
-    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.16);
+    box-shadow: 0 0 0 4px var(--plat-mix-rgba-20-184-166-0-16);
   }
 
   &:disabled {
-    background: #f4f7f6;
+    background: var(--plat-f4f7f6);
     cursor: not-allowed;
   }
 }
@@ -173,14 +173,14 @@ $contact-error: #dc2626;
   padding: 0.7rem 0.85rem;
   border-radius: 14px;
   border: 1px solid $contact-line;
-  background: #ffffff;
+  background: var(--plat-ffffff);
   cursor: pointer;
   text-align: left;
   transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
 
   &:hover {
-    border-color: rgba(20, 184, 166, 0.5);
-    background: #f2fbf8;
+    border-color: var(--plat-mix-rgba-20-184-166-0-5);
+    background: var(--plat-f2fbf8);
   }
 
   &:has(.contact-modal__radio-input:disabled) {
@@ -190,8 +190,8 @@ $contact-error: #dc2626;
 
   &--checked {
     border-color: $contact-accent;
-    background: #effbf8;
-    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.14);
+    background: var(--plat-effbf8);
+    box-shadow: 0 0 0 3px var(--plat-mix-rgba-20-184-166-0-14);
   }
 
 }
@@ -206,8 +206,8 @@ $contact-error: #dc2626;
   height: 1.25rem;
   box-sizing: border-box;
   border-radius: 50%;
-  border: 1.6px solid #b7c0bd;
-  background: #ffffff;
+  border: 1.6px solid var(--plat-b7c0bd);
+  background: var(--plat-ffffff);
   pointer-events: none;
   transition: border-color 0.18s ease;
 }
@@ -264,8 +264,8 @@ $contact-error: #dc2626;
   margin: 0;
   padding: 0.7rem 0.85rem;
   border-radius: 10px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: var(--plat-fef2f2);
+  border: 1px solid var(--plat-fecaca);
   color: $contact-error;
   font-size: 0.88rem;
   line-height: 1.45;
@@ -278,16 +278,16 @@ $contact-error: #dc2626;
   border-radius: 12px;
   border: none;
   background: linear-gradient(135deg, $contact-primary 0%, $contact-accent 100%);
-  color: #ffffff;
+  color: var(--plat-ffffff);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.28);
+  box-shadow: 0 8px 20px var(--plat-mix-rgba-15-118-110-0-28);
   transition: transform 0.18s ease, box-shadow 0.2s ease, opacity 0.18s ease;
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 12px 28px rgba(15, 118, 110, 0.36);
+    box-shadow: 0 12px 28px var(--plat-mix-rgba-15-118-110-0-36);
   }
 
   &:active:not(:disabled) {
@@ -343,7 +343,7 @@ $contact-error: #dc2626;
   margin-top: 0.1rem;
   border: 2px solid $contact-line;
   border-radius: 4px;
-  background: #ffffff;
+  background: var(--plat-ffffff);
   transition: border-color 0.18s ease, background 0.18s ease;
 
   &::after {
@@ -391,10 +391,10 @@ $contact-error: #dc2626;
   height: 4rem;
   border-radius: 50%;
   background: linear-gradient(135deg, $contact-primary 0%, $contact-accent 100%);
-  color: #ffffff;
+  color: var(--plat-ffffff);
   font-size: 2rem;
   font-weight: 700;
-  box-shadow: 0 12px 28px rgba(15, 118, 110, 0.32);
+  box-shadow: 0 12px 28px var(--plat-mix-rgba-15-118-110-0-32);
   animation: contact-success-pop 0.45s $contact-modal-easing both;
 
   @media (prefers-reduced-motion: reduce) {

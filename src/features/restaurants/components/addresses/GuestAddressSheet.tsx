@@ -308,7 +308,7 @@ function resolveAddressError(error: unknown): string {
     if (error.code === 'ADDRESS_LIMIT') {
       return 'Можно сохранить не больше 10 адресов';
     }
-    return error.message;
+    return 'Не удалось сохранить адрес. Проверьте данные и попробуйте ещё раз.';
   }
   return 'Не удалось сохранить адрес';
 }

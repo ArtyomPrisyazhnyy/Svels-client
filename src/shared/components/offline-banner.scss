@@ -1,0 +1,16 @@
+.offline-banner {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  background: var(--rs-primary-soft);
+  border-bottom: 1px solid var(--rs-border);
+}
+
+.offline-banner__text {
+  margin: 0;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--rs-text);
+}

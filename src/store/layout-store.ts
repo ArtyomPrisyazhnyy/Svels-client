@@ -401,7 +401,7 @@ export const useLayoutStore = create<LayoutState>((set, get) => ({
           ? {
               ...z,
               decorData: {
-                grid: z.decorData?.grid ?? { size: 20, visible: true, color: '#e5e7eb' },
+                grid: z.decorData?.grid ?? { size: 20, visible: true, color: 'var(--plat-e5e7eb)' },
                 objects: [...(z.decorData?.objects ?? []), { ...decor }],
               },
             }
@@ -608,7 +608,7 @@ export const useLayoutStore = create<LayoutState>((set, get) => ({
           ? {
               ...z,
               decorData: {
-                grid: z.decorData?.grid ?? { size: 20, visible: true, color: '#e5e7eb' },
+                grid: z.decorData?.grid ?? { size: 20, visible: true, color: 'var(--plat-e5e7eb)' },
                 objects: [...(z.decorData?.objects ?? []), ...pasted],
               },
             }
@@ -734,17 +734,17 @@ export function createDecorObject(
   const id = uuidv7();
   switch (type) {
     case 'line':
-      return { id, type: 'line', points: [x, y, x + 100, y], strokeWidth: 3, color: '#374151' };
+      return { id, type: 'line', points: [x, y, x + 100, y], strokeWidth: 3, color: 'var(--plat-374151)' };
     case 'polyline':
-      return { id, type: 'polyline', points: [x, y, x + 100, y, x + 100, y + 80], strokeWidth: 3, color: '#374151', closed: false };
+      return { id, type: 'polyline', points: [x, y, x + 100, y, x + 100, y + 80], strokeWidth: 3, color: 'var(--plat-374151)', closed: false };
     case 'zone':
-      return { id, type: 'zone', points: [x, y, x + 160, y, x + 160, y + 100, x, y + 100], fill: '#dbeafe', stroke: '#3b82f6', strokeWidth: 2 };
+      return { id, type: 'zone', points: [x, y, x + 160, y, x + 160, y + 100, x, y + 100], fill: 'var(--plat-dbeafe)', stroke: 'var(--plat-3b82f6)', strokeWidth: 2 };
     case 'shape':
-      return { id, type: 'shape', shape: 'rect', x, y, width: 120, height: 80, rotation: 0, fill: '#f3f4f6', stroke: '#9ca3af', strokeWidth: 2 };
+      return { id, type: 'shape', shape: 'rect', x, y, width: 120, height: 80, rotation: 0, fill: 'var(--plat-f3f4f6)', stroke: 'var(--plat-9ca3af)', strokeWidth: 2 };
     case 'text':
-      return { id, type: 'text', x, y, rotation: 0, text: 'Текст', fontSize: 24, color: '#111827' };
+      return { id, type: 'text', x, y, rotation: 0, text: 'Текст', fontSize: 24, color: 'var(--plat-111827)' };
     case 'decor-icon':
-      return { id, type: 'decor-icon', x, y, rotation: 0, icon: 'plant', width: 48, height: 48, color: '#16a34a' };
+      return { id, type: 'decor-icon', x, y, rotation: 0, icon: 'plant', width: 48, height: 48, color: 'var(--plat-16a34a)' };
     default:
       throw new Error(`Unknown decor type: ${type}`);
   }
@@ -787,7 +787,7 @@ export function createNewTable(
 export function decorLayoutOf(zone: FloorPlanZone): DecorLayoutData {
   return (
     zone.decorData ?? {
-      grid: { size: 20, visible: true, color: '#e5e7eb' },
+      grid: { size: 20, visible: true, color: 'var(--plat-e5e7eb)' },
       objects: [],
     }
   );

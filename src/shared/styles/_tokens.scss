@@ -1,3 +1,5 @@
+@import './platform-palette';
+
 // Design tokens — spacing, radii, z-index, typography, motion, semantic --rs-* defaults.
 
 $space-scale: (
@@ -68,6 +70,7 @@ $z-scale: (
   --rs-text-muted: #64748b;
   --rs-text-soft: #94a3b8;
   --rs-border: #e2e8f0;
+  --rs-input-border: #94a3b8;
   --rs-accent: #0f766e;
   --rs-on-accent: #ffffff;
   --rs-primary: #2563eb;
@@ -76,6 +79,7 @@ $z-scale: (
   --rs-surface: #ffffff;
   --rs-on-primary: #ffffff;
   --rs-danger: #dc2626;
+  --rs-on-danger: #ffffff;
   --overlay: rgba(15, 23, 42, 0.55);
 }
 

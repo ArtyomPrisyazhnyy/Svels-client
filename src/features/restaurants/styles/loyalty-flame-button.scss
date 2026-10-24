@@ -6,10 +6,10 @@
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
-  border: 1px solid var(--rs-border, #e2e8f0);
+  border: 1px solid var(--rs-border, var(--rs-border));
   border-radius: 999px;
-  background: var(--rs-surface, #ffffff);
-  color: #f59e0b;
+  background: var(--rs-surface, var(--rs-surface));
+  color: var(--rs-accent);
   font-size: 1.15rem;
   line-height: 1;
   cursor: pointer;
@@ -18,11 +18,11 @@
   @media (hover: hover) {
     &:hover {
       transform: translateY(-1px);
-      border-color: #fbbf24;
+      border-color: color-mix(in srgb, var(--rs-accent) 70%, var(--rs-surface));
     }
   }
 
   &--lit {
-    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--rs-accent) 20%, transparent);
   }
 }

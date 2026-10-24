@@ -5,6 +5,7 @@ import { Circle, Ellipse, Group, Line, Rect, Text, Transformer } from 'react-kon
 import type Konva from 'konva';
 import type { FloorPlanTable, PublicFloorPlanTable, SeatKind, TableShape, TableSeat } from '@/shared/types/floor-plan';
 import { useLayoutStore } from '@/store/layout-store';
+import { CANVAS_SHADOW } from '@/shared/design-tokens/floor-plan-colors';
 import { SEAT_COLORS, SEAT_DEFAULT_SLOTS, SEAT_SLOT_WIDTH, TABLE_COLORS } from './constants';
 
 interface TableNodeProps {
@@ -166,8 +167,8 @@ export const TableNode = forwardRef<Konva.Node, TableNodeProps>(function TableNo
   const y = table.positionY ?? 0;
   const fill = tableFillColor(table, selected, busyUntil);
   const stroke = selected ? TABLE_COLORS.selected : TABLE_COLORS.active;
-  const labelColor = selected ? '#ffffff' : TABLE_COLORS.label;
-  const capacityColor = selected ? '#e5e7eb' : TABLE_COLORS.capacity;
+  const labelColor = selected ? TABLE_COLORS.fill : TABLE_COLORS.label;
+  const capacityColor = selected ? SEAT_COLORS.back : TABLE_COLORS.capacity;
 
   function handleClick(e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) {
     if (!editable) {
@@ -276,7 +277,7 @@ export const TableNode = forwardRef<Konva.Node, TableNodeProps>(function TableNo
     stroke,
     strokeWidth: selected ? 3 : 2,
     cornerRadius: table.cornerRadius ?? 6,
-    shadowColor: 'rgba(0,0,0,0.15)',
+    shadowColor: CANVAS_SHADOW,
     shadowBlur: 6,
     shadowOffset: { x: 0, y: 2 },
   };
@@ -305,7 +306,7 @@ export const TableNode = forwardRef<Konva.Node, TableNodeProps>(function TableNo
             stroke={stroke}
             strokeWidth={selected ? 3 : 2}
             lineJoin="round"
-            shadowColor="rgba(0,0,0,0.15)"
+            shadowColor={CANVAS_SHADOW}
             shadowBlur={6}
             shadowOffset={{ x: 0, y: 2 }}
           />
@@ -321,7 +322,7 @@ export const TableNode = forwardRef<Konva.Node, TableNodeProps>(function TableNo
             fill={fill}
             stroke={stroke}
             strokeWidth={selected ? 3 : 2}
-            shadowColor="rgba(0,0,0,0.15)"
+            shadowColor={CANVAS_SHADOW}
             shadowBlur={6}
             shadowOffset={{ x: 0, y: 2 }}
           />
@@ -335,7 +336,7 @@ export const TableNode = forwardRef<Konva.Node, TableNodeProps>(function TableNo
             fill={fill}
             stroke={stroke}
             strokeWidth={selected ? 3 : 2}
-            shadowColor="rgba(0,0,0,0.15)"
+            shadowColor={CANVAS_SHADOW}
             shadowBlur={6}
             shadowOffset={{ x: 0, y: 2 }}
           />
@@ -391,7 +392,7 @@ export const TableNode = forwardRef<Konva.Node, TableNodeProps>(function TableNo
                 x={table.points![i * 2]}
                 y={table.points![i * 2 + 1]}
                 radius={6}
-                fill="#ffffff"
+                fill={TABLE_COLORS.fill}
                 stroke={TABLE_COLORS.selected}
                 strokeWidth={2}
                 draggable

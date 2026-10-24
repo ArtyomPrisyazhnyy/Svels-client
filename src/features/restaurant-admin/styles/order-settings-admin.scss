@@ -8,7 +8,7 @@
   h2 {
     margin: 0 0 0.35rem;
     font-size: 1.1rem;
-    color: #0f172a;
+    color: var(--plat-0f172a);
   }
 
   @media (max-width: 640px) {
@@ -21,7 +21,7 @@
 .order-settings-admin__empty,
 .order-settings-admin__notice {
   margin: 0;
-  color: #64748b;
+  color: var(--plat-64748b);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -29,8 +29,8 @@
 .order-settings-admin__notice {
   padding: 0.75rem 1rem;
   border-radius: 10px;
-  background: #fffbeb;
-  color: #92400e;
+  background: var(--plat-fffbeb);
+  color: var(--plat-92400e);
 }
 
 .order-settings-admin__error,
@@ -42,13 +42,13 @@
 }
 
 .order-settings-admin__error {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--plat-fef2f2);
+  color: var(--plat-b91c1c);
 }
 
 .order-settings-admin__success {
-  background: #ecfdf5;
-  color: #047857;
+  background: var(--plat-ecfdf5);
+  color: var(--plat-047857);
 }
 
 .order-settings-admin__save {
@@ -56,8 +56,8 @@
   border: none;
   border-radius: 10px;
   padding: 0.75rem 1.125rem;
-  background: #0d9488;
-  color: #fff;
+  background: var(--plat-0f766e);
+  color: var(--plat-ffffff);
   font-weight: 600;
   cursor: pointer;
 
@@ -78,15 +78,15 @@
 }
 
 .order-settings-admin__panel {
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: var(--plat-ffffff);
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 16px;
   padding: 1.25rem;
 
   h3 {
     margin: 0 0 0.35rem;
     font-size: 1rem;
-    color: #0f172a;
+    color: var(--plat-0f172a);
   }
 
   .order-settings-admin__hint {
@@ -101,7 +101,7 @@
 .order-settings-admin__hint--warn {
   margin-top: 0.75rem;
   margin-bottom: 0;
-  color: #b45309;
+  color: var(--plat-b45309);
 }
 
 .order-settings-admin__options {
@@ -116,14 +116,14 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.875rem 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--plat-f8fafc);
   cursor: pointer;
 
   &:has(input:checked) {
-    border-color: #99f6e4;
-    background: #f0fdfa;
+    border-color: var(--plat-99f6e4);
+    background: var(--plat-f0fdfa);
   }
 }
 
@@ -133,12 +133,12 @@
   gap: 0.25rem;
 
   strong {
-    color: #0f172a;
+    color: var(--plat-0f172a);
     font-size: 0.9375rem;
   }
 
   span {
-    color: #64748b;
+    color: var(--plat-64748b);
     font-size: 0.8125rem;
     line-height: 1.45;
   }
@@ -151,7 +151,7 @@
   flex-shrink: 0;
   appearance: none;
   border-radius: 999px;
-  background: #cbd5e1;
+  background: var(--plat-cbd5e1);
   position: relative;
   cursor: pointer;
   transition: background 0.15s;
@@ -164,12 +164,12 @@
     width: 1.25rem;
     height: 1.25rem;
     border-radius: 50%;
-    background: #fff;
+    background: var(--plat-ffffff);
     transition: transform 0.15s;
   }
 
   &:checked {
-    background: #0d9488;
+    background: var(--plat-0f766e);
 
     &::after {
       transform: translateX(1.25rem);
@@ -191,21 +191,21 @@
   > span {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--plat-334155);
   }
 
   input,
   select {
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--plat-e2e8f0);
     border-radius: 10px;
     padding: 0.625rem 0.75rem;
     font: inherit;
-    background: #fff;
+    background: var(--plat-ffffff);
 
     &:disabled {
-      background: #f1f5f9;
+      background: var(--plat-f1f5f9);
       opacity: 0.7;
       cursor: not-allowed;
     }

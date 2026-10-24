@@ -1,19 +1,19 @@
 @use '../shared/styles/matte-glass' as glass;
 
 /* ===== Дизайн-токены лендинга ===== */
-$landing-bg: #f6f8f7;
-$landing-surface: #ffffff;
-$landing-ink: #0b1a18;
-$landing-ink-muted: #54635f;
-$landing-line: #e3e8e6;
-$landing-primary: #0f766e;
-$landing-primary-strong: #0d5d57;
-$landing-primary-soft: #ecfdf5;
-$landing-accent: #14b8a6;
+$landing-bg: var(--plat-f6f8f7);
+$landing-surface: var(--plat-ffffff);
+$landing-ink: var(--plat-0b1a18);
+$landing-ink-muted: var(--plat-54635f);
+$landing-line: var(--plat-e3e8e6);
+$landing-primary: var(--plat-0f766e);
+$landing-primary-strong: var(--plat-0d5d57);
+$landing-primary-soft: var(--plat-ecfdf5);
+$landing-accent: var(--plat-14b8a6);
 $landing-radius: 18px;
-$landing-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
-$landing-shadow-md: 0 10px 30px rgba(15, 118, 110, 0.12);
-$landing-shadow-lg: 0 24px 60px rgba(15, 118, 110, 0.22);
+$landing-shadow-sm: 0 1px 2px var(--plat-mix-rgba-15-23-42-0-04), 0 1px 3px var(--plat-mix-rgba-15-23-42-0-06);
+$landing-shadow-md: 0 10px 30px var(--plat-mix-rgba-15-118-110-0-12);
+$landing-shadow-lg: 0 24px 60px var(--plat-mix-rgba-15-118-110-0-22);
 $landing-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 $landing-dur: 0.6s;
 $landing-header-offset: 5.5rem;
@@ -74,8 +74,8 @@ html:has(.landing) {
   gap: 0;
 
   &::before {
-    background: rgba(255, 255, 255, 0.7);
-    border-bottom-color: rgba(230, 232, 240, 0.8);
+    background: var(--plat-mix-rgba-255-255-255-0-7);
+    border-bottom-color: var(--plat-mix-rgba-230-232-240-0-8);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     backdrop-filter: blur(20px) saturate(160%);
   }
@@ -188,12 +188,12 @@ html:has(.landing) {
 
   &--primary {
     background: linear-gradient(135deg, $landing-primary 0%, $landing-accent 100%);
-    color: #ffffff;
-    box-shadow: 0 8px 20px rgba(15, 118, 110, 0.28);
+    color: var(--plat-ffffff);
+    box-shadow: 0 8px 20px var(--plat-mix-rgba-15-118-110-0-28);
 
     &:hover:not(:disabled) {
       transform: translateY(-1px);
-      box-shadow: 0 12px 28px rgba(15, 118, 110, 0.36);
+      box-shadow: 0 12px 28px var(--plat-mix-rgba-15-118-110-0-36);
     }
 
     &:active:not(:disabled) {
@@ -208,7 +208,7 @@ html:has(.landing) {
     box-shadow: $landing-shadow-sm;
 
     &:hover {
-      border-color: #c7c9d6;
+      border-color: var(--plat-c7c9d6);
       background: $landing-surface;
       transform: translateY(-1px);
     }
@@ -265,7 +265,7 @@ html:has(.landing) {
   height: 7px;
   border-radius: 50%;
   background: $landing-accent;
-  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.18);
+  box-shadow: 0 0 0 4px var(--plat-mix-rgba-20-184-166-0-18);
 }
 
 .landing__hero-title {
@@ -278,7 +278,7 @@ html:has(.landing) {
 }
 
 .landing__hero-title-accent {
-  background: linear-gradient(120deg, $landing-primary 0%, $landing-accent 60%, #2dd4bf 100%);
+  background: linear-gradient(120deg, $landing-primary 0%, $landing-accent 60%, var(--plat-2dd4bf) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -316,8 +316,8 @@ html:has(.landing) {
   position: relative;
   scroll-margin-top: $landing-header-offset;
   background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(20, 184, 166, 0.08), transparent 60%),
-    linear-gradient(180deg, transparent 0, #fbfcfb 8%, #ffffff 100%);
+    radial-gradient(ellipse 70% 50% at 50% 0%, var(--plat-mix-rgba-20-184-166-0-08), transparent 60%),
+    linear-gradient(180deg, transparent 0, var(--plat-fbfcfb) 8%, var(--plat-ffffff) 100%);
 }
 
 .landing__section--pricing {
@@ -369,7 +369,7 @@ html:has(.landing) {
   margin: 0;
   padding: 1.5rem;
   list-style: none;
-  background: #ffffff;
+  background: var(--plat-ffffff);
   border: 1px solid $landing-line;
   border-radius: 22px;
 
@@ -437,11 +437,11 @@ html:has(.landing) {
     border-color 0.22s $landing-ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--plat-mix-rgba-255-255-255-0-7);
   }
 
   &.is-active {
-    background: #ffffff;
+    background: var(--plat-ffffff);
     border-color: $landing-line;
   }
 
@@ -484,8 +484,8 @@ html:has(.landing) {
   padding: 1.15rem;
   border-radius: 24px;
   background:
-    linear-gradient(180deg, #102422 0%, #16332f 100%);
-  box-shadow: 0 24px 50px rgba(11, 26, 24, 0.18);
+    linear-gradient(180deg, var(--plat-102422) 0%, var(--plat-16332f) 100%);
+  box-shadow: 0 24px 50px var(--plat-mix-rgba-11-26-24-0-18);
 }
 
 .landing__features-cta {
@@ -511,7 +511,7 @@ html:has(.landing) {
     width: min(130%, 560px);
     aspect-ratio: 1;
     transform: translate(-50%, -50%);
-    background: radial-gradient(closest-side, rgba(20, 184, 166, 0.2), transparent 72%);
+    background: radial-gradient(closest-side, var(--plat-mix-rgba-20-184-166-0-2), transparent 72%);
     pointer-events: none;
   }
 }
@@ -520,9 +520,9 @@ html:has(.landing) {
   width: min(100%, 440px);
   border-radius: 16px;
   overflow: hidden;
-  background: #ffffff;
-  border: 1px solid rgba(227, 232, 230, 0.9);
-  box-shadow: 0 22px 48px rgba(11, 26, 24, 0.14);
+  background: var(--plat-ffffff);
+  border: 1px solid var(--plat-mix-rgba-227-232-230-0-9);
+  box-shadow: 0 22px 48px var(--plat-mix-rgba-11-26-24-0-14);
 
   &--embed {
     width: 100%;
@@ -535,7 +535,7 @@ html:has(.landing) {
   align-items: center;
   gap: 0.75rem;
   padding: 0.65rem 0.85rem;
-  background: #f3f6f5;
+  background: var(--plat-f3f6f5);
   border-bottom: 1px solid $landing-line;
 }
 
@@ -547,10 +547,10 @@ html:has(.landing) {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #d5dbd8;
+    background: var(--plat-d5dbd8);
 
     &:first-child {
-      background: #f0b4b4;
+      background: var(--plat-f0b4b4);
     }
   }
 }
@@ -559,7 +559,7 @@ html:has(.landing) {
   flex: 1;
   padding: 0.28rem 0.7rem;
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--plat-ffffff);
   font-size: 0.75rem;
   color: $landing-ink-muted;
 }
@@ -574,8 +574,8 @@ html:has(.landing) {
   gap: 0.25rem;
   padding: 1.1rem 1rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--plat-0f766e) 0%, var(--plat-14b8a6) 100%);
+  color: var(--plat-ffffff);
 
   strong,
   em,
@@ -606,7 +606,7 @@ html:has(.landing) {
     gap: 0.15rem;
     padding: 0.7rem 0.6rem;
     border-radius: 10px;
-    background: #f6f8f7;
+    background: var(--plat-f6f8f7);
     font-size: 0.78rem;
     font-weight: 600;
 
@@ -624,8 +624,8 @@ html:has(.landing) {
   width: 158px;
   padding: 8px;
   border-radius: 26px;
-  background: #111c1a;
-  box-shadow: 0 18px 36px rgba(11, 26, 24, 0.28);
+  background: var(--plat-111c1a);
+  box-shadow: 0 18px 36px var(--plat-mix-rgba-11-26-24-0-28);
   animation: landing-phone-float 6.5s $landing-ease infinite alternate;
 
   &--embed {
@@ -656,14 +656,14 @@ html:has(.landing) {
   height: 8px;
   margin: 4px auto 8px;
   border-radius: 999px;
-  background: #2a3b37;
+  background: var(--plat-2a3b37);
 }
 
 .landing-phone__screen {
   min-height: 210px;
   padding: 0.7rem;
   border-radius: 18px;
-  background: #f7faf8;
+  background: var(--plat-f7faf8);
   color: $landing-ink;
 
   header {
@@ -692,7 +692,7 @@ html:has(.landing) {
       width: 18px;
       height: 18px;
       border-radius: 6px;
-      background: #d7efe8;
+      background: var(--plat-d7efe8);
     }
 
     em {
@@ -707,7 +707,7 @@ html:has(.landing) {
 .landing-mock {
   height: 100%;
   min-height: 312px;
-  color: #e7f4f0;
+  color: var(--plat-e7f4f0);
 }
 
 .landing-mock--booking {
@@ -725,7 +725,7 @@ html:has(.landing) {
   span {
     padding: 0.35rem 0.65rem;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--plat-mix-rgba-255-255-255-0-08);
     font-size: 0.78rem;
   }
 }
@@ -738,24 +738,24 @@ html:has(.landing) {
   padding: 1.5rem 1rem 2rem;
   min-height: 220px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--plat-mix-rgba-255-255-255-0-04);
 
   i {
     width: 54px;
     height: 54px;
     margin: auto;
     border-radius: 50%;
-    border: 2px solid rgba(231, 244, 240, 0.28);
-    background: rgba(20, 184, 166, 0.08);
+    border: 2px solid var(--plat-mix-rgba-231-244-240-0-28);
+    background: var(--plat-mix-rgba-20-184-166-0-08);
 
     &.is-busy {
       opacity: 0.28;
     }
 
     &.is-pick {
-      border-color: #5eead4;
-      background: rgba(20, 184, 166, 0.35);
-      box-shadow: 0 0 0 8px rgba(94, 234, 212, 0.12);
+      border-color: var(--plat-5eead4);
+      background: var(--plat-mix-rgba-20-184-166-0-35);
+      box-shadow: 0 0 0 8px var(--plat-mix-rgba-94-234-212-0-12);
       animation: landing-table-pulse 1.8s ease-in-out infinite;
     }
   }
@@ -766,13 +766,13 @@ html:has(.landing) {
     bottom: 0.85rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #99f6e4;
+    color: var(--plat-99f6e4);
   }
 }
 
 @keyframes landing-table-pulse {
   50% {
-    box-shadow: 0 0 0 12px rgba(94, 234, 212, 0.04);
+    box-shadow: 0 0 0 12px var(--plat-mix-rgba-94-234-212-0-04);
   }
 }
 
@@ -793,13 +793,13 @@ html:has(.landing) {
     align-items: center;
     gap: 0.8rem;
     padding: 0.85rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--plat-mix-rgba-255-255-255-0-08);
 
     i {
       width: 44px;
       height: 44px;
       border-radius: 12px;
-      background: linear-gradient(180deg, #2dd4bf, #0f766e);
+      background: linear-gradient(180deg, var(--plat-2dd4bf), var(--plat-0f766e));
     }
 
     span {
@@ -812,12 +812,12 @@ html:has(.landing) {
     em {
       font-style: normal;
       font-weight: 500;
-      color: rgba(231, 244, 240, 0.62);
+      color: var(--plat-mix-rgba-231-244-240-0-62);
     }
 
     em {
       margin-left: auto;
-      color: #fff;
+      color: var(--plat-ffffff);
     }
   }
 
@@ -831,8 +831,8 @@ html:has(.landing) {
     strong {
       padding: 0.5rem 0.85rem;
       border-radius: 10px;
-      background: #14b8a6;
-      color: #042f2e;
+      background: var(--plat-14b8a6);
+      color: var(--plat-042f2e);
     }
   }
 }
@@ -849,14 +849,14 @@ html:has(.landing) {
   align-items: stretch;
   overflow: hidden;
   border-radius: 16px;
-  background: #f7faf8;
+  background: var(--plat-f7faf8);
   color: $landing-ink;
 
   aside {
     width: 34%;
     padding: 1rem 0.85rem;
-    background: #12302c;
-    color: #d7efe8;
+    background: var(--plat-12302c);
+    color: var(--plat-d7efe8);
     font-size: 0.78rem;
 
     b {
@@ -870,7 +870,7 @@ html:has(.landing) {
       border-radius: 8px;
 
       &.is-on {
-        background: rgba(20, 184, 166, 0.22);
+        background: var(--plat-mix-rgba-20-184-166-0-22);
       }
     }
   }
@@ -905,10 +905,10 @@ html:has(.landing) {
     width: 28px;
     height: 16px;
     border-radius: 999px;
-    background: #d5dbd8;
+    background: var(--plat-d5dbd8);
 
     &.is-on {
-      background: #14b8a6;
+      background: var(--plat-14b8a6);
     }
   }
 }
@@ -926,7 +926,7 @@ html:has(.landing) {
   grid-template-columns: 1fr 1fr;
   padding: 0.28rem;
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--plat-ffffff);
   border: 1px solid $landing-line;
   box-shadow: $landing-shadow-sm;
 }
@@ -940,7 +940,7 @@ html:has(.landing) {
   width: calc(50% - 0.28rem);
   border-radius: 999px;
   background: linear-gradient(135deg, $landing-primary 0%, $landing-accent 100%);
-  box-shadow: 0 6px 16px rgba(15, 118, 110, 0.24);
+  box-shadow: 0 6px 16px var(--plat-mix-rgba-15-118-110-0-24);
   transition: transform 0.38s $landing-ease;
 }
 
@@ -963,7 +963,7 @@ html:has(.landing) {
   transition: color 0.28s $landing-ease;
 
   &.is-active {
-    color: #ffffff;
+    color: var(--plat-ffffff);
   }
 
   &:focus-visible {
@@ -988,7 +988,7 @@ html:has(.landing) {
   flex-direction: column;
   gap: 0.55rem;
   padding: 1.7rem 1.6rem 1.8rem;
-  background: #ffffff;
+  background: var(--plat-ffffff);
   border: 1px solid $landing-line;
   border-radius: 22px;
 }
@@ -1139,8 +1139,8 @@ html:has(.landing) {
     background 0.28s $landing-ease;
 
   &.is-open {
-    border-color: rgba(15, 118, 110, 0.28);
-    background: #ffffff;
+    border-color: var(--plat-mix-rgba-15-118-110-0-28);
+    background: var(--plat-ffffff);
   }
 }
 

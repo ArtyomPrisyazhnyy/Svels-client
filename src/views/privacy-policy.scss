@@ -1,8 +1,8 @@
-$privacy-primary: #0f766e;
-$privacy-accent: #14b8a6;
-$privacy-ink: #0b1a18;
-$privacy-line: #e3e8e6;
-$privacy-surface: #f8faf9;
+$privacy-primary: var(--plat-0f766e);
+$privacy-accent: var(--plat-14b8a6);
+$privacy-ink: var(--plat-0b1a18);
+$privacy-line: var(--plat-e3e8e6);
+$privacy-surface: var(--plat-f8faf9);
 
 .privacy-policy {
   min-height: 100vh;
@@ -57,7 +57,7 @@ $privacy-surface: #f8faf9;
 
 .legal-doc__p {
   margin: 0;
-  color: #1e293b;
+  color: var(--plat-1e293b);
 }
 
 .legal-doc__list {
@@ -79,7 +79,7 @@ $privacy-surface: #f8faf9;
   }
 
   th {
-    background: #fff;
+    background: var(--plat-ffffff);
     font-weight: 600;
   }
 }
@@ -92,13 +92,13 @@ $privacy-surface: #f8faf9;
 
 .legal-doc__body > :first-child {
   font-size: 0.9rem;
-  color: #b45309;
+  color: var(--plat-b45309);
   font-weight: 600;
 }
 
 .restaurant-legal-page__header {
   border-bottom: 1px solid $privacy-line;
-  background: #fff;
+  background: var(--plat-ffffff);
   padding-block: 1rem;
 }
 

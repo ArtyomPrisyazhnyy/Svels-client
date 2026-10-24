@@ -1,0 +1,11 @@
+---
+description: Theme colors, contrast guards, and lint requirements
+alwaysApply: true
+---
+
+# Colors & contrast
+
+- Use **only** theme CSS variables (`var(--rs-*)`) in feature/UI SCSS and components. Raw hex/rgb/hsl/named colors belong **only** in `src/shared/styles/_tokens.scss` and `src/shared/design-tokens/color-themes.ts`.
+- Primary actions: `var(--rs-primary)` + `var(--rs-on-primary)` (not accent/on-accent unless intentionally link-style).
+- When adding a new foreground/background pair, extend `src/shared/design-tokens/theme-contrast.test.ts` and run `npm run test:unit`.
+- Before push: `npm run lint` and `npm run test:unit`; for guest UI changes also run `npx playwright test e2e/tests/color-contrast.spec.ts`.

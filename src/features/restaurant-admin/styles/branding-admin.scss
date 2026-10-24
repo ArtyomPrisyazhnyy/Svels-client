@@ -3,8 +3,8 @@
 }
 
 .branding-admin__panel {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--plat-ffffff);
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 16px;
   padding: 1.25rem;
 }
@@ -18,7 +18,7 @@
 .branding-admin__notice,
 .branding-admin__empty {
   margin: 0 0 1rem;
-  color: #64748b;
+  color: var(--plat-64748b);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -27,8 +27,8 @@
   margin: 0 0 1rem;
   padding: 0.75rem;
   border-radius: 8px;
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--plat-fef2f2);
+  color: var(--plat-b91c1c);
   font-size: 0.9rem;
 }
 
@@ -36,8 +36,8 @@
   margin: 0 0 1rem;
   padding: 0.75rem;
   border-radius: 8px;
-  background: #ecfdf5;
-  color: #047857;
+  background: var(--plat-ecfdf5);
+  color: var(--plat-047857);
   font-size: 0.9rem;
 }
 
@@ -48,9 +48,9 @@
   min-height: 120px;
   margin-bottom: 1rem;
   padding: 1rem;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--plat-cbd5e1);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--plat-f8fafc);
 }
 
 .branding-admin__preview {
@@ -60,7 +60,7 @@
 }
 
 .branding-admin__placeholder {
-  color: #94a3b8;
+  color: var(--plat-475569);
   font-size: 0.95rem;
 }
 
@@ -76,8 +76,8 @@
   justify-content: center;
   padding: 0.65rem 1rem;
   border-radius: 10px;
-  background: #0f172a;
-  color: #ffffff;
+  background: var(--plat-0f172a);
+  color: var(--plat-ffffff);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -90,10 +90,10 @@
 
 .branding-admin__remove {
   padding: 0.65rem 1rem;
-  border: 1px solid #fecaca;
+  border: 1px solid var(--plat-fecaca);
   border-radius: 10px;
-  background: #ffffff;
-  color: #b91c1c;
+  background: var(--plat-ffffff);
+  color: var(--plat-b91c1c);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;

@@ -22,8 +22,8 @@
 
 .locations-admin__panel,
 .locations-admin__list-panel {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--plat-ffffff);
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 16px;
   padding: 1.25rem;
 }
@@ -32,7 +32,7 @@
 .locations-admin__notice,
 .locations-admin__empty {
   margin: 0 0 1rem;
-  color: #64748b;
+  color: var(--plat-64748b);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -41,8 +41,8 @@
   margin: 0 0 1rem;
   padding: 0.75rem;
   border-radius: 8px;
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--plat-fef2f2);
+  color: var(--plat-b91c1c);
 }
 
 .locations-admin__form {
@@ -62,7 +62,7 @@
   }
 
   input {
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--plat-e2e8f0);
     border-radius: 10px;
     padding: 0.65rem 0.75rem;
     font: inherit;
@@ -75,11 +75,11 @@
   align-items: center;
   gap: 0.75rem;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--plat-64748b);
 
   button {
-    border: 1px solid #cbd5e1;
-    background: #f8fafc;
+    border: 1px solid var(--plat-cbd5e1);
+    background: var(--plat-f8fafc);
     border-radius: 999px;
     padding: 0.4rem 0.9rem;
     cursor: pointer;
@@ -99,12 +99,12 @@
   }
 
   button[type='submit'] {
-    background: #0f766e;
-    color: #ffffff;
+    background: var(--plat-0f766e);
+    color: var(--plat-ffffff);
   }
 
   button[type='button'] {
-    background: #f1f5f9;
+    background: var(--plat-f1f5f9);
   }
 }
 
@@ -122,12 +122,12 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 12px;
 
   p {
     margin: 0.25rem 0 0;
-    color: #475569;
+    color: var(--plat-475569);
     font-size: 0.9rem;
   }
 }
@@ -140,7 +140,7 @@
   button {
     border: none;
     background: transparent;
-    color: #0f766e;
+    color: var(--plat-0f766e);
     font-weight: 600;
     cursor: pointer;
     text-align: right;

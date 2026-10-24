@@ -72,25 +72,25 @@
   }
 
   &__shape--outer {
-    stroke: #ffffff;
+    stroke: var(--rs-surface);
     stroke-width: 3.25;
   }
 
   &__shape--inner {
-    stroke: #1e293b;
+    stroke: var(--rs-text);
     stroke-width: 1.5;
-    fill: #ffffff;
+    fill: var(--rs-surface);
   }
 
   &__shape--inner-plain {
-    stroke: var(--rs-text-muted, #64748b);
+    stroke: var(--rs-text-muted, var(--rs-text-muted));
     stroke-width: 1.75;
-    fill: #ffffff;
+    fill: var(--rs-surface);
   }
 
   &__shape--inner-active {
-    stroke: #e11d48;
-    fill: #e11d48;
+    stroke: var(--rs-danger);
+    fill: var(--rs-danger);
   }
 
   &__ring {
@@ -99,14 +99,14 @@
     margin: auto;
     width: 1.35rem;
     height: 1.35rem;
-    border: 2px solid #fb7185;
+    border: 2px solid color-mix(in srgb, var(--rs-danger) 65%, var(--rs-surface));
     border-radius: 999px;
     pointer-events: none;
     animation: favorite-heart-ring 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 
     &--delay {
       animation-delay: 0.07s;
-      border-color: #fda4af;
+      border-color: color-mix(in srgb, var(--rs-danger) 45%, var(--rs-surface));
     }
   }
 
@@ -117,7 +117,7 @@
     .favorite-heart-button__icon {
       width: 1.45rem;
       height: 1.45rem;
-      filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.5));
+      filter: drop-shadow(0 1px 2px color-mix(in srgb, var(--rs-text) 50%, transparent));
     }
 
     @media (hover: hover) {
@@ -138,13 +138,13 @@
 
     @media (hover: hover) {
       &:hover .favorite-heart-button__shape--inner-plain {
-        stroke: #f43f5e;
+        stroke: var(--rs-danger);
       }
     }
   }
 
   &--active.favorite-heart-button--overlay .favorite-heart-button__icon {
-    filter: drop-shadow(0 2px 6px rgba(225, 29, 72, 0.45));
+    filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--rs-danger) 45%, transparent));
   }
 
   &--pulse-like .favorite-heart-button__icon {

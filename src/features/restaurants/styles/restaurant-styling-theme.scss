@@ -24,7 +24,7 @@
     background: transparent;
     --rs-cart-surface: var(--rs-surface);
     --rs-cart-canvas: var(--rs-surface);
-    --rs-cart-item-surface: color-mix(in srgb, var(--rs-text) 4%, var(--rs-surface));
+    --rs-cart-item-surface: var(--rs-surface);
   }
 
   .restaurant-public {

@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background: #f9fafb;
+  background: var(--plat-f9fafb);
   border-radius: 12px;
 
   &__controls {
@@ -12,9 +12,9 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: #fff;
+    background: var(--plat-ffffff);
     border-radius: 10px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--plat-e5e7eb);
   }
 
   &__field {
@@ -22,8 +22,8 @@
     flex-direction: column;
     gap: 4px;
     font-size: 13px;
-    color: #374151;
-    input { padding: 7px 9px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; }
+    color: var(--plat-374151);
+    input { padding: 7px 9px; border: 1px solid var(--plat-d1d5db); border-radius: 6px; font-size: 13px; }
   }
 
   &__zones {
@@ -35,13 +35,13 @@
 
   &__zone {
     padding: 6px 12px;
-    background: #f3f4f6;
-    border: 1px solid #d1d5db;
+    background: var(--plat-f3f4f6);
+    border: 1px solid var(--plat-d1d5db);
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
-    color: #374151;
-    &--active { background: #2563eb; color: #fff; border-color: #2563eb; }
+    color: var(--plat-374151);
+    &--active { background: var(--plat-2563eb); color: var(--plat-ffffff); border-color: var(--plat-2563eb); }
   }
 
   &__legend {
@@ -49,7 +49,7 @@
     flex-wrap: wrap;
     gap: 16px;
     font-size: 13px;
-    color: #374151;
+    color: var(--plat-374151);
     padding: 8px 4px;
 
     span { display: inline-flex; align-items: center; gap: 6px; }
@@ -59,10 +59,10 @@
     display: inline-block;
     width: 12px; height: 12px;
     border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.15);
-    &--free { background: #22c55e; }
-    &--busy { background: #ef4444; }
-    &--selected { background: #f97316; }
+    border: 1px solid var(--plat-mix-rgba-0-0-0-0-15);
+    &--free { background: var(--plat-22c55e); }
+    &--busy { background: var(--plat-ef4444); }
+    &--selected { background: var(--plat-f97316); }
   }
 
   &__status, &__error {
@@ -71,13 +71,13 @@
     text-align: center;
     font-size: 14px;
   }
-  &__status { background: #e5e7eb; color: #374151; }
-  &__error { background: #fee2e2; color: #b91c1c; }
+  &__status { background: var(--plat-e5e7eb); color: var(--plat-374151); }
+  &__error { background: var(--plat-fee2e2); color: var(--plat-b91c1c); }
 
   &__canvas-wrap {
-    background: #fff;
+    background: var(--plat-ffffff);
     border-radius: 10px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--plat-e5e7eb);
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -89,8 +89,8 @@
     justify-content: space-between;
     gap: 12px;
     padding: 12px 16px;
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
+    background: var(--plat-fff7ed);
+    border: 1px solid var(--plat-fed7aa);
     border-radius: 10px;
   }
 
@@ -98,19 +98,19 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    strong { font-size: 15px; color: #9a3412; }
-    span { font-size: 13px; color: #c2410c; }
+    strong { font-size: 15px; color: var(--plat-9a3412); }
+    span { font-size: 13px; color: var(--plat-c2410c); }
   }
 
   &__confirm-btn {
     padding: 10px 22px;
-    background: #f97316;
-    color: #fff;
+    background: var(--plat-f97316);
+    color: var(--plat-ffffff);
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     font-size: 14px;
-    &:hover { background: #ea580c; }
+    &:hover { background: var(--plat-ea580c); }
   }
 }

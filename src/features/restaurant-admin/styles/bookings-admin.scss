@@ -4,7 +4,7 @@
   h2 {
     margin: 0 0 0.35rem;
     font-size: 1.1rem;
-    color: #0f172a;
+    color: var(--plat-0f172a);
   }
 }
 
@@ -12,7 +12,7 @@
 .bookings-admin__empty,
 .bookings-admin__notice {
   margin: 0;
-  color: #64748b;
+  color: var(--plat-64748b);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -20,24 +20,24 @@
 .bookings-admin__notice {
   padding: 0.75rem 1rem;
   border-radius: 10px;
-  background: #fffbeb;
-  color: #92400e;
+  background: var(--plat-fffbeb);
+  color: var(--plat-92400e);
 }
 
 .bookings-admin__error {
   margin: 0 0 1rem;
   padding: 0.75rem;
   border-radius: 8px;
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--plat-fef2f2);
+  color: var(--plat-b91c1c);
   font-size: 0.875rem;
 }
 
 .bookings-admin__table-wrap {
   overflow-x: auto;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 16px;
-  background: #fff;
+  background: var(--plat-ffffff);
 }
 
 .bookings-admin__table {
@@ -49,12 +49,12 @@
   td {
     text-align: left;
     padding: 0.75rem 0.875rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--plat-f1f5f9);
     white-space: nowrap;
   }
 
   th {
-    color: #64748b;
+    color: var(--plat-64748b);
     font-weight: 600;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -80,27 +80,27 @@
   font-weight: 600;
 
   &--pending {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--plat-fef3c7);
+    color: var(--plat-92400e);
   }
   &--confirmed {
-    background: #dcfce7;
-    color: #047857;
+    background: var(--plat-dcfce7);
+    color: var(--plat-047857);
   }
   &--cancelled {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--plat-fee2e2);
+    color: var(--plat-b91c1c);
   }
   &--completed {
-    background: #e0e7ff;
-    color: #3730a3;
+    background: var(--plat-e0e7ff);
+    color: var(--plat-3730a3);
   }
 }
 
 .bookings-admin__select {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 8px;
   padding: 0.35rem 0.5rem;
   font: inherit;
-  background: #fff;
+  background: var(--plat-ffffff);
 }

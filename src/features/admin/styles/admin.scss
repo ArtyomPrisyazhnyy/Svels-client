@@ -1,7 +1,7 @@
 .admin {
   min-height: 100vh;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--plat-0f172a);
+  color: var(--plat-e2e8f0);
 }
 
 .admin__header {
@@ -15,8 +15,8 @@
   margin-left: 0.5rem;
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
-  background: #7c3aed;
-  color: #ffffff;
+  background: var(--plat-7c3aed);
+  color: var(--plat-ffffff);
   font-size: 0.7rem;
   font-weight: 700;
   vertical-align: middle;
@@ -30,7 +30,7 @@
 
 .admin__intro {
   margin: 0 0 1.5rem;
-  color: #94a3b8;
+  color: var(--plat-94a3b8);
   line-height: 1.5;
 }
 
@@ -41,9 +41,9 @@
   margin: 0 0 1rem;
   padding: 0.35rem 0.75rem;
   font-size: 0.8125rem;
-  color: #86efac;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: var(--plat-86efac);
+  background: var(--plat-mix-rgba-34-197-94-0-1);
+  border: 1px solid var(--plat-mix-rgba-34-197-94-0-25);
   border-radius: 999px;
 
   &::before {
@@ -51,7 +51,7 @@
     width: 0.5rem;
     height: 0.5rem;
     border-radius: 50%;
-    background: #22c55e;
+    background: var(--plat-22c55e);
     animation: admin-live-pulse 1.5s ease-in-out infinite;
   }
 }
@@ -70,10 +70,10 @@
 .admin__empty {
   padding: 2rem;
   text-align: center;
-  color: #64748b;
-  background: #111827;
+  color: var(--plat-94a3b8);
+  background: var(--plat-111827);
   border-radius: 12px;
-  border: 1px dashed #334155;
+  border: 1px dashed var(--plat-334155);
 }
 
 .admin__list {
@@ -83,8 +83,8 @@
 }
 
 .admin__card {
-  background: #111827;
-  border: 1px solid #1e293b;
+  background: var(--plat-111827);
+  border: 1px solid var(--plat-1e293b);
   border-radius: 12px;
   padding: 1.25rem;
 }
@@ -92,12 +92,12 @@
 .admin__card-title {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
-  color: #f8fafc;
+  color: var(--plat-f8fafc);
 }
 
 .admin__meta {
   margin: 0 0 0.75rem;
-  color: #94a3b8;
+  color: var(--plat-94a3b8);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -105,7 +105,7 @@
 .admin__locations {
   margin: 0 0 1rem;
   padding-left: 1.2rem;
-  color: #cbd5e1;
+  color: var(--plat-cbd5e1);
   font-size: 0.875rem;
   line-height: 1.6;
 }
@@ -125,21 +125,21 @@
   cursor: pointer;
 
   &--approve {
-    background: #16a34a;
-    color: #ffffff;
+    background: var(--plat-15803d);
+    color: var(--plat-ffffff);
 
     &:hover:not(:disabled) {
-      background: #15803d;
+      background: var(--plat-166534);
     }
   }
 
   &--reject {
     background: transparent;
-    color: #f87171;
-    border: 1px solid #7f1d1d;
+    color: var(--plat-f87171);
+    border: 1px solid var(--plat-7f1d1d);
 
     &:hover:not(:disabled) {
-      background: #450a0a;
+      background: var(--plat-450a0a);
     }
   }
 
@@ -153,8 +153,8 @@
   margin: 0 0 1rem;
   padding: 0.75rem;
   border-radius: 8px;
-  background: #450a0a;
-  color: #fecaca;
+  background: var(--plat-450a0a);
+  color: var(--plat-fecaca);
   font-size: 0.875rem;
 }
 
@@ -163,16 +163,16 @@
   gap: 0.5rem;
   margin-bottom: 1.25rem;
   padding: 0.25rem;
-  background: #111827;
+  background: var(--plat-111827);
   border-radius: 10px;
-  border: 1px solid #1e293b;
+  border: 1px solid var(--plat-1e293b);
 }
 
 .admin__tabs-btn {
   flex: 1;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: var(--plat-94a3b8);
   font-size: 0.9rem;
   font-weight: 600;
   padding: 0.625rem 1rem;
@@ -180,8 +180,8 @@
   cursor: pointer;
 
   &--active {
-    background: #1e293b;
-    color: #f8fafc;
+    background: var(--plat-1e293b);
+    color: var(--plat-f8fafc);
   }
 }
 
@@ -196,30 +196,30 @@
 .admin__search {
   flex: 1;
   min-width: 200px;
-  border: 1px solid #334155;
+  border: 1px solid var(--plat-334155);
   border-radius: 8px;
-  background: #111827;
-  color: #f8fafc;
+  background: var(--plat-111827);
+  color: var(--plat-f8fafc);
   padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
 }
 
 .admin__btn--primary {
-  background: #7c3aed;
-  color: #ffffff;
+  background: var(--plat-7c3aed);
+  color: var(--plat-ffffff);
 
   &:hover:not(:disabled) {
-    background: #6d28d9;
+    background: var(--plat-6d28d9);
   }
 }
 
 .admin__btn--secondary {
-  background: #1e293b;
-  color: #e2e8f0;
-  border: 1px solid #334155;
+  background: var(--plat-1e293b);
+  color: var(--plat-e2e8f0);
+  border: 1px solid var(--plat-334155);
 
   &:hover:not(:disabled) {
-    background: #334155;
+    background: var(--plat-334155);
   }
 }
 
@@ -227,32 +227,32 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #229ed9;
-  color: #ffffff;
+  background: var(--plat-229ed9);
+  color: var(--plat-ffffff);
   text-decoration: none;
 
   &:hover {
-    background: #1a8bc4;
+    background: var(--plat-1a8bc4);
   }
 }
 
 .admin__btn--ghost {
   background: transparent;
-  color: #94a3b8;
-  border: 1px solid #334155;
+  color: var(--plat-94a3b8);
+  border: 1px solid var(--plat-334155);
 }
 
 .admin__section-title {
   margin: 0 0 1rem;
   font-size: 1rem;
-  color: #f8fafc;
+  color: var(--plat-f8fafc);
 }
 
 .admin__create-form {
   margin-bottom: 1.25rem;
   padding: 1.25rem;
-  background: #111827;
-  border: 1px solid #1e293b;
+  background: var(--plat-111827);
+  border: 1px solid var(--plat-1e293b);
   border-radius: 12px;
 }
 
@@ -268,13 +268,13 @@
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--plat-94a3b8);
 
   input {
-    border: 1px solid #334155;
+    border: 1px solid var(--plat-334155);
     border-radius: 8px;
-    background: #0f172a;
-    color: #f8fafc;
+    background: var(--plat-0f172a);
+    color: var(--plat-f8fafc);
     padding: 0.5rem 0.625rem;
     font-size: 0.9rem;
   }
@@ -287,24 +287,24 @@
 .admin__invite {
   padding: 1rem;
   border-radius: 12px;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--plat-0f172a);
+  border: 1px solid var(--plat-334155);
 }
 
 .admin__invite-title {
   margin: 0 0 0.5rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--plat-f8fafc);
 }
 
 .admin__invite-url {
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 0.75rem;
-  border: 1px solid #334155;
+  border: 1px solid var(--plat-334155);
   border-radius: 8px;
-  background: #111827;
-  color: #cbd5e1;
+  background: var(--plat-111827);
+  color: var(--plat-cbd5e1);
   padding: 0.5rem 0.625rem;
   font-size: 0.8rem;
 }

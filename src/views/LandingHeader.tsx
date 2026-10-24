@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ContactButton } from './ContactButton';
 
 const LANDING_SECTION_LINKS = [
@@ -14,9 +15,9 @@ export function LandingHeader() {
   return (
     <header className="landing__header">
       <div className="landing__container">
-        <a className="landing__brand" href="/" aria-label="Svels">
+        <Link className="landing__brand" href="/" aria-label="Svels">
           <span className="landing__brand-mark">Svels</span>
-        </a>
+        </Link>
         <nav className="landing__nav" aria-label="Разделы">
           {LANDING_SECTION_LINKS.map(({ href, label }) => (
             <a key={href} href={href} className="landing__nav-link">

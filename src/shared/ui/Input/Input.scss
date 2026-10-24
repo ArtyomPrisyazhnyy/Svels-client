@@ -6,7 +6,7 @@
   width: 100%;
   min-width: 0;
   margin: 0;
-  border: 1px solid var(--rs-border);
+  border: 1px solid var(--rs-input-border, var(--rs-border));
   background: var(--rs-bg);
   color: var(--rs-text);
   font-family: inherit;

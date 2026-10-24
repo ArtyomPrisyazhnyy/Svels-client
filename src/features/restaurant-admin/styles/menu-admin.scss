@@ -17,13 +17,13 @@
 }
 
 .menu-admin__error {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--plat-fef2f2);
+  color: var(--plat-b91c1c);
 }
 
 .menu-admin__notice {
-  background: #fffbeb;
-  color: #92400e;
+  background: var(--plat-fffbeb);
+  color: var(--plat-92400e);
 }
 
 .menu-admin__list-panel h2 {
@@ -31,7 +31,7 @@
 }
 
 .menu-admin__empty {
-  color: #94a3b8;
+  color: var(--plat-475569);
   font-size: 0.9rem;
 }
 
@@ -60,9 +60,9 @@
 }
 
 .menu-admin__category-btn {
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  color: #334155;
+  border: 1px solid var(--plat-cbd5e1);
+  background: var(--plat-ffffff);
+  color: var(--plat-334155);
   border-radius: 8px;
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
@@ -74,8 +74,8 @@
   }
 
   &--danger {
-    border-color: #fecaca;
-    color: #b91c1c;
+    border-color: var(--plat-fecaca);
+    color: var(--plat-b91c1c);
   }
 }
 
@@ -93,8 +93,8 @@
   grid-template-columns: 72px 1fr auto;
   gap: 0.75rem;
   padding: 0.75rem;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--plat-ffffff);
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 12px;
   align-items: start;
 
@@ -113,24 +113,24 @@
   font-size: 0.9rem;
 
   strong {
-    color: #0f172a;
+    color: var(--plat-0f172a);
   }
 
   > span {
-    color: #0f766e;
+    color: var(--plat-0f766e);
     font-weight: 600;
   }
 }
 
 .menu-admin__item-variant {
   font-weight: 600;
-  color: #64748b;
+  color: var(--plat-64748b);
 }
 
 .menu-admin__modifiers {
   margin: 0.25rem 0 0;
   padding-left: 1rem;
-  color: #64748b;
+  color: var(--plat-64748b);
   font-size: 0.8rem;
   line-height: 1.4;
 }
@@ -142,9 +142,9 @@
 }
 
 .menu-admin__edit {
-  border: 1px solid #99f6e4;
-  background: #fff;
-  color: #0d9488;
+  border: 1px solid var(--plat-99f6e4);
+  background: var(--plat-ffffff);
+  color: var(--plat-0f766e);
   border-radius: 8px;
   padding: 0.375rem 0.625rem;
   font-size: 0.8rem;
@@ -152,19 +152,19 @@
   white-space: nowrap;
 
   &:hover {
-    background: #f0fdfa;
+    background: var(--plat-f0fdfa);
   }
 }
 
 .menu-admin__item--editing {
-  border-color: #0d9488;
-  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
+  border-color: var(--plat-0f766e);
+  box-shadow: 0 0 0 2px var(--plat-mix-rgba-13-148-136-0-15);
 }
 
 .menu-admin__delete {
-  border: 1px solid #fecaca;
-  background: #fff;
-  color: #b91c1c;
+  border: 1px solid var(--plat-fecaca);
+  background: var(--plat-ffffff);
+  color: var(--plat-b91c1c);
   border-radius: 8px;
   padding: 0.375rem 0.625rem;
   font-size: 0.8rem;

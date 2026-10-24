@@ -5,23 +5,7 @@ export const MIN_ZOOM = 0.2;
 export const MAX_ZOOM = 3;
 export const ZOOM_STEP = 1.1;
 
-export const TABLE_COLORS = {
-  active: '#22c55e',
-  inactive: '#9ca3af',
-  selected: '#2563eb',
-  busy: '#ef4444',
-  booked: '#f97316',
-  fill: '#ffffff',
-  label: '#111827',
-  capacity: '#6b7280',
-} as const;
-
-export const SEAT_COLORS = {
-  fill: '#f9fafb',
-  stroke: '#9ca3af',
-  back: '#e5e7eb',
-  selected: '#2563eb',
-} as const;
+export { TABLE_COLORS, SEAT_COLORS, DECOR_DEFAULTS } from '@/shared/design-tokens/floor-plan-colors';
 
 /** Ширина одного посадочного места на диване/скамейке (px). */
 export const SEAT_SLOT_WIDTH = 26;
@@ -32,14 +16,6 @@ export const SEAT_DEFAULT_SLOTS: Record<'chair' | 'stool' | 'couch' | 'bench', n
   couch: 2,
   bench: 2,
 };
-
-export const DECOR_DEFAULTS = {
-  stroke: '#374151',
-  fill: '#f3f4f6',
-  zoneFill: '#dbeafe',
-  zoneStroke: '#3b82f6',
-  textColor: '#111827',
-} as const;
 
 export const TABLE_SHAPES: Array<{ value: 'rectangle' | 'round' | 'square' | 'oval' | 'polygon'; label: string }> = [
   { value: 'rectangle', label: 'Прямоугольный' },

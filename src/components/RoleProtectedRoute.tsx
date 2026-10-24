@@ -17,7 +17,7 @@ function AuthCheckingFallback() {
   return (
     <div
       suppressHydrationWarning
-      style={{ minHeight: '40vh', display: 'grid', placeItems: 'center', color: '#64748b' }}
+      style={{ minHeight: '40vh', display: 'grid', placeItems: 'center', color: 'var(--plat-64748b)' }}
     >
       Проверка доступа…
     </div>

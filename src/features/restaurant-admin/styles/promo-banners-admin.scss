@@ -16,8 +16,8 @@
 
 .promo-banners-admin__panel,
 .promo-banners-admin__list-panel {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--plat-ffffff);
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 16px;
   padding: 1.25rem;
 }
@@ -27,7 +27,7 @@
 .promo-banners-admin__empty,
 .promo-banners-admin__file-hint {
   margin: 0 0 1rem;
-  color: #64748b;
+  color: var(--plat-64748b);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -41,16 +41,16 @@
   margin: 0 0 1rem;
   padding: 0.75rem;
   border-radius: 8px;
-  background: #fef2f2;
-  color: #b91c1c;
+  background: var(--plat-fef2f2);
+  color: var(--plat-b91c1c);
   font-size: 0.875rem;
 }
 
 .promo-banners-admin__notice {
   padding: 0.75rem 1rem;
   border-radius: 10px;
-  background: #fffbeb;
-  color: #92400e;
+  background: var(--plat-fffbeb);
+  color: var(--plat-92400e);
 }
 
 .promo-banners-admin__form {
@@ -68,7 +68,7 @@
   .promo-banners-admin__label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--plat-334155);
   }
 
   input[type='text'],
@@ -77,7 +77,7 @@
   input[type='file'] {
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--plat-e2e8f0);
     border-radius: 10px;
     padding: 0.75rem;
     font: inherit;
@@ -100,7 +100,7 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.9rem;
-  color: #334155;
+  color: var(--plat-334155);
   cursor: pointer;
 }
 
@@ -118,15 +118,15 @@
   margin-bottom: 0.55rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--plat-334155);
   cursor: pointer;
 }
 
 .promo-banners-admin__preview {
   overflow: hidden;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border: 1px solid var(--plat-e2e8f0);
+  background: var(--plat-f8fafc);
 
   img {
     display: block;
@@ -165,8 +165,8 @@
 }
 
 .promo-banners-admin__submit {
-  background: #0f172a;
-  color: #ffffff;
+  background: var(--plat-0f172a);
+  color: var(--plat-ffffff);
 
   &:disabled {
     opacity: 0.55;
@@ -175,8 +175,8 @@
 }
 
 .promo-banners-admin__cancel {
-  background: #f1f5f9;
-  color: #334155;
+  background: var(--plat-f1f5f9);
+  color: var(--plat-334155);
 }
 
 .promo-banners-admin__list {
@@ -194,13 +194,13 @@
   gap: 0.75rem;
   align-items: center;
   padding: 0.65rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--plat-e2e8f0);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--plat-f8fafc);
 
   &--editing {
-    border-color: #94a3b8;
-    background: #ffffff;
+    border-color: var(--plat-475569);
+    background: var(--plat-ffffff);
   }
 
   &--inactive {
@@ -213,7 +213,7 @@
   height: 56px;
   border-radius: 8px;
   object-fit: cover;
-  background: #e2e8f0;
+  background: var(--plat-e2e8f0);
 }
 
 .promo-banners-admin__item-body {
@@ -224,12 +224,12 @@
 
   strong {
     font-size: 0.95rem;
-    color: #0f172a;
+    color: var(--plat-0f172a);
   }
 
   span {
     font-size: 0.8rem;
-    color: #64748b;
+    color: var(--plat-64748b);
   }
 }
 
@@ -240,13 +240,13 @@
 
   button {
     padding: 0.4rem 0.7rem;
-    background: #e2e8f0;
-    color: #1e293b;
+    background: var(--plat-e2e8f0);
+    color: var(--plat-1e293b);
     font-size: 0.8rem;
   }
 }
 
 .promo-banners-admin__delete {
-  background: #fee2e2 !important;
-  color: #b91c1c !important;
+  background: var(--plat-fee2e2) !important;
+  color: var(--plat-b91c1c) !important;
 }

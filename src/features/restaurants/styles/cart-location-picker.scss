@@ -4,7 +4,7 @@
   gap: 0.75rem;
 
   [data-testid='location-map'] {
-    border: 1px solid var(--rs-border, #e2e8f0);
+    border: 1px solid var(--rs-border, var(--rs-border));
   }
 }
 
@@ -15,9 +15,9 @@
 }
 
 .cart-location-picker__city {
-  border: 1.5px solid var(--rs-border, #e2e8f0);
-  background: var(--rs-surface, #ffffff);
-  color: var(--rs-text, #0f172a);
+  border: 1.5px solid var(--rs-border, var(--rs-border));
+  background: var(--rs-surface, var(--rs-surface));
+  color: var(--rs-text, var(--rs-text));
   border-radius: 999px;
   padding: 0.4rem 0.85rem;
   font: inherit;
@@ -25,9 +25,9 @@
   cursor: pointer;
 
   &--active {
-    border-color: var(--rs-accent, #0f766e);
-    background: color-mix(in srgb, var(--rs-accent, #0f766e) 16%, var(--rs-surface, #ffffff));
-    color: var(--rs-accent, #0f766e);
+    border-color: var(--rs-accent, var(--rs-accent));
+    background: color-mix(in srgb, var(--rs-accent, var(--rs-accent)) 16%, var(--rs-surface, var(--rs-surface)));
+    color: var(--rs-accent, var(--rs-accent));
   }
 }
 
@@ -42,8 +42,8 @@
   button {
     width: 100%;
     text-align: left;
-    border: 1px solid var(--rs-border, #e2e8f0);
-    background: var(--rs-bg, #f8fafc);
+    border: 1px solid var(--rs-border, var(--rs-border));
+    background: var(--rs-bg, var(--rs-bg));
     border-radius: 10px;
     padding: 0.55rem 0.75rem;
     font: inherit;
@@ -54,13 +54,13 @@
   }
 
   .is-active {
-    border-color: var(--rs-accent, #0f766e);
-    color: var(--rs-accent, #0f766e);
+    border-color: var(--rs-accent, var(--rs-accent));
+    color: var(--rs-accent, var(--rs-accent));
   }
 }
 
 .cart-location-picker__address {
   margin: 0;
   font-weight: 600;
-  color: var(--rs-text, #0f172a);
+  color: var(--rs-text, var(--rs-text));
 }

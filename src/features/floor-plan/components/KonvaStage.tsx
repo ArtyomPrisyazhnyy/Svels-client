@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Layer, Line, Rect, Stage } from 'react-konva';
 import type Konva from 'konva';
 import { useActiveItems, useLayoutStore, createDecorObject } from '@/store/layout-store';
+import { DECOR_DEFAULTS, GRID_COLOR, SELECTION_HIGHLIGHT_FILL } from '@/shared/design-tokens/floor-plan-colors';
 import { TABLE_COLORS } from './constants';
 import { DecorNode } from './DecorNode';
 import { TableNode } from './TableNode';
@@ -341,7 +342,7 @@ export function KonvaStage({ width, height }: KonvaStageProps) {
   // Сетка
   const gridLines: React.ReactNode[] = [];
   if (gridVisible) {
-    const gridColor = activeZone?.decorData?.grid.color ?? '#e5e7eb';
+    const gridColor = activeZone?.decorData?.grid.color ?? GRID_COLOR;
     for (let x = 0; x <= width / zoom; x += gridSize) {
       gridLines.push(
         <Line key={`v${x}`} points={[x, 0, x, height / zoom]} stroke={gridColor} strokeWidth={0.5} listening={false} />,
@@ -427,13 +428,13 @@ export function KonvaStage({ width, height }: KonvaStageProps) {
 
           {/* Preview рисования */}
           {previewLine && (
-            <Line points={previewLine} stroke="#374151" strokeWidth={3} dash={[6, 4]} listening={false} />
+            <Line points={previewLine} stroke={DECOR_DEFAULTS.stroke} strokeWidth={3} dash={[6, 4]} listening={false} />
           )}
           {previewPolyline && (
             <Line
               points={previewPolyline}
-              stroke={previewZoneClosed ? '#3b82f6' : '#374151'}
-              fill={previewZoneClosed ? '#dbeafe' : undefined}
+              stroke={previewZoneClosed ? DECOR_DEFAULTS.zoneStroke : DECOR_DEFAULTS.stroke}
+              fill={previewZoneClosed ? DECOR_DEFAULTS.zoneFill : undefined}
               strokeWidth={2}
               closed={previewZoneClosed}
               dash={[6, 4]}
@@ -451,7 +452,7 @@ export function KonvaStage({ width, height }: KonvaStageProps) {
               stroke={TABLE_COLORS.selected}
               strokeWidth={1}
               dash={[4, 4]}
-              fill="rgba(37, 99, 235, 0.08)"
+              fill={SELECTION_HIGHLIGHT_FILL}
               listening={false}
             />
           )}

@@ -15,6 +15,7 @@ import type { DepositScheme, FloorPlan, FloorPlanZone, LayoutTablePayload, SaveL
 import { DepositSettingsPanel } from './DepositSettingsPanel';
 import { RightInspectorPanel } from './RightInspectorPanel';
 import { LayersPanel } from './LayersPanel';
+import { GRID_COLOR } from '@/shared/design-tokens/floor-plan-colors';
 import { STAGE_HEIGHT, STAGE_WIDTH } from './constants';
 import { Toolbar } from './Toolbar';
 import { useHotkeys } from './useHotkeys';
@@ -45,23 +46,7 @@ export function FloorPlanEditor({ restaurantId, token }: FloorPlanEditorProps) {
   const [error, setError] = useState<string | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const dirtyRef = useRef(false);
-
-  // Подписка на изменения зон для auto-save
-  const zonesJson = JSON.stringify(zones);
-  useEffect(() => {
-    if (!activeZoneId || zones.length === 0) return;
-    dirtyRef.current = true;
-    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
-    autoSaveTimer.current = setTimeout(() => {
-      void saveActiveZone();
-      dirtyRef.current = false;
-    }, 1500);
-    return () => {
-      if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [zonesJson, activeZoneId]);
+  const [isDirty, setIsDirty] = useState(false);
 
   const saveActiveZone = useCallback(async () => {
     if (!activeZoneId) return;
@@ -91,18 +76,33 @@ export function FloorPlanEditor({ restaurantId, token }: FloorPlanEditorProps) {
         description: t.description ?? undefined,
       }));
       const payload: SaveLayoutPayload = {
-        decorData: zone.decorData ?? { grid: { size: 20, visible: true, color: '#e5e7eb' }, objects: [] },
+        decorData: zone.decorData ?? { grid: { size: 20, visible: true, color: GRID_COLOR }, objects: [] },
         tables,
       };
       await saveLayout(restaurantId, token, activeZoneId, payload);
       await revalidateRestaurantPublicPage(restaurantId);
       setLastSavedAt(Date.now());
+      setIsDirty(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось сохранить планировку');
     } finally {
       setSaving(false);
     }
   }, [activeZoneId, zones, restaurantId, token]);
+
+  // Подписка на изменения зон для auto-save
+  const zonesJson = JSON.stringify(zones);
+  useEffect(() => {
+    if (!activeZoneId || zones.length === 0) return;
+    setIsDirty(true);
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => {
+      void saveActiveZone();
+    }, 1500);
+    return () => {
+      if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    };
+  }, [zonesJson, activeZoneId, saveActiveZone, zones.length]);
 
   useHotkeys({ onSave: () => void saveActiveZone(), canSave: true });
 
@@ -215,7 +215,7 @@ export function FloorPlanEditor({ restaurantId, token }: FloorPlanEditorProps) {
       <footer className="fp-editor__footer">
         {saving && <span>Сохранение…</span>}
         {!saving && lastSavedAt && <span>✓ Сохранено {new Date(lastSavedAt).toLocaleTimeString()}</span>}
-        {!saving && !lastSavedAt && dirtyRef.current && <span>• Есть несохранённые изменения</span>}
+        {!saving && !lastSavedAt && isDirty && <span>• Есть несохранённые изменения</span>}
       </footer>
     </div>
   );

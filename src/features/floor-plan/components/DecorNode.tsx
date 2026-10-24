@@ -4,7 +4,8 @@ import { forwardRef, useEffect, useRef } from 'react';
 import { Circle, Ellipse, Group, Line, Path, Rect, Text, Transformer } from 'react-konva';
 import type Konva from 'konva';
 import type { DecorObject, PolylineDecorObject, ZoneDecorObject } from '@/shared/types/floor-plan';
-import { DECOR_ICONS } from './constants';
+import { DECOR_ICONS, TABLE_COLORS } from './constants';
+import { DECOR_DEFAULTS } from '@/shared/design-tokens/floor-plan-colors';
 import { buildRoundedPath } from './path-utils';
 
 /** Внутренний рендер point-based decor (line/polyline/zone) с учётом spline и скругления. */
@@ -190,7 +191,7 @@ export const DecorNode = forwardRef<Konva.Node, DecorNodeProps>(function DecorNo
     rotationSnapTolerance: 5,
     enabledAnchors: isPointBased ? [] : [...TRANSFORMER_ANCHORS],
     anchorSize: 8,
-    borderStroke: '#2563eb',
+    borderStroke: TABLE_COLORS.selected,
     borderDash: isPointBased ? ([4, 4] as number[]) : undefined,
     rotateAnchorOffset: 24,
   };
@@ -331,7 +332,7 @@ export const DecorNode = forwardRef<Konva.Node, DecorNodeProps>(function DecorNo
           <Rect
             width={decor.width}
             height={decor.height}
-            fill={decor.color ?? '#f3f4f6'}
+            fill={decor.color ?? DECOR_DEFAULTS.fill}
             cornerRadius={6}
             opacity={0.85}
           />

@@ -33,6 +33,12 @@
 - Обязательные правила качества UI: **[docs/ui-rules.md](docs/ui-rules.md)** и **[`.cursor/rules/ui.mdc`](.cursor/rules/ui.mdc)** — применяются ко всем PR с разметкой или стилями.
 - Токены дизайна: `src/shared/styles/_tokens.scss` (импорт в `app/layout.tsx`).
 
+### Цвета и контраст
+
+- **Только переменные темы** (`var(--rs-*)`, токены из `src/shared/design-tokens/color-themes.ts` и `src/shared/styles/_tokens.scss`). Не коммитить hex/rgb/hsl/именованные цвета в SCSS/TSX вне token-файлов.
+- Новые сочетания текста и фона добавляйте в список пар в `src/shared/design-tokens/theme-contrast.test.ts` и проверяйте WCAG (≥4.5 для обычного текста, ≥3 для крупного/UI).
+- Перед push: `npm run lint` (stylelint + `scripts/check-no-raw-colors.mjs` + ESLint), `npm run test:unit` (в т.ч. контраст тем), затронутые Playwright-спеки (включая `e2e/tests/color-contrast.spec.ts` при изменении UI/токенов).
+
 ## Параллельная работа агентов
 
 - Типы и API-обёртки — в `src/shared/types` и `src/features/**/api/`.
