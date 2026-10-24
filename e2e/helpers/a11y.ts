@@ -37,6 +37,22 @@ export async function expectNoSeriousAxeViolations(
   }
 }
 
-export async function expectNoContrastViolations(page: Page): Promise<void> {
-  await expectNoSeriousAxeViolations(page, { rules: ['color-contrast'] });
+export async function expectNoContrastViolations(
+  page: Page,
+  includeSelector = '#main-content',
+): Promise<void> {
+  let builder = new AxeBuilder({ page }).withRules(['color-contrast']);
+  if (includeSelector) {
+    builder = builder.include(includeSelector);
+  }
+  const results = await builder.analyze();
+  const serious = results.violations.filter(
+    (violation) => violation.impact === 'serious' || violation.impact === 'critical',
+  );
+  if (serious.length > 0) {
+    const summary = serious
+      .map((v) => `${v.id} (${v.impact}): ${v.help}\n${v.nodes.map((n) => n.html).join('\n')}`)
+      .join('\n\n');
+    expect(serious, `axe serious/critical violations:\n${summary}`).toHaveLength(0);
+  }
 }
