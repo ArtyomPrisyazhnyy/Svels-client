@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { CartCheckoutDraft, CartLineItem } from '@/shared/types/cart';
 import { createDefaultCheckoutDraft } from '@/shared/types/cart';
 import { normalizePhoneForPhoneInput } from '@/shared/utils/phone.util';
+import { sumCartQuantity } from '@/features/restaurants/utils/cart-items-label.util';
 import { commerceEpoch, registerCartReset } from './commerce-session';
 
 const CART_PERSIST_VERSION = 2;
@@ -143,7 +144,7 @@ export const useCartStore = create<CartState>()(
       getRestaurantTotals: (restaurantId) => {
         const items = get().getRestaurantItems(restaurantId);
         return {
-          itemCount: items.reduce((sum, line) => sum + line.quantity, 0),
+          itemCount: sumCartQuantity(items),
           totalAmount: items.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0),
         };
       },

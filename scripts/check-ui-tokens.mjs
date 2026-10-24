@@ -15,6 +15,7 @@ const EXTRA_FILES = [
   'src/features/restaurants/styles/delivery-address-fields.scss',
   'src/features/restaurants/styles/requested-time-picker.scss',
   'src/features/restaurants/styles/order-success-view.scss',
+  'src/features/restaurants/styles/cart-variants.scss',
 ];
 
 const HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;

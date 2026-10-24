@@ -1,4 +1,12 @@
-/** Russian plural for cart line count: 1 товар, 2–4 товара, 5+ товаров */
+/** Pieces in the cart: the sum of every line's quantity, not the number of lines. */
+export function sumCartQuantity(lines: ReadonlyArray<{ quantity: number }>): number {
+  return lines.reduce((sum, line) => sum + line.quantity, 0);
+}
+
+/**
+ * Russian plural for a piece count.
+ * 1 товар, 2–4 товара, 5+ товаров, and 11–14 товаров.
+ */
 export function formatCartItemsCount(count: number): string {
   const mod10 = count % 10;
   const mod100 = count % 100;

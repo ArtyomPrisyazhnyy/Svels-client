@@ -28,6 +28,9 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      - name: Unit tests
+        run: npm run test:unit
+
       - name: Lint changed TypeScript files
         run: |
           FILES=$(git diff --name-only --diff-filter=ACMR "origin/${{ github.base_ref }}"...HEAD | grep -E '\.(ts|tsx)$' || true)

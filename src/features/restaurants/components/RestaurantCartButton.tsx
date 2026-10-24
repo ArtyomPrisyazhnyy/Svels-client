@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { formatCartItemsCount, sumCartQuantity } from '../utils/cart-items-label.util';
 import { preloadRestaurantCartModal } from './lazy-venue-modals';
 import '../styles/restaurant-cart-button.scss';
 
@@ -46,7 +47,7 @@ export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartBut
       const sync = () => {
         const state = useCartStore.getState();
         const items = state.restaurantId === restaurantId ? state.items : [];
-        setItemCount(items.reduce((sum, line) => sum + line.quantity, 0));
+        setItemCount(sumCartQuantity(items));
         setHydrated(!persist?.hasHydrated || persist.hasHydrated());
       };
       void rehydrateCartStore().finally(sync);
@@ -69,11 +70,15 @@ export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartBut
       onClick={onOpen}
       onMouseEnter={preloadRestaurantCartModal}
       onTouchStart={preloadRestaurantCartModal}
-      aria-label={hasItems ? `Корзина, ${itemCount} поз.` : 'Корзина'}
+      aria-label={hasItems ? `Корзина, ${formatCartItemsCount(itemCount)}` : 'Корзина'}
       data-testid="cart-button"
     >
       <CartIcon />
-      {hasItems && <span className="restaurant-cart-button__badge">{itemCount}</span>}
+      {hasItems && (
+        <span className="restaurant-cart-button__badge" data-testid="cart-button-badge">
+          {itemCount}
+        </span>
+      )}
     </button>
   );
 }

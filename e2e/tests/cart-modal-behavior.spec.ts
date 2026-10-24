@@ -164,4 +164,79 @@ test.describe('Cart modal behavior', () => {
     expect(rightGap).toBeGreaterThanOrEqual(8);
     expect(rightGap).toBeLessThanOrEqual(24);
   });
+
+  test('получение — сегмент в корзине, без вложенной модалки', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    const adminToken = seed.restaurantAdmin.auth.accessToken;
+    await apiClient.setOrderSettings(seed.restaurantId, adminToken, {
+      fulfillmentDelivery: true,
+      fulfillmentTakeaway: true,
+      fulfillmentDineIn: false,
+      paymentCash: true,
+    });
+    await revalidateRestaurantPublicPage(seed.restaurantId);
+    await seedCart(page, seed.restaurantId);
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    await page.getByTestId('cart-button').click();
+
+    await expect(page.getByTestId('cart-fulfillment-summary')).toHaveCount(0);
+    await expect(page.getByTestId('cart-fulfillment-sheet')).toHaveCount(0);
+    const segmented = page.getByTestId('cart-fulfillment-segmented');
+    await expect(segmented).toBeVisible();
+    await expect(segmented.getByRole('radio', { name: 'Доставка' })).toBeChecked();
+    await expect(segmented.getByRole('radio', { name: 'На месте' })).toHaveCount(0);
+    await segmented.getByRole('radio', { name: 'Самовывоз' }).click();
+    await expect(segmented.getByRole('radio', { name: 'Самовывоз' })).toBeChecked();
+    await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
+  });
+
+  test('счётчик — сумма количеств, не число строк', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    const line = buildLine();
+    line.quantity = 3;
+    await page.addInitScript(
+      ({ rid, cartItems }) => {
+        window.localStorage.setItem(
+          'svels-cart',
+          JSON.stringify({
+            state: {
+              version: 2,
+              restaurantId: rid,
+              items: cartItems,
+              checkoutByRestaurant: {},
+            },
+            version: 2,
+          }),
+        );
+      },
+      { rid: seed.restaurantId, cartItems: [line] },
+    );
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    const opener = page.getByTestId('cart-button');
+    await expect(opener).toHaveAttribute('aria-label', 'Корзина, 3 товара');
+    await expect(page.getByTestId('cart-button-badge')).toHaveText('3');
+    await opener.click();
+    await expect(page.getByTestId('cart-items-header')).toContainText('3 товара');
+    await page
+      .getByTestId('cart-item-counter')
+      .getByRole('button', { name: 'Увеличить количество' })
+      .click();
+    await expect(page.getByTestId('cart-items-header')).toContainText('4 товара');
+    await page.getByTestId('cart-close').click();
+    await expect(page.getByTestId('cart-button-badge')).toHaveText('4');
+    await expect(opener).toHaveAttribute('aria-label', 'Корзина, 4 товара');
+  });
+
+  test('степпер меняет количество в строке', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    await seedCart(page, seed.restaurantId);
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    await page.getByTestId('cart-button').click();
+    const counter = page.getByTestId('cart-item-counter').first();
+    await expect(counter).toContainText('1');
+    await counter.getByRole('button', { name: 'Увеличить количество' }).click();
+    await expect(counter).toContainText('2');
+    await counter.getByRole('button', { name: 'Уменьшить количество' }).click();
+    await expect(counter).toContainText('1');
+  });
 });
