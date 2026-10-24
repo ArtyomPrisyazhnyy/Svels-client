@@ -84,7 +84,6 @@ export function ResponsiveImage({
   return (
     <picture>
       <source srcSet={webp} type="image/webp" />
-      {/* eslint-disable-next-line @next/next/no-img-element -- WebP <picture> fallback */}
       <img
         src={fallback}
         alt={alt}
