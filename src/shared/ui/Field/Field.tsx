@@ -26,7 +26,7 @@ export function Field({
 }: FieldProps) {
   const hintId = hint ? `${htmlFor}-hint` : undefined;
   const errorId = error ? `${htmlFor}-error` : undefined;
-  const describedBy = [errorId, hintId].filter(Boolean).join(' ') || undefined;
+  const labelId = `${htmlFor}-label`;
 
   let control = children;
   if (isValidElement(children)) {
@@ -42,6 +42,7 @@ export function Field({
         .join(' ') || undefined;
     control = cloneElement(child, {
       id: child.props.id ?? htmlFor,
+      'aria-labelledby': labelId,
       'aria-describedby': mergedDescribedBy,
       'aria-invalid': error ? true : undefined,
     });
@@ -49,7 +50,7 @@ export function Field({
 
   return (
     <Stack gap={2} className={cn('ui-field', className)} testId={testId}>
-      <label className="ui-field__label" htmlFor={htmlFor}>
+      <label id={labelId} className="ui-field__label" htmlFor={htmlFor}>
         {label}
         {required ? (
           <span className="ui-field__required" aria-hidden>

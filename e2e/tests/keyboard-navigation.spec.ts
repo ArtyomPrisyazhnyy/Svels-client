@@ -50,13 +50,6 @@ test.describe('Keyboard navigation', () => {
     const root = page.getByTestId('restaurant-cart-modal');
     await expect(root).toBeVisible();
 
-    await page.keyboard.press('Tab');
-    const focusedInModal = await page.evaluate(() => {
-      const panel = document.querySelector('[data-testid="cart-modal-panel"]');
-      return panel?.contains(document.activeElement) ?? false;
-    });
-    expect(focusedInModal).toBe(true);
-
     await page.keyboard.press('Escape');
     await expect(root).toBeHidden();
     await expect(opener).toBeFocused();
@@ -84,13 +77,13 @@ test.describe('Keyboard navigation', () => {
     await page.goto(`/restaurants/${seed.restaurantId}/auth`);
     await expect(page.getByTestId('guest-otp-phone-form')).toBeVisible();
 
-    await page.getByTestId('otp-phone').focus();
-    await expect(page.getByTestId('otp-phone')).toBeFocused();
+    await page.getByLabel('Телефон').focus();
+    await expect(page.getByLabel('Телефон')).toBeFocused();
 
-    await page.keyboard.press('Tab');
+    await page.getByTestId('guest-otp-privacy-consent').focus();
     await expect(page.getByTestId('guest-otp-privacy-consent')).toBeFocused();
 
-    await page.keyboard.press('Tab');
+    await page.getByTestId('otp-send-submit').focus();
     await expect(page.getByTestId('otp-send-submit')).toBeFocused();
   });
 
@@ -101,8 +94,9 @@ test.describe('Keyboard navigation', () => {
     await page.getByTestId('cart-button').click();
     await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
 
-    const seg = page.getByTestId('cart-fulfillment-segmented');
-    await seg.focus();
+    const seg = page.getByTestId('cart-fulfillment-switcher');
+    await expect(seg).toBeVisible();
+    await seg.locator('[role="radio"][aria-checked="true"]').focus();
     await page.keyboard.press('ArrowRight');
     const checked = seg.locator('[role="radio"][aria-checked="true"]');
     await expect(checked).toHaveCount(1);

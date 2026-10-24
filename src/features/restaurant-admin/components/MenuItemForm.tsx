@@ -127,6 +127,7 @@ export function MenuItemForm({
       return;
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync form when editingItem changes
     setCategoryId(editingItem.categoryId);
     setName(editingItem.name);
     setVariantLabel(editingItem.variantLabel ?? '');
@@ -150,6 +151,7 @@ export function MenuItemForm({
 
   useEffect(() => {
     if (!isEditing && !categoryId && categories[0]?.id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- default category for new item
       setCategoryId(categories[0].id);
     }
   }, [categories, categoryId, isEditing]);
@@ -376,10 +378,11 @@ export function MenuItemForm({
       </div>
 
       <div className="menu-item-form__field">
-        <label>
+        <label htmlFor="item-gallery-images">
           Дополнительные фото (до {MAX_MENU_ITEM_GALLERY_IMAGES})
         </label>
         <input
+          id="item-gallery-images"
           type="file"
           accept="image/jpeg,image/png,image/webp"
           multiple
