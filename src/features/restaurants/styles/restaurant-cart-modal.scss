@@ -106,8 +106,12 @@
 }
 
 .restaurant-cart-modal__list-header {
+  box-sizing: border-box;
+  width: 100%;
   min-height: var(--control-h-md);
   min-width: 0;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--rs-border);
 }
 
 .restaurant-cart-modal__checkout {
@@ -199,9 +203,41 @@
 }
 
 .restaurant-cart-modal__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
   margin: 0;
-  padding: 0;
-  color: var(--rs-text-soft);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  border: 1px dashed var(--rs-border);
+  border-radius: var(--rs-card-radius, var(--radius-lg));
+  background: var(--rs-cart-item-surface, var(--rs-surface));
+}
+
+.restaurant-cart-modal__empty-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--rs-text);
+}
+
+.restaurant-cart-modal__empty-hint {
+  margin: 0;
+  max-width: 100%;
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--rs-text-muted);
+}
+
+.restaurant-cart-modal__list-card {
+  min-width: 0;
+  border: 1px solid var(--rs-border);
+  border-radius: var(--rs-card-radius, var(--radius-lg));
+  background: var(--rs-cart-item-surface, var(--rs-surface));
+  overflow: hidden;
 }
 
 .restaurant-cart-modal__list {
@@ -210,32 +246,45 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 0;
+  min-width: 0;
 }
 
 .restaurant-cart-modal__item {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border: 1px solid var(--rs-border);
-  border-radius: var(--rs-card-radius, var(--radius-lg));
-  background-color: var(--rs-cart-item-surface, var(--rs-cart-surface, var(--rs-bg)));
+  grid-template-areas:
+    'main'
+    'actions';
+  gap: var(--space-2) var(--space-3);
+  align-items: start;
+  min-width: 0;
+  padding: var(--space-3);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  container-type: inline-size;
+  container-name: cart-item;
 
   @media (min-width: 768px) {
     grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'main actions';
+    align-items: center;
   }
 }
 
+.restaurant-cart-modal__item + .restaurant-cart-modal__item {
+  border-top: 1px solid var(--rs-border);
+}
+
 .restaurant-cart-modal__item--with-image {
-  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-columns: calc(var(--space-10) + var(--space-4)) minmax(0, 1fr);
   grid-template-areas:
     'media main'
-    'actions actions';
-  align-items: start;
+    'media actions';
 
   @media (min-width: 768px) {
-    grid-template-columns: 64px minmax(0, 1fr) auto;
+    grid-template-columns: calc(var(--space-10) + var(--space-4)) minmax(0, 1fr) auto;
     grid-template-areas: 'media main actions';
   }
 }
@@ -259,17 +308,14 @@
 }
 
 .restaurant-cart-modal__item-media {
-  width: 56px;
-  height: 56px;
+  grid-area: media;
+  width: calc(var(--space-10) + var(--space-4));
+  height: calc(var(--space-10) + var(--space-4));
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--rs-border);
   flex-shrink: 0;
-
-  @media (min-width: 768px) {
-    width: 64px;
-    height: 64px;
-  }
+  align-self: start;
 
   picture,
   img {
@@ -284,16 +330,34 @@
 }
 
 .restaurant-cart-modal__item-main {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--space-3);
+  row-gap: var(--space-1);
+  align-items: start;
   min-width: 0;
+
+  @container cart-item (max-width: 272px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .restaurant-cart-modal__item-title {
+  grid-column: 1;
+  grid-row: 1;
   margin: 0;
+  min-width: 0;
   font-size: var(--text-md);
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1.25;
   color: var(--rs-text);
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow-wrap: break-word;
+
+  @container cart-item (max-width: 272px) {
+    grid-column: 1;
+    grid-row: 1;
+  }
 }
 
 .restaurant-cart-modal__item-variant {
@@ -302,53 +366,86 @@
 }
 
 .restaurant-cart-modal__modifiers {
+  grid-column: 1 / -1;
   list-style: none;
-  margin: var(--space-2) 0 0;
+  margin: 0;
   padding: 0;
+  min-width: 0;
   font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: 1.45;
   color: var(--rs-text-muted);
-  line-height: 1.4;
+  overflow-wrap: break-word;
+
+  @container cart-item (max-width: 272px) {
+    grid-column: 1;
+    grid-row: 2;
+  }
 }
 
 .restaurant-cart-modal__item-price {
-  margin: var(--space-2) 0 0;
-  font-size: var(--text-lg);
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  font-size: var(--text-md);
   font-weight: 700;
+  line-height: 1.25;
   color: var(--rs-accent);
-  overflow-wrap: anywhere;
+  min-width: 0;
+  text-align: end;
+
+  // ~320px cart: the title column is too narrow to share a line with the price.
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-variant-numeric: tabular-nums;
+
+  @container cart-item (max-width: 272px) {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: end;
+  }
+}
+
+.restaurant-cart-modal__item-main:has(.restaurant-cart-modal__modifiers)
+  .restaurant-cart-modal__item-price {
+  @container cart-item (max-width: 272px) {
+    grid-row: 3;
+  }
 }
 
 .restaurant-cart-modal__item-actions {
+  grid-area: actions;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--space-2);
-  flex-shrink: 0;
-  width: 100%;
-
-  @media (min-width: 768px) {
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: center;
-    width: auto;
-  }
+  min-width: 0;
+  width: auto;
 }
 
 .restaurant-cart-modal__counter {
   display: inline-flex;
   align-items: stretch;
+  flex-shrink: 0;
   padding: var(--space-1);
   background: var(--rs-surface);
   border-radius: var(--radius-pill);
   border: 1px solid var(--rs-border);
 }
 
+.restaurant-cart-modal__counter--quiet {
+  padding: 0;
+  background: transparent;
+  border: none;
+  gap: var(--space-1);
+}
+
 .restaurant-cart-modal__counter-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: var(--control-h-md);
   height: var(--control-h-md);
   padding: 0;
@@ -360,6 +457,19 @@
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+    }
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
 }
 
 .restaurant-cart-modal__counter-value {
@@ -460,21 +570,45 @@
 }
 
 .restaurant-cart-modal__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
   margin: 0;
-  font-size: var(--text-xl);
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.25;
   color: var(--rs-text);
-  text-align: center;
+  text-align: start;
 
   @media (min-width: 768px) {
-    text-align: start;
+    flex: 0 1 auto;
+    justify-content: flex-start;
+    width: auto;
   }
+}
+
+.restaurant-cart-modal__panel .restaurant-cart-modal__total-label {
+  color: var(--rs-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.restaurant-cart-modal__panel .restaurant-cart-modal__total-amount {
+  color: var(--rs-text);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .restaurant-cart-modal__footer .restaurant-cart-modal__submit.ui-btn--full {
   @media (min-width: 768px) {
     width: auto;
-    min-width: 10rem;
+    min-width: calc(var(--space-10) * 4);
   }
 }
 
@@ -488,4 +622,44 @@
   border: none;
   border-radius: 0;
   background: transparent;
+}
+
+.restaurant-cart-modal__panel .fulfillment-selector,
+.cart-fulfillment-sheet-body .fulfillment-selector {
+  margin: 0;
+}
+
+.restaurant-styled .restaurant-cart-modal__panel .restaurant-cart-modal__list-card .restaurant-cart-modal__item {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .restaurant-cart-modal__counter-value {
+    animation: cart-qty-in var(--duration-fast) var(--ease-standard);
+  }
+}
+
+@keyframes cart-qty-in {
+  from {
+    transform: translateY(var(--space-1));
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .restaurant-cart-modal__counter-btn {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
+
+  .restaurant-cart-modal__counter-value {
+    animation: none;
+  }
 }

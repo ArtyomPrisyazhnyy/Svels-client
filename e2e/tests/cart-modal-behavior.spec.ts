@@ -164,4 +164,51 @@ test.describe('Cart modal behavior', () => {
     expect(rightGap).toBeGreaterThanOrEqual(8);
     expect(rightGap).toBeLessThanOrEqual(24);
   });
+
+  test('получение — одна строка, sheet с выбором, Escape закрывает только sheet', async ({
+    page,
+    seed,
+    asGuest,
+  }) => {
+    void asGuest;
+    const adminToken = seed.restaurantAdmin.auth.accessToken;
+    await apiClient.setOrderSettings(seed.restaurantId, adminToken, {
+      fulfillmentDelivery: true,
+      fulfillmentTakeaway: true,
+      fulfillmentDineIn: false,
+      paymentCash: true,
+    });
+    await revalidateRestaurantPublicPage(seed.restaurantId);
+    await seedCart(page, seed.restaurantId);
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    await page.getByTestId('cart-button').click();
+
+    const summary = page.getByTestId('cart-fulfillment-summary');
+    await expect(summary).toBeVisible();
+    await expect(page.getByTestId('cart-fulfillment-segmented')).toHaveCount(0);
+    await summary.getByRole('button').click();
+    const sheet = page.getByTestId('cart-fulfillment-sheet');
+    await expect(sheet).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(sheet).toBeHidden();
+    await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
+
+    await summary.getByRole('button').click();
+    await page.getByRole('radio', { name: 'Самовывоз' }).click();
+    await expect(sheet).toBeHidden();
+    await expect(summary).toContainText('Самовывоз');
+  });
+
+  test('степпер меняет количество в строке', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    await seedCart(page, seed.restaurantId);
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    await page.getByTestId('cart-button').click();
+    const counter = page.getByTestId('cart-item-counter').first();
+    await expect(counter).toContainText('1');
+    await counter.getByRole('button', { name: 'Увеличить количество' }).click();
+    await expect(counter).toContainText('2');
+    await counter.getByRole('button', { name: 'Уменьшить количество' }).click();
+    await expect(counter).toContainText('1');
+  });
 });
