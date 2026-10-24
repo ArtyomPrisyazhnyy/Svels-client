@@ -18,6 +18,7 @@ import type { OtpDeliveryChannel } from '@/shared/types/auth';
 import { toPhoneApiValue, isCompleteBelarusPhone } from '@/shared/utils/phone.util';
 import { useRestaurantStylingOptional } from '@/features/restaurants/context/RestaurantStylingContext';
 import { GUEST_PRIVACY_CONSENT_ERROR } from '../constants/guest-privacy-consent';
+import { FormLiveError } from '@/shared/a11y/FormLiveError';
 import { GuestRestaurantOAuthButtons } from './GuestRestaurantOAuthButtons';
 
 type Step = 'phone' | 'code' | 'register';
@@ -202,7 +203,7 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
   if (step === 'register') {
     return (
       <form className="auth-form" onSubmit={handleRegister}>
-        {error && <p className="auth-error">{error}</p>}
+        {error ? <FormLiveError message={error} className="auth-error" /> : null}
         <p className="auth-hint">
           Номер {maskedPhone} подтверждён. Укажите имя для профиля в этом заведении.
         </p>
@@ -242,7 +243,9 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
   if (step === 'code') {
     return (
       <form className="auth-form" onSubmit={handleVerifyCode} data-testid="guest-otp-code-form">
-        {error && <p className="auth-error" data-testid="auth-error">{error}</p>}
+        {error ? (
+          <FormLiveError message={error} className="auth-error" testId="auth-error" />
+        ) : null}
         <p className="auth-hint">
           {channelLabel(channel)}. Номер: <strong>{maskedPhone}</strong>
         </p>
@@ -301,7 +304,9 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
 
   return (
     <div className="guest-otp-phone-step">
-      {error && <p className="auth-error" data-testid="auth-error">{error}</p>}
+      {error ? (
+        <FormLiveError message={error} className="auth-error" testId="auth-error" />
+      ) : null}
       <form className="auth-form" onSubmit={handleSendPhone} data-testid="guest-otp-phone-form">
         <Field label="Телефон" htmlFor="otp-phone">
           <PhoneInput

@@ -2,6 +2,7 @@
 
 import {
   DEFAULT_RESTAURANT_STYLING,
+  RESTAURANT_COLOR_THEME_OPTIONS,
   type RestaurantColorTheme,
 } from '@/shared/types/restaurant-styling';
 import { RestaurantStylingShell } from '@/features/restaurants/context/RestaurantStylingContext';
@@ -10,7 +11,9 @@ import { UiPrimitivesBoard } from '@/shared/ui/dev/UiPrimitivesBoard';
 import { Stack } from '@/shared/ui/Stack/Stack';
 import './dev-ui-playground.scss';
 
-const PLAYGROUND_THEMES: RestaurantColorTheme[] = ['classic', 'midnight', 'warm'];
+const PLAYGROUND_THEMES: RestaurantColorTheme[] = RESTAURANT_COLOR_THEME_OPTIONS.map(
+  (option) => option.value,
+);
 
 function resolveTheme(theme: string): RestaurantColorTheme {
   if (PLAYGROUND_THEMES.includes(theme as RestaurantColorTheme)) {
@@ -37,10 +40,12 @@ export function DevUiPlayground({ theme }: DevUiPlaygroundProps) {
 
   return (
     <RestaurantStylingShell styling={styling} enableScrollToTop={false}>
-      <Stack gap={8} className="dev-ui-playground__stack">
-        <UiTokensBoard />
-        <UiPrimitivesBoard />
-      </Stack>
+      <main id="main-content" tabIndex={-1}>
+        <Stack gap={8} className="dev-ui-playground__stack">
+          <UiTokensBoard />
+          <UiPrimitivesBoard />
+        </Stack>
+      </main>
     </RestaurantStylingShell>
   );
 }

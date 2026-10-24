@@ -34,6 +34,7 @@ interface ThemeVars {
   surface: string;
   onPrimary?: string;
   onAccent?: string;
+  dangerText?: string;
 }
 
 const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
@@ -120,6 +121,8 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     primarySoft: '#1e293b',
     border: '#334155',
     surface: '#1e293b',
+    onAccent: '#0f172a',
+    dangerText: '#fca5a5',
   },
   ember: {
     bg: '#1c1917',
@@ -132,6 +135,8 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     primarySoft: '#292524',
     border: '#44403c',
     surface: '#292524',
+    onAccent: '#1c1917',
+    dangerText: '#fca5a5',
   },
   obsidian: {
     bg: '#09090b',
@@ -144,6 +149,8 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     primarySoft: '#18181b',
     border: '#3f3f46',
     surface: '#18181b',
+    onAccent: '#09090b',
+    dangerText: '#fca5a5',
   },
   moss: {
     bg: '#052e16',
@@ -156,6 +163,8 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     primarySoft: '#064e3b',
     border: '#166534',
     surface: '#064e3b',
+    onAccent: '#052e16',
+    dangerText: '#fca5a5',
   },
   wine: {
     bg: '#1a0a0f',
@@ -168,6 +177,8 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     primarySoft: '#2d0a14',
     border: '#4c0519',
     surface: '#2d0a14',
+    onAccent: '#1a0a0f',
+    dangerText: '#fda4af',
   },
   sand: {
     bg: '#faf8f5',
@@ -186,12 +197,13 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     text: '#713f12',
     textMuted: '#a16207',
     textSoft: '#fde047',
-    accent: '#ca8a04',
+    accent: '#713f12',
     primary: '#eab308',
     primaryHover: '#ca8a04',
     primarySoft: '#fef9c3',
     border: '#fde68a',
     surface: '#ffffff',
+    onAccent: '#ffffff',
   },
   graphite: {
     bg: '#f4f4f5',
@@ -230,6 +242,7 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     surface: '#141414',
     onPrimary: '#000000',
     onAccent: '#000000',
+    dangerText: '#fca5a5',
   },
   neon: {
     bg: '#06040a',
@@ -242,6 +255,8 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     primarySoft: '#1f0814',
     border: '#4a0e2e',
     surface: '#120818',
+    onAccent: '#06040a',
+    dangerText: '#fda4af',
   },
 };
 
@@ -290,6 +305,8 @@ export function buildRestaurantStylingVars(
     ['--rs-surface' as string]: theme.surface,
     ['--rs-on-primary' as string]: theme.onPrimary ?? '#ffffff',
     ['--rs-on-accent' as string]: theme.onAccent ?? '#ffffff',
+    ['--rs-danger-text' as string]: theme.dangerText ?? '#dc2626',
+    ['--rs-on-danger' as string]: '#ffffff',
   };
 }
 

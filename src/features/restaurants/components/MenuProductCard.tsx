@@ -34,11 +34,12 @@ export function MenuProductCard({
   );
   const toggle = useFavoritesStore((s) => s.toggle);
 
-  function handleCardClick(event: MouseEvent<HTMLDivElement>) {
-    if ((event.target as HTMLElement).closest('[data-favorite-heart]')) {
-      return;
+  function handleFavoriteClick(event: MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (restaurantId) {
+      void toggle(restaurantId, item.id);
     }
-    onSelect(item);
   }
 
   const favoriteButton =
@@ -51,62 +52,55 @@ export function MenuProductCard({
             ? 'menu-product-card__favorite menu-product-card__favorite--magazine'
             : 'menu-product-card__favorite'
         }
-        onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          void toggle(restaurantId, item.id);
-        }}
+        onClick={handleFavoriteClick}
       />
     ) : null;
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
+    <article
       className="menu-product-card"
       onPointerEnter={onPreload}
       onFocus={onPreload}
       onTouchStart={onPreload}
-      onClick={handleCardClick}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          onSelect(item);
-        }
-      }}
-      data-testid={`menu-item-${item.id}`}
     >
-      <div className="menu-product-card__media">
-        <ResponsiveImage
-          src={item.imageUrl}
-          webpSrc={item.imageWebpUrl}
-          alt={item.name}
-          loading={imageLoading}
-        />
-        {!isMagazine ? favoriteButton : null}
-      </div>
-
-      <div className="menu-product-card__body">
-        {isMagazine ? favoriteButton : null}
-        <span className="menu-product-card__title">
-          {item.name}
-          {item.variantLabel && (
-            <span className="menu-product-card__variant"> {item.variantLabel}</span>
-          )}
-        </span>
-
-        {item.description && (
-          <p className="menu-product-card__description">{item.description}</p>
-        )}
-
-        <p className="menu-product-card__price">
-          <MenuItemPriceDisplay
-            price={item.price}
-            oldPrice={item.oldPrice}
-            showFromPrefix={showFromPrice}
+      <button
+        type="button"
+        className="menu-product-card__open"
+        onClick={() => onSelect(item)}
+        data-testid={`menu-item-${item.id}`}
+      >
+        <div className="menu-product-card__media">
+          <ResponsiveImage
+            src={item.imageUrl}
+            webpSrc={item.imageWebpUrl}
+            alt=""
+            loading={imageLoading}
           />
-        </p>
-      </div>
-    </div>
+        </div>
+
+        <div className="menu-product-card__body">
+          <span className="menu-product-card__title">
+            {item.name}
+            {item.variantLabel && (
+              <span className="menu-product-card__variant"> {item.variantLabel}</span>
+            )}
+          </span>
+
+          {item.description && (
+            <p className="menu-product-card__description">{item.description}</p>
+          )}
+
+          <p className="menu-product-card__price">
+            <MenuItemPriceDisplay
+              price={item.price}
+              oldPrice={item.oldPrice}
+              showFromPrefix={showFromPrice}
+            />
+          </p>
+        </div>
+      </button>
+
+      {favoriteButton}
+    </article>
   );
 }

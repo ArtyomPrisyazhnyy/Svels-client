@@ -52,7 +52,6 @@ export function PasswordInput({ id, label, className, ...inputProps }: PasswordI
           className="auth-password__toggle"
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? 'Скрыть пароль' : 'Показать пароль'}
-          tabIndex={-1}
         >
           {visible ? <EyeOffIcon /> : <EyeIcon />}
         </button>
