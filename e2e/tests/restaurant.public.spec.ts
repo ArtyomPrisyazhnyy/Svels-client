@@ -75,11 +75,10 @@ test.describe('Restaurant public page', () => {
     const fulfillmentSummary = page.getByTestId('cart-fulfillment-summary');
     if (await fulfillmentSummary.isVisible()) {
       await fulfillmentSummary.getByRole('button').click();
-      const takeawayTab = page.getByRole('radio', { name: 'Самовывоз' });
-      if (await takeawayTab.isVisible()) {
-        await takeawayTab.click();
-        await expect(page.getByTestId('cart-fulfillment-sheet')).toBeHidden();
-      }
+      const sheet = page.getByTestId('cart-fulfillment-sheet');
+      await expect(sheet).toBeVisible();
+      await sheet.getByRole('radio', { name: 'Самовывоз' }).click();
+      await expect(sheet).toBeHidden();
     }
     await page.getByTestId('cart-go-to-checkout').click();
     await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
