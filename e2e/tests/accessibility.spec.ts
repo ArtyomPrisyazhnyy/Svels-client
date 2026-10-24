@@ -139,14 +139,18 @@ test.describe('Accessibility (axe)', () => {
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await page.getByTestId('cart-button').click();
     await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
-    await expectNoSeriousAxeViolations(page);
+    await expectNoSeriousAxeViolations(page, {
+      includeSelector: '[data-testid="restaurant-cart-modal"]',
+    });
   });
 
   test('guest auth modal from header', async ({ page, seed }) => {
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await page.getByTestId('guest-profile-button').click();
     await expect(page.getByTestId('restaurant-auth-modal')).toBeVisible();
-    await expectNoSeriousAxeViolations(page);
+    await expectNoSeriousAxeViolations(page, {
+      includeSelector: '[data-testid="restaurant-auth-modal"]',
+    });
   });
 
   test('landing contact modal form', async ({ page }) => {

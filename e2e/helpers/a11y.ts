@@ -6,6 +6,8 @@ export type AxeScanOptions = {
   rules?: string[];
   /** Exclude rules from the run. */
   excludeRules?: string[];
+  /** Limit analysis to a selector (e.g. open modal). */
+  includeSelector?: string;
 };
 
 export async function expectNoSeriousAxeViolations(
@@ -13,6 +15,10 @@ export async function expectNoSeriousAxeViolations(
   options: AxeScanOptions = {},
 ): Promise<void> {
   let builder = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
+
+  if (options.includeSelector) {
+    builder = builder.include(options.includeSelector);
+  }
 
   if (options.rules?.length) {
     builder = builder.withRules(options.rules);
