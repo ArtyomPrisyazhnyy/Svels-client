@@ -97,7 +97,7 @@ export function CartVariantReceipt({
                   </p>
                   <span className="cart-receipt__leader" aria-hidden />
                   <p className="cart-receipt__price">
-                    <CurrencyAmount amount={line.unitPrice * line.quantity} />
+                    <CurrencyAmount amount={line.unitPrice * line.quantity} fractionDigits={2} />
                   </p>
                 </div>
                 {line.modifiers.length > 0 ? (

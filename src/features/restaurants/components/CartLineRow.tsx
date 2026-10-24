@@ -56,45 +56,46 @@ interface CartLineRowProps {
 }
 
 export function CartLineRow({ line, onDecrement, onIncrement }: CartLineRowProps) {
-  return (
-    <li
-      className={`restaurant-cart-modal__item${
-        line.imageUrl ? ' restaurant-cart-modal__item--with-image' : ''
-      }`}
-    >
-      {line.imageUrl ? (
-        <div className="restaurant-cart-modal__item-media">
-          <ResponsiveImage src={line.imageUrl} webpSrc={line.imageWebpUrl} alt="" />
-        </div>
-      ) : null}
+  const hasNotes = Boolean(line.variantLabel) || line.modifiers.length > 0;
 
-      <div className="restaurant-cart-modal__item-main">
-        <p className="restaurant-cart-modal__item-title">
-          {line.name}
-          {line.variantLabel ? (
-            <span className="restaurant-cart-modal__item-variant"> {line.variantLabel}</span>
-          ) : null}
-        </p>
-        <p className="restaurant-cart-modal__item-price">
-          <CurrencyAmount amount={line.unitPrice * line.quantity} />
-        </p>
-        {line.modifiers.length > 0 ? (
-          <ul className="restaurant-cart-modal__modifiers">
-            {line.modifiers.map((modifier) => (
-              <li key={`${modifier.groupName}-${modifier.optionName}`}>
-                {modifier.groupName}: {modifier.optionName}
-              </li>
-            ))}
-          </ul>
+  return (
+    <li className="restaurant-cart-modal__item">
+      <div className="restaurant-cart-modal__item-media">
+        {line.imageUrl ? (
+          <ResponsiveImage src={line.imageUrl} webpSrc={line.imageWebpUrl} alt="" />
         ) : null}
       </div>
 
-      <div className="restaurant-cart-modal__item-actions" data-testid="cart-item-actions">
-        <CartQtyStepper
-          quantity={line.quantity}
-          onDecrement={onDecrement}
-          onIncrement={onIncrement}
-        />
+      <div className="restaurant-cart-modal__item-main">
+        <p className="restaurant-cart-modal__item-title">{line.name}</p>
+        {hasNotes ? (
+          <div className="restaurant-cart-modal__item-notes">
+            {line.variantLabel ? (
+              <p className="restaurant-cart-modal__item-variant">{line.variantLabel}</p>
+            ) : null}
+            {line.modifiers.length > 0 ? (
+              <ul className="restaurant-cart-modal__modifiers">
+                {line.modifiers.map((modifier) => (
+                  <li key={`${modifier.groupName}-${modifier.optionName}`}>
+                    {modifier.groupName}: {modifier.optionName}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        ) : null}
+        <div className="restaurant-cart-modal__item-trade">
+          <p className="restaurant-cart-modal__item-price">
+            <CurrencyAmount amount={line.unitPrice * line.quantity} fractionDigits={2} />
+          </p>
+          <div className="restaurant-cart-modal__item-actions" data-testid="cart-item-actions">
+            <CartQtyStepper
+              quantity={line.quantity}
+              onDecrement={onDecrement}
+              onIncrement={onIncrement}
+            />
+          </div>
+        </div>
       </div>
     </li>
   );

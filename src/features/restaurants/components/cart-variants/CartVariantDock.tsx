@@ -53,7 +53,7 @@ export function CartVariantDock({
           >
             <span className="cart-dock__cta-label">Оформить</span>
             <span className="cart-dock__cta-amount">
-              <CurrencyAmount amount={totalAmount} />
+              <CurrencyAmount amount={totalAmount} fractionDigits={2} />
             </span>
           </Button>
         </div>

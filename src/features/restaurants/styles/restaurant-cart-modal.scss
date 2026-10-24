@@ -252,70 +252,29 @@
 
 .restaurant-cart-modal__item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    'main'
-    'actions';
-  gap: var(--space-2) var(--space-3);
+  grid-template-columns: calc(var(--space-10) + var(--space-2)) minmax(0, 1fr);
+  column-gap: var(--space-3);
   align-items: start;
   min-width: 0;
-  padding: var(--space-3);
+  padding: var(--space-1) var(--space-3);
   border: none;
   border-radius: 0;
   background: transparent;
-  container-type: inline-size;
-  container-name: cart-item;
-
-  @media (min-width: 768px) {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: 'main actions';
-    align-items: center;
-  }
 }
 
 .restaurant-cart-modal__item + .restaurant-cart-modal__item {
   border-top: 1px solid var(--rs-border);
 }
 
-.restaurant-cart-modal__item--with-image {
-  grid-template-columns: calc(var(--space-10) + var(--space-4)) minmax(0, 1fr);
-  grid-template-areas:
-    'media main'
-    'media actions';
-
-  @media (min-width: 768px) {
-    grid-template-columns: calc(var(--space-10) + var(--space-4)) minmax(0, 1fr) auto;
-    grid-template-areas: 'media main actions';
-  }
-}
-
-.restaurant-cart-modal__item--with-image .restaurant-cart-modal__item-media {
-  grid-area: media;
-}
-
-.restaurant-cart-modal__item--with-image .restaurant-cart-modal__item-main {
-  grid-area: main;
-}
-
-.restaurant-cart-modal__item--with-image .restaurant-cart-modal__item-actions {
-  grid-area: actions;
-  align-self: stretch;
-  justify-content: flex-end;
-
-  @media (min-width: 768px) {
-    align-self: center;
-  }
-}
-
 .restaurant-cart-modal__item-media {
-  grid-area: media;
-  width: calc(var(--space-10) + var(--space-4));
-  height: calc(var(--space-10) + var(--space-4));
+  box-sizing: border-box;
+  width: calc(var(--space-10) + var(--space-2));
+  height: calc(var(--space-10) + var(--space-2));
+  border: 1px solid var(--rs-border);
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: var(--rs-border);
+  background: color-mix(in srgb, var(--rs-accent) 16%, var(--rs-surface));
   flex-shrink: 0;
-  align-self: start;
 
   picture,
   img {
@@ -330,105 +289,104 @@
 }
 
 .restaurant-cart-modal__item-main {
-  grid-area: main;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: var(--space-3);
+  grid-template-areas:
+    'title title'
+    'notes trade';
+  column-gap: var(--space-2);
   row-gap: var(--space-1);
   align-items: start;
   min-width: 0;
+  overflow: hidden;
 
-  @container cart-item (max-width: 272px) {
-    grid-template-columns: minmax(0, 1fr);
+  &:has(.restaurant-cart-modal__modifiers) {
+    align-items: end;
   }
 }
 
 .restaurant-cart-modal__item-title {
-  grid-column: 1;
-  grid-row: 1;
+  grid-area: title;
   margin: 0;
   min-width: 0;
   font-size: var(--text-md);
   font-weight: 600;
   line-height: 1.25;
   color: var(--rs-text);
-  overflow-wrap: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
 
-  @container cart-item (max-width: 272px) {
-    grid-column: 1;
-    grid-row: 1;
-  }
+.restaurant-cart-modal__item-notes {
+  grid-area: notes;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
 }
 
 .restaurant-cart-modal__item-variant {
-  font-weight: 600;
+  margin: 0;
+  min-width: 0;
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: 1.25;
   color: var(--rs-text-muted);
+  overflow-wrap: break-word;
 }
 
 .restaurant-cart-modal__modifiers {
-  grid-column: 1 / -1;
   list-style: none;
   margin: 0;
   padding: 0;
   min-width: 0;
   font-size: var(--text-sm);
   font-weight: 400;
-  line-height: 1.45;
+  line-height: 1.25;
   color: var(--rs-text-muted);
   overflow-wrap: break-word;
+}
 
-  @container cart-item (max-width: 272px) {
-    grid-column: 1;
-    grid-row: 2;
-  }
+.restaurant-cart-modal__item-trade {
+  grid-area: trade;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 0;
+  min-width: 0;
 }
 
 .restaurant-cart-modal__item-price {
-  grid-column: 2;
-  grid-row: 1;
   margin: 0;
-  font-size: var(--text-md);
+  font-size: var(--text-sm);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1;
   color: var(--rs-accent);
-  min-width: 0;
   text-align: end;
-
-  // ~320px cart: the title column is too narrow to share a line with the price.
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   font-variant-numeric: tabular-nums;
-
-  @container cart-item (max-width: 272px) {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: end;
-  }
-}
-
-.restaurant-cart-modal__item-main:has(.restaurant-cart-modal__modifiers)
-  .restaurant-cart-modal__item-price {
-  @container cart-item (max-width: 272px) {
-    grid-row: 3;
-  }
 }
 
 .restaurant-cart-modal__item-actions {
-  grid-area: actions;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
   min-width: 0;
-  width: auto;
 }
 
 .restaurant-cart-modal__counter {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: stretch;
   flex-shrink: 0;
-  padding: var(--space-1);
+  width: calc(var(--space-8) * 3);
+  height: var(--space-8);
+  padding: 0;
   background: var(--rs-surface);
   border-radius: var(--radius-pill);
   border: 1px solid var(--rs-border);
@@ -438,22 +396,21 @@
   padding: 0;
   background: transparent;
   border: none;
-  gap: var(--space-1);
 }
 
 .restaurant-cart-modal__counter-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: var(--control-h-md);
-  height: var(--control-h-md);
+  flex: 1 1 0;
+  min-width: 0;
+  height: auto;
   padding: 0;
   border: none;
   border-radius: var(--radius-pill);
   background: transparent;
   color: var(--rs-text);
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
@@ -476,9 +433,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: var(--space-8);
-  height: var(--control-h-md);
-  padding: 0 var(--space-1);
+  flex: 1 1 0;
+  min-width: 0;
+  height: auto;
+  padding: 0;
   text-align: center;
   font-size: var(--text-md);
   font-weight: 600;

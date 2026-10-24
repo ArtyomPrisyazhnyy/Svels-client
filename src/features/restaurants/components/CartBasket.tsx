@@ -177,7 +177,7 @@ export function CartCheckoutBar({ totalAmount, children }: CartCheckoutBarProps)
       <p className="restaurant-cart-modal__total">
         <span className="restaurant-cart-modal__total-label">Итого</span>
         <span className="restaurant-cart-modal__total-amount">
-          <CurrencyAmount amount={totalAmount} />
+          <CurrencyAmount amount={totalAmount} fractionDigits={2} />
         </span>
       </p>
       {children}
