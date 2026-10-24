@@ -256,7 +256,7 @@
   column-gap: var(--space-3);
   align-items: start;
   min-width: 0;
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-3);
   border: none;
   border-radius: 0;
   background: transparent;
@@ -289,24 +289,31 @@
 }
 
 .restaurant-cart-modal__item-main {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'title title'
-    'notes trade';
-  column-gap: var(--space-2);
-  row-gap: var(--space-1);
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
   min-width: 0;
-  overflow: hidden;
+}
 
-  &:has(.restaurant-cart-modal__modifiers) {
-    align-items: end;
-  }
+.restaurant-cart-modal__item-head,
+.restaurant-cart-modal__item-foot {
+  display: flex;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.restaurant-cart-modal__item-head {
+  align-items: baseline;
+}
+
+.restaurant-cart-modal__item-foot {
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 .restaurant-cart-modal__item-title {
-  grid-area: title;
+  flex: 1 1 auto;
   margin: 0;
   min-width: 0;
   font-size: var(--text-md);
@@ -321,11 +328,11 @@
 }
 
 .restaurant-cart-modal__item-notes {
-  grid-area: notes;
+  flex: 1 1 0%;
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  min-width: 0;
+  min-width: calc(var(--space-10) * 2);
 }
 
 .restaurant-cart-modal__item-variant {
@@ -350,28 +357,31 @@
   overflow-wrap: break-word;
 }
 
-.restaurant-cart-modal__item-trade {
-  grid-area: trade;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-end;
-  gap: 0;
-  min-width: 0;
-}
-
 .restaurant-cart-modal__item-price {
+  flex: 0 0 auto;
   margin: 0;
   font-size: var(--text-sm);
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.25;
   color: var(--rs-accent);
   text-align: end;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+
+  .byn-price {
+    align-items: baseline;
+    line-height: 1.25;
+    overflow: visible;
+  }
+
+  .byn-sign {
+    line-height: 1;
+    overflow: visible;
+  }
 }
 
 .restaurant-cart-modal__item-actions {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -582,8 +592,7 @@
   background: transparent;
 }
 
-.restaurant-cart-modal__panel .fulfillment-selector,
-.cart-fulfillment-sheet-body .fulfillment-selector {
+.restaurant-cart-modal__panel .fulfillment-selector {
   margin: 0;
 }
 

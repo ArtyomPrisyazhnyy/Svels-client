@@ -1,17 +1,15 @@
 'use client';
 
-import { type ReactNode, useState } from 'react';
+import { type ReactNode } from 'react';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
-import { Button, Cluster, Sheet, Stack } from '@/shared/ui';
+import { Button, Cluster, Stack } from '@/shared/ui';
 import {
   FULFILLMENT_OPTIONS,
   type FulfillmentKey,
   type RestaurantOrderSettings,
 } from '@/shared/types/order-settings';
 import type { CartLineItem } from '@/shared/types/cart';
-import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
 import { formatCartItemsCount } from '../utils/cart-items-label.util';
-import { CartDetailRow } from './CartDetailRow';
 import { CartLineRow } from './CartLineRow';
 import { FulfillmentSelector } from './FulfillmentSelector';
 
@@ -83,9 +81,7 @@ export function CartBasketBody({
   onConfirmClear,
   emptyTestId = 'cart-empty',
 }: CartBasketBodyProps) {
-  const [sheetOpen, setSheetOpen] = useState(false);
   const options = FULFILLMENT_OPTIONS.filter((option) => orderSettings[option.key]);
-  const fulfillmentLabel = options.find((option) => option.key === fulfillment)?.title ?? '';
 
   return (
     <>
@@ -94,13 +90,10 @@ export function CartBasketBody({
           className="restaurant-cart-modal__fulfillment-block"
           data-testid="cart-fulfillment-switcher"
         >
-          <CartDetailRow
-            label="Получение"
-            value={fulfillmentLabel}
-            navigate
-            expanded={false}
-            onToggle={() => setSheetOpen(true)}
-            testId="cart-fulfillment-summary"
+          <FulfillmentSelector
+            settings={orderSettings}
+            value={fulfillment}
+            onChange={onFulfillmentChange}
           />
         </div>
       ) : null}
@@ -142,26 +135,6 @@ export function CartBasketBody({
           </ul>
         </div>
       )}
-
-      <Sheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        title="Получение"
-        testId="cart-fulfillment-sheet"
-        stacked
-        wrap={(node) => <RestaurantStylingPortalRoot>{node}</RestaurantStylingPortalRoot>}
-      >
-        <div className="cart-fulfillment-sheet-body">
-          <FulfillmentSelector
-            settings={orderSettings}
-            value={fulfillment}
-            onChange={(value) => {
-              onFulfillmentChange(value);
-              setSheetOpen(false);
-            }}
-          />
-        </div>
-      </Sheet>
     </>
   );
 }

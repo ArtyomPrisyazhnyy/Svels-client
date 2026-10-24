@@ -72,13 +72,10 @@ test.describe('Restaurant public page', () => {
     await expect(page.getByTestId('restaurant-cart-modal').getByText(firstItem.name)).toBeVisible({
       timeout: 10_000,
     });
-    const fulfillmentSummary = page.getByTestId('cart-fulfillment-summary');
-    if (await fulfillmentSummary.isVisible()) {
-      await fulfillmentSummary.getByRole('button').click();
-      const sheet = page.getByTestId('cart-fulfillment-sheet');
-      await expect(sheet).toBeVisible();
-      await sheet.getByRole('radio', { name: 'Самовывоз' }).click();
-      await expect(sheet).toBeHidden();
+    const fulfillment = page.getByTestId('cart-fulfillment-segmented');
+    if (await fulfillment.isVisible()) {
+      await fulfillment.getByRole('radio', { name: 'Самовывоз' }).click();
+      await expect(fulfillment.getByRole('radio', { name: 'Самовывоз' })).toBeChecked();
     }
     await page.getByTestId('cart-go-to-checkout').click();
     await expect(page.getByTestId('cart-checkout-step')).toBeVisible();

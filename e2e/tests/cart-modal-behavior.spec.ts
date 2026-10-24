@@ -165,11 +165,7 @@ test.describe('Cart modal behavior', () => {
     expect(rightGap).toBeLessThanOrEqual(24);
   });
 
-  test('получение — одна строка, sheet с выбором, Escape закрывает только sheet', async ({
-    page,
-    seed,
-    asGuest,
-  }) => {
+  test('получение — сегмент в корзине, без вложенной модалки', async ({ page, seed, asGuest }) => {
     void asGuest;
     const adminToken = seed.restaurantAdmin.auth.accessToken;
     await apiClient.setOrderSettings(seed.restaurantId, adminToken, {
@@ -183,20 +179,15 @@ test.describe('Cart modal behavior', () => {
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await page.getByTestId('cart-button').click();
 
-    const summary = page.getByTestId('cart-fulfillment-summary');
-    await expect(summary).toBeVisible();
-    await expect(page.getByTestId('cart-fulfillment-segmented')).toHaveCount(0);
-    await summary.getByRole('button').click();
-    const sheet = page.getByTestId('cart-fulfillment-sheet');
-    await expect(sheet).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(sheet).toBeHidden();
+    await expect(page.getByTestId('cart-fulfillment-summary')).toHaveCount(0);
+    await expect(page.getByTestId('cart-fulfillment-sheet')).toHaveCount(0);
+    const segmented = page.getByTestId('cart-fulfillment-segmented');
+    await expect(segmented).toBeVisible();
+    await expect(segmented.getByRole('radio', { name: 'Доставка' })).toBeChecked();
+    await expect(segmented.getByRole('radio', { name: 'На месте' })).toHaveCount(0);
+    await segmented.getByRole('radio', { name: 'Самовывоз' }).click();
+    await expect(segmented.getByRole('radio', { name: 'Самовывоз' })).toBeChecked();
     await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
-
-    await summary.getByRole('button').click();
-    await page.getByRole('radio', { name: 'Самовывоз' }).click();
-    await expect(sheet).toBeHidden();
-    await expect(summary).toContainText('Самовывоз');
   });
 
   test('степпер меняет количество в строке', async ({ page, seed, asGuest }) => {

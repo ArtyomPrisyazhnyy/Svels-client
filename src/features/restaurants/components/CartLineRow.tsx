@@ -67,27 +67,29 @@ export function CartLineRow({ line, onDecrement, onIncrement }: CartLineRowProps
       </div>
 
       <div className="restaurant-cart-modal__item-main">
-        <p className="restaurant-cart-modal__item-title">{line.name}</p>
-        {hasNotes ? (
-          <div className="restaurant-cart-modal__item-notes">
-            {line.variantLabel ? (
-              <p className="restaurant-cart-modal__item-variant">{line.variantLabel}</p>
-            ) : null}
-            {line.modifiers.length > 0 ? (
-              <ul className="restaurant-cart-modal__modifiers">
-                {line.modifiers.map((modifier) => (
-                  <li key={`${modifier.groupName}-${modifier.optionName}`}>
-                    {modifier.groupName}: {modifier.optionName}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        ) : null}
-        <div className="restaurant-cart-modal__item-trade">
+        <div className="restaurant-cart-modal__item-head">
+          <p className="restaurant-cart-modal__item-title">{line.name}</p>
           <p className="restaurant-cart-modal__item-price">
             <CurrencyAmount amount={line.unitPrice * line.quantity} fractionDigits={2} />
           </p>
+        </div>
+        <div className="restaurant-cart-modal__item-foot">
+          {hasNotes ? (
+            <div className="restaurant-cart-modal__item-notes">
+              {line.variantLabel ? (
+                <p className="restaurant-cart-modal__item-variant">{line.variantLabel}</p>
+              ) : null}
+              {line.modifiers.length > 0 ? (
+                <ul className="restaurant-cart-modal__modifiers">
+                  {line.modifiers.map((modifier) => (
+                    <li key={`${modifier.groupName}-${modifier.optionName}`}>
+                      {modifier.groupName}: {modifier.optionName}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
           <div className="restaurant-cart-modal__item-actions" data-testid="cart-item-actions">
             <CartQtyStepper
               quantity={line.quantity}

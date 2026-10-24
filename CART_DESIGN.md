@@ -31,19 +31,19 @@ Checkout rows (time, payment, address extras) already disclose one topic at a ti
 ## Principles
 
 - One basket surface, one radius, hairline separators, padding on the 4/8 scale (`--space-*` only).
-- The title uses the full text width and clamps at two lines. Variant and modifiers are small muted lines. The price, always with two decimals, sits above a 32×96 stepper at the trailing edge.
+- The title clamps at two lines. Variant and modifiers are small muted lines. The price, always with two decimals, shares the title’s baseline at the trailing edge. A 32×96 stepper sits at the bottom of the last text line.
 - Quantity is that compact stepper, not a full-bleed bar. The checkout button stays a 44px target.
-- Two to four choices stay a `SegmentedControl`. The basket does not show that control until the guest asks.
+- Two to four choices stay a `SegmentedControl`. Receiving is that control, full width, at the top of the basket. Only methods the venue enables are shown. There is no second modal.
 - The primary button is the bottom control in the thumb zone. The total is a label plus an amount directly above it, so the price is readable without opening the button.
 - Motion is colour and a 4px settle on the quantity, 120ms, removed when `prefers-reduced-motion` is set. Height is not animated, so opening a checkout row does not move the layout under a test.
-- The checkout button and the receiving row stay at least 44px. The quantity stepper is 32px tall and 96px wide, so a short dish stays inside 72–80px. 320px must not scroll sideways. Long names clamp at two lines. A line with no photo still reserves a 48px placeholder so the text column does not shift.
+- The checkout button and the receiving control stay at least 44px. The quantity stepper is 32px tall and 96px wide. Row padding is equal on the top and bottom. 320px must not scroll sideways. Long names clamp at two lines. A line with no photo still reserves a 48px placeholder so the text column does not shift.
 
 ## Three variants
 
 | | Сводка | Док | Чек |
 | --- | --- | --- | --- |
-| Receiving | One row, “Получение · Доставка”. Opens a sheet with the segmented control. Choosing a method closes the sheet. | One chip with method, address, and time. The sheet holds the switch, the address, and the time, and stays open until “Готово”. | A bill line that expands the segmented control in place. No sheet. |
-| Lines | Grouped list. 48px photo or placeholder, name up to two lines, variant as muted text, price above a 32×96 stepper on the right. | 40px photo and name. Stepper under the text until 768px, then on the right. No per-line price. | Dashed bill. Name, dotted leader, price. Quiet stepper underneath. |
+| Receiving | Full-width segmented control at the top of the basket. No extra row and no sheet. | One chip with method, address, and time. The sheet holds the switch, the address, and the time, and stays open until “Готово”. | A bill line that expands the segmented control in place. No sheet. |
+| Lines | Grouped list. 48px photo or placeholder, name up to two lines, variant as muted text, price on the name’s baseline, 32×96 stepper at the bottom of the text. | 40px photo and name. Stepper under the text until 768px, then on the right. No per-line price. | Dashed bill. Name, dotted leader, price. Quiet stepper underneath. |
 | Total | “Итого” on the left, amount on the right, full-width “Оформить заказ” under them. | The amount lives inside the bottom button, next to “Оформить”. | Same bar as Сводка, button reads “Оплатить счёт”, plus a positions line on the bill. |
 
 All three use the same mocked lines on `/dev/cart-variants` (a long name, modifiers, a line with no photo). Quantity and the receiving method are shared across the tabs. Clearing the list shows the empty state.
@@ -51,7 +51,7 @@ All three use the same mocked lines on `/dev/cart-variants` (a long name, modifi
 ## Why Сводка is the cart
 
 - **Beauty.** One list, one radius, the price lined up with the name, a quiet total, and the same disclosure row the checkout already uses. Док hides the line price, so the guest cannot check a dish without doing the sum in their head. Чек’s dotted leaders read as a paper bill, which is a nice idea and a weaker menu.
-- **Convenience.** Switching delivery and pickup is two taps (open, choose) and the sheet closes itself. The current choice stays visible, so nobody hunts for it. Док asks for a confirmation button after every look at the address. Чек pushes the segmented control back into the scrolling list, which is the clutter we were removing, just one tap later.
+- **Convenience.** Delivery, pickup, and dine-in are one tap on the control at the top of the basket. The current choice stays visible, and nothing opens a second modal. Док asks for a confirmation button after every look at the address. Чек tucks the same control behind a bill line.
 - **Compactness.** The always-open switch and its 28px margin are gone. Fifteen rows share one border instead of fifteen cards, and the stepper no longer adds a full-width band. The checkout step is unchanged, so address, time, and payment do not grow.
 - **Thumb reach.** The checkout button is full width at the bottom of the sheet. The stepper is the trailing control of each row, under the thumb, and it no longer takes a band of its own. Док’s button also holds the amount, which is easy to hit and harder to read next to a long label. Чек’s quiet stepper is reachable, and the bill is taller because every line is text with no photo to anchor it.
 

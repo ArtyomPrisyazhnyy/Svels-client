@@ -160,9 +160,10 @@ async function openScenario(
   }
 
   if (scenario === 'step2-pickup') {
-    await page.getByTestId('cart-fulfillment-summary').getByRole('button').click();
-    await page.getByRole('radio', { name: 'Самовывоз' }).click();
-    await expect(page.getByTestId('cart-fulfillment-sheet')).toBeHidden();
+    const fulfillment = page.getByTestId('cart-fulfillment-segmented');
+    await expect(fulfillment).toBeVisible();
+    await fulfillment.getByRole('radio', { name: 'Самовывоз' }).click();
+    await expect(fulfillment.getByRole('radio', { name: 'Самовывоз' })).toBeChecked();
   }
 
   await page.getByTestId('cart-go-to-checkout').click();
