@@ -40,10 +40,12 @@ export function DevUiPlayground({ theme }: DevUiPlaygroundProps) {
 
   return (
     <RestaurantStylingShell styling={styling} enableScrollToTop={false}>
-      <Stack gap={8} className="dev-ui-playground__stack">
-        <UiTokensBoard />
-        <UiPrimitivesBoard />
-      </Stack>
+      <main id="main-content" tabIndex={-1}>
+        <Stack gap={8} className="dev-ui-playground__stack">
+          <UiTokensBoard />
+          <UiPrimitivesBoard />
+        </Stack>
+      </main>
     </RestaurantStylingShell>
   );
 }

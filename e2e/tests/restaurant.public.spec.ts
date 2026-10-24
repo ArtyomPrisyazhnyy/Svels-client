@@ -28,7 +28,8 @@ test.describe('Restaurant public page', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     const heart = page
-      .getByTestId(`menu-item-${firstItem!.id}`)
+      .locator('article.menu-product-card')
+      .filter({ has: page.getByTestId(`menu-item-${firstItem!.id}`) })
       .locator('.favorite-heart-button');
     await heart.click();
     await expect(heart).toHaveClass(/favorite-heart-button--active/);
@@ -133,10 +134,12 @@ test.describe('Restaurant public page', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     const heart = page
-      .getByTestId(`menu-item-${firstItem!.id}`)
+      .locator('article.menu-product-card')
+      .filter({ has: page.getByTestId(`menu-item-${firstItem!.id}`) })
       .locator('.favorite-heart-button');
     const heart2 = page
-      .getByTestId(`menu-item-${secondItem!.id}`)
+      .locator('article.menu-product-card')
+      .filter({ has: page.getByTestId(`menu-item-${secondItem!.id}`) })
       .locator('.favorite-heart-button');
     await expect(heart).toHaveAttribute('aria-pressed', 'true');
     await heart2.click();
