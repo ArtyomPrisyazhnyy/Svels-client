@@ -103,7 +103,7 @@
 
 .social-links-admin__submit {
   border: none;
-  background: var(--plat-0d9488);
+  background: var(--plat-0f766e);
   color: var(--plat-ffffff);
 
   &:disabled {
@@ -137,7 +137,7 @@
   border-radius: 12px;
 
   &--editing {
-    border-color: var(--plat-0d9488);
+    border-color: var(--plat-0f766e);
     box-shadow: 0 0 0 2px var(--plat-mix-rgba-13-148-136-0-12);
   }
 }
@@ -154,7 +154,7 @@
   }
 
   a {
-    color: var(--plat-0d9488);
+    color: var(--plat-0f766e);
     font-size: 0.85rem;
     text-decoration: none;
     overflow: hidden;

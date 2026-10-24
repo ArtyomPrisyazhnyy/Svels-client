@@ -52,12 +52,20 @@ const ACCENT_OVERRIDES: Partial<Record<RestaurantColorTheme, string>> = {
 };
 
 function resolveInputBorderColor(theme: ThemeColorTokens): string {
+  let best: string = INPUT_BORDER_CANDIDATES[0];
+  let bestRatio = 0;
+
   for (const candidate of INPUT_BORDER_CANDIDATES) {
-    if (contrastRatio(candidate, theme.surface) >= 3) {
-      return candidate;
+    const ratio = contrastRatio(candidate, theme.surface);
+    const passes = ratio >= 3;
+    const bestPasses = bestRatio >= 3;
+    if ((passes && !bestPasses) || (passes && bestPasses && ratio < bestRatio) || (!passes && !bestPasses && ratio > bestRatio)) {
+      best = candidate;
+      bestRatio = ratio;
     }
   }
-  return INPUT_BORDER_CANDIDATES[0];
+
+  return best;
 }
 
 function resolveDangerColor(theme: ThemeColorTokens): string {
@@ -354,9 +362,9 @@ export function resolveThemeOnColors(theme: ThemeColorTokens): {
   const preferredAccent = theme.onAccent ?? '#ffffff';
 
   return {
-    onPrimary: pickOnColor(theme.primary, 3, preferredPrimary),
-    onAccent: pickOnColor(theme.accent, 3, preferredAccent),
-    onDanger: pickOnColor(danger, 3, GLOBAL_SEMANTIC_TOKENS.onDanger),
+    onPrimary: pickOnColor(theme.primary, 4.5, preferredPrimary),
+    onAccent: pickOnColor(theme.accent, 4.5, preferredAccent),
+    onDanger: pickOnColor(danger, 4.5, GLOBAL_SEMANTIC_TOKENS.onDanger),
   };
 }
 

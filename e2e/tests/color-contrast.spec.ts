@@ -31,6 +31,12 @@ async function expectNoColorContrastViolations(
   page: import('@playwright/test').Page,
   context: string,
 ) {
+  const panel = page.locator('.ui-overlay-panel--active');
+  if (await panel.count()) {
+    await expect
+      .poll(async () => panel.first().evaluate((el) => getComputedStyle(el).opacity))
+      .toBe('1');
+  }
   const results = await new AxeBuilder({ page }).withRules(['color-contrast']).analyze();
   expect(
     results.violations,
@@ -108,7 +114,7 @@ test.describe('Color contrast (axe)', () => {
     test('/restaurant-admin/menu', async ({ page, asRestaurantAdmin }) => {
       void asRestaurantAdmin;
       await page.setViewportSize(VIEWPORT);
-      await page.goto('/restaurant-admin/menu', { waitUntil: 'networkidle' });
+      await page.goto('/restaurant-admin/menu', { waitUntil: 'domcontentloaded' });
       await expect(page.getByTestId('restaurant-admin-layout')).toBeVisible();
       await expectNoColorContrastViolations(page, 'admin/restaurant-admin/menu');
     });
@@ -116,21 +122,22 @@ test.describe('Color contrast (axe)', () => {
     test('/restaurant-admin/orders', async ({ page, asRestaurantAdmin }) => {
       void asRestaurantAdmin;
       await page.setViewportSize(VIEWPORT);
-      await page.goto('/restaurant-admin/orders', { waitUntil: 'networkidle' });
+      await page.goto('/restaurant-admin/orders', { waitUntil: 'domcontentloaded' });
       await expectNoColorContrastViolations(page, 'admin/restaurant-admin/orders');
     });
 
     test('/restaurant-admin/styling', async ({ page, asRestaurantAdmin }) => {
       void asRestaurantAdmin;
       await page.setViewportSize(VIEWPORT);
-      await page.goto('/restaurant-admin/styling', { waitUntil: 'networkidle' });
+      await page.goto('/restaurant-admin/styling', { waitUntil: 'domcontentloaded' });
       await expectNoColorContrastViolations(page, 'admin/restaurant-admin/styling');
     });
 
     test('/admin', async ({ page, asSuperAdmin }) => {
       void asSuperAdmin;
       await page.setViewportSize(VIEWPORT);
-      await page.goto('/admin', { waitUntil: 'networkidle' });
+      await page.goto('/admin', { waitUntil: 'domcontentloaded' });
+      await expect(page.getByTestId('super-admin-page')).toBeVisible();
       await expectNoColorContrastViolations(page, 'admin/super-admin');
     });
   });

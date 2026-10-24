@@ -4,7 +4,7 @@ test.describe('Friendly API errors', () => {
   test('shows friendly network copy without raw fetch message', async ({ page, seed, asGuest }) => {
     void asGuest;
 
-    await page.route('**/orders/my**', async (route) => {
+    await page.route('**/users/me/pre-orders**', async (route) => {
       await route.abort('failed');
     });
 

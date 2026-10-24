@@ -21,7 +21,7 @@ export function useGuestOrders(restaurantId: string): UseGuestOrdersResult {
   const [error, setError] = useState<string | null>(null);
 
   const orders = cached?.data ?? [];
-  const loading = hydrated && Boolean(accessToken) && !cached;
+  const loading = hydrated && Boolean(accessToken) && !cached && !error;
 
   useEffect(() => {
     if (!hydrated || !accessToken) {

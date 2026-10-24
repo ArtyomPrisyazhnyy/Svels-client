@@ -113,7 +113,7 @@
   &--active {
     border-color: var(--rs-accent);
     background: var(--rs-accent);
-    color: var(--rs-surface);
+    color: var(--rs-on-accent, var(--rs-surface));
   }
 }
 

@@ -68,8 +68,8 @@ describe('restaurant theme token contrast', () => {
           background: theme.surface,
           minRatio: 4.5,
         },
-        { label: 'on-primary on primary', foreground: onPrimary, background: theme.primary, minRatio: 3 },
-        { label: 'on-accent on accent', foreground: onAccent, background: theme.accent, minRatio: 3 },
+        { label: 'on-primary on primary', foreground: onPrimary, background: theme.primary, minRatio: 4.5 },
+        { label: 'on-accent on accent', foreground: onAccent, background: theme.accent, minRatio: 4.5 },
         { label: 'link accent on bg', foreground: theme.accent, background: theme.bg, minRatio: 4.5 },
         {
           label: 'link accent on surface',

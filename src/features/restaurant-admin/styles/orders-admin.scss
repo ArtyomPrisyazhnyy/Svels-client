@@ -91,7 +91,7 @@
   width: 2.75rem;
   height: 1.5rem;
   flex-shrink: 0;
-  accent-color: var(--plat-0d9488);
+  accent-color: var(--plat-0f766e);
 }
 
 .orders-admin__toolbar {
@@ -127,7 +127,7 @@
   gap: 0.35rem;
 
   &--active {
-    border-color: var(--plat-0d9488);
+    border-color: var(--plat-0f766e);
     background: var(--plat-ecfdf5);
     color: var(--plat-0f766e);
   }
@@ -233,7 +233,7 @@
 
   dt {
     margin: 0;
-    color: var(--plat-94a3b8);
+    color: var(--plat-475569);
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -250,7 +250,7 @@
 }
 
 .orders-admin__tel {
-  color: var(--plat-0d9488);
+  color: var(--plat-0f766e);
   text-decoration: none;
   font-weight: 600;
 }
@@ -331,7 +331,7 @@
   }
 
   &--primary {
-    background: var(--plat-0d9488);
+    background: var(--plat-0f766e);
     color: var(--plat-ffffff);
   }
 
@@ -446,7 +446,7 @@
   margin: 0.35rem 0 0.75rem;
   text-align: right;
   font-size: 0.75rem;
-  color: var(--plat-94a3b8);
+  color: var(--plat-475569);
 }
 
 .orders-admin__modal-actions {
