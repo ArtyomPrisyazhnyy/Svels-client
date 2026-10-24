@@ -190,6 +190,43 @@ test.describe('Cart modal behavior', () => {
     await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
   });
 
+  test('счётчик — сумма количеств, не число строк', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    const line = buildLine();
+    line.quantity = 3;
+    await page.addInitScript(
+      ({ rid, cartItems }) => {
+        window.localStorage.setItem(
+          'svels-cart',
+          JSON.stringify({
+            state: {
+              version: 2,
+              restaurantId: rid,
+              items: cartItems,
+              checkoutByRestaurant: {},
+            },
+            version: 2,
+          }),
+        );
+      },
+      { rid: seed.restaurantId, cartItems: [line] },
+    );
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+    const opener = page.getByTestId('cart-button');
+    await expect(opener).toHaveAttribute('aria-label', 'Корзина, 3 товара');
+    await expect(page.getByTestId('cart-button-badge')).toHaveText('3');
+    await opener.click();
+    await expect(page.getByTestId('cart-items-header')).toContainText('3 товара');
+    await page
+      .getByTestId('cart-item-counter')
+      .getByRole('button', { name: 'Увеличить количество' })
+      .click();
+    await expect(page.getByTestId('cart-items-header')).toContainText('4 товара');
+    await page.getByTestId('cart-close').click();
+    await expect(page.getByTestId('cart-button-badge')).toHaveText('4');
+    await expect(opener).toHaveAttribute('aria-label', 'Корзина, 4 товара');
+  });
+
   test('степпер меняет количество в строке', async ({ page, seed, asGuest }) => {
     void asGuest;
     await seedCart(page, seed.restaurantId);

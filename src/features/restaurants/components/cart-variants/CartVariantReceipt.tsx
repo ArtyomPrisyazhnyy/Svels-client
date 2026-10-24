@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import { Button, Stack } from '@/shared/ui';
-import { formatCartItemsCount } from '../../utils/cart-items-label.util';
+import { formatCartItemsCount, sumCartQuantity } from '../../utils/cart-items-label.util';
 import { CartClearControl, CartCheckoutBar, CartEmptyNote } from '../CartBasket';
 import { CartQtyStepper } from '../CartLineRow';
 import { FulfillmentSelector } from '../FulfillmentSelector';
@@ -121,7 +121,7 @@ export function CartVariantReceipt({
         <div className="cart-receipt__bill">
           <div className="cart-receipt__bill-line">
             <span>Позиции</span>
-            <span>{formatCartItemsCount(lines.length)}</span>
+            <span>{formatCartItemsCount(sumCartQuantity(lines))}</span>
           </div>
           <p className="cart-receipt__note">Время: как можно скорее</p>
         </div>

@@ -44,7 +44,7 @@ Checkout rows (time, payment, address extras) already disclose one topic at a ti
 | --- | --- | --- | --- |
 | Receiving | Full-width segmented control at the top of the basket. No extra row and no sheet. | One chip with method, address, and time. The sheet holds the switch, the address, and the time, and stays open until “Готово”. | A bill line that expands the segmented control in place. No sheet. |
 | Lines | Grouped list. 48px photo or placeholder, name up to two lines, variant as muted text, price on the name’s baseline, 32×96 stepper at the bottom of the text. | 40px photo and name. Stepper under the text until 768px, then on the right. No per-line price. | Dashed bill. Name, dotted leader, price. Quiet stepper underneath. |
-| Total | “Итого” on the left, amount on the right, full-width “Оформить заказ” under them. | The amount lives inside the bottom button, next to “Оформить”. | Same bar as Сводка, button reads “Оплатить счёт”, plus a positions line on the bill. |
+| Total | “Итого” on the left, amount on the right, full-width “Оформить заказ” under them. The list header counts pieces (the sum of quantities): 1 товар, 2–4 товара, 5+ товаров, 11–14 товаров. | The amount lives inside the bottom button, next to “Оформить”. | Same bar as Сводка, button reads “Оплатить счёт”, plus a piece-count line on the bill. |
 
 All three use the same mocked lines on `/dev/cart-variants` (a long name, modifiers, a line with no photo). Quantity and the receiving method are shared across the tabs. Clearing the list shows the empty state.
 

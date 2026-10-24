@@ -9,7 +9,7 @@ import {
   type RestaurantOrderSettings,
 } from '@/shared/types/order-settings';
 import type { CartLineItem } from '@/shared/types/cart';
-import { formatCartItemsCount } from '../utils/cart-items-label.util';
+import { formatCartItemsCount, sumCartQuantity } from '../utils/cart-items-label.util';
 import { CartLineRow } from './CartLineRow';
 import { FulfillmentSelector } from './FulfillmentSelector';
 
@@ -114,7 +114,7 @@ export function CartBasketBody({
             testId="cart-items-header"
           >
             <span className="restaurant-cart-modal__list-header-title">
-              {formatCartItemsCount(items.length)}
+              {formatCartItemsCount(sumCartQuantity(items))}
             </span>
             <CartClearControl
               promptOpen={clearPromptOpen}
