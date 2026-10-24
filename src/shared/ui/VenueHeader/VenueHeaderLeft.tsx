@@ -51,6 +51,9 @@ export function VenueHeaderLeft({
           src={logoUrl}
           webpSrc={logoWebpUrl}
           alt=""
+          width={36}
+          height={36}
+          priority
         />
       ) : null}
       <span className="venue-header__brand-name">{restaurantName}</span>

@@ -15,7 +15,9 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report e2e/playwright-report",
-    "check:ui-tokens": "node scripts/check-ui-tokens.mjs"
+    "check:ui-tokens": "node scripts/check-ui-tokens.mjs",
+    "lighthouse": "node scripts/lighthouse/run.mjs",
+    "lighthouse:ci": "lhci autorun"
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
@@ -36,6 +38,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",
     "@eslint/js": "^9.39.1",
+    "@lhci/cli": "^0.14.0",
     "@playwright/test": "^1.62.0",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
@@ -45,6 +48,7 @@
     "eslint-config-next": "^15.5.4",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.6.0",
+    "lighthouse": "^12.8.2",
     "sass": "^1.101.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2"

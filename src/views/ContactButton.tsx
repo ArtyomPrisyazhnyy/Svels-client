@@ -1,7 +1,12 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import { ContactModal } from './ContactModal';
+
+const ContactModal = dynamic(
+  () => import('./ContactModal').then((module) => ({ default: module.ContactModal })),
+  { ssr: false },
+);
 
 /**
  * Кнопка «Оставить заявку» в шапке и hero-секции лендинга.

@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
   devIndicators: false,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [360, 390, 414, 640, 768, 1024, 1280],
+    imageSizes: [36, 48, 64, 96, 128, 256, 384],
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -45,6 +50,24 @@ const nextConfig: NextConfig = {
     }
 
     return [
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/fonts/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       {
         source: '/:path*',
         headers: productionSecurityHeaders,
