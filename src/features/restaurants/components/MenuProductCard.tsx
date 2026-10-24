@@ -38,7 +38,7 @@ export function MenuProductCard({
     ? `Подробнее: ${item.name}, ${item.variantLabel}`
     : `Подробнее: ${item.name}`;
 
-  function handleFavoriteClick(event: MouseEvent<HTMLButtonElement>) {
+  function handleFavoriteClick(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
     if (restaurantId) {
