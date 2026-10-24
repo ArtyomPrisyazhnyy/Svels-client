@@ -574,7 +574,12 @@ export default function StylingAdminPage() {
           {previewStyling && (
             <section className="styling-admin__preview-panel">
               <h3>Предпросмотр</h3>
-              <RestaurantStylingShell styling={previewStyling} className="styling-admin__preview" enableScrollToTop={false}>
+              <RestaurantStylingShell
+                styling={previewStyling}
+                className="styling-admin__preview"
+                loadAllRestaurantFonts
+                enableScrollToTop={false}
+              >
                 <header className="glass-header glass-header--tenant">
                   <div className="glass-header__brand">
                     <span className="glass-header__brand-name">Bistro Lotos</span>

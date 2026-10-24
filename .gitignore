@@ -18,6 +18,9 @@ dist-ssr
 !.env.example
 !e2e/.env.example
 
+# Lighthouse
+lighthouse-reports/
+
 # Playwright
 e2e/.auth/
 e2e/test-results/

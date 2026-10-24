@@ -75,6 +75,9 @@ export function RestaurantPublicHeader({
             src={logoUrl}
             webpSrc={logoWebpUrl}
             alt=""
+            width={36}
+            height={36}
+            priority
           />
         )}
         <span className="glass-header__brand-name">{restaurantName}</span>
