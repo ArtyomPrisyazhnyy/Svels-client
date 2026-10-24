@@ -125,11 +125,11 @@
   cursor: pointer;
 
   &--approve {
-    background: var(--plat-16a34a);
+    background: var(--plat-15803d);
     color: var(--plat-ffffff);
 
     &:hover:not(:disabled) {
-      background: var(--plat-15803d);
+      background: var(--plat-166534);
     }
   }
 

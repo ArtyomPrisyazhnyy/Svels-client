@@ -31,10 +31,12 @@ async function expectNoColorContrastViolations(
   page: import('@playwright/test').Page,
   context: string,
 ) {
-  const panel = page.locator('.ui-overlay-panel--active');
-  if (await panel.count()) {
+  const panels = page.locator('.ui-overlay-panel--active');
+  const panelCount = await panels.count();
+  for (let index = 0; index < panelCount; index += 1) {
+    const panel = panels.nth(index);
     await expect
-      .poll(async () => panel.first().evaluate((el) => getComputedStyle(el).opacity))
+      .poll(async () => panel.evaluate((el) => getComputedStyle(el).opacity))
       .toBe('1');
   }
   const results = await new AxeBuilder({ page }).withRules(['color-contrast']).analyze();
