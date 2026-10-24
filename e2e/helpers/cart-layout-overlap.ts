@@ -145,9 +145,19 @@ export async function assertCartMobileLayoutNoOverlap(page: Page): Promise<void>
       label: 'title vs back',
     },
     {
-      a: modal.locator('.restaurant-cart-modal__item-main').first(),
+      a: modal.locator('.restaurant-cart-modal__item-title').first(),
       b: modal.getByTestId('cart-item-counter').first(),
-      label: 'item main vs counter',
+      label: 'item title vs counter',
+    },
+    {
+      a: modal.locator('.restaurant-cart-modal__item-notes').first(),
+      b: modal.getByTestId('cart-item-counter').first(),
+      label: 'item notes vs counter',
+    },
+    {
+      a: modal.locator('.restaurant-cart-modal__item-price').first(),
+      b: modal.getByTestId('cart-item-counter').first(),
+      label: 'item price vs counter',
     },
     {
       a: modal.getByTestId('cart-modal-footer').locator('.restaurant-cart-modal__total'),
