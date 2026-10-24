@@ -197,7 +197,7 @@ const COLOR_THEMES: Record<RestaurantColorTheme, ThemeVars> = {
     text: '#713f12',
     textMuted: '#a16207',
     textSoft: '#fde047',
-    accent: '#ca8a04',
+    accent: '#a16207',
     primary: '#eab308',
     primaryHover: '#ca8a04',
     primarySoft: '#fef9c3',
