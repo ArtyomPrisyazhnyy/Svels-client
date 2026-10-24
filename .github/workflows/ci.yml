@@ -71,6 +71,11 @@ jobs:
       - name: Install Playwright Chromium (Lighthouse Chrome)
         run: npx playwright install chromium
 
+      - name: Start mock API for static generation
+        run: |
+          node scripts/lighthouse/mock-api.mjs &
+          sleep 2
+
       - name: Build production client
         env:
           NEXT_PUBLIC_API_URL: http://127.0.0.1:3000

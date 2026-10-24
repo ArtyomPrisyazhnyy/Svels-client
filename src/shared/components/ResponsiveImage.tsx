@@ -66,6 +66,8 @@ export function ResponsiveImage({
     }
 
     return (
+      // data:/external URLs and WebP fallbacks stay on <img> (picture/source).
+      // eslint-disable-next-line @next/next/no-img-element -- intentional non-optimizer paths
       <img
         src={fallback}
         alt={alt}
@@ -82,6 +84,7 @@ export function ResponsiveImage({
   return (
     <picture>
       <source srcSet={webp} type="image/webp" />
+      {/* eslint-disable-next-line @next/next/no-img-element -- WebP <picture> fallback */}
       <img
         src={fallback}
         alt={alt}

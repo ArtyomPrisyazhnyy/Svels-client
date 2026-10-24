@@ -20,6 +20,7 @@ dist-ssr
 
 # Lighthouse
 lighthouse-reports/
+.lighthouseci/
 
 # Playwright
 e2e/.auth/
