@@ -321,6 +321,7 @@
   line-height: 1.25;
   color: var(--rs-text);
   overflow: hidden;
+  overflow-wrap: break-word;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
