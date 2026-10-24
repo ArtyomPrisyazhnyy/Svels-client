@@ -211,6 +211,7 @@ export function SegmentedControl<T extends string>({
             role="radio"
             aria-checked={checked}
             disabled={option.disabled}
+            tabIndex={checked ? 0 : -1}
             className={optionClass}
             onClick={() => onChange(option.value)}
             data-testid={option.testId}

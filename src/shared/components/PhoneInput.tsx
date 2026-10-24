@@ -64,7 +64,7 @@ export function PhoneInput({
           disabled={disabled}
           className="phone-input__control"
           placeholder={PHONE_INPUT_NATIONAL_PLACEHOLDER}
-          aria-label={rest['aria-label'] ?? 'Номер телефона без кода страны'}
+          aria-label={rest['aria-label']}
           value={nationalValue}
           onChange={(event) => {
             const national = formatBelarusNationalInput(event.target.value);

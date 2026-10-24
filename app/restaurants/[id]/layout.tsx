@@ -58,7 +58,9 @@ export default async function RestaurantVenueLayout({
             flameDisplayEnabled={loyaltySettings.flameDisplayEnabled ?? false}
             favoritesEnabled={favoritesEnabled}
           />
-          <div className="venue-layout__content">{children}</div>
+          <main id="main-content" className="venue-layout__content" tabIndex={-1}>
+            {children}
+          </main>
         </div>
       </VenueOverlayProvider>
     </RestaurantStylingShell>

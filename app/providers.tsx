@@ -3,6 +3,7 @@
 import { Suspense, useEffect } from 'react';
 import { useAuthProfileSync } from '@/hooks/useAuthProfileSync';
 import { ScrollToTopButton } from '@/shared/components/ScrollToTopButton';
+import { SkipToContent } from '@/shared/ui/SkipToContent/SkipToContent';
 import { subscribeAuthLogoutCleanup } from '@/features/restaurants/session/clear-local-commerce-session';
 import { useAuthStore } from '@/store/auth.store';
 
@@ -20,6 +21,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthProfileSync>
+      <SkipToContent />
       {children}
       <Suspense fallback={null}>
         <ScrollToTopButton />

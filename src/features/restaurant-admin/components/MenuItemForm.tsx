@@ -346,8 +346,9 @@ export function MenuItemForm({
       {error && <p className="menu-item-form__error">{error}</p>}
 
       <div className="menu-item-form__field">
-        <label>Фотография (обложка) *</label>
+        <label htmlFor="item-cover-image">Фотография (обложка) *</label>
         <input
+          id="item-cover-image"
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={(e) => void handleImageChange(e.target.files?.[0])}

@@ -32,6 +32,7 @@ export function LandingPage() {
     <div className="landing" data-testid="landing-page">
       <LandingHeader />
 
+      <main id="main-content" tabIndex={-1}>
       <section className="landing__hero landing__container">
         <div className="landing__hero-copy">
           <Reveal className="landing__hero-badge">
@@ -74,6 +75,7 @@ export function LandingPage() {
       <LandingFeatures />
       <LandingPricing />
       <LandingFaq />
+      </main>
 
       <footer className="landing__footer">
         <div className="landing__container landing__footer-inner">

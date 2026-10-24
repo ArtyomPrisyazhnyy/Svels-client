@@ -31,9 +31,18 @@ export function Field({
   let control = children;
   if (isValidElement(children)) {
     const child = children as ReactElement<Record<string, unknown>>;
+    const existingDescribedBy = child.props['aria-describedby'];
+    const mergedDescribedBy =
+      [
+        typeof existingDescribedBy === 'string' ? existingDescribedBy : undefined,
+        errorId,
+        hintId,
+      ]
+        .filter(Boolean)
+        .join(' ') || undefined;
     control = cloneElement(child, {
       id: child.props.id ?? htmlFor,
-      'aria-describedby': describedBy,
+      'aria-describedby': mergedDescribedBy,
       'aria-invalid': error ? true : undefined,
     });
   }
@@ -58,7 +67,7 @@ export function Field({
         </p>
       ) : null}
       {error ? (
-        <p id={errorId} className="ui-field__error" role="alert">
+        <p id={errorId} className="ui-field__error" role="alert" aria-live="assertive">
           {error}
         </p>
       ) : null}
