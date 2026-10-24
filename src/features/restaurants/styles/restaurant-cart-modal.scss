@@ -298,18 +298,20 @@
 .restaurant-cart-modal__item-head,
 .restaurant-cart-modal__item-foot {
   display: flex;
-  gap: var(--space-3);
   min-width: 0;
 }
 
 .restaurant-cart-modal__item-head {
   align-items: baseline;
+  gap: var(--space-3);
 }
 
 .restaurant-cart-modal__item-foot {
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: flex-end;
+  column-gap: var(--space-3);
+  row-gap: var(--space-1);
 }
 
 .restaurant-cart-modal__item-title {
@@ -334,6 +336,11 @@
   flex-direction: column;
   gap: var(--space-1);
   min-width: calc(var(--space-10) * 2);
+}
+
+.restaurant-cart-modal__item-notes:has(.restaurant-cart-modal__modifiers) {
+  flex: 1 1 100%;
+  min-width: 0;
 }
 
 .restaurant-cart-modal__item-variant {
@@ -361,24 +368,13 @@
 .restaurant-cart-modal__item-price {
   flex: 0 0 auto;
   margin: 0;
-  font-size: var(--text-sm);
+  font-size: var(--text-md);
   font-weight: 700;
   line-height: 1.25;
   color: var(--rs-accent);
   text-align: end;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-
-  .byn-price {
-    align-items: baseline;
-    line-height: 1.25;
-    overflow: visible;
-  }
-
-  .byn-sign {
-    line-height: 1;
-    overflow: visible;
-  }
 }
 
 .restaurant-cart-modal__item-actions {
@@ -437,6 +433,15 @@
 
   &:active {
     transform: scale(0.96);
+  }
+
+  &:focus {
+    background: transparent;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--rs-accent);
+    outline-offset: 2px;
   }
 }
 
@@ -572,6 +577,20 @@
   line-height: 1.25;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.restaurant-cart-modal__panel .byn-price {
+  --byn-sign-scale: 1.18em;
+  align-items: baseline;
+  gap: calc(var(--space-1)/2);
+  line-height: 1.25;
+  overflow: visible;
+}
+
+.restaurant-cart-modal__panel .byn-price .byn-sign {
+  line-height: 1;
+  overflow: visible;
+  transform: none;
 }
 
 .restaurant-cart-modal__footer .restaurant-cart-modal__submit.ui-btn--full {

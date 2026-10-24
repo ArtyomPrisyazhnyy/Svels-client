@@ -31,7 +31,7 @@ Checkout rows (time, payment, address extras) already disclose one topic at a ti
 ## Principles
 
 - One basket surface, one radius, hairline separators, padding on the 4/8 scale (`--space-*` only).
-- The title clamps at two lines. Variant and modifiers are small muted lines. The price, always with two decimals, shares the title’s baseline at the trailing edge. A 32×96 stepper sits at the bottom of the last text line.
+- The title clamps at two lines. Variant and modifiers are small muted lines. Modifier lines use the full text width, so a stepper beside them cannot break «Молоко: Овсяное». The price, always with two decimals, is 16px and bold and shares the title’s baseline at the trailing edge. The currency mark is 1.18em of that size, 2px from the digits, on the same baseline, including «Итого». A 32×96 stepper sits at the bottom right: beside a short variant, and under the modifiers when those lines are present. Its resting background is empty.
 - Quantity is that compact stepper, not a full-bleed bar. The checkout button stays a 44px target.
 - Two to four choices stay a `SegmentedControl`. Receiving is that control, full width, at the top of the basket. Only methods the venue enables are shown. There is no second modal.
 - The primary button is the bottom control in the thumb zone. The total is a label plus an amount directly above it, so the price is readable without opening the button.
@@ -43,7 +43,7 @@ Checkout rows (time, payment, address extras) already disclose one topic at a ti
 | | Сводка | Док | Чек |
 | --- | --- | --- | --- |
 | Receiving | Full-width segmented control at the top of the basket. No extra row and no sheet. | One chip with method, address, and time. The sheet holds the switch, the address, and the time, and stays open until “Готово”. | A bill line that expands the segmented control in place. No sheet. |
-| Lines | Grouped list. 48px photo or placeholder, name up to two lines, variant as muted text, price on the name’s baseline, 32×96 stepper at the bottom of the text. | 40px photo and name. Stepper under the text until 768px, then on the right. No per-line price. | Dashed bill. Name, dotted leader, price. Quiet stepper underneath. |
+| Lines | Grouped list. 48px photo or placeholder, name up to two lines, variant as muted text, modifiers full width, 16px price on the name’s baseline, 32×96 stepper at the bottom right. | 40px photo and name. Stepper under the text until 768px, then on the right. No per-line price. | Dashed bill. Name, dotted leader, price. Quiet stepper underneath. |
 | Total | “Итого” on the left, amount on the right, full-width “Оформить заказ” under them. The list header counts pieces (the sum of quantities): 1 товар, 2–4 товара, 5+ товаров, 11–14 товаров. | The amount lives inside the bottom button, next to “Оформить”. | Same bar as Сводка, button reads “Оплатить счёт”, plus a piece-count line on the bill. |
 
 All three use the same mocked lines on `/dev/cart-variants` (a long name, modifiers, a line with no photo). Quantity and the receiving method are shared across the tabs. Clearing the list shows the empty state.
