@@ -47,17 +47,17 @@ export const FULFILLMENT_OPTIONS: FulfillmentOption[] = [
   {
     key: 'fulfillmentDelivery',
     title: 'Доставка',
-    description: 'Клиент получает заказ по указанному адресу.',
+    description: 'Вы привозите заказ по адресу гостя. Включайте, только если доставка у вас уже есть.',
   },
   {
     key: 'fulfillmentTakeaway',
     title: 'Самовывоз',
-    description: 'Клиент забирает заказ и уносит с собой — как кофе в бумажном стаканчике.',
+    description: 'Гость забирает заказ с собой. Для кофейни это основной способ.',
   },
   {
     key: 'fulfillmentDineIn',
     title: 'На месте',
-    description: 'Клиент потребляет заказ в заведении — как кофе в стеклянной кружке.',
+    description: 'Гость ест и пьёт у вас в зале.',
   },
 ];
 
@@ -90,17 +90,17 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
   {
     key: 'paymentCash',
     title: 'Наличными',
-    description: 'Оплата наличными при получении заказа.',
+    description: 'Гость платит наличными при получении. Для запуска этого достаточно.',
   },
   {
     key: 'paymentCardOnSite',
     title: 'Картой на месте',
-    description: 'Оплата картой при получении — в зале или на кассе.',
+    description: 'Гость платит картой на вашей кассе. Деньги идут на ваш терминал, не в Svels.',
   },
   {
     key: 'paymentOnline',
     title: 'Онлайн',
-    description: 'Предоплата или оплата картой через приложение до получения.',
+    description: 'Гость платит картой на сайте. Нужен магазин bePaid, иначе выключите этот пункт.',
   },
 ];
 

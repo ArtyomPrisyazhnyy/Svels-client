@@ -22,12 +22,14 @@ function SettingsToggle({
   description,
   checked,
   disabled,
+  testId,
   onChange,
 }: {
   title: string;
   description: string;
   checked: boolean;
   disabled?: boolean;
+  testId?: string;
   onChange: (checked: boolean) => void;
 }) {
   return (
@@ -41,6 +43,7 @@ function SettingsToggle({
         className="order-settings-admin__toggle"
         checked={checked}
         disabled={disabled}
+        data-testid={testId}
         onChange={(e) => onChange(e.target.checked)}
       />
     </label>
@@ -88,6 +91,7 @@ export default function OrderSettingsAdminPage() {
   }, [restaurantId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadSettings();
   }, [loadSettings]);
 
@@ -154,12 +158,13 @@ export default function OrderSettingsAdminPage() {
         <div>
           <h2>Условия заказа</h2>
           <p className="order-settings-admin__intro">
-            Выберите, как гости могут получать предзаказы и чем им разрешено платить.
+            По умолчанию включены самовывоз, заказ в зале, наличные и карта на кассе. Доставка выключена. Онлайн включён, но без bePaid он ломает оплату — выключите его, если договора с bePaid нет.
           </p>
         </div>
         <button
           type="button"
           className="order-settings-admin__save"
+          data-testid="order-settings-save"
           disabled={saving || loading || !hasChanges}
           onClick={() => void handleSave()}
         >
@@ -187,6 +192,7 @@ export default function OrderSettingsAdminPage() {
                   description={option.description}
                   checked={Boolean(draft[option.key])}
                   disabled={saving}
+                  testId={`order-toggle-${option.key}`}
                   onChange={(value) => handleToggle(option.key, value)}
                 />
               ))}
@@ -206,6 +212,7 @@ export default function OrderSettingsAdminPage() {
                   description={option.description}
                   checked={Boolean(draft[option.key])}
                   disabled={saving}
+                  testId={`order-toggle-${option.key}`}
                   onChange={(value) => handleToggle(option.key, value)}
                 />
               ))}
