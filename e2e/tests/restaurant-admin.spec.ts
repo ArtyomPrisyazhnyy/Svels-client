@@ -7,6 +7,18 @@ const ADMIN_SECTIONS: Array<{
   heading?: RegExp;
 }> = [
   {
+    path: '/restaurant-admin/launch',
+    navTestId: 'nav-launch',
+    assert: 'heading',
+    heading: /Запуск сайта/i,
+  },
+  {
+    path: '/restaurant-admin/hours',
+    navTestId: 'nav-hours',
+    assert: 'heading',
+    heading: /Часы работы/i,
+  },
+  {
     path: '/restaurant-admin/preview',
     navTestId: 'nav-preview',
     assert: 'heading',

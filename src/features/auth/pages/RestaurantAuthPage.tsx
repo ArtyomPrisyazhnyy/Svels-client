@@ -65,18 +65,18 @@ export function RestaurantAuthPage() {
     setSuccess(null);
 
     if (password !== confirmPassword) {
-      setError('Пароли не совпадают');
+      setError('Пароли не совпадают. Введите один и тот же пароль в оба поля — без лишнего пробела в конце.');
       return;
     }
 
     if (!/^\d{9}$/.test(unp)) {
-      setError('УНП должен содержать 9 цифр');
+      setError('УНП — ровно 9 цифр из свидетельства о регистрации. Пример: 123456789. Буквы и пробелы не подходят.');
       return;
     }
 
     const filledLocations = locations.filter((l) => l.address.trim() && l.city.trim());
     if (!filledLocations.length) {
-      setError('Укажите город и адрес хотя бы одной точки');
+      setError('Нужны и город, и адрес хотя бы одной точки. Пример: Минск, ул. Немига 5. Пустую строку мы не сохраняем.');
       return;
     }
 
@@ -84,9 +84,9 @@ export function RestaurantAuthPage() {
 
     try {
       const auth = await register({ email, password, firstName, lastName });
-      setAuth(auth.accessToken, auth.user);
 
-      await registerRestaurant(auth.accessToken, {
+      try {
+        await registerRestaurant(auth.accessToken, {
         name: businessName,
         unp,
         description: description || undefined,
@@ -98,11 +98,22 @@ export function RestaurantAuthPage() {
         })),
       });
 
-      setSuccess(
-        'Заявка отправлена на модерацию. После одобления суперадминистратором вы получите доступ к панели заведения.',
-      );
+      } catch (err) {
+        setError(
+          err instanceof ApiError
+            ? `Аккаунт создан, но заявка не ушла: ${err.message}. Откройте вкладку «Уже есть аккаунт» и войдите этим email — повторно регистрироваться не нужно.`
+            : 'Аккаунт создан, но заявка не ушла. Войдите через «Уже есть аккаунт» и отправьте её ещё раз.',
+        );
+        return;
+      }
+
+      setAuth(auth.accessToken, auth.user);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось отправить заявку');
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'Не удалось отправить заявку. Проверьте email и пароль и попробуйте ещё раз.',
+      );
     } finally {
       setLoading(false);
     }
@@ -114,9 +125,9 @@ export function RestaurantAuthPage() {
         <Link href="/" className="auth-card__back">
           ← На главную
         </Link>
-        <h1 className="auth-card__title">Для заведений</h1>
+        <h1 className="auth-card__title">Запуск заведения</h1>
         <p className="auth-card__subtitle">
-          Регистрация ресторана, бара или кофейни. Сети могут указать несколько точек.
+          Ресторан, кафе, кофейня или цветочный. Сначала заявка, после проверки — меню, часы и сайт. Сеть можно отметить, если точек несколько.
         </p>
 
         <div className="auth-tabs">
@@ -149,13 +160,15 @@ export function RestaurantAuthPage() {
         {tab === 'login' ? (
           <div>
             <p className="restaurant-auth__hint">
-              Войдите аккаунтом администратора заведения. Если заявка ещё на модерации — дождитесь
-              одобрения.
+              Войдите тем же email и паролем, что при заявке. Если заявка ещё на проверке, откроется статус, а не меню.
             </p>
             {error && <p className="auth-error">{error}</p>}
             <LoginForm
               onSuccess={() => {
                 const role = useAuthStore.getState().user?.role ?? 'user';
+                if (role === 'user') {
+                  return;
+                }
                 router.replace(getPostAuthPath(role));
               }}
             />
@@ -213,6 +226,9 @@ export function RestaurantAuthPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <p className="restaurant-auth__hint">
+                Не короче 8 символов. Запомните его: после проверки заявки вход только с этим паролем.
+              </p>
               <PasswordInput
                 id="rest-confirm"
                 label="Подтвердите пароль"
@@ -241,12 +257,14 @@ export function RestaurantAuthPage() {
                   id="rest-unp"
                   required
                   inputMode="numeric"
-                  pattern="\d{9}"
                   maxLength={9}
                   placeholder="123456789"
                   value={unp}
                   onChange={(e) => setUnp(e.target.value.replace(/\D/g, '').slice(0, 9))}
                 />
+                <p className="restaurant-auth__hint" data-testid="auth-unp-hint">
+                  9 цифр из свидетельства о государственной регистрации. Это не номер телефона и не расчётный счёт.
+                </p>
               </div>
               <label className="restaurant-auth__checkbox">
                 <input
@@ -321,14 +339,14 @@ export function RestaurantAuthPage() {
               )}
             </fieldset>
 
-            <button className="auth-submit" type="submit" disabled={loading || !!success}>
+            <button className="auth-submit" type="submit" disabled={loading || !!success} data-testid="auth-register-submit">
               {loading ? 'Отправка…' : 'Отправить заявку'}
             </button>
           </form>
         )}
 
         <p className="auth-card__footer">
-          Уже подавали заявку на подключение? Перейдите на вкладку «Вход».
+          Уже отправляли заявку? Откройте вкладку «Уже есть аккаунт».
         </p>
       </div>
     </div>

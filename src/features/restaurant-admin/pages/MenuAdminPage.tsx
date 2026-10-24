@@ -193,7 +193,14 @@ export default function MenuAdminPage() {
           {loading ? (
             <p className="menu-admin__empty">Загрузка…</p>
           ) : sortedCategories.length === 0 ? (
-            <p className="menu-admin__empty">Пока нет категорий и позиций.</p>
+            <div data-testid="menu-empty">
+              <p className="menu-admin__empty">
+                Меню пустое — гости не смогут ничего заказать. Сначала категория, например «Кофе», затем позиция с фото и ценой.
+              </p>
+              <button type="button" className="menu-admin__edit" onClick={() => document.getElementById('new-category')?.focus()}>
+                Создать категорию
+              </button>
+            </div>
           ) : (
             sortedCategories.map((category, categoryIndex) => (
               <div key={category.id} className="menu-admin__category" data-testid={`menu-category-${category.id}`}>
@@ -244,7 +251,7 @@ export default function MenuAdminPage() {
                   </div>
                 </div>
                 {category.items.length === 0 ? (
-                  <p className="menu-admin__empty">Нет позиций</p>
+                  <p className="menu-admin__empty">В «{category.name}» пока нет позиций. Добавьте блюдо слева: фото, название и цена.</p>
                 ) : (
                   <ul className="menu-admin__items">
                     {category.items.map((item) => (

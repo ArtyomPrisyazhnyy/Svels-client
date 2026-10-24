@@ -12,6 +12,7 @@ import type { LoyaltySettings } from '../../../shared/types/loyalty-settings';
 import type { PromoBanner } from '../../../shared/types/promo-banner';
 import type { SocialLink } from '../../../shared/types/social-link';
 import { useAuthStore } from '../../../store/auth.store';
+import { markPreviewSeen } from '../launch/launch-checklist';
 import { fetchRestaurantPreview } from '../api/restaurant-preview.api';
 import '../styles/restaurant-page-preview.scss';
 
@@ -53,8 +54,15 @@ export default function RestaurantPagePreview() {
   }, [restaurantId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadPreview();
   }, [loadPreview]);
+
+  useEffect(() => {
+    if (restaurantId && restaurant) {
+      markPreviewSeen(restaurantId);
+    }
+  }, [restaurant, restaurantId]);
 
   if (!restaurantId) {
     return (
@@ -70,7 +78,7 @@ export default function RestaurantPagePreview() {
         <div>
           <h2 className="restaurant-page-preview__title">Страница заведения</h2>
           <p className="restaurant-page-preview__hint">
-            Так вашу страницу видят гости — без доступа к админ-панели.
+            Так страницу видит гость. Если меню пустое или нет часов — вернитесь в «Запуск» и закройте эти шаги, прежде чем отправлять ссылку.
           </p>
         </div>
         {restaurant && (
@@ -91,6 +99,11 @@ export default function RestaurantPagePreview() {
         <p className="restaurant-page-preview__empty">Загрузка…</p>
       ) : restaurant && orderSettings && styling ? (
         <div className="restaurant-page-preview__frame">
+          {menu.categories.every((category) => category.items.length === 0) ? (
+            <p className="restaurant-page-preview__error" data-testid="preview-empty-menu">
+              Гости увидят пустое меню. Добавьте хотя бы одну позицию с фото в разделе «Меню».
+            </p>
+          ) : null}
           <RestaurantPublicPage
             restaurant={restaurant}
             menu={menu}

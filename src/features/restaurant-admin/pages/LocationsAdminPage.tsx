@@ -53,6 +53,7 @@ export default function LocationsAdminPage() {
   }, [restaurantId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadLocations();
   }, [loadLocations]);
 
@@ -172,8 +173,7 @@ export default function LocationsAdminPage() {
       <section className="locations-admin__panel">
         <h2>{editing ? 'Редактирование точки' : 'Новая точка'}</h2>
         <p className="locations-admin__hint">
-          Нужна хотя бы одна точка. Укажите город, адрес и поставьте метку на карте — гости
-          выберут её при заказе на месте или навынос.
+          Нужна хотя бы одна точка. Город и адрес — как на вывеске, например Минск, ул. Немига 5. Метку можно поставить кнопкой «Найти на карте» или кликом. Гости выбирают эту точку при самовывозе и заказе в зале.
         </p>
 
         {error ? <p className="locations-admin__error">{error}</p> : null}

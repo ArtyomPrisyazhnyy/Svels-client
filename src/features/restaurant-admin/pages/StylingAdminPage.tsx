@@ -215,13 +215,13 @@ export default function StylingAdminPage() {
         <div>
           <h2>Стилизация</h2>
           <p className="styling-admin__intro">
-            Настройте внешний вид страницы заведения для гостей: шрифт, цвета, кнопки и переключатель
-            способа получения заказа.
+            Для запуска хватит шрифта, цветовой темы и вида карточки. Классическая тема уже включена — сайт можно открывать и так. Кнопки, шапка и подвал спрятаны ниже: их можно не трогать.
           </p>
         </div>
         <button
           type="button"
           className="styling-admin__save"
+          data-testid="styling-save"
           disabled={saving || loading || !hasChanges}
           onClick={() => void handleSave()}
         >
@@ -295,6 +295,8 @@ export default function StylingAdminPage() {
               </div>
             </section>
 
+            <details className="styling-admin__more">
+              <summary className="styling-admin__more-summary">Кнопки и переключатель — можно не менять</summary>
             <section className="styling-admin__panel">
               <h3>Форма кнопок</h3>
               <div className="styling-admin__options">
@@ -367,6 +369,7 @@ export default function StylingAdminPage() {
               </div>
             </section>
 
+            </details>
             <section className="styling-admin__panel">
               <h3>Стиль карточек товара</h3>
               <div className="styling-admin__options styling-admin__options--switcher">
@@ -450,12 +453,12 @@ export default function StylingAdminPage() {
               </label>
             </section>
 
+            <details className="styling-admin__more">
+              <summary className="styling-admin__more-summary">Шапка, подвал, валюта и избранное</summary>
             <section className="styling-admin__panel">
               <h3>Избранное</h3>
               <p className="styling-admin__hint">
-                Сердечки на карточках и в карточке позиции, вкладка «Избранное» в мобильном
-                приложении. После выключения нужна пересборка white-label приложения, чтобы
-                экран избранного не попал в бандл.
+                Сердечки на карточках. Для сайта включено по умолчанию. Выключайте, только если избранное не нужно гостям.
               </p>
               <label className="styling-admin__toggle-option">
                 <span className="styling-admin__toggle-copy">
@@ -569,6 +572,7 @@ export default function StylingAdminPage() {
                 ))}
               </div>
             </section>
+            </details>
           </div>
 
           {previewStyling && (

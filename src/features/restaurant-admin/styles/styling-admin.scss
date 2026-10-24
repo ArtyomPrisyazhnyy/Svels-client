@@ -302,3 +302,23 @@
     cursor: not-allowed;
   }
 }
+
+.styling-admin__more {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--rs-border);
+  border-radius: var(--radius-md);
+  background: var(--rs-surface);
+}
+
+.styling-admin__more-summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--control-h-md);
+  color: var(--rs-text);
+  font-size: var(--text-md);
+  font-weight: 600;
+  cursor: pointer;
+}

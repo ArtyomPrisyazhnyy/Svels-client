@@ -58,6 +58,7 @@ export default function BookingSettingsAdminPage() {
   }, [restaurantId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadSettings();
   }, [loadSettings]);
 
@@ -201,7 +202,7 @@ export default function BookingSettingsAdminPage() {
           <section className="order-settings-admin__panel">
             <h3>Параметры слотов</h3>
             <p className="order-settings-admin__hint">
-              Доступные времена брони генерируются из графика работы с указанным шагом.
+              Время слотов берётся из раздела «Часы работы». Если часы не заданы, гость не увидит свободное время.
             </p>
             <label className="order-settings-admin__field">
               <span>Шаг слота</span>
