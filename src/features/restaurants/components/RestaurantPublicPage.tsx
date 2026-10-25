@@ -206,7 +206,7 @@ export function RestaurantPublicPage({
 
   if (embedded) {
     return (
-      <RestaurantStylingShell styling={styling}>
+      <RestaurantStylingShell styling={styling} loadAllRestaurantFonts>
         {body}
       </RestaurantStylingShell>
     );

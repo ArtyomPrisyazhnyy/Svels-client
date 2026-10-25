@@ -44,6 +44,10 @@ export function RestaurantMenuCatalog({
   const showStandaloneNav =
     styling.menuCategoryNavEnabled && categories.length > 1 && navContext === null;
 
+  const firstMenuImageItemId = categories
+    .flatMap((category) => category.items)
+    .find((item) => Boolean(item.imageUrl))?.id;
+
   if (categories.length === 0) {
     return (
       <section className="restaurant-menu" data-testid="restaurant-menu">
@@ -73,15 +77,20 @@ export function RestaurantMenuCatalog({
         >
           <h2 className="restaurant-menu__category-title">{category.name}</h2>
           <div className="restaurant-menu__grid">
-            {category.items.map((item) => (
-              <MenuProductCard
-                key={item.id}
-                restaurantId={restaurantId}
-                item={item}
-                onSelect={setSelectedItem}
-                onPreload={preloadMenuProductDetailModal}
-              />
-            ))}
+            {category.items.map((item) => {
+              const isFirstImage = item.id === firstMenuImageItemId;
+              return (
+                <MenuProductCard
+                  key={item.id}
+                  restaurantId={restaurantId}
+                  item={item}
+                  onSelect={setSelectedItem}
+                  onPreload={preloadMenuProductDetailModal}
+                  priority={isFirstImage}
+                  imageLoading={isFirstImage ? 'eager' : 'lazy'}
+                />
+              );
+            })}
           </div>
         </div>
       ))}

@@ -54,6 +54,53 @@ jobs:
         continue-on-error: true
         run: node scripts/check-ui-tokens.mjs
 
+  lighthouse:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3001
+      LIGHTHOUSE_RESTAURANT_ID: 00000000-0000-4000-8000-000000000001
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium (Lighthouse Chrome)
+        run: npx playwright install chromium
+
+      - name: Start mock API for static generation
+        run: |
+          node scripts/lighthouse/mock-api.mjs &
+          sleep 2
+
+      - name: Build production client
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:3000
+          NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3001
+        run: npm run build
+
+      - name: Lighthouse CI (mobile, 3 key pages)
+        env:
+          CHROME_PATH: ${{ github.workspace }}/.cache/ms-playwright/chromium-*/chrome-linux64/chrome
+        run: |
+          CHROME_BIN=$(find "$HOME/.cache/ms-playwright" -path '*/chrome-linux64/chrome' -type f | head -1)
+          export CHROME_PATH="$CHROME_BIN"
+          npm run lighthouse:ci
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: lighthouse-reports/
+          if-no-files-found: ignore
+
   e2e:
     runs-on: ubuntu-latest
     env:

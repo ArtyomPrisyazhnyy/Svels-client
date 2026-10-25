@@ -36,7 +36,7 @@ export function DevUiPlayground({ theme }: DevUiPlaygroundProps) {
   };
 
   return (
-    <RestaurantStylingShell styling={styling} enableScrollToTop={false}>
+    <RestaurantStylingShell styling={styling} loadAllRestaurantFonts enableScrollToTop={false}>
       <Stack gap={8} className="dev-ui-playground__stack">
         <UiTokensBoard />
         <UiPrimitivesBoard />

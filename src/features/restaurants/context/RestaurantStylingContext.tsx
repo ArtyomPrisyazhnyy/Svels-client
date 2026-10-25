@@ -26,6 +26,10 @@ interface RestaurantStylingShellProps {
   styling: RestaurantStyling;
   children: ReactNode;
   className?: string;
+  /** Один класс next/font для активного шрифта (публичные страницы). */
+  fontVariableClass?: string;
+  /** true — подключить все паки шрифтов (превью в админке). */
+  loadAllRestaurantFonts?: boolean;
   /** false — для встроенного превью в админке (кнопка не уходит в body). */
   enableScrollToTop?: boolean;
 }
@@ -34,16 +38,21 @@ function RestaurantStylingRoot({
   styling,
   className,
   children,
+  fontVariableClass,
+  loadAllRestaurantFonts,
 }: {
   styling: RestaurantStyling;
   className?: string;
   children: ReactNode;
+  fontVariableClass?: string;
+  loadAllRestaurantFonts?: boolean;
 }) {
   const cssVars = buildRestaurantStylingVars(styling) as CSSProperties;
   const domProps = getRestaurantStylingDomProps(styling);
-  const rootClassName = ['restaurant-styled', RESTAURANT_FONT_CLASSES, className]
-    .filter(Boolean)
-    .join(' ');
+  const fontClasses = loadAllRestaurantFonts
+    ? RESTAURANT_FONT_CLASSES
+    : (fontVariableClass ?? '');
+  const rootClassName = ['restaurant-styled', fontClasses, className].filter(Boolean).join(' ');
 
   return (
     <div
@@ -61,6 +70,8 @@ export function RestaurantStylingShell({
   styling,
   children,
   className,
+  fontVariableClass,
+  loadAllRestaurantFonts = false,
   enableScrollToTop = true,
 }: RestaurantStylingShellProps) {
   return (
@@ -70,7 +81,12 @@ export function RestaurantStylingShell({
         currencyDisplay: styling.currencyDisplay,
       }}
     >
-      <RestaurantStylingRoot styling={styling} className={className}>
+      <RestaurantStylingRoot
+        styling={styling}
+        className={className}
+        fontVariableClass={fontVariableClass}
+        loadAllRestaurantFonts={loadAllRestaurantFonts}
+      >
         {children}
         {enableScrollToTop ? <RestaurantStylingScrollToTop /> : null}
       </RestaurantStylingRoot>

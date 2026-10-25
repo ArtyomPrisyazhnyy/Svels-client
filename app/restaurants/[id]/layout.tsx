@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { RestaurantStylingShell } from '@/features/restaurants/context/RestaurantStylingContext';
+import { loadRestaurantFontVariableClass } from '@/features/restaurants/fonts/load-restaurant-font';
 import { VenueOverlayProvider } from '@/features/restaurants/context/VenueOverlayContext';
 import { VenueHeader } from '@/shared/ui/VenueHeader/VenueHeader';
 import {
@@ -40,9 +41,10 @@ export default async function RestaurantVenueLayout({
 
   const favoritesEnabled = styling.favoritesEnabled !== false;
   const bookingEnabled = bookingSettings.bookingEnabled ?? false;
+  const fontVariableClass = await loadRestaurantFontVariableClass(styling.fontFamily);
 
   return (
-    <RestaurantStylingShell styling={styling}>
+    <RestaurantStylingShell styling={styling} fontVariableClass={fontVariableClass}>
       <VenueOverlayProvider
         restaurantId={restaurant.id}
         restaurantName={restaurant.name}
