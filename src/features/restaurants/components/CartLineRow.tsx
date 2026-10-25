@@ -59,7 +59,7 @@ export function CartLineRow({ line, onDecrement, onIncrement }: CartLineRowProps
   const hasNotes = Boolean(line.variantLabel) || line.modifiers.length > 0;
 
   return (
-    <li className="restaurant-cart-modal__item">
+    <li className="restaurant-cart-modal__item" data-testid="cart-line">
       <div className="restaurant-cart-modal__item-media">
         {line.imageUrl ? (
           <ResponsiveImage src={line.imageUrl} webpSrc={line.imageWebpUrl} alt="" />

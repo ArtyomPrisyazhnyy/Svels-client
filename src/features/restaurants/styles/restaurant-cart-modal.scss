@@ -1,9 +1,17 @@
 .ui-modal--cart-sheet {
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  /* svh keeps the sheet inside the toolbar; dvh tracks the visible viewport. */
+  height: 100svh;
+  height: 100dvh;
+  max-height: 100svh;
+  max-height: 100dvh;
   padding: var(--space-4) 0 0;
   box-sizing: border-box;
 
   @media (min-width: 768px) {
+    justify-content: center;
     align-items: center;
     padding: var(--space-8);
   }
@@ -68,6 +76,10 @@
 
 .restaurant-cart-modal__panel.ui-overlay-panel {
   --cart-footer-block: 0px;
+  flex: 0 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-height: calc(100svh - var(--space-4));
   max-height: calc(100dvh - var(--space-4));
   background-color: var(--rs-cart-surface, var(--rs-surface));
   backdrop-filter: none;
@@ -77,8 +89,14 @@
   isolation: isolate;
 
   @media (min-width: 768px) {
-    max-height: min(92vh, 760px);
+    max-height: min(92svh, 760px);
+    max-height: min(92dvh, 760px);
     border-radius: var(--rs-card-radius, var(--radius-xl));
+  }
+
+  > .ui-overlay-panel__header,
+  > .ui-overlay-panel__footer {
+    flex-shrink: 0;
   }
 
   .ui-overlay-panel__header {
@@ -107,6 +125,7 @@
 
 .restaurant-cart-modal__list-header {
   box-sizing: border-box;
+  flex-shrink: 0;
   width: 100%;
   min-height: var(--control-h-md);
   min-width: 0;
@@ -131,6 +150,7 @@
 .restaurant-cart-modal__fulfillment-block {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   gap: var(--space-4);
   width: 100%;
   min-width: 0;
@@ -148,10 +168,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: var(--space-4);
   background-color: var(--rs-cart-canvas, var(--rs-cart-surface, var(--rs-surface)));
   scrollbar-width: none;
@@ -161,6 +183,10 @@
     width: 0;
     height: 0;
   }
+}
+
+.restaurant-cart-modal__body--basket {
+  overflow: hidden;
 }
 
 .restaurant-cart-modal__panel .ui-icon-btn {
@@ -233,6 +259,10 @@
 }
 
 .restaurant-cart-modal__list-card {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
   min-width: 0;
   border: 1px solid var(--rs-border);
   border-radius: var(--rs-card-radius, var(--radius-lg));
@@ -245,9 +275,22 @@
   margin: 0;
   padding: 0;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 0;
+  min-height: 0;
   min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 }
 
 .restaurant-cart-modal__item {
@@ -496,6 +539,7 @@
 }
 
 .restaurant-cart-modal__paused {
+  flex-shrink: 0;
   margin: 0;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
@@ -515,6 +559,7 @@
 }
 
 .restaurant-cart-modal__error {
+  flex-shrink: 0;
   background: color-mix(in srgb, var(--rs-danger) 12%, var(--rs-surface));
   color: var(--rs-danger);
 }
