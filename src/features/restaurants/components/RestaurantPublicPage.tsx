@@ -37,6 +37,7 @@ import { VenueNavHeightSync } from './VenueNavHeightSync';
 import { RestaurantPublicHeader } from './RestaurantPublicHeader';
 import { RestaurantFooter } from './RestaurantFooter';
 import '../styles/restaurant-public.scss';
+import '../styles/venue-layout.scss';
 
 interface RestaurantPublicPageProps {
   restaurant: PublicRestaurant;
@@ -90,7 +91,11 @@ function RestaurantPublicPageBody({
     >
       {embedded ? <RestaurantPublicHeader {...headerProps} /> : null}
 
-      <main className="restaurant-public__main">
+      <main
+        className="restaurant-public__main venue-menu-frame"
+        data-testid="venue-menu-frame"
+        data-venue-menu-frame=""
+      >
         <h1>{restaurant.name}</h1>
         <p className="restaurant-public__address">{restaurant.address}</p>
 

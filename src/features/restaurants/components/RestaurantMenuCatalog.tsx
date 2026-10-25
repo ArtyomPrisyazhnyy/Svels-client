@@ -8,7 +8,7 @@ import { useRestaurantStylingOptional } from '../context/RestaurantStylingContex
 import { useMenuCategoryNavOptional } from '../context/MenuCategoryNavContext';
 import { getAvailableMenuCategories } from '../utils/menu-catalog.util';
 import { MenuCategoryNav } from './MenuCategoryNav';
-import { MenuProductCard } from './MenuProductCard';
+import { MenuProductGrid } from './MenuProductGrid';
 import '../styles/restaurant-menu.scss';
 
 const MenuProductDetailModal = dynamic(
@@ -72,17 +72,12 @@ export function RestaurantMenuCatalog({
           className="restaurant-menu__category"
         >
           <h2 className="restaurant-menu__category-title">{category.name}</h2>
-          <div className="restaurant-menu__grid">
-            {category.items.map((item) => (
-              <MenuProductCard
-                key={item.id}
-                restaurantId={restaurantId}
-                item={item}
-                onSelect={setSelectedItem}
-                onPreload={preloadMenuProductDetailModal}
-              />
-            ))}
-          </div>
+          <MenuProductGrid
+            restaurantId={restaurantId}
+            items={category.items}
+            onSelect={setSelectedItem}
+            onPreload={preloadMenuProductDetailModal}
+          />
         </div>
       ))}
 

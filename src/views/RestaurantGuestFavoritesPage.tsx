@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useFavoritesPersistReady, useHydrateFavorites } from '@/hooks/useHydrateFavorites';
-import { MenuProductCard } from '@/features/restaurants/components/MenuProductCard';
+import { MenuProductGrid } from '@/features/restaurants/components/MenuProductGrid';
 import { GuestFavoritesPageSkeleton } from '@/features/restaurants/components/guest-page-skeletons/GuestPageSkeletons';
 import { getAvailableMenuCategories } from '@/features/restaurants/utils/menu-catalog.util';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
@@ -149,8 +149,9 @@ export function RestaurantGuestFavoritesPage({
   return (
     <>
       <main
-        className="venue-subpage__main restaurant-favorites-page__main"
+        className="venue-menu-frame restaurant-favorites-page__main"
         data-testid="guest-favorites-page"
+        data-venue-menu-frame=""
       >
         <Stack gap={4} className="venue-subpage__stack">
           <PageTitle
@@ -174,17 +175,13 @@ export function RestaurantGuestFavoritesPage({
               </Link>
             </div>
           ) : (
-            <div className="restaurant-menu__grid" data-testid="guest-page-first-block">
-              {favoriteItems.map((item) => (
-                <MenuProductCard
-                  key={item.id}
-                  restaurantId={restaurantId}
-                  item={item}
-                  onSelect={setSelectedItem}
-                  imageLoading="eager"
-                />
-              ))}
-            </div>
+            <MenuProductGrid
+              restaurantId={restaurantId}
+              items={favoriteItems}
+              onSelect={setSelectedItem}
+              imageLoading="eager"
+              testId="guest-page-first-block"
+            />
           )}
         </Stack>
       </main>

@@ -28,10 +28,6 @@
 }
 
 .restaurant-public__main {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
   min-width: 0;
   overflow: visible;
 
@@ -42,8 +38,6 @@
   }
 
   @media (max-width: 640px) {
-    padding: 1.25rem 1rem;
-
     h1 {
       font-size: 1.5rem;
     }
