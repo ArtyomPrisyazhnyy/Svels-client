@@ -1,0 +1,80 @@
+.hours-admin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.hours-admin__note,
+.hours-admin__error,
+.hours-admin__success {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.hours-admin__note {
+  color: var(--rs-text-muted);
+}
+
+.hours-admin__error {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--rs-primary-soft);
+  color: var(--rs-danger);
+}
+
+.hours-admin__success {
+  color: var(--rs-accent);
+  font-weight: 600;
+}
+
+.hours-admin__form,
+.hours-admin__days,
+.hours-admin__empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hours-admin__empty {
+  padding: var(--space-4);
+  border: 1px solid var(--rs-border);
+  border-radius: var(--radius-md);
+  background: var(--rs-surface);
+}
+
+.hours-admin__day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--rs-border);
+  border-radius: var(--radius-md);
+  background: var(--rs-surface);
+}
+
+.hours-admin__time {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  color: var(--rs-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.hours-admin__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+@media (min-width: 768px) {
+  .hours-admin__day {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+    align-items: end;
+  }
+}

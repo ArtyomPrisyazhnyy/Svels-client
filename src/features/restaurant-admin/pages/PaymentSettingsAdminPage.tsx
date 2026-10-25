@@ -78,6 +78,7 @@ export default function PaymentSettingsAdminPage() {
   }, [restaurantId, accessToken]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadSettings();
   }, [loadSettings]);
 
@@ -153,9 +154,8 @@ export default function PaymentSettingsAdminPage() {
       <header className="order-settings-admin__header">
         <div>
           <h2>Оплата / bePaid</h2>
-          <p className="order-settings-admin__intro">
-            Ключи магазина из кабинета bePaid. Secret Key хранится в зашифрованном виде и
-            наружу не отдаётся.
+          <p className="order-settings-admin__intro" data-testid="payment-optional-hint">
+            Для запуска сайта bePaid не нужен: гости могут платить наличными и картой на кассе. Подключайте онлайн, только если договор с bePaid уже есть. Shop ID — номер магазина в кабинете bePaid, не УНП и не номер карты. Secret Key после сохранения наружу не показывается.
           </p>
         </div>
         <button
@@ -274,8 +274,8 @@ export default function PaymentSettingsAdminPage() {
                   })
                 }
               >
-                <option value="authorization">Холд (authorization)</option>
-                <option value="payment">Сразу списание (payment)</option>
+                <option value="authorization">Холд — деньги резервируются и списываются после проверки заказа</option>
+                <option value="payment">Сразу списание — деньги уходят в момент оплаты</option>
               </select>
             </label>
 

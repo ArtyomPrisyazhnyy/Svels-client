@@ -15,7 +15,7 @@ import { Reveal } from './Reveal';
 const STEPS = [
   {
     title: 'Заявка',
-    text: 'Пишете в мессенджер — смотрим зал, меню и как хотите принимать гостей.',
+    text: 'Оставляете название, УНП и адрес на сайте. После проверки открывается панель запуска — без созвона.',
   },
   {
     title: 'Сайт',
@@ -49,6 +49,9 @@ export function LandingPage() {
           </Reveal>
           <Reveal className="landing__hero-actions" delay={150}>
             <ContactButton label="Оставить заявку" variant="primary" />
+            <a href="/auth/restaurant" className="landing-cta landing-cta--ghost" data-testid="landing-self-serve">
+              Заполнить заявку самостоятельно
+            </a>
             <a href="#features" className="landing-cta landing-cta--ghost">Смотреть экраны</a>
           </Reveal>
         </div>

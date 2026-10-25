@@ -45,6 +45,10 @@ function RoleProtectedRouteInner({ roles, children }: RoleProtectedRouteProps) {
     }
 
     if (!roles.includes(user.role)) {
+      if (user.role === 'user') {
+        router.replace('/auth/restaurant');
+        return;
+      }
       router.replace(getPostAuthPath(user.role, undefined, user.restaurantId));
     }
   }, [hydrated, user, accessToken, roles, router, logout]);

@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { ApiError } from '../../../shared/api/api-client';
 import type {
   MenuCategory,
@@ -84,6 +84,11 @@ export function MenuItemForm({
 }: MenuItemFormProps) {
   const isEditing = Boolean(editingItem);
   const [categoryId, setCategoryId] = useState(categories[0]?.id ?? '');
+  const categoryFromList =
+    categories.find((category) => category.id === categoryId)?.id ?? categories[0]?.id ?? '';
+  if (!isEditing && categoryFromList !== categoryId) {
+    setCategoryId(categoryFromList);
+  }
   const [newCategoryName, setNewCategoryName] = useState('');
   const [name, setName] = useState('');
   const [variantLabel, setVariantLabel] = useState('');
@@ -102,6 +107,7 @@ export function MenuItemForm({
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
 
   function resetForm() {
     setCategoryId(categories[0]?.id ?? '');
@@ -127,6 +133,7 @@ export function MenuItemForm({
       return;
     }
 
+    /* eslint-disable react-hooks/set-state-in-effect -- форма повторяет выбранную позицию */
     setCategoryId(editingItem.categoryId);
     setName(editingItem.name);
     setVariantLabel(editingItem.variantLabel ?? '');
@@ -146,13 +153,13 @@ export function MenuItemForm({
     setGalleryUrls(editingItem.galleryUrls ?? []);
     setGalleryWebpUrls(editingItem.galleryWebpUrls ?? []);
     setError(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [editingItem]);
 
   useEffect(() => {
-    if (!isEditing && !categoryId && categories[0]?.id) {
-      setCategoryId(categories[0].id);
-    }
-  }, [categories, categoryId, isEditing]);
+    if (!error) return;
+    errorRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [error]);
 
   async function handleImageChange(file: File | undefined) {
     if (!file) return;
@@ -232,10 +239,23 @@ export function MenuItemForm({
   }
 
   async function handleCreateCategory() {
-    if (!newCategoryName.trim()) return;
-    const newId = await onCategoryCreate(newCategoryName.trim());
-    setCategoryId(newId);
-    setNewCategoryName('');
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) {
+      setError('Введите название категории, например «Кофе» или «Букеты», и нажмите «Добавить».');
+      return;
+    }
+    setError(null);
+    try {
+      const newId = await onCategoryCreate(trimmed);
+      setCategoryId(newId);
+      setNewCategoryName('');
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'Категорию создать не удалось. Название должно быть коротким, без пустой строки.',
+      );
+    }
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -243,18 +263,28 @@ export function MenuItemForm({
     setError(null);
 
     if (!imageUrl) {
-      setError('Загрузите фотографию блюда');
+      setError('Сначала выберите фото: JPG, PNG или WebP. Без фото позицию сохранить нельзя — гости видят карточку с картинкой.');
       return;
     }
 
     if (!categoryId) {
-      setError('Выберите или создайте категорию');
+      setError('Нет категории. В поле «Новая категория» напишите, например, «Кофе» и нажмите «Добавить».');
+      return;
+    }
+
+    if (!name.trim()) {
+      setError('Введите название, например «Капучино» или «Букет из 11 роз».');
+      return;
+    }
+
+    if (!price.trim()) {
+      setError('Укажите цену числом, например 7.50. Если позиция бесплатная, напишите 0.');
       return;
     }
 
     const parsedPrice = Number(price);
     if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
-      setError('Укажите корректную базовую цену');
+      setError('Цена должна быть числом, например 7.50. Буквы и пустое поле не подойдут.');
       return;
     }
 
@@ -341,18 +371,38 @@ export function MenuItemForm({
   }
 
   return (
-    <form className="menu-item-form" onSubmit={handleSubmit} onKeyDown={handleEnterNavigation}>
+    <form
+      className="menu-item-form"
+      noValidate
+      onSubmit={handleSubmit}
+      onKeyDown={handleEnterNavigation}
+    >
       <h2>{isEditing ? 'Редактирование позиции' : 'Новая позиция меню'}</h2>
-      {error && <p className="menu-item-form__error">{error}</p>}
+      {error && (
+        <p className="menu-item-form__error" data-testid="menu-item-error" ref={errorRef}>
+          {error}
+        </p>
+      )}
 
       <div className="menu-item-form__field">
-        <label>Фотография (обложка) *</label>
+        <label htmlFor="menu-item-photo">Фотография *</label>
         <input
+          id="menu-item-photo"
           type="file"
           accept="image/jpeg,image/png,image/webp"
+          data-testid="menu-item-photo"
           onChange={(e) => void handleImageChange(e.target.files?.[0])}
         />
-        {uploading && <p className="menu-item-form__hint">Загрузка…</p>}
+        {uploading && (
+          <p className="menu-item-form__hint" data-testid="menu-item-photo-status">
+            Фото отправляется. Кнопка «Добавить в меню» включится, когда оно будет готово.
+          </p>
+        )}
+        {!uploading && imageUrl && (
+          <p className="menu-item-form__hint" data-testid="menu-item-photo-ready">
+            Фото на месте — можно добавлять позицию.
+          </p>
+        )}
         {imagePreview ? (
           <img
             className="menu-item-form__preview menu-item-form__preview--cover"
@@ -370,7 +420,7 @@ export function MenuItemForm({
           )
         )}
         <p className="menu-item-form__hint">
-          Обложка отображается в карточке товара в меню. Сервер сохраняет WebP и JPEG/PNG.
+          Гости видят это фото на карточке. Подойдёт JPG, PNG или WebP. Пока фото не загружено, кнопка «Добавить в меню» не нажимается.
         </p>
       </div>
 
@@ -418,8 +468,7 @@ export function MenuItemForm({
           </div>
         )}
         <p className="menu-item-form__hint">
-          Видны только в окне товара. Кнопкой «Обложка» можно выбрать, какое фото
-          показывать первым в меню.
+          Необязательно. Эти фото открываются, когда гость нажимает на блюдо.
         </p>
       </div>
 
@@ -428,13 +477,13 @@ export function MenuItemForm({
           <label htmlFor="item-category">Категория *</label>
           <select
             id="item-category"
+            data-testid="item-category"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            required
           >
-            <option value="" disabled>
-              Выберите категорию
-            </option>
+            {categories.length === 0 && (
+              <option value="">Сначала добавьте категорию рядом</option>
+            )}
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -449,10 +498,11 @@ export function MenuItemForm({
               id="new-category"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
-              placeholder="Напитки"
+              placeholder="Кофе"
+              data-testid="new-category-name"
             />
-            <button type="button" onClick={() => void handleCreateCategory()}>
-              +
+            <button type="button" onClick={() => void handleCreateCategory()} data-testid="category-create">
+              Добавить
             </button>
           </div>
         </div>
@@ -460,7 +510,7 @@ export function MenuItemForm({
 
       <div className="menu-item-form__field">
         <label htmlFor="item-name">Название *</label>
-        <input id="item-name" required value={name} onChange={(e) => setName(e.target.value)} />
+        <input id="item-name" value={name} onChange={(e) => setName(e.target.value)} />
       </div>
 
       <div className="menu-item-form__field">
@@ -489,7 +539,6 @@ export function MenuItemForm({
             type="number"
             min="0"
             step="0.01"
-            required
             value={price}
             onChange={(e) => setPrice(e.target.value)}
           />
@@ -538,7 +587,7 @@ export function MenuItemForm({
 
       <fieldset className="menu-item-form__fieldset menu-item-form__nutrition-block">
         <legend>КБЖУ</legend>
-        <p className="menu-item-form__nutrition-note">Необязательно — укажите на 100 г или на порцию</p>
+        <p className="menu-item-form__nutrition-note">Можно пропустить. Гости увидят блюдо и без калорий. Если заполняете — на 100 г или на порцию.</p>
         <div className="menu-item-form__nutrition">
           <label className="nutrition-card nutrition-card--calories">
             <span className="nutrition-card__label">Ккал</span>
@@ -629,7 +678,12 @@ export function MenuItemForm({
       <ModifierGroupsEditor groups={modifierGroups} onChange={setModifierGroups} />
 
       <div className="menu-item-form__actions">
-        <button className="menu-item-form__submit" type="submit" disabled={loading || uploading || galleryUploading}>
+        <button
+          className="menu-item-form__submit"
+          type="submit"
+          disabled={loading || uploading || galleryUploading || !imageUrl}
+          data-testid="menu-item-submit"
+        >
           {loading
             ? 'Сохранение…'
             : isEditing

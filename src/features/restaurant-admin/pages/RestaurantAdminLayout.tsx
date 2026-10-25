@@ -76,7 +76,7 @@ export default function RestaurantAdminLayout({ children }: { children: React.Re
 
         <div className="restaurant-admin__content">
           <p className="restaurant-admin__welcome">
-            {user?.firstName}, управляйте заведением для предзаказов.
+            {user?.firstName}, здесь шаги, чтобы гости открыли ваш сайт.
           </p>
           {children}
         </div>

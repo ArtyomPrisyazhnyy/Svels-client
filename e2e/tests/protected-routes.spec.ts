@@ -15,7 +15,7 @@ test.describe('Protected routes', () => {
   test('restaurant_admin не открывает /admin', async ({ page, asRestaurantAdmin }) => {
     void asRestaurantAdmin;
     await page.goto('/admin');
-    await expect(page).toHaveURL(/\/restaurant-admin\/menu/);
+    await expect(page).toHaveURL(/\/restaurant-admin\/launch/);
   });
 
   test('super_admin перенаправляется с restaurant-admin на /admin', async ({
