@@ -89,7 +89,7 @@
 
 .ui-btn--danger {
   background: var(--rs-danger);
-  color: var(--rs-on-accent);
+  color: var(--rs-on-danger, #ffffff);
   border-color: var(--rs-danger);
 
   @media (hover: hover) {

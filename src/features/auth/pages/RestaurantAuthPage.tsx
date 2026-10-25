@@ -109,7 +109,7 @@ export function RestaurantAuthPage() {
   }
 
   return (
-    <div className="auth-page" data-testid="restaurant-auth-page">
+    <main id="main-content" className="auth-page" data-testid="restaurant-auth-page" tabIndex={-1}>
       <div className="auth-card auth-card--wide">
         <Link href="/" className="auth-card__back">
           ← На главную
@@ -119,9 +119,13 @@ export function RestaurantAuthPage() {
           Регистрация ресторана, бара или кофейни. Сети могут указать несколько точек.
         </p>
 
-        <div className="auth-tabs">
+        <div className="auth-tabs" role="tablist" aria-label="Регистрация или вход">
           <button
             type="button"
+            role="tab"
+            id="restaurant-auth-tab-register"
+            aria-selected={tab === 'register'}
+            aria-controls="restaurant-auth-tabpanel"
             className={`auth-tabs__btn ${tab === 'register' ? 'auth-tabs__btn--active' : ''}`}
             data-testid="auth-tab-register"
             onClick={() => {
@@ -134,6 +138,10 @@ export function RestaurantAuthPage() {
           </button>
           <button
             type="button"
+            role="tab"
+            id="restaurant-auth-tab-login"
+            aria-selected={tab === 'login'}
+            aria-controls="restaurant-auth-tabpanel"
             className={`auth-tabs__btn ${tab === 'login' ? 'auth-tabs__btn--active' : ''}`}
             data-testid="auth-tab-login"
             onClick={() => {
@@ -147,7 +155,11 @@ export function RestaurantAuthPage() {
         </div>
 
         {tab === 'login' ? (
-          <div>
+          <div
+            role="tabpanel"
+            id="restaurant-auth-tabpanel"
+            aria-labelledby="restaurant-auth-tab-login"
+          >
             <p className="restaurant-auth__hint">
               Войдите аккаунтом администратора заведения. Если заявка ещё на модерации — дождитесь
               одобрения.
@@ -161,7 +173,13 @@ export function RestaurantAuthPage() {
             />
           </div>
         ) : (
-          <form className="auth-form restaurant-auth" onSubmit={handleRegisterSubmit}>
+          <form
+            className="auth-form restaurant-auth"
+            onSubmit={handleRegisterSubmit}
+            role="tabpanel"
+            id="restaurant-auth-tabpanel"
+            aria-labelledby="restaurant-auth-tab-register"
+          >
             {error && (
               <p className="auth-error" data-testid="auth-error">
                 {error}
@@ -331,6 +349,6 @@ export function RestaurantAuthPage() {
           Уже подавали заявку на подключение? Перейдите на вкладку «Вход».
         </p>
       </div>
-    </div>
+    </main>
   );
 }

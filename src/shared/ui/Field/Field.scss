@@ -11,7 +11,7 @@
 }
 
 .ui-field__required {
-  color: var(--rs-danger);
+  color: var(--rs-danger-text, var(--rs-danger));
 }
 
 .ui-field__hint,
@@ -25,7 +25,7 @@
 }
 
 .ui-field__error {
-  color: var(--rs-danger);
+  color: var(--rs-danger-text, var(--rs-danger));
 }
 
 .ui-field__a11y {

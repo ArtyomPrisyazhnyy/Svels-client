@@ -135,7 +135,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--rs-text-soft, #94a3b8);
+  color: var(--rs-text-muted);
   margin-bottom: 0.5rem;
 }
 
@@ -163,7 +163,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--rs-text-soft, #94a3b8);
+  color: var(--rs-text-muted);
   margin: 0 0 0.875rem;
 }
 
@@ -193,7 +193,7 @@
   flex-wrap: wrap;
   border-top: 1px solid var(--rs-border, #e2e8f0);
   font-size: 0.8125rem;
-  color: var(--rs-text-soft, #94a3b8);
+  color: var(--rs-text-muted);
 
   > span {
     min-width: 0;
@@ -208,7 +208,7 @@
 .restaurant-public__footer-credit {
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: var(--rs-text-soft, #94a3b8);
+  color: var(--rs-text-muted);
 }
 
 .restaurant-public__footer-credit-link {

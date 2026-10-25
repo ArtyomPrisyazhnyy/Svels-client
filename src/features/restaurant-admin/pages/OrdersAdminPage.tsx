@@ -147,13 +147,15 @@ export default function OrdersAdminPage() {
       )}
 
       <div className="orders-admin__toolbar">
-        <div className="orders-admin__tabs" role="tablist">
+        <div className="orders-admin__tabs" role="tablist" aria-label="Статусы заказов">
           {ORDERS_TABS.map((item) => (
             <button
               key={item.id}
               type="button"
               role="tab"
+              id={`orders-tab-${item.id}-btn`}
               aria-selected={tab === item.id}
+              aria-controls="orders-admin-tabpanel"
               className={`orders-admin__tab${tab === item.id ? ' orders-admin__tab--active' : ''}`}
               onClick={() => setTab(item.id)}
               data-testid={`orders-tab-${item.id}`}
@@ -199,15 +201,21 @@ export default function OrdersAdminPage() {
 
       {displayError && <p className="orders-admin__error">{displayError}</p>}
 
-      <OrderList
-        orders={orders}
-        loading={loading}
-        role={role}
-        locations={locations}
-        busyOrderId={busyOrderId}
-        onStatusChange={(id, status) => void handleStatusChange(id, status)}
-        onCancelClick={setCancelTarget}
-      />
+      <div
+        role="tabpanel"
+        id="orders-admin-tabpanel"
+        aria-labelledby={`orders-tab-${tab}-btn`}
+      >
+        <OrderList
+          orders={orders}
+          loading={loading}
+          role={role}
+          locations={locations}
+          busyOrderId={busyOrderId}
+          onStatusChange={(id, status) => void handleStatusChange(id, status)}
+          onCancelClick={setCancelTarget}
+        />
+      </div>
 
       {accessToken && canManageTelegram(role) && (
         <TelegramConnectPanel restaurantId={restaurantId} token={accessToken} />

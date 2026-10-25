@@ -74,12 +74,12 @@ export default function RestaurantAdminLayout({ children }: { children: React.Re
           ))}
         </nav>
 
-        <div className="restaurant-admin__content">
+        <main id="main-content" className="restaurant-admin__content" tabIndex={-1}>
           <p className="restaurant-admin__welcome">
             {user?.firstName}, управляйте заведением для предзаказов.
           </p>
           {children}
-        </div>
+        </main>
       </div>
     </div>
   );

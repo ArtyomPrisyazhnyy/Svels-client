@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { login } from '../api/auth.api';
 import { useAuthStore } from '@/store/auth.store';
 import { ApiError } from '@/shared/api/api-client';
+import { FormLiveError } from '@/shared/a11y/FormLiveError';
 import { PasswordInput } from './PasswordInput';
 
 interface LoginFormProps {
@@ -34,8 +35,15 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit} data-testid="login-form">
-      {error && <p className="auth-error" data-testid="auth-error">{error}</p>}
+    <form
+      className="auth-form"
+      onSubmit={handleSubmit}
+      data-testid="login-form"
+      aria-describedby={error ? 'login-form-error' : undefined}
+    >
+      {error ? (
+        <FormLiveError message={error} className="auth-error" testId="auth-error" id="login-form-error" />
+      ) : null}
 
       <div className="auth-field">
         <label htmlFor="login-email">Email</label>

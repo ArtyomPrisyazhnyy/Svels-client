@@ -110,7 +110,7 @@ export default function SuperAdminPage() {
         </button>
       </header>
 
-      <main className="admin__main">
+      <main id="main-content" className="admin__main" tabIndex={-1}>
         <p className="admin__intro">
           Здравствуйте, {user?.firstName}. Рассматривайте заявки заведений на подключение к
           платформе.
@@ -119,9 +119,13 @@ export default function SuperAdminPage() {
           )}
         </p>
 
-        <nav className="admin__tabs" aria-label="Разделы суперадмина">
+        <nav className="admin__tabs" role="tablist" aria-label="Разделы суперадмина">
           <button
             type="button"
+            role="tab"
+            id="super-admin-tab-registrations-btn"
+            aria-selected={tab === 'registrations'}
+            aria-controls="super-admin-tabpanel"
             className={`admin__tabs-btn${tab === 'registrations' ? ' admin__tabs-btn--active' : ''}`}
             onClick={() => setTab('registrations')}
             data-testid="super-admin-tab-registrations"
@@ -130,6 +134,10 @@ export default function SuperAdminPage() {
           </button>
           <button
             type="button"
+            role="tab"
+            id="super-admin-tab-restaurants-btn"
+            aria-selected={tab === 'restaurants'}
+            aria-controls="super-admin-tabpanel"
             className={`admin__tabs-btn${tab === 'restaurants' ? ' admin__tabs-btn--active' : ''}`}
             onClick={() => setTab('restaurants')}
             data-testid="super-admin-tab-restaurants"
@@ -138,8 +146,17 @@ export default function SuperAdminPage() {
           </button>
         </nav>
 
-        {error && <p className="admin__error">{error}</p>}
+        {error && <p className="admin__error" role="alert" aria-live="assertive">{error}</p>}
 
+        <div
+          role="tabpanel"
+          id="super-admin-tabpanel"
+          aria-labelledby={
+            tab === 'registrations'
+              ? 'super-admin-tab-registrations-btn'
+              : 'super-admin-tab-restaurants-btn'
+          }
+        >
         {tab === 'registrations' ? (
           loading ? (
             <p className="admin__empty">Загрузка заявок…</p>
@@ -199,6 +216,7 @@ export default function SuperAdminPage() {
         ) : (
           accessToken && <SuperAdminRestaurantsTab accessToken={accessToken} />
         )}
+        </div>
       </main>
     </div>
   );

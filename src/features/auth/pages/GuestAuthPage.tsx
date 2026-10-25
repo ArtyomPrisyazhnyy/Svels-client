@@ -27,7 +27,7 @@ export function GuestAuthPage({ redirectFrom }: GuestAuthPageProps) {
   }
 
   return (
-    <div className="auth-page">
+    <main id="main-content" className="auth-page" tabIndex={-1}>
       <div className="auth-card">
         <Link href="/" className="auth-card__back">
           ← На главную
@@ -37,9 +37,13 @@ export function GuestAuthPage({ redirectFrom }: GuestAuthPageProps) {
           Зарегистрируйтесь, чтобы бронировать столы и оформлять предзаказы
         </p>
 
-        <div className="auth-tabs">
+        <div className="auth-tabs" role="tablist" aria-label="Режим авторизации">
           <button
             type="button"
+            role="tab"
+            id="guest-auth-tab-login"
+            aria-selected={tab === 'login'}
+            aria-controls="guest-auth-tabpanel"
             className={`auth-tabs__btn ${tab === 'login' ? 'auth-tabs__btn--active' : ''}`}
             onClick={() => {
               setTab('login');
@@ -50,6 +54,10 @@ export function GuestAuthPage({ redirectFrom }: GuestAuthPageProps) {
           </button>
           <button
             type="button"
+            role="tab"
+            id="guest-auth-tab-register"
+            aria-selected={tab === 'register'}
+            aria-controls="guest-auth-tabpanel"
             className={`auth-tabs__btn ${tab === 'register' ? 'auth-tabs__btn--active' : ''}`}
             onClick={() => {
               setTab('register');
@@ -60,11 +68,17 @@ export function GuestAuthPage({ redirectFrom }: GuestAuthPageProps) {
           </button>
         </div>
 
-        {tab === 'login' ? (
-          <LoginForm onSuccess={handleSuccess} />
-        ) : (
-          <RegisterForm onSuccess={handleSuccess} />
-        )}
+        <div
+          role="tabpanel"
+          id="guest-auth-tabpanel"
+          aria-labelledby={tab === 'login' ? 'guest-auth-tab-login' : 'guest-auth-tab-register'}
+        >
+          {tab === 'login' ? (
+            <LoginForm onSuccess={handleSuccess} />
+          ) : (
+            <RegisterForm onSuccess={handleSuccess} />
+          )}
+        </div>
 
         <div className="auth-divider">или</div>
 
@@ -76,6 +90,6 @@ export function GuestAuthPage({ redirectFrom }: GuestAuthPageProps) {
           Владелец заведения? <Link href="/auth/restaurant">Регистрация для ресторанов</Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }

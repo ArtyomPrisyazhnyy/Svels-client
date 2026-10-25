@@ -235,7 +235,7 @@ export function UiPrimitivesBoard() {
             <Input id="ui-name" placeholder="Иван" testId="ui-field-name" />
           </Field>
           <Field label="Телефон" htmlFor="ui-phone" required>
-            <Input id="ui-phone" defaultValue="+375 29 000-00-01" testId="ui-field-phone" />
+            <Input id="ui-phone" placeholder="29 123-45-67" testId="ui-field-phone" />
           </Field>
           <Field label="Комментарий" htmlFor="ui-comment" error="Слишком коротко">
             <Textarea id="ui-comment" defaultValue="Ок" testId="ui-field-error" />

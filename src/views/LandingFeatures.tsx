@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 import { ContactButton } from './ContactButton';
 import { LANDING_SHOWCASES, type ShowcaseId } from './landing-content';
 import { Reveal } from './Reveal';
@@ -27,6 +27,19 @@ export function LandingFeatures() {
     return () => window.clearInterval(timer);
   }, [paused]);
 
+  function handleTabListKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+      return;
+    }
+    event.preventDefault();
+    const ids = LANDING_SHOWCASES.map((item) => item.id);
+    const index = ids.indexOf(activeId);
+    const direction = event.key === 'ArrowRight' ? 1 : -1;
+    const nextIndex = (index + direction + ids.length) % ids.length;
+    setActiveId(ids[nextIndex]);
+    document.getElementById(`landing-tab-${ids[nextIndex]}`)?.focus();
+  }
+
   return (
     <section
       id="features"
@@ -46,7 +59,12 @@ export function LandingFeatures() {
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          <div className="landing__showcase-list" role="tablist" aria-label="Возможности">
+          <div
+            className="landing__showcase-list"
+            role="tablist"
+            aria-label="Возможности"
+            onKeyDown={handleTabListKeyDown}
+          >
             {LANDING_SHOWCASES.map((item) => {
               const selected = item.id === activeId;
               return (

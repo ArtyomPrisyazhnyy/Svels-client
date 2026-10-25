@@ -161,7 +161,7 @@ export function ContactModal({ onClose }: ContactModalProps) {
                     className="contact-modal__input"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+375 29 000-00-00"
+                    placeholder="Телефон с кодом страны"
                     autoComplete="tel"
                     required
                     disabled={status === 'submitting'}
