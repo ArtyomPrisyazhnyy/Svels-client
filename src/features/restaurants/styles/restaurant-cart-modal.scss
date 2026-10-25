@@ -1,17 +1,9 @@
 .ui-modal--cart-sheet {
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: stretch;
-  /* svh keeps the sheet inside the toolbar; dvh tracks the visible viewport. */
-  height: 100svh;
-  height: 100dvh;
-  max-height: 100svh;
-  max-height: 100dvh;
+  align-items: flex-end;
   padding: var(--space-4) 0 0;
   box-sizing: border-box;
 
   @media (min-width: 768px) {
-    justify-content: center;
     align-items: center;
     padding: var(--space-8);
   }
@@ -94,7 +86,6 @@
     border-radius: var(--rs-card-radius, var(--radius-xl));
   }
 
-  > .ui-overlay-panel__header,
   > .ui-overlay-panel__footer {
     flex-shrink: 0;
   }
@@ -168,7 +159,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  flex: 1 1 auto;
+  flex: 1;
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
