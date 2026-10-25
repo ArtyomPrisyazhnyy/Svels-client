@@ -8,6 +8,7 @@ export interface ModalPreviewProps {
   headerStart?: ReactNode;
   headerEnd?: ReactNode;
   testId?: string;
+  panelClassName?: string;
   children: ReactNode;
 }
 
@@ -18,6 +19,7 @@ export function ModalPreview({
   headerStart,
   headerEnd,
   testId,
+  panelClassName,
   children,
 }: ModalPreviewProps) {
   return (
@@ -31,6 +33,7 @@ export function ModalPreview({
       headerStart={headerStart}
       headerEnd={headerEnd}
       testId={testId}
+      panelClassName={panelClassName}
     >
       {children}
     </ModalPanel>

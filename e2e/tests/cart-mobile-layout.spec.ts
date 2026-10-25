@@ -100,3 +100,59 @@ test.describe('Cart mobile layout', () => {
     await assertCartStep2SectionSpacing(page);
   });
 });
+
+async function assertNoHorizontalOverflow(page: import('@playwright/test').Page) {
+  const overflow = await page.evaluate(() => {
+    const root = document.documentElement;
+    const panel = document.querySelector('[data-testid="cart-modal-panel"]');
+    const title = document.querySelector('.restaurant-cart-modal__item-title');
+    const panelOverflow =
+      panel instanceof HTMLElement ? panel.scrollWidth - panel.clientWidth : 0;
+    const titleOverflow =
+      title instanceof HTMLElement ? title.scrollWidth - title.clientWidth : 0;
+    return {
+      page: root.scrollWidth - root.clientWidth,
+      panel: panelOverflow,
+      title: titleOverflow,
+    };
+  });
+  expect(overflow.page).toBeLessThanOrEqual(1);
+  expect(overflow.panel).toBeLessThanOrEqual(1);
+  expect(overflow.title).toBeLessThanOrEqual(1);
+}
+
+test.describe('Cart narrow widths', () => {
+  test('1 позиция на 320 без горизонтального скролла', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    await page.setViewportSize({ width: 320, height: 700 });
+    await seedCartItems(page, seed.restaurantId, 1);
+    await openCartStep1(page, seed.restaurantId);
+    await expect(page.getByTestId('cart-modal-footer')).toBeVisible();
+    await expect(page.getByTestId('cart-item-counter')).toBeVisible();
+    await assertNoHorizontalOverflow(page);
+    await assertCartMobileLayoutNoOverlap(page);
+  });
+
+  test('15 позиций с длинными названиями на 320 и 390', async ({ page, seed, asGuest }) => {
+    void asGuest;
+    await seedCartItems(page, seed.restaurantId, 15);
+    for (const width of [320, 390, 1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await openCartStep1(page, seed.restaurantId);
+      await expect(page.getByTestId('cart-items-header')).toContainText('15 товаров');
+      await expect(page.getByTestId('cart-modal-footer')).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+      await assertCartMobileLayoutNoOverlap(page);
+      const counter = page.getByTestId('cart-item-counter').first();
+      const panel = page.getByTestId('cart-modal-panel');
+      const counterBox = await counter.boundingBox();
+      const panelBox = await panel.boundingBox();
+      expect(counterBox).not.toBeNull();
+      expect(panelBox).not.toBeNull();
+      expect(counterBox!.x).toBeGreaterThanOrEqual(panelBox!.x - 1);
+      expect(counterBox!.x + counterBox!.width).toBeLessThanOrEqual(panelBox!.x + panelBox!.width + 1);
+      await page.getByTestId('cart-close').click();
+      await expect(page.getByTestId('restaurant-cart-modal')).toBeHidden();
+    }
+  });
+});

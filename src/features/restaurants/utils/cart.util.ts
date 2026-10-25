@@ -1,6 +1,7 @@
 import type { CartLineItem, CartModifierLine } from '@/shared/types/cart';
 import type { MenuItem, MenuModifierGroup } from '@/shared/types/menu';
 import { generateUuidV7 } from '@/shared/utils/uuid.util';
+import { sumCartQuantity } from './cart-items-label.util';
 import {
   calculateModifierUnitPrice,
   getModifierGroupKey,
@@ -68,7 +69,7 @@ export function buildCartLineItem(
 }
 
 export function getCartTotals(items: CartLineItem[]): { itemCount: number; totalAmount: number } {
-  const itemCount = items.reduce((sum, line) => sum + line.quantity, 0);
+  const itemCount = sumCartQuantity(items);
   const totalAmount = items.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0);
 
   return { itemCount, totalAmount };

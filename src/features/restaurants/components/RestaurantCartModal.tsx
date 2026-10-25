@@ -1,9 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import { PhoneInput } from '@/shared/components/PhoneInput';
-import { Modal, Cluster, Stack } from '@/shared/ui';
+import { Modal, Stack } from '@/shared/ui';
 import { Button } from '@/shared/ui/Button/Button';
 import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import { Field } from '@/shared/ui/Field/Field';
@@ -11,8 +10,6 @@ import { IconButton } from '@/shared/ui/IconButton/IconButton';
 import { Input } from '@/shared/ui/Input/Input';
 import { Textarea } from '@/shared/ui/Textarea/Textarea';
 import { IconBack } from '@/shared/ui/icons/icons';
-import { formatCartItemsCount } from '../utils/cart-items-label.util';
-import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useCartStore } from '@/store/cart.store';
 import { ApiError } from '@/shared/api/api-client';
@@ -21,7 +18,7 @@ import {
   formatRestaurantLocationLine,
   type RestaurantLocation,
 } from '@/shared/types/restaurant-location';
-import { FulfillmentSelector } from './FulfillmentSelector';
+import { CartBasketBody, CartCheckoutBar } from './CartBasket';
 import { CartLocationPicker } from './CartLocationPicker';
 import { PaymentSelector } from './PaymentSelector';
 import { DeliveryAddressFields } from './DeliveryAddressFields';
@@ -51,10 +48,7 @@ import {
 } from '@/shared/types/order-settings';
 import { useAuthStore } from '@/store/auth.store';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
-import {
-  isCompleteBelarusPhone,
-  normalizePhoneForPhoneInput,
-} from '@/shared/utils/phone.util';
+import { normalizePhoneForPhoneInput } from '@/shared/utils/phone.util';
 import { createPreOrder } from '../api/pre-orders.api';
 import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
 import {
@@ -105,7 +99,6 @@ export function RestaurantCartModal({
   const items = useCartStore((s) =>
     s.restaurantId === restaurantId ? s.items : EMPTY_CART_ITEMS,
   );
-  const removeLine = useCartStore((s) => s.removeLine);
   const updateLineQuantity = useCartStore((s) => s.updateLineQuantity);
   const clearCart = useCartStore((s) => s.clearCart);
   const getCheckoutDraft = useCartStore((s) => s.getCheckoutDraft);
@@ -498,43 +491,38 @@ export function RestaurantCartModal({
   const titleId = 'restaurant-cart-modal-title';
 
   const footer =
-    successOrderNumber === null
-      ? (
-          <footer className="restaurant-cart-modal__footer" data-testid="cart-modal-footer">
-            <p className="restaurant-cart-modal__total">
-              Итого: <CurrencyAmount amount={totalAmount} />
-            </p>
-            {step2 ? (
-              <Button
-                type="button"
-                variant="primary"
-                size="lg"
-                fullWidth
-                loading={submitting}
-                disabled={submitting}
-                onClick={() => void handleSubmit()}
-                testId="cart-submit"
-                className="restaurant-cart-modal__submit"
-              >
-                {submitting ? 'Оформление…' : checkoutValidation.ctaLabel}
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="primary"
-                size="lg"
-                fullWidth
-                disabled={!canContinueToStep2}
-                onClick={handleGoToCheckout}
-                testId="cart-go-to-checkout"
-                className="restaurant-cart-modal__submit"
-              >
-                Оформить заказ
-              </Button>
-            )}
-          </footer>
-        )
-      : undefined;
+    successOrderNumber === null ? (
+      <CartCheckoutBar totalAmount={totalAmount}>
+        {step2 ? (
+          <Button
+            type="button"
+            variant="primary"
+            size="lg"
+            fullWidth
+            loading={submitting}
+            disabled={submitting}
+            onClick={() => void handleSubmit()}
+            testId="cart-submit"
+            className="restaurant-cart-modal__submit"
+          >
+            {submitting ? 'Оформление…' : checkoutValidation.ctaLabel}
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            variant="primary"
+            size="lg"
+            fullWidth
+            disabled={!canContinueToStep2}
+            onClick={handleGoToCheckout}
+            testId="cart-go-to-checkout"
+            className="restaurant-cart-modal__submit"
+          >
+            Оформить заказ
+          </Button>
+        )}
+      </CartCheckoutBar>
+    ) : undefined;
 
   return (
     <Modal
@@ -840,154 +828,21 @@ export function RestaurantCartModal({
                 </Stack>
               ) : (
                 <>
-                  {enabledFulfillment.length > 1 && (
-                    <div
-                      className="restaurant-cart-modal__fulfillment-block"
-                      data-testid="cart-fulfillment-switcher"
-                    >
-                      <div className="restaurant-cart-modal__fulfillment">
-                        <FulfillmentSelector
-                          settings={orderSettings}
-                          value={fulfillment}
-                          onChange={(value) => {
-                            setFulfillment(value);
-                            syncDraft({ fulfillment: value });
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {items.length === 0 ? (
-                    <p className="restaurant-cart-modal__empty" data-testid="cart-empty">
-                      Корзина пуста
-                    </p>
-                  ) : (
-                    <>
-                      <Cluster
-                        className="restaurant-cart-modal__list-header"
-                        justify="space-between"
-                        align="center"
-                        testId="cart-items-header"
-                      >
-                        <span className="restaurant-cart-modal__list-header-title">
-                          {formatCartItemsCount(items.length)}
-                        </span>
-                        {clearPromptOpen ? (
-                          <Cluster gap={2} align="center">
-                            <span className="restaurant-cart-modal__clear-prompt">Очистить?</span>
-                            <Button
-                              type="button"
-                              variant="link"
-                              size="sm"
-                              onClick={handleClearCartConfirmed}
-                              testId="cart-clear-confirm-yes"
-                            >
-                              Да
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="link"
-                              size="sm"
-                              onClick={() => setClearPromptOpen(false)}
-                              testId="cart-clear-confirm-no"
-                            >
-                              Нет
-                            </Button>
-                          </Cluster>
-                        ) : (
-                          <Button
-                            type="button"
-                            variant="link"
-                            size="sm"
-                            className="restaurant-cart-modal__clear-link"
-                            onClick={() => setClearPromptOpen(true)}
-                            testId="cart-clear"
-                          >
-                            Очистить корзину
-                          </Button>
-                        )}
-                      </Cluster>
-                      <ul className="restaurant-cart-modal__list">
-                      {items.map((line) => (
-                        <li
-                          key={line.id}
-                          className={`restaurant-cart-modal__item${
-                            line.imageUrl ? ' restaurant-cart-modal__item--with-image' : ''
-                          }`}
-                        >
-                          {line.imageUrl && (
-                            <div className="restaurant-cart-modal__item-media">
-                              <ResponsiveImage
-                                src={line.imageUrl}
-                                webpSrc={line.imageWebpUrl}
-                                alt=""
-                              />
-                            </div>
-                          )}
-
-                          <div className="restaurant-cart-modal__item-main">
-                            <p className="restaurant-cart-modal__item-title">
-                              {line.name}
-                              {line.variantLabel && (
-                                <span className="restaurant-cart-modal__item-variant">
-                                  {' '}
-                                  {line.variantLabel}
-                                </span>
-                              )}
-                            </p>
-
-                            {line.modifiers.length > 0 && (
-                              <ul className="restaurant-cart-modal__modifiers">
-                                {line.modifiers.map((modifier) => (
-                                  <li key={`${modifier.groupName}-${modifier.optionName}`}>
-                                    {modifier.groupName}: {modifier.optionName}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-
-                            <p className="restaurant-cart-modal__item-price">
-                              <CurrencyAmount amount={line.unitPrice * line.quantity} />
-                            </p>
-                          </div>
-
-                          <div
-                            className="restaurant-cart-modal__item-actions"
-                            data-testid="cart-item-actions"
-                          >
-                            <div
-                              className="restaurant-cart-modal__counter"
-                              aria-label="Количество"
-                              data-testid="cart-item-counter"
-                            >
-                              <button
-                                type="button"
-                                className="restaurant-cart-modal__counter-btn"
-                                onClick={() => updateLineQuantity(line.id, line.quantity - 1)}
-                                aria-label="Уменьшить количество"
-                              >
-                                −
-                              </button>
-                              <span className="restaurant-cart-modal__counter-value">
-                                {line.quantity}
-                              </span>
-                              <button
-                                type="button"
-                                className="restaurant-cart-modal__counter-btn"
-                                onClick={() => updateLineQuantity(line.id, line.quantity + 1)}
-                                aria-label="Увеличить количество"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    </>
-                  )}
-
+                  <CartBasketBody
+                    items={items}
+                    orderSettings={orderSettings}
+                    fulfillment={fulfillment}
+                    onFulfillmentChange={(value) => {
+                      setFulfillment(value);
+                      syncDraft({ fulfillment: value });
+                    }}
+                    onDecrement={(line) => updateLineQuantity(line.id, line.quantity - 1)}
+                    onIncrement={(line) => updateLineQuantity(line.id, line.quantity + 1)}
+                    clearPromptOpen={clearPromptOpen}
+                    onAskClear={() => setClearPromptOpen(true)}
+                    onCancelClear={() => setClearPromptOpen(false)}
+                    onConfirmClear={handleClearCartConfirmed}
+                  />
                   {error && <p className="restaurant-cart-modal__error">{error}</p>}
                 </>
               )}
