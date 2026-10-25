@@ -123,7 +123,7 @@ export function CartBasketBody({
               onCancel={onCancelClear}
             />
           </Cluster>
-          <ul className="restaurant-cart-modal__list">
+          <ul className="restaurant-cart-modal__list" data-testid="cart-items-list">
             {items.map((line) => (
               <CartLineRow
                 key={line.id}

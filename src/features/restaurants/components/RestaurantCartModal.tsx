@@ -487,6 +487,7 @@ export function RestaurantCartModal({
   const fieldErrors = showValidationHints ? checkoutValidation.fieldErrors : {};
 
   const step2 = cartStep === 2 && successOrderNumber === null;
+  const basketStep = !step2 && successOrderNumber === null;
   const modalTitle = step2 ? getStep2Title(fulfillment) : 'Корзина';
   const titleId = 'restaurant-cart-modal-title';
 
@@ -557,7 +558,11 @@ export function RestaurantCartModal({
         footer={footer}
       >
         <div
-          className="restaurant-cart-modal__body"
+          className={
+            basketStep
+              ? 'restaurant-cart-modal__body restaurant-cart-modal__body--basket'
+              : 'restaurant-cart-modal__body'
+          }
           data-testid="cart-modal-body"
           data-cart-step={cartStep}
         >
