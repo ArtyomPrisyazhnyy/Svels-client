@@ -38,12 +38,14 @@ function MenuModalPhoto({
     return <div className="menu-product-modal__placeholder" aria-hidden="true" />;
   }
   return (
-    <ResponsiveImage
-      src={src}
-      webpSrc={webpSrc}
-      alt=""
-      onError={() => setFailed(true)}
-    />
+    <div className="menu-product-modal__photo">
+      <ResponsiveImage
+        src={src}
+        webpSrc={webpSrc}
+        alt=""
+        onError={() => setFailed(true)}
+      />
+    </div>
   );
 }
 

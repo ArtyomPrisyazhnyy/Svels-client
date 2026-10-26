@@ -21,18 +21,37 @@
 
 .menu-product-modal__media {
   flex-shrink: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   height: 260px;
-  background: #f1f5f9;
+  background: color-mix(in srgb, var(--rs-border) 30%, var(--rs-bg));
   overflow: hidden;
-  border-radius: 20px 20px 0 0;
   position: relative;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
 
+  picture,
+  .menu-product-modal__photo,
   img {
     width: 100%;
     height: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
     object-fit: cover;
     display: block;
     color: transparent;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .menu-product-modal__photo {
+    min-height: 0;
   }
 }
 
@@ -44,12 +63,23 @@
 .menu-product-modal__carousel {
   position: absolute;
   inset: 0;
+  width: 100%;
   height: 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 
   .carousel__viewport,
   .carousel__container,
   .carousel__slide {
     height: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .carousel__viewport {
+    width: 100%;
   }
 
   .carousel__slide {

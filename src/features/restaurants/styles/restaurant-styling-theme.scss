@@ -525,6 +525,25 @@
 
   .menu-product-modal__media {
     background: color-mix(in srgb, var(--rs-border) 30%, var(--rs-bg));
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+
+    picture,
+    .menu-product-modal__photo,
+    img {
+      border: none;
+      border-radius: 0;
+      outline: none;
+      box-shadow: none;
+    }
+
+    .menu-product-modal__carousel,
+    .menu-product-modal__carousel .carousel__viewport {
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
   }
 
   .menu-product-modal__close {
