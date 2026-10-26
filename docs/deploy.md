@@ -15,7 +15,6 @@ docker build -t svels-client:latest \
   --build-arg NEXT_PUBLIC_SITE_URL=https://svels.by \
   --build-arg NEXT_PUBLIC_PLATFORM_HOSTS=localhost,127.0.0.1,svels.by,www.svels.by \
   --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com \
-  --build-arg NEXT_PUBLIC_YANDEX_MAPS_KEY=your-yandex-key \
   .
 ```
 
@@ -54,7 +53,6 @@ curl -sf -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3000/privacypolicy
 | `NEXT_PUBLIC_PLATFORM_HOSTS` | Список хостов платформы через запятую; остальные `Host` → custom domain (middleware). Также влияет на `allowedDevOrigins` в `next.config.ts`. |
 | `NEXT_PUBLIC_API_URL` | Базовый URL API для SSR/middleware и (если задан) для браузера. **Не задан** при `docker build` → на сборке используется `http://localhost:3000` (mock в Dockerfile). Для compose-образа передайте `http://api:3000` и `--add-host=api:127.0.0.1` (см. выше). |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | OAuth Google (кнопка входа). |
-| `NEXT_PUBLIC_YANDEX_MAPS_KEY` | Ключ Яндекс.Карт (опционально). |
 | `NEXT_PUBLIC_SENTRY_DSN` | DSN Sentry (опционально; без значения мониторинг выключен). |
 
 `NEXT_PUBLIC_*` в Next.js встраиваются в клиентский бандл **на сборке**. Смена значения без пересборки образа для клиента не сработает (кроме серверных путей, где читается `process.env` без инлайна — для middleware `NEXT_PUBLIC_*` тоже фиксируется при build).

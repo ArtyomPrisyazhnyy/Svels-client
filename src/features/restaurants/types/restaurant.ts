@@ -7,5 +7,10 @@ export interface PublicRestaurant {
   customDomain?: string | null;
   logoUrl?: string | null;
   logoWebpUrl?: string | null;
+  legalName?: string | null;
+  legalAddress?: string | null;
+  contactPhone?: string | null;
+  contactEmail?: string | null;
+  unp?: string | null;
   createdAt: string;
 }

@@ -1,9 +1,10 @@
 import type { MetadataRoute } from 'next';
+import { buildVenueSitemapEntries, getPlatformOrigin } from '@/features/restaurants/seo/venue-seo';
 import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
 import { serverFetch } from '@/shared/api/server-api';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3001';
+  const siteUrl = getPlatformOrigin();
 
   let restaurants: PublicRestaurant[] = [];
 
@@ -20,11 +21,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 1,
     },
-    ...restaurants.map((restaurant) => ({
-      url: `${siteUrl}/restaurants/${restaurant.id}`,
-      lastModified: new Date(restaurant.createdAt),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    })),
+    ...restaurants.flatMap((restaurant) =>
+      buildVenueSitemapEntries({
+        restaurantId: restaurant.id,
+        customDomain: restaurant.customDomain,
+        lastModified: restaurant.createdAt,
+        platformOrigin: siteUrl,
+      }),
+    ),
   ];
 }

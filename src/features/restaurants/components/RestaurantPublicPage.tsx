@@ -48,6 +48,8 @@ interface RestaurantPublicPageProps {
   promoBanners?: PromoBanner[];
   loyaltySettings?: LoyaltySettings;
   embedded?: boolean;
+  /** Отдельный заголовок для страницы меню. */
+  pageTitle?: string;
 }
 
 function RestaurantPublicPageBody({
@@ -60,6 +62,7 @@ function RestaurantPublicPageBody({
   promoBanners = [],
   loyaltySettings,
   embedded = false,
+  pageTitle,
   categoryNavEnabled,
 }: RestaurantPublicPageProps & { categoryNavEnabled: boolean }) {
   const paths = useRestaurantGuestPaths(restaurant.id, embedded);
@@ -91,7 +94,7 @@ function RestaurantPublicPageBody({
       {embedded ? <RestaurantPublicHeader {...headerProps} /> : null}
 
       <main className="restaurant-public__main">
-        <h1>{restaurant.name}</h1>
+        <h1>{pageTitle ?? restaurant.name}</h1>
         <p className="restaurant-public__address">{restaurant.address}</p>
 
         {restaurant.description && (
@@ -163,6 +166,7 @@ export function RestaurantPublicPage({
   promoBanners,
   loyaltySettings,
   embedded,
+  pageTitle,
 }: RestaurantPublicPageProps) {
   const navCategories = useMemo(
     () => toMenuCategoryNavItems(getAvailableMenuCategories(menu.categories)),
@@ -186,6 +190,7 @@ export function RestaurantPublicPage({
         promoBanners={promoBanners}
         loyaltySettings={loyaltySettings}
         embedded={embedded}
+        pageTitle={pageTitle}
         categoryNavEnabled
       />
     </MenuCategoryNavProvider>
@@ -200,6 +205,7 @@ export function RestaurantPublicPage({
       promoBanners={promoBanners}
       loyaltySettings={loyaltySettings}
       embedded={embedded}
+      pageTitle={pageTitle}
       categoryNavEnabled={false}
     />
   );

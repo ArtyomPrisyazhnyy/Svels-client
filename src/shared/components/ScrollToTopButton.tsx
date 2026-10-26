@@ -7,7 +7,7 @@ import '@/shared/styles/scroll-to-top-button.scss';
 
 const ADMIN_PREFIXES = ['/admin', '/restaurant-admin'] as const;
 const PLATFORM_RESTAURANT_GUEST = /^\/restaurants\/[^/]+(\/|$)/;
-const TENANT_GUEST_PATHS = /^\/(|booking|pre-order|account|favorites|auth|payment\/result)(\/|$)/;
+const TENANT_GUEST_PATHS = /^\/(|booking|pre-order|account|favorites|auth|menu|payment\/result)(\/|$)/;
 
 function isRestaurantGuestPage(pathname: string, tenantMode: boolean): boolean {
   if (PLATFORM_RESTAURANT_GUEST.test(pathname)) {
@@ -52,7 +52,6 @@ export function ScrollToTopButton({ forRestaurantTheme = false }: { forRestauran
 
   useEffect(() => {
     if (hiddenOnAdmin || hiddenOnRestaurantGuest) {
-      setVisible(false);
       return;
     }
 

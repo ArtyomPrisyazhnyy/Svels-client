@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { buildRestaurantGuestPath } from '@/shared/routing/restaurant-guest-path';
+import {
+  buildRestaurantGuestPath,
+  type RestaurantGuestSegment,
+} from '@/shared/routing/restaurant-guest-path';
 import { isPlatformHost, normalizeHost } from '@/shared/tenant/platform-hosts';
 import { resolveRestaurantByDomain } from '@/shared/tenant/resolve-restaurant';
 
-const TENANT_GUEST_SEGMENTS = new Set(['booking', 'pre-order', 'account', 'auth', 'favorites', 'legal']);
+const TENANT_GUEST_SEGMENTS = new Set([
+  'booking',
+  'pre-order',
+  'account',
+  'auth',
+  'favorites',
+  'legal',
+  'menu',
+]);
 const TENANT_BLOCKED_PREFIXES = ['/admin', '/restaurant-admin'];
 
 function mapTenantPath(pathname: string, restaurantId: string): string {
@@ -23,7 +34,7 @@ function mapTenantPath(pathname: string, restaurantId: string): string {
   const segment = normalizedPath.slice(1).split('/')[0];
 
   if (segment && TENANT_GUEST_SEGMENTS.has(segment)) {
-    return buildRestaurantGuestPath(restaurantId, segment as 'booking' | 'pre-order' | 'account' | 'auth' | 'favorites');
+    return buildRestaurantGuestPath(restaurantId, segment as RestaurantGuestSegment);
   }
 
   return buildRestaurantGuestPath(restaurantId, 'home');

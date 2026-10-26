@@ -26,6 +26,12 @@ const ADMIN_SECTIONS: Array<{
   },
   { path: '/restaurant-admin/menu', navTestId: 'nav-menu', assert: 'heading', heading: /меню/i },
   {
+    path: '/restaurant-admin/dashboard',
+    navTestId: 'nav-dashboard',
+    assert: 'heading',
+    heading: /Статистика/i,
+  },
+  {
     path: '/restaurant-admin/locations',
     navTestId: 'nav-locations',
     assert: 'heading',
