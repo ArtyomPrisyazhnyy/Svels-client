@@ -15,10 +15,9 @@ test.describe('Карта точек', () => {
     await expect(map).toBeVisible();
     await expect(map.locator('.leaflet-container')).toBeVisible({ timeout: 15_000 });
     await expect(map.locator('.leaflet-control-attribution')).toContainText(/OpenStreetMap/);
-    await expect(map.locator('.leaflet-control-attribution a')).toHaveAttribute(
-      'href',
-      /openstreetmap\.org\/copyright/,
-    );
+    await expect(
+      map.locator('.leaflet-control-attribution').getByRole('link', { name: 'OpenStreetMap' }),
+    ).toHaveAttribute('href', /openstreetmap\.org\/copyright/);
     await expect(page.getByTestId('location-map-open')).toHaveAttribute(
       'href',
       /^https:\/\/www\.openstreetmap\.org\//,
