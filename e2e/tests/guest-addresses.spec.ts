@@ -67,7 +67,7 @@ test.describe('Guest saved addresses', () => {
     await page.getByTestId('address-sheet').getByTestId('address-add').click();
     await page.getByTestId('delivery-street').fill('Ленина');
     await page.getByTestId('delivery-house').fill('5');
-    await page.getByTestId('address-label-chips').getByRole('button', { name: 'Работа' }).click();
+    await page.getByTestId('address-label-chips').getByRole('radio', { name: 'Работа' }).click();
     await page.getByTestId('address-default-checkbox').check();
     await page.getByTestId('address-save').click();
     await expect(page.getByTestId('guest-address-list')).toBeVisible();

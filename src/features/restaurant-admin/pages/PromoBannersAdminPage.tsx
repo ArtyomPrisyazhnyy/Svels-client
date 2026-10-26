@@ -8,6 +8,7 @@ import {
   type FormEvent,
 } from 'react';
 import { ApiError } from '../../../shared/api/api-client';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import { ResponsiveImage } from '../../../shared/components/ResponsiveImage';
 import {
   PROMO_BANNER_ASPECT_RATIO_LABELS,
@@ -336,16 +337,12 @@ export default function PromoBannersAdminPage() {
               />
             </div>
 
-            <label className="promo-banners-admin__checkbox">
-              <input
-                type="checkbox"
-                checked={form.isActive}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, isActive: e.target.checked }))
-                }
-              />
-              Активен
-            </label>
+            <Checkbox
+              className="promo-banners-admin__checkbox"
+              checked={form.isActive}
+              onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
+              label="Активен"
+            />
           </div>
 
           <div className="promo-banners-admin__field">

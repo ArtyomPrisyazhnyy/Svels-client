@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { fetchOrderSettings, setOrdersPaused } from '../api/order-settings.api';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import { formatOrderApiError } from './orderErrors';
 
 interface OrdersPauseToggleProps {
@@ -47,25 +48,24 @@ export function OrdersPauseToggle({ restaurantId, token, onError }: OrdersPauseT
   }
 
   return (
-    <label className="orders-admin__pause">
-      <span className="orders-admin__pause-copy">
-        <strong>Пауза приёма заказов</strong>
-        <span>
-          {loading
-            ? 'Загрузка…'
-            : paused
-              ? 'Новые заказы от гостей временно не принимаются'
-              : 'Гости могут оформлять предзаказы'}
+    <Checkbox
+      className="orders-admin__pause"
+      checked={paused}
+      disabled={loading || saving}
+      onChange={(e) => void handleToggle(e.target.checked)}
+      testId="orders-pause-toggle"
+      label={
+        <span className="orders-admin__pause-copy">
+          <strong>Пауза приёма заказов</strong>
+          <span>
+            {loading
+              ? 'Загрузка…'
+              : paused
+                ? 'Новые заказы от гостей временно не принимаются'
+                : 'Гости могут оформлять предзаказы'}
+          </span>
         </span>
-      </span>
-      <input
-        type="checkbox"
-        className="orders-admin__pause-toggle"
-        checked={paused}
-        disabled={loading || saving}
-        onChange={(e) => void handleToggle(e.target.checked)}
-        data-testid="orders-pause-toggle"
-      />
-    </label>
+      }
+    />
   );
 }

@@ -87,7 +87,7 @@ test.describe('Guest OAuth in venue auth modal', () => {
 
     await expect(page.getByTestId('auth-error')).toContainText(GUEST_PRIVACY_CONSENT_ERROR);
     await expect(page.getByTestId('guest-otp-privacy-consent-label')).toHaveClass(
-      /guest-otp-privacy-consent-label--invalid/,
+      /ui-checkbox--invalid/,
     );
     await expect(page.getByTestId('guest-otp-privacy-consent')).toBeFocused();
     expect(oauthPostCount).toBe(0);

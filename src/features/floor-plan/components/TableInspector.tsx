@@ -4,6 +4,7 @@ import { v7 as uuidv7 } from 'uuid';
 import { useLayoutStore } from '@/store/layout-store';
 import { SEAT_KINDS } from '@/shared/types/floor-plan';
 import type { FloorPlanTable, SeatKind, TableSeat } from '@/shared/types/floor-plan';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import { SEAT_DEFAULT_SLOTS, SEAT_SLOT_WIDTH, TABLE_OBJECT_TYPES, TABLE_SHAPES } from './constants';
 
 interface TableInspectorProps {
@@ -281,23 +282,19 @@ export function TableInspector({ restaurantId, depositScheme }: TableInspectorPr
         )}
       </div>
 
-      <label className="fp-inspector__field fp-inspector__field--row">
-        <span>Доступен для брони</span>
-        <input
-          type="checkbox"
-          checked={table.isActive}
-          onChange={(e) => patch({ isActive: e.target.checked })}
-        />
-      </label>
+      <Checkbox
+        className="fp-inspector__field fp-inspector__field--row"
+        checked={table.isActive}
+        onChange={(e) => patch({ isActive: e.target.checked })}
+        label="Доступен для брони"
+      />
 
-      <label className="fp-inspector__field fp-inspector__field--row">
-        <span>Виден гостям</span>
-        <input
-          type="checkbox"
-          checked={table.visibleToGuests}
-          onChange={(e) => patch({ visibleToGuests: e.target.checked })}
-        />
-      </label>
+      <Checkbox
+        className="fp-inspector__field fp-inspector__field--row"
+        checked={table.visibleToGuests}
+        onChange={(e) => patch({ visibleToGuests: e.target.checked })}
+        label="Виден гостям"
+      />
 
       <button
         type="button"

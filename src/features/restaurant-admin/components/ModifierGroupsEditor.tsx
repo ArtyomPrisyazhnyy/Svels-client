@@ -1,3 +1,4 @@
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import { PriceDelta } from '../../../shared/components/CurrencyAmount';
 import type { MenuModifierGroup } from '../../../shared/types/menu';
 import { generateUuidV7 } from '../../../shared/utils/uuid.util';
@@ -88,14 +89,12 @@ export function ModifierGroupsEditor({ groups, onChange }: ModifierGroupsEditorP
           </div>
 
           {group.selectionType === 'single' && (
-            <label className="modifiers__required">
-              <input
-                type="checkbox"
-                checked={group.required}
-                onChange={(e) => updateGroup(groupIndex, { required: e.target.checked })}
-              />
-              Обязательный выбор
-            </label>
+            <Checkbox
+              className="modifiers__required"
+              checked={group.required}
+              onChange={(e) => updateGroup(groupIndex, { required: e.target.checked })}
+              label="Обязательный выбор"
+            />
           )}
 
           <div className="modifiers__options">

@@ -16,6 +16,7 @@ import {
   updateBookingSettings,
 } from '../api/booking-settings.api';
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import '../styles/order-settings-admin.scss';
 
 export default function BookingSettingsAdminPage() {
@@ -139,32 +140,30 @@ export default function BookingSettingsAdminPage() {
           <section className="order-settings-admin__panel">
             <h3>Статус</h3>
             <div className="order-settings-admin__options">
-              <label className="order-settings-admin__option">
-                <span className="order-settings-admin__option-copy">
-                  <strong>Бронирование включено</strong>
-                  <span>Гости смогут бронировать стол через страницу заведения.</span>
-                </span>
-                <input
-                  type="checkbox"
-                  className="order-settings-admin__toggle"
-                  checked={Boolean(draft.bookingEnabled)}
-                  disabled={saving}
-                  onChange={(e) => updateDraft({ bookingEnabled: e.target.checked })}
-                />
-              </label>
-              <label className="order-settings-admin__option">
-                <span className="order-settings-admin__option-copy">
-                  <strong>Автоподтверждение</strong>
-                  <span>Брони подтверждаются автоматически. Иначе ждут подтверждения в разделе «Брони».</span>
-                </span>
-                <input
-                  type="checkbox"
-                  className="order-settings-admin__toggle"
-                  checked={Boolean(draft.autoConfirm)}
-                  disabled={saving || !draft.bookingEnabled}
-                  onChange={(e) => updateDraft({ autoConfirm: e.target.checked })}
-                />
-              </label>
+              <Checkbox
+                className="order-settings-admin__option"
+                checked={Boolean(draft.bookingEnabled)}
+                disabled={saving}
+                onChange={(e) => updateDraft({ bookingEnabled: e.target.checked })}
+                label={
+                  <span className="order-settings-admin__option-copy">
+                    <strong>Бронирование включено</strong>
+                    <span>Гости смогут бронировать стол через страницу заведения.</span>
+                  </span>
+                }
+              />
+              <Checkbox
+                className="order-settings-admin__option"
+                checked={Boolean(draft.autoConfirm)}
+                disabled={saving || !draft.bookingEnabled}
+                onChange={(e) => updateDraft({ autoConfirm: e.target.checked })}
+                label={
+                  <span className="order-settings-admin__option-copy">
+                    <strong>Автоподтверждение</strong>
+                    <span>Брони подтверждаются автоматически. Иначе ждут подтверждения в разделе «Брони».</span>
+                  </span>
+                }
+              />
             </div>
           </section>
 

@@ -3,12 +3,12 @@
 import { useMemo, useState } from 'react';
 import { DeliveryAddressFields } from '../DeliveryAddressFields';
 import { Field, Input, Stack, Button, Checkbox } from '@/shared/ui';
+import { AddressLabelSegment } from '../AddressLabelSegment';
 import type { DeliveryAddress } from '@/shared/types/pre-order';
 import { isGuestAddressFormValid } from '../../utils/guest-address.util';
 import '../../styles/guest-addresses.scss';
 
 const LABEL_MAX = 40;
-const QUICK_LABELS = ['Дом', 'Работа'] as const;
 
 export interface GuestAddressFormValues {
   label: string;
@@ -68,22 +68,11 @@ export function GuestAddressForm({
           testId="address-label-input"
         />
       </Field>
-      <div className="guest-address-form__chips" data-testid="address-label-chips">
-        {QUICK_LABELS.map((chip) => (
-          <Button
-            key={chip}
-            type="button"
-            variant="secondary"
-            size="md"
-            className={`guest-address-form__chip-btn${
-              label.trim() === chip ? ' guest-address-form__chip-btn--active' : ''
-            }`}
-            onClick={() => setLabel(chip)}
-          >
-            {chip}
-          </Button>
-        ))}
-      </div>
+      <AddressLabelSegment
+        value={label}
+        onChange={setLabel}
+        testId="address-label-chips"
+      />
       <Checkbox
         label="Сделать основным"
         checked={isDefault}

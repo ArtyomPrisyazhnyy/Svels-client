@@ -19,6 +19,7 @@ import {
   fetchLoyaltySettings,
   updateLoyaltySettings,
 } from '../api/loyalty-settings.api';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import '../styles/loyalty-admin.scss';
 
 function createEmptyReward(): LoyaltyReward {
@@ -279,34 +280,30 @@ export default function LoyaltyAdminPage() {
 
       <section className="loyalty-admin__panel">
         <h3>Огонёк на сайте</h3>
-        <label className="loyalty-admin__toggle">
-          <input
-            type="checkbox"
-            checked={draft.flameDisplayEnabled}
-            onChange={(e) => {
-              const enabled = e.target.checked;
-              patchDraft({
-                flameDisplayEnabled: enabled,
-                flameRewardsEnabled: enabled ? draft.flameRewardsEnabled : false,
-              });
-            }}
-          />
-          Отображать огонёк гостям на странице заведения
-        </label>
+        <Checkbox
+          className="loyalty-admin__toggle"
+          checked={draft.flameDisplayEnabled}
+          onChange={(e) => {
+            const enabled = e.target.checked;
+            patchDraft({
+              flameDisplayEnabled: enabled,
+              flameRewardsEnabled: enabled ? draft.flameRewardsEnabled : false,
+            });
+          }}
+          label="Отображать огонёк гостям на странице заведения"
+        />
       </section>
 
       {draft.flameDisplayEnabled && (
         <>
           <section className="loyalty-admin__panel">
             <h3>Программы на огоньке</h3>
-            <label className="loyalty-admin__toggle">
-              <input
-                type="checkbox"
-                checked={draft.flameRewardsEnabled}
-                onChange={(e) => patchDraft({ flameRewardsEnabled: e.target.checked })}
-              />
-              Давать бонусы при достижении уровней огонька
-            </label>
+            <Checkbox
+              className="loyalty-admin__toggle"
+              checked={draft.flameRewardsEnabled}
+              onChange={(e) => patchDraft({ flameRewardsEnabled: e.target.checked })}
+              label="Давать бонусы при достижении уровней огонька"
+            />
             <p className="loyalty-admin__hint">
               Если выключить — огонёк останется как статус лояльности без автоматических наград.
             </p>

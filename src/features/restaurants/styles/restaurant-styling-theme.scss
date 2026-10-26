@@ -780,14 +780,6 @@
     }
   }
 
-  .restaurant-cart-modal__checkbox {
-    color: var(--rs-text);
-
-    input {
-      accent-color: var(--rs-accent);
-    }
-  }
-
   .restaurant-cart-modal__recipient {
     background: color-mix(in srgb, var(--rs-text) 5%, var(--rs-bg));
     border-color: var(--rs-border);

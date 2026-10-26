@@ -1,16 +1,19 @@
 'use client';
 
 import { useCallback, useEffect, useMemo } from 'react';
-import { Stack, Skeleton, Checkbox, Button } from '@/shared/ui';
+import { Skeleton, Checkbox } from '@/shared/ui';
 import type { CartCheckoutDraft } from '@/shared/types/cart';
 import { useGuestAddressesStore } from '@/store/guest-addresses.store';
 import { CartDetailRow } from '../CartDetailRow';
+import { CartCheckoutSection } from '../CartCheckoutSection';
+import { AddressLabelSegment } from '../AddressLabelSegment';
 import { DeliveryAddressFields } from '../DeliveryAddressFields';
 import { GuestAddressSheet } from './GuestAddressSheet';
 import type { GuestAddressFormValues } from './GuestAddressForm';
 import { formatGuestAddressCheckoutValue } from '../../utils/guest-address.util';
 import { createGuestAddressPayloadFromForm } from '../../utils/guest-address-form.util';
 import '../../styles/guest-addresses.scss';
+import '../../styles/cart-checkout-section.scss';
 
 interface CartCheckoutGuestAddressLoaderProps {
   restaurantId: string;
@@ -53,10 +56,8 @@ export function CartCheckoutDeliveryAddressInline({
   );
 
   return (
-    <Stack
-      gap={3}
-      as="section"
-      className="cart-checkout-section cart-checkout-section--address"
+    <CartCheckoutSection
+      className="cart-checkout-section--address"
       testId="cart-address-section"
     >
       <DeliveryAddressFields
@@ -77,25 +78,14 @@ export function CartCheckoutDeliveryAddressInline({
             onChange={(e) => onDraftChange({ saveDeliveryAddress: e.target.checked })}
             testId="address-save-checkbox"
           />
-          <div className="guest-address-form__chips" data-testid="address-label-chips-inline">
-            {['Дом', 'Работа'].map((chip) => (
-              <Button
-                key={chip}
-                type="button"
-                variant="secondary"
-                size="md"
-                className={`guest-address-form__chip-btn${
-                  draft.deliveryAddressLabel === chip ? ' guest-address-form__chip-btn--active' : ''
-                }`}
-                onClick={() => onDraftChange({ deliveryAddressLabel: chip })}
-              >
-                {chip}
-              </Button>
-            ))}
-          </div>
+          <AddressLabelSegment
+            value={draft.deliveryAddressLabel}
+            onChange={(label) => onDraftChange({ deliveryAddressLabel: label })}
+            testId="address-label-chips-inline"
+          />
         </>
       )}
-      <div className="cart-checkout-rows cart-checkout-rows--inset">
+      <div className="cart-checkout-section__inset-rows">
         <CartDetailRow
           label="Уточнить адрес"
           value=""
@@ -111,7 +101,7 @@ export function CartCheckoutDeliveryAddressInline({
           />
         </CartDetailRow>
       </div>
-    </Stack>
+    </CartCheckoutSection>
   );
 }
 
@@ -160,8 +150,8 @@ export function CartCheckoutSavedAddressRow({
 export function CartCheckoutSavedAddressRowSkeleton() {
   return (
     <div className="cart-detail-row cart-detail-row--grouped" data-testid="checkout-address-row">
-      <div className="cart-detail-row__trigger cart-detail-row__trigger--static">
-        <span className="cart-detail-row__label">Адрес</span>
+      <div className="ui-collapsible-row__trigger ui-collapsible-row__trigger--static cart-detail-row__trigger--static">
+        <span className="ui-collapsible-row__label">Адрес</span>
         <span className="guest-address-checkout-row__value">
           <Skeleton
             variant="text"
