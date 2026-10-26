@@ -6,6 +6,8 @@ import type { RestaurantStyling } from '@/shared/types/restaurant-styling';
 import type { BookingAvailability } from '@/shared/types/booking';
 import type { BookingSettings } from '@/shared/types/booking-settings';
 import { DEFAULT_BOOKING_SETTINGS } from '@/shared/types/booking-settings';
+import type { RestaurantLocation } from '@/shared/types/restaurant-location';
+import type { WorkSchedule } from '@/shared/types/schedule';
 import type { SocialLink } from '@/shared/types/social-link';
 import type { PromoBanner } from '@/shared/types/promo-banner';
 import {
@@ -144,6 +146,30 @@ export const getRestaurantSocialLinks = cache(async (restaurantId: string): Prom
   try {
     return await serverFetch<SocialLink[]>(
       `/restaurants/${restaurantId}/social-links`,
+      undefined,
+      publicPageFetchOptions(restaurantId),
+    );
+  } catch {
+    return [];
+  }
+});
+
+export const getRestaurantLocations = cache(async (restaurantId: string): Promise<RestaurantLocation[]> => {
+  try {
+    return await serverFetch<RestaurantLocation[]>(
+      `/restaurants/${restaurantId}/locations`,
+      undefined,
+      publicPageFetchOptions(restaurantId),
+    );
+  } catch {
+    return [];
+  }
+});
+
+export const getRestaurantSchedules = cache(async (restaurantId: string): Promise<WorkSchedule[]> => {
+  try {
+    return await serverFetch<WorkSchedule[]>(
+      `/restaurants/${restaurantId}/schedules`,
       undefined,
       publicPageFetchOptions(restaurantId),
     );

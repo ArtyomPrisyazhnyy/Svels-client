@@ -68,6 +68,7 @@ export const RESTAURANT_ADMIN_NAV: Array<{
   label: string;
   permission: RestaurantPermission | null;
 }> = [
+  { to: '/restaurant-admin/dashboard', label: 'Статистика', permission: 'manage_restaurant' },
   { to: '/restaurant-admin/preview', label: 'Страница заведения', permission: 'manage_menu' },
   { to: '/restaurant-admin/branding', label: 'Брендинг', permission: 'manage_branding' },
   { to: '/restaurant-admin/banners', label: 'Баннеры', permission: 'manage_marketing' },
