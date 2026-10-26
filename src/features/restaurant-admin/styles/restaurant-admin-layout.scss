@@ -24,6 +24,13 @@
   &::-webkit-scrollbar {
     display: none;
   }
+
+  /* Extra scroll space so the active chip can sit fully at the start
+     instead of leaving a sliced label on the left. */
+  &::after {
+    content: '';
+    flex: 0 0 100%;
+  }
 }
 
 .restaurant-admin__nav-link {
@@ -93,6 +100,11 @@
     overflow-y: auto;
     padding: var(--space-3);
     mask-image: none;
+
+    &::after {
+      content: none;
+    }
+
     border-bottom: none;
     border-right: 1px solid var(--rs-border);
   }
