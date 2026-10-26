@@ -5,6 +5,8 @@ import '../styles/restaurant-profile-button.scss';
 interface RestaurantGuestProfileButtonProps {
   authenticated?: boolean;
   onClick: () => void;
+  onMouseEnter?: () => void;
+  onTouchStart?: () => void;
 }
 
 function ProfileIcon() {
@@ -28,6 +30,8 @@ function ProfileIcon() {
 export function RestaurantGuestProfileButton({
   authenticated = false,
   onClick,
+  onMouseEnter,
+  onTouchStart,
 }: RestaurantGuestProfileButtonProps) {
   return (
     <button
@@ -36,6 +40,8 @@ export function RestaurantGuestProfileButton({
         authenticated ? ' restaurant-profile-button--authenticated' : ''
       }`}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onTouchStart={onTouchStart}
       aria-label={authenticated ? 'Личный кабинет' : 'Войти'}
       data-testid="guest-profile-button"
     >

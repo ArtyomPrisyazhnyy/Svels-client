@@ -22,6 +22,9 @@ export const useAuthStore = create<AuthState>()(
         void import('./guest-addresses.store').then(({ resetGuestAddressesStore }) => {
           resetGuestAddressesStore();
         });
+        void import('./guest-data.store').then(({ resetGuestDataStore }) => {
+          resetGuestDataStore();
+        });
       },
     }),
     {

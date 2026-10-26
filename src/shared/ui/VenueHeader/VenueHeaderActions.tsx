@@ -5,6 +5,7 @@ import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { useAuthStore } from '@/store/auth.store';
 import { useVenueOverlayOptional } from '@/features/restaurants/context/VenueOverlayContext';
+import { prefetchGuestData } from '@/features/restaurants/guest-data/ensure-guest-data';
 import { RestaurantCartButton } from '@/features/restaurants/components/RestaurantCartButton';
 import { RestaurantFavoritesHeaderButton } from '@/features/restaurants/components/RestaurantFavoritesHeaderButton';
 import { RestaurantGuestProfileButton } from '@/features/restaurants/components/RestaurantGuestProfileButton';
@@ -76,6 +77,8 @@ export function VenueHeaderActions({
         <RestaurantGuestProfileButton
           authenticated={isGuestOfRestaurant}
           onClick={handleProfileClick}
+          onMouseEnter={() => prefetchGuestData(restaurantId, 'both')}
+          onTouchStart={() => prefetchGuestData(restaurantId, 'both')}
         />
       </div>
       {enableCart && overlay ? (

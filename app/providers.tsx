@@ -5,8 +5,10 @@ import { useAuthProfileSync } from '@/hooks/useAuthProfileSync';
 import { ScrollToTopButton } from '@/shared/components/ScrollToTopButton';
 import { subscribeAuthLogoutCleanup } from '@/features/restaurants/session/clear-local-commerce-session';
 import { useAuthStore } from '@/store/auth.store';
+import { subscribeGuestDataAuth } from '@/store/guest-data-auth';
 
 subscribeAuthLogoutCleanup();
+subscribeGuestDataAuth();
 
 function AuthProfileSync({ children }: { children: React.ReactNode }) {
   useAuthProfileSync();
