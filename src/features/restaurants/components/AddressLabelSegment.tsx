@@ -1,6 +1,7 @@
 'use client';
 
 import { SegmentedControl } from '@/shared/ui';
+import { CART_CHECKOUT_SEGMENTED_PROPS } from '../constants/cart-segmented-control';
 
 const ADDRESS_LABEL_OPTIONS = [
   { value: 'Дом', label: 'Дом', testId: 'address-label-dom' },
@@ -25,9 +26,7 @@ export function AddressLabelSegment({ value, onChange, testId }: AddressLabelSeg
       onChange={onChange}
       ariaLabel="Метка адреса"
       size="md"
-      fullWidth
-      switcherStyle="segmented"
-      compact
+      {...CART_CHECKOUT_SEGMENTED_PROPS}
       testId={testId ?? 'address-label-segmented'}
     />
   );

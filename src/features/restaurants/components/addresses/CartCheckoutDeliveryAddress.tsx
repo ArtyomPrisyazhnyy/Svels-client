@@ -6,7 +6,6 @@ import type { CartCheckoutDraft } from '@/shared/types/cart';
 import { useGuestAddressesStore } from '@/store/guest-addresses.store';
 import { CartDetailRow } from '../CartDetailRow';
 import { CartCheckoutSection } from '../CartCheckoutSection';
-import { AddressLabelSegment } from '../AddressLabelSegment';
 import { DeliveryAddressFields } from '../DeliveryAddressFields';
 import { GuestAddressSheet } from './GuestAddressSheet';
 import type { GuestAddressFormValues } from './GuestAddressForm';
@@ -77,11 +76,6 @@ export function CartCheckoutDeliveryAddressInline({
             checked={draft.saveDeliveryAddress}
             onChange={(e) => onDraftChange({ saveDeliveryAddress: e.target.checked })}
             testId="address-save-checkbox"
-          />
-          <AddressLabelSegment
-            value={draft.deliveryAddressLabel}
-            onChange={(label) => onDraftChange({ deliveryAddressLabel: label })}
-            testId="address-label-chips-inline"
           />
         </>
       )}

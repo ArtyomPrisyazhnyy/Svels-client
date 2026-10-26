@@ -14,6 +14,7 @@ process.env.E2E_API_URL = apiURL;
 export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
+  updateSnapshots: process.env.CI ? 'missing' : undefined,
   retries: process.env.CI ? 2 : 0,
   // 1 worker: auth/OTP throttling на backend (nestjs-throttler)
   workers: 1,

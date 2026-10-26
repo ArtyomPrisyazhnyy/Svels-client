@@ -79,6 +79,7 @@ export default function PaymentSettingsAdminPage() {
   }, [restaurantId, accessToken]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadSettings();
   }, [loadSettings]);
 

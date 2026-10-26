@@ -315,6 +315,7 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
         </Field>
 
         <Checkbox
+          id="guest-otp-privacy-consent"
           className="auth-hint guest-otp-privacy-consent-label"
           invalid={consentInvalid}
           checked={privacyConsent}

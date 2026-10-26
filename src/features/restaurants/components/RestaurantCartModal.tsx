@@ -57,7 +57,6 @@ import {
   buildCreatePreOrderPayload,
 } from '../utils/checkout-payload.util';
 import { getPreOrderErrorMessage, isItemUnavailableError } from '../utils/pre-order-error.util';
-import { buildRequestedTimeSlots } from '../utils/requested-time.util';
 import {
   getStep2Title,
   validateCartCheckout,
@@ -183,16 +182,6 @@ export function RestaurantCartModal({
     () => locations.find((row) => row.id === locationId) ?? null,
     [locations, locationId],
   );
-
-  const timeSlots = useMemo(() => buildRequestedTimeSlots(), []);
-
-  const timeSummary = useMemo(() => {
-    if (draft.requestedAtMode === 'asap') {
-      return 'Как можно скорее';
-    }
-    const slot = timeSlots.find((s) => s.id === draft.requestedAtSlotIso);
-    return slot?.label ?? 'Ко времени';
-  }, [draft.requestedAtMode, draft.requestedAtSlotIso, timeSlots]);
 
   const paymentSummary = useMemo(() => {
     const key = payment ?? enabledPayments[0]?.key;
@@ -411,9 +400,6 @@ export function RestaurantCartModal({
         isGuestOfRestaurant &&
         selectCheckoutUsesSavedAddresses(restaurantId);
 
-      const inlineLabel =
-        draft.deliveryAddressLabel.trim() || draft.deliveryAddress.street.trim();
-
       const payload = buildCreatePreOrderPayload({
         fulfillment,
         payment,
@@ -433,7 +419,6 @@ export function RestaurantCartModal({
           fulfillment === 'fulfillmentDelivery' &&
           !usesSavedAddresses &&
           draft.saveDeliveryAddress,
-        addressLabel: inlineLabel || undefined,
         requestedAtIso,
         orderForSomeoneElse: draft.orderForSomeoneElse,
         recipientName: draft.recipientName,

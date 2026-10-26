@@ -116,6 +116,7 @@ export default function LoyaltyAdminPage() {
   }, [restaurantId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void load();
   }, [load]);
 
