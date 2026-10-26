@@ -87,6 +87,9 @@ export async function apiRequest<T>(
       },
     });
   } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw error;
+    }
     const detail = error instanceof Error ? error.message : 'network error';
     throw new ApiError(
       0,

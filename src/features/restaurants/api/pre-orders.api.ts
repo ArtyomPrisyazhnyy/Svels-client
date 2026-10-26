@@ -18,10 +18,19 @@ export function createPreOrder(
   });
 }
 
-export function fetchMyOrders(token: string): Promise<OrderDto[]> {
-  return apiRequest<OrderDto[]>('/users/me/pre-orders', {
+export function fetchMyOrders(
+  token: string,
+  options?: { restaurantId?: string; signal?: AbortSignal },
+): Promise<OrderDto[]> {
+  const params = new URLSearchParams();
+  if (options?.restaurantId) {
+    params.set('restaurantId', options.restaurantId);
+  }
+  const query = params.toString();
+  return apiRequest<OrderDto[]>(`/users/me/pre-orders${query ? `?${query}` : ''}`, {
     method: 'GET',
     token,
+    signal: options?.signal,
   });
 }
 

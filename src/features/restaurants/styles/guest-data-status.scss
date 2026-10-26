@@ -1,0 +1,22 @@
+.guest-data-anchor {
+  position: relative;
+}
+
+.guest-data-refresh {
+  position: absolute;
+  z-index: var(--z-sticky);
+  top: 0;
+  right: var(--space-4);
+  left: var(--space-4);
+  height: 2px;
+  background: var(--rs-accent);
+  pointer-events: none;
+}
+
+.guest-data-status__message {
+  margin: 0;
+  min-width: 0;
+  color: var(--rs-danger);
+  font-size: var(--text-md);
+  line-height: 1.45;
+}

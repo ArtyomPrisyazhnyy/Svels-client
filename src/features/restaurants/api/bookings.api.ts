@@ -26,8 +26,14 @@ export function createBooking(
   });
 }
 
-export function fetchMyBookings(token: string): Promise<Booking[]> {
-  return apiRequest<Booking[]>('/users/me/bookings', { token });
+export function fetchMyBookings(
+  token: string,
+  options?: { signal?: AbortSignal },
+): Promise<Booking[]> {
+  return apiRequest<Booking[]>('/users/me/bookings', {
+    token,
+    signal: options?.signal,
+  });
 }
 
 export function cancelBooking(token: string, bookingId: string): Promise<Booking> {

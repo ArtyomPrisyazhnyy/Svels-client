@@ -1,60 +1,62 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ApiError } from '@/shared/api/api-client';
+import { useCallback, useEffect, useState } from 'react';
 import type { Booking } from '@/shared/types/booking';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useAuthStore } from '@/store/auth.store';
+import { guestDataCacheKey } from '@/store/guest-data.logic';
 import { useGuestDataStore } from '@/store/guest-data.store';
-import { fetchMyBookings } from '../api/bookings.api';
+import { ensureGuestBookings } from '../guest-data/ensure-guest-data';
 
 interface UseGuestBookingsResult {
   bookings: Booking[];
   loading: boolean;
   error: string | null;
+  refreshing: boolean;
+  retrying: boolean;
+  retry: () => void;
 }
 
-export function useGuestBookings(): UseGuestBookingsResult {
+export function useGuestBookings(restaurantId: string): UseGuestBookingsResult {
   const hydrated = useAuthHydrated();
-  const accessToken = useAuthStore((s) => s.accessToken);
-  const cached = useGuestDataStore((s) => s.bookings);
-  const [error, setError] = useState<string | null>(null);
-
-  const bookings = cached?.data ?? [];
-  const loading = hydrated && Boolean(accessToken) && !cached;
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const userId = useAuthStore((state) => state.user?.id ?? null);
+  const cacheKey = userId ? guestDataCacheKey(userId, restaurantId) : null;
+  const cached = useGuestDataStore((state) =>
+    cacheKey ? state.bookingsByKey[cacheKey] : undefined,
+  );
+  const refreshing = useGuestDataStore((state) =>
+    cacheKey ? state.refreshingBookings[cacheKey] === true : false,
+  );
+  const error = useGuestDataStore((state) =>
+    cacheKey ? state.bookingsError[cacheKey] ?? null : null,
+  );
+  const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
-    if (!hydrated || !accessToken) {
+    if (!hydrated || !accessToken || !userId) {
       return;
     }
+    void ensureGuestBookings({ userId, restaurantId, token: accessToken });
+  }, [hydrated, accessToken, userId, restaurantId]);
 
-    const store = useGuestDataStore.getState();
-    const existing = store.bookings;
-    const shouldFetch = !existing || !store.isFresh(existing);
-    if (!shouldFetch) {
+  const retry = useCallback(() => {
+    if (!accessToken || !userId) {
       return;
     }
+    setRetrying(true);
+    void ensureGuestBookings({
+      userId,
+      restaurantId,
+      token: accessToken,
+      force: true,
+    }).finally(() => {
+      setRetrying(false);
+    });
+  }, [accessToken, restaurantId, userId]);
 
-    let cancelled = false;
+  const bookings = cached?.data ?? [];
+  const loading = Boolean(hydrated && accessToken && userId && !cached && !error);
 
-    void (async () => {
-      try {
-        const rows = await fetchMyBookings(accessToken);
-        if (!cancelled) {
-          store.setBookings(rows);
-          setError(null);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : 'Не удалось загрузить брони');
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [hydrated, accessToken]);
-
-  return { bookings, loading, error };
+  return { bookings, loading, error, refreshing, retrying, retry };
 }

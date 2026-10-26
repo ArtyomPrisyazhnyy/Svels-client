@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { formatPhoneDisplay } from '@/shared/utils/phone.util';
@@ -17,7 +17,13 @@ import { Button } from '@/shared/ui/Button/Button';
 import { Stack } from '@/shared/ui/Stack/Stack';
 import { GuestAccountAddressesSection } from '@/features/restaurants/components/addresses/GuestAccountAddressesSection';
 import { GuestAccountBookingsSkeleton } from '@/features/restaurants/components/guest-page-skeletons/GuestPageSkeletons';
+import {
+  GuestDataError,
+  GuestDataRefreshMark,
+} from '@/features/restaurants/guest-data/GuestDataRefreshMark';
+import { guestDataPrefetchHandlers, prefetchGuestData } from '@/features/restaurants/guest-data/ensure-guest-data';
 import { useGuestBookings } from '@/features/restaurants/hooks/useGuestBookings';
+import { guestDataCacheKey } from '@/store/guest-data.logic';
 import { useGuestDataStore } from '@/store/guest-data.store';
 import '@/features/restaurants/styles/restaurant-guest-account-page.scss';
 
@@ -41,9 +47,19 @@ export function RestaurantGuestAccountPage({
   const accessToken = useAuthStore((s) => s.accessToken);
   const logout = useAuthStore((s) => s.logout);
   const paths = useRestaurantGuestPaths(restaurantId);
-  const { bookings, loading, error: fetchError } = useGuestBookings();
+  const {
+    bookings,
+    loading,
+    error: fetchError,
+    refreshing,
+    retrying,
+    retry,
+  } = useGuestBookings(restaurantId);
   const [cancelError, setCancelError] = useState<string | null>(null);
-  const error = cancelError ?? fetchError;
+
+  useEffect(() => {
+    prefetchGuestData(restaurantId, 'both');
+  }, [restaurantId]);
 
   function handleLogout() {
     markGuestLogoutRedirectPending();
@@ -54,9 +70,16 @@ export function RestaurantGuestAccountPage({
     if (!accessToken) return;
     try {
       const updated = await cancelBooking(accessToken, bookingId);
-      const current = useGuestDataStore.getState().bookings?.data ?? [];
+      const userId = useAuthStore.getState().user?.id;
+      if (!userId) {
+        return;
+      }
+      const key = guestDataCacheKey(userId, restaurantId);
+      const current = useGuestDataStore.getState().bookingsByKey[key]?.data ?? [];
       useGuestDataStore.getState().setBookings(
-        current.map((b) => (b.id === updated.id ? updated : b)),
+        userId,
+        restaurantId,
+        current.map((booking) => (booking.id === updated.id ? updated : booking)),
       );
       setCancelError(null);
     } catch (err) {
@@ -114,21 +137,38 @@ export function RestaurantGuestAccountPage({
             <h2>Действия</h2>
             <div className="restaurant-guest-account__links">
               <Link href={paths.booking}>Бронирование</Link>
-              <Link href={paths.preOrder}>Мои заказы</Link>
+              <Link
+                href={paths.preOrder}
+                data-testid="guest-account-orders-link"
+                {...guestDataPrefetchHandlers(restaurantId, 'orders')}
+              >
+                Мои заказы
+              </Link>
             </div>
           </section>
 
-          <section className="restaurant-guest-account__section">
+          <section className="restaurant-guest-account__section guest-data-anchor" data-testid="guest-bookings-section">
+            <GuestDataRefreshMark active={refreshing} testId="guest-bookings-refreshing" />
             <h2>Мои брони</h2>
-            {error && <p className="restaurant-guest-account__hint">{error}</p>}
+            {cancelError && <p className="restaurant-guest-account__hint">{cancelError}</p>}
             {loading ? (
               <GuestAccountBookingsSkeleton />
+            ) : fetchError && bookings.length === 0 ? (
+              <GuestDataError
+                message={fetchError}
+                testId="guest-bookings-error"
+                retryTestId="guest-bookings-retry"
+                retrying={retrying}
+                onRetry={retry}
+              />
             ) : bookings.length === 0 ? (
-              <p className="restaurant-guest-account__hint">Пока нет бронирований.</p>
+              <p className="restaurant-guest-account__hint" data-testid="guest-bookings-empty">
+                Пока нет бронирований.
+              </p>
             ) : (
-              <ul className="restaurant-guest-account__bookings">
+              <ul className="restaurant-guest-account__bookings" data-testid="guest-bookings-list" aria-busy={refreshing || undefined}>
                 {bookings.map((booking) => (
-                  <li key={booking.id} className="restaurant-guest-account__booking">
+                  <li key={booking.id} className="restaurant-guest-account__booking" data-testid={`guest-booking-${booking.id}`}>
                     <div className="restaurant-guest-account__booking-info">
                       <strong>
                         {booking.bookingDate} в {booking.bookingTime.slice(0, 5)}

@@ -5,6 +5,7 @@ import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import type { SocialLink } from '@/shared/types/social-link';
 import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
+import { guestDataPrefetchHandlers } from '../guest-data/ensure-guest-data';
 import { RestaurantSocialLinks } from './RestaurantSocialLinks';
 
 export type RestaurantFooterRestaurant = Pick<
@@ -60,10 +61,18 @@ export function RestaurantFooter({
               Избранное
             </Link>
           )}
-          <Link href={paths.preOrder} className="restaurant-public__footer-link">
+          <Link
+            href={paths.preOrder}
+            className="restaurant-public__footer-link"
+            {...guestDataPrefetchHandlers(restaurant.id, 'orders')}
+          >
             Предзаказ
           </Link>
-          <Link href={paths.account} className="restaurant-public__footer-link">
+          <Link
+            href={paths.account}
+            className="restaurant-public__footer-link"
+            {...guestDataPrefetchHandlers(restaurant.id, 'both')}
+          >
             Личный кабинет
           </Link>
           <Link

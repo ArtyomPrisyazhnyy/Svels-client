@@ -4,8 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import type { OrderDto } from '@/shared/types/pre-order';
 import { useAuthStore } from '@/store/auth.store';
-import { fetchMyOrder, fetchMyOrders } from '../api/pre-orders.api';
-import { useGuestDataStore } from '@/store/guest-data.store';
+import { fetchMyOrder } from '../api/pre-orders.api';
+import { GuestDataError, GuestDataRefreshMark } from '../guest-data/GuestDataRefreshMark';
+import { ensureGuestOrders } from '../guest-data/ensure-guest-data';
 import { GuestOrdersListSkeleton } from './guest-page-skeletons/GuestPageSkeletons';
 import { useGuestOrders } from '../hooks/useGuestOrders';
 import {
@@ -37,22 +38,24 @@ function formatRequestedAt(iso: string | null): string {
 
 export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
   const accessToken = useAuthStore((s) => s.accessToken);
-  const { orders, loading, error } = useGuestOrders(restaurantId);
+  const { orders, loading, error, refreshing, retrying, retry } = useGuestOrders(restaurantId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<OrderDto | null>(null);
 
   const loadOrders = useCallback(async () => {
-    if (!accessToken) {
+    const token = useAuthStore.getState().accessToken;
+    const userId = useAuthStore.getState().user?.id;
+    if (!token || !userId) {
       return;
     }
-    try {
-      const rows = await fetchMyOrders(accessToken);
-      const forRestaurant = rows.filter((o) => o.restaurantId === restaurantId);
-      useGuestDataStore.getState().setOrders(restaurantId, forRestaurant);
-    } catch {
-      // polling errors are non-fatal
-    }
-  }, [accessToken, restaurantId]);
+    await ensureGuestOrders({
+      userId,
+      restaurantId,
+      token,
+      force: true,
+      silent: true,
+    });
+  }, [restaurantId]);
 
   const hasActiveOrders = orders.some((o) => !isTerminalOrderStatus(o.status));
 
@@ -110,8 +113,18 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
     );
   }
 
-  if (error) {
-    return <p className="guest-orders-list__error">{error}</p>;
+  if (error && orders.length === 0) {
+    return (
+      <div data-testid="guest-page-first-block">
+        <GuestDataError
+          message={error}
+          testId="guest-orders-error"
+          retryTestId="guest-orders-retry"
+          retrying={retrying}
+          onRetry={retry}
+        />
+      </div>
+    );
   }
 
   if (orders.length === 0) {
@@ -125,8 +138,13 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
   }
 
   return (
-    <div className="guest-orders-list" data-testid="guest-orders-list">
-      <div data-testid="guest-page-first-block">
+    <div
+      className="guest-orders-list guest-data-anchor"
+      data-testid="guest-orders-list"
+      aria-busy={refreshing || undefined}
+    >
+      <GuestDataRefreshMark active={refreshing} testId="guest-orders-refreshing" />
+      <div className="guest-orders-list__column" data-testid="guest-page-first-block">
       <ul className="guest-orders-list__items">
         {orders.map((order) => (
           <li key={order.id}>

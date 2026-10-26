@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { GuestVenueDataPrefetch } from '@/features/restaurants/guest-data/GuestVenueDataPrefetch';
 import { RestaurantStylingShell } from '@/features/restaurants/context/RestaurantStylingContext';
 import { VenueOverlayProvider } from '@/features/restaurants/context/VenueOverlayContext';
 import { VenueHeader } from '@/shared/ui/VenueHeader/VenueHeader';
@@ -50,6 +51,7 @@ export default async function RestaurantVenueLayout({
         bookingEnabled={bookingEnabled}
       >
         <div className="venue-layout" data-testid="venue-layout">
+          <GuestVenueDataPrefetch restaurantId={restaurant.id} />
           <VenueHeader
             restaurantId={restaurant.id}
             restaurantName={restaurant.name}

@@ -229,24 +229,34 @@ export const apiClient = {
     });
   },
 
-  async createGuest(restaurantId: string, firstName = 'E2E', lastName = 'Guest') {
-    const phone = `+37529${String(Date.now()).slice(-7)}${Math.floor(Math.random() * 10)}`.slice(
-      0,
-      13,
-    );
-    await this.sendGuestOtp(restaurantId, phone);
+  async createGuest(
+    restaurantId: string,
+    firstName = 'E2E',
+    lastName = 'Guest',
+    phone?: string,
+  ) {
+    const resolvedPhone =
+      phone ??
+      `+37529${String(Date.now()).slice(-7)}${Math.floor(Math.random() * 10)}`.slice(0, 13);
+    await this.sendGuestOtp(restaurantId, resolvedPhone);
     await sleep(200);
-    const otp = await this.getLastDevOtp(phone);
-    const verified = await this.verifyGuestOtp(restaurantId, phone, otp.code);
+    const otp = await this.getLastDevOtp(resolvedPhone);
+    const verified = await this.verifyGuestOtp(restaurantId, resolvedPhone, otp.code);
     if (verified.status === 'authenticated') {
-      return { auth: verified as AuthResponse, phone };
+      if (phone && verified.user.restaurantId && verified.user.restaurantId !== restaurantId) {
+        throw new Error(`Phone ${resolvedPhone} belongs to another restaurant`);
+      }
+      return {
+        auth: { accessToken: verified.accessToken, user: verified.user },
+        phone: resolvedPhone,
+      };
     }
     const auth = await this.registerGuestWithOtp(restaurantId, {
       registrationToken: verified.registrationToken,
       firstName,
       lastName,
     });
-    return { auth, phone };
+    return { auth, phone: resolvedPhone };
   },
 
   getMenu(restaurantId: string) {
@@ -265,12 +275,40 @@ export const apiClient = {
   updateBookingSettings(
     restaurantId: string,
     token: string,
-    payload: { bookingEnabled?: boolean },
+    payload: {
+      bookingEnabled?: boolean;
+      mode?: 'specific_table' | 'by_seats';
+      autoConfirm?: boolean;
+    },
   ) {
-    return api<{ bookingEnabled: boolean }>('PATCH', `/restaurants/${restaurantId}/booking-settings`, {
+    return api<{ bookingEnabled: boolean; mode: string }>('PATCH', `/restaurants/${restaurantId}/booking-settings`, {
       token,
       body: payload,
     });
+  },
+
+  getBookingAvailability(restaurantId: string, date: string) {
+    return api<{ slots: string[]; enabled: boolean; mode: string }>(
+      'GET',
+      `/restaurants/${restaurantId}/bookings/availability?date=${encodeURIComponent(date)}`,
+    );
+  },
+
+  createBooking(
+    restaurantId: string,
+    token: string,
+    payload: {
+      bookingDate: string;
+      bookingTime: string;
+      guestCount: number;
+      notes?: string;
+    },
+  ) {
+    return api<{ id: string; bookingDate: string; bookingTime: string; guestCount: number }>(
+      'POST',
+      `/restaurants/${restaurantId}/bookings`,
+      { token, body: payload },
+    );
   },
 
   addGuestFavorite(restaurantId: string, token: string, menuItemId: string) {
@@ -315,6 +353,13 @@ export const apiClient = {
     return api<PreOrderResponse>('POST', `/restaurants/${restaurantId}/pre-orders`, {
       token,
       body: payload,
+    });
+  },
+
+  setOrdersPaused(restaurantId: string, token: string, ordersPaused: boolean) {
+    return api('PATCH', `/restaurants/${restaurantId}/order-settings/pause`, {
+      token,
+      body: { ordersPaused },
     });
   },
 
