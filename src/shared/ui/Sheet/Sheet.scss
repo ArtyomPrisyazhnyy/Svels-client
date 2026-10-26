@@ -9,3 +9,34 @@
 .ui-sheet__backdrop--stacked {
   z-index: var(--z-stacked);
 }
+
+.ui-overlay-panel__grab {
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: var(--space-6);
+  z-index: 2;
+  touch-action: none;
+}
+
+@media (min-width: 768px) {
+  .ui-sheet--bottom {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .ui-sheet--bottom .ui-overlay-panel--sheet {
+    max-width: none;
+    max-height: 92dvh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  .ui-sheet--bottom .ui-overlay-panel--sheet .ui-overlay-panel__handle {
+    display: block;
+  }
+
+  .ui-sheet--bottom .ui-overlay-panel--sheet .ui-overlay-panel__header {
+    padding-top: var(--space-6);
+  }
+}

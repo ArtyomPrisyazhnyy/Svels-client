@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   canAccessRestaurantAdminPath,
   getRestaurantAdminHomePath,
@@ -23,6 +23,7 @@ export default function RestaurantAdminLayout({ children }: { children: React.Re
   const role = user?.role;
   const badge =
     role && isRestaurantStaffRole(role) ? RESTAURANT_STAFF_LABELS[role] : 'Админ заведения';
+  const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
 
   const navItems = RESTAURANT_ADMIN_NAV.filter(
     (item) => item.permission === null || staffHasPermission(role, item.permission),
@@ -38,14 +39,23 @@ export default function RestaurantAdminLayout({ children }: { children: React.Re
     }
   }, [role, pathname, router]);
 
+  useEffect(() => {
+    activeLinkRef.current?.scrollIntoView({ inline: 'start', block: 'nearest' });
+  }, [pathname]);
+
   return (
     <div className="restaurant-admin" data-testid="restaurant-admin-layout">
       <header className="glass-header restaurant-admin__header">
-        <Link href="/" className="glass-header__link glass-header__link--accent restaurant-admin__back">
-          ← На главную
+        <Link
+          href="/"
+          aria-label="На главную"
+          className="glass-header__link glass-header__link--accent restaurant-admin__back"
+        >
+          <span aria-hidden="true">←</span>
+          <span className="restaurant-admin__back-label">На главную</span>
         </Link>
-        <h1 className="glass-header__title">
-          Svels
+        <h1 className="glass-header__title restaurant-admin__title">
+          <span className="restaurant-admin__brand">Svels</span>
           <span className="restaurant-admin__badge">{badge}</span>
         </h1>
         <button
@@ -59,27 +69,27 @@ export default function RestaurantAdminLayout({ children }: { children: React.Re
       </header>
 
       <div className="restaurant-admin__body">
-        <nav className="restaurant-admin__nav" data-testid="restaurant-admin-nav">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              href={item.to}
-              className={`restaurant-admin__nav-link${
-                pathname.startsWith(item.to) ? ' restaurant-admin__nav-link--active' : ''
-              }`}
-              data-testid={`nav-${item.to.replace('/restaurant-admin/', '')}`}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <nav className="restaurant-admin__nav" aria-label="Разделы админки" data-testid="restaurant-admin-nav">
+          {navItems.map((item) => {
+            const active = pathname.startsWith(item.to);
+            return (
+              <Link
+                key={item.to}
+                ref={active ? activeLinkRef : undefined}
+                href={item.to}
+                className={`restaurant-admin__nav-link${
+                  active ? ' restaurant-admin__nav-link--active' : ''
+                }`}
+                aria-current={active ? 'page' : undefined}
+                data-testid={`nav-${item.to.replace('/restaurant-admin/', '')}`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="restaurant-admin__content">
-          <p className="restaurant-admin__welcome">
-            {user?.firstName}, управляйте заведением для предзаказов.
-          </p>
-          {children}
-        </div>
+        <div className="restaurant-admin__content">{children}</div>
       </div>
     </div>
   );
