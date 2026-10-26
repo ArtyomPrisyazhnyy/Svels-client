@@ -44,10 +44,10 @@ async function ensureOpenEveryDay(restaurantId: string, token: string): Promise<
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+        body: JSON.stringify({
         dayOfWeek,
-        openTime: '10:00',
-        closeTime: '22:00',
+        openTime: '00:00',
+        closeTime: '23:59',
         isOpen: true,
       }),
     });
@@ -98,6 +98,7 @@ test.describe('Guest orders and bookings cache', () => {
     seed,
   }) => {
     const adminToken = seed.restaurantAdmin.auth.accessToken;
+    try {
     const { auth: guest, phone } = await createAllowedGuest(seed.restaurantId);
     assertE2ETestPhone(phone);
 
@@ -207,5 +208,12 @@ test.describe('Guest orders and bookings cache', () => {
         return Object.keys(orders).length === 0 && Object.keys(bookings).length === 0;
       });
     }).toBe(true);
+    } finally {
+      // The suite shares one restaurant. Leave booking off and the day open
+      // so later order and footer screenshots match the seeded venue.
+      await apiClient.updateBookingSettings(seed.restaurantId, adminToken, {
+        bookingEnabled: false,
+      });
+    }
   });
 });
