@@ -587,7 +587,7 @@
     color: var(--rs-text);
   }
 
-  .menu-product-modal__body {
+  .menu-product-modal__panel.ui-overlay-panel .ui-overlay-panel__body {
     scrollbar-color: var(--rs-text-soft) var(--rs-bg);
 
     &::-webkit-scrollbar-track {
