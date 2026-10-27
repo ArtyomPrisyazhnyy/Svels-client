@@ -16,8 +16,8 @@ export async function assertCartTitleCentered(panel: Locator): Promise<void> {
 }
 
 export async function assertExpandedRowContentGap(row: Locator): Promise<void> {
-  const trigger = row.locator('.cart-detail-row__trigger');
-  const content = row.locator('.cart-detail-row__content');
+  const trigger = row.locator('.ui-collapsible-row__trigger');
+  const content = row.locator('.ui-collapsible-row__content');
   await expect(content).toBeVisible();
   const triggerBox = await trigger.boundingBox();
   const contentBox = await content.boundingBox();

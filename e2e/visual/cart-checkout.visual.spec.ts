@@ -74,7 +74,7 @@ async function seedCart(
               [rid]: {
                 fulfillment: fulfillmentKey,
                 customerName: 'Тест',
-                phone: '+375290000001',
+                phone: '+375290000002',
                 deliveryAddress: {
                   street: 'Ленина',
                   house: '1',
