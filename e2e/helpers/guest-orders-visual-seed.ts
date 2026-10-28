@@ -3,8 +3,6 @@ import type { CreatePreOrderPayload } from '../../src/shared/types/pre-order';
 import type { MenuItem } from '../../src/shared/types/menu';
 import type { AuthResponse } from './api';
 
-export const VISUAL_GUEST_PHONE = '+375290000003';
-
 export interface VisualGuestOrderSeed {
   guestAuth: AuthResponse;
   orderNumber: number;
@@ -62,6 +60,7 @@ async function seedCappuccino(
 export async function seedVisualCancelledGuestOrder(
   restaurantId: string,
   adminToken: string,
+  guestAuth: AuthResponse,
 ): Promise<VisualGuestOrderSeed> {
   await apiClient.setOrderSettings(restaurantId, adminToken, {
     fulfillmentTakeaway: true,
@@ -79,14 +78,14 @@ export async function seedVisualCancelledGuestOrder(
     throw new Error('E2E restaurant must have a location');
   }
 
-  const { auth: guestAuth } = await apiClient.guestOtpLogin(restaurantId, VISUAL_GUEST_PHONE);
+  const guestPhone = guestAuth.user.phone ?? '+375290000001';
 
   const payload: CreatePreOrderPayload = {
     fulfillmentType: 'takeaway',
     paymentMethod: 'cash',
     locationId,
-    customerName: 'Visual Guest',
-    customerPhone: VISUAL_GUEST_PHONE,
+    customerName: `${guestAuth.user.firstName} ${guestAuth.user.lastName}`.trim(),
+    customerPhone: guestPhone,
     items: [
       {
         menuItemId,

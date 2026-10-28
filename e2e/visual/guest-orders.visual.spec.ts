@@ -14,6 +14,7 @@ let appliedTheme: RestaurantColorTheme | null = null;
 async function ensureVisualOrder(seed: {
   restaurantId: string;
   restaurantAdmin: { auth: { accessToken: string } };
+  guest: import('./env').E2eSeed['guest'];
 }): Promise<NonNullable<typeof visualOrderSeed>> {
   if (visualOrderSeed) {
     return visualOrderSeed;
@@ -21,6 +22,7 @@ async function ensureVisualOrder(seed: {
   visualOrderSeed = await seedVisualCancelledGuestOrder(
     seed.restaurantId,
     seed.restaurantAdmin.auth.accessToken,
+    seed.guest,
   );
   return visualOrderSeed;
 }
