@@ -36,7 +36,7 @@ test.describe.configure({ mode: 'serial' });
 test.describe('Promo banner walkthrough capture', () => {
   test.skip(!process.env.CAPTURE_WALKTHROUGH, 'Set CAPTURE_WALKTHROUGH=1 to generate artifacts');
 
-  test('screenshots for classic/midnight cropper and public 4:1 strip', async ({ page, seed }) => {
+  test('full-page admin + public top screenshots', async ({ page, seed }) => {
     fs.mkdirSync(OUT_DIR, { recursive: true });
     await loginAdmin(page, seed);
 
@@ -48,12 +48,13 @@ test.describe('Promo banner walkthrough capture', () => {
 
       for (const [label, width, height] of [
         ['390', 390, 844],
-        ['1280', 1280, 800],
+        ['1280', 1280, 900],
       ] as const) {
         await page.setViewportSize({ width, height });
-        await page.getByTestId('promo-banner-cropper').scrollIntoViewIfNeeded();
-        await page.getByTestId('promo-banner-cropper').screenshot({
-          path: path.join(OUT_DIR, `promo-cropper-${theme}-${label}.png`),
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.screenshot({
+          path: path.join(OUT_DIR, `promo-admin-banners-${theme}-${label}.png`),
+          fullPage: true,
         });
       }
 
@@ -64,18 +65,19 @@ test.describe('Promo banner walkthrough capture', () => {
       await expect(page.getByText(`Walkthrough 4:1 ${theme}`)).toBeVisible({ timeout: 20_000 });
 
       await page.goto(`/restaurants/${seed.restaurantId}?walkthrough=${theme}`);
-      await expect(page.getByTestId('promo-banner-strip-frame-4_1').first()).toBeVisible({
-        timeout: 15_000,
-      });
+      await expect(page.getByTestId('restaurant-public-page')).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByTestId('promo-banner-strip').first()).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByTestId('menu-category-nav-scroll')).toBeVisible({ timeout: 15_000 });
 
       for (const [label, width, height] of [
         ['390', 390, 844],
-        ['1280', 1280, 800],
+        ['1280', 1280, 900],
       ] as const) {
         await page.setViewportSize({ width, height });
-        await page.getByTestId('promo-banner-strip').scrollIntoViewIfNeeded();
-        await page.getByTestId('promo-banner-strip').screenshot({
-          path: path.join(OUT_DIR, `promo-public-4-1-${theme}-${label}.png`),
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.screenshot({
+          path: path.join(OUT_DIR, `promo-public-top-${theme}-${label}.png`),
+          fullPage: false,
         });
       }
     }

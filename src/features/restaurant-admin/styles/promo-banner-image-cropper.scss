@@ -37,20 +37,6 @@
   pointer-events: none;
 }
 
-.promo-banner-crop__zoom {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--rs-text, #334155);
-
-  input[type='range'] {
-    width: 100%;
-  }
-}
-
 .promo-banner-crop__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  margin-top: 0;
 }

@@ -2,6 +2,7 @@ export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from '.
 export { IconButton, type IconButtonProps } from './IconButton/IconButton';
 export { Field, type FieldProps } from './Field/Field';
 export { Input, type InputProps } from './Input/Input';
+export { RangeInput, type RangeInputProps } from './RangeInput/RangeInput';
 export { Textarea, type TextareaProps } from './Textarea/Textarea';
 export { Select, type SelectProps } from './Select/Select';
 export { Checkbox, type CheckboxProps } from './Checkbox/Checkbox';

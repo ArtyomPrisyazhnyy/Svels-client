@@ -7,18 +7,18 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
-import { Button } from '@/shared/ui/Button/Button';
-import type { PromoBannerAspectRatio } from '@/shared/types/promo-banner';
-import {
-  PROMO_BANNER_MODAL_CROP_ASPECT,
-  promoBannerAspectRatioToNumber,
-} from '../utils/promo-banner-aspect.util';
 import {
   clampCropTransform,
   createInitialCropTransform,
   getMinCoverZoom,
   type CropTransform,
 } from '../utils/promo-banner-crop.util';
+import type { PromoBannerAspectRatio } from '@/shared/types/promo-banner';
+import { Field, RangeInput } from '@/shared/ui';
+import {
+  PROMO_BANNER_MODAL_CROP_ASPECT,
+  promoBannerAspectRatioToNumber,
+} from '../utils/promo-banner-aspect.util';
 import '../styles/promo-banner-image-cropper.scss';
 
 export interface PromoBannerImageCropperProps {
@@ -213,38 +213,38 @@ export function PromoBannerImageCropper({
         />
       </div>
 
-      <label className="promo-banner-crop__zoom">
-        <span>Масштаб</span>
-        <input
-          type="range"
+      <Field label="Масштаб" htmlFor="promo-banner-crop-zoom">
+        <RangeInput
+          id="promo-banner-crop-zoom"
           min={minZoom}
           max={Math.max(minZoom * 3, minZoom + 0.01)}
           step={0.01}
           value={transform.zoom}
-          data-testid="promo-banner-cropper-zoom"
+          testId="promo-banner-cropper-zoom"
           disabled={confirming || imageSize.width <= 0}
           onChange={(event) => handleZoomChange(Number.parseFloat(event.target.value))}
         />
-      </label>
+      </Field>
 
-      <div className="promo-banner-crop__actions">
-        <Button
+      <div className="promo-banners-admin__actions promo-banner-crop__actions">
+        <button
           type="button"
-          variant="secondary"
+          className="promo-banners-admin__cancel"
           disabled={confirming}
+          data-testid="promo-banner-cropper-cancel"
           onClick={onCancel}
-          testId="promo-banner-cropper-cancel"
         >
           Отмена
-        </Button>
-        <Button
+        </button>
+        <button
           type="button"
+          className="promo-banners-admin__submit"
           disabled={!canConfirm}
-          testId="promo-banner-cropper-apply"
+          data-testid="promo-banner-cropper-apply"
           onClick={() => onConfirm(transform, viewportSize)}
         >
           {confirming ? 'Загрузка…' : 'Применить обрезку'}
-        </Button>
+        </button>
       </div>
       <p className="promo-banner-crop__meta">{sourceFileName}</p>
     </div>
