@@ -61,12 +61,23 @@
   padding: 0;
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background: var(--rs-surface, #ffffff);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  background: transparent;
+  box-shadow: none;
 
   @media (max-width: 640px) {
     margin-bottom: var(--space-5);
     border-radius: var(--radius-md);
+  }
+
+  .promo-banner-aspect-frame {
+    background: transparent;
+  }
+
+  .promo-banner-aspect-frame__image {
+    border: 0;
+    outline: none;
+    vertical-align: top;
+    object-fit: cover;
   }
 }
 
@@ -78,10 +89,6 @@
 
 .promo-banner-strip__frame {
   border-radius: inherit;
-}
-
-.promo-banner-strip__image {
-  object-fit: contain;
 }
 
 .promo-banner-strip__carousel {
