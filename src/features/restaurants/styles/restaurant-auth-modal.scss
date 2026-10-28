@@ -13,16 +13,11 @@
   min-width: 0;
 }
 
-.guest-otp-privacy-consent-label {
-  cursor: pointer;
+.guest-otp-privacy-consent-label.ui-checkbox {
+  align-items: flex-start;
 
-  &--invalid {
+  &.ui-checkbox--invalid .ui-checkbox__label {
     color: var(--rs-danger);
-
-    input[type='checkbox'] {
-      outline: 2px solid var(--rs-danger);
-      outline-offset: 2px;
-    }
   }
 }
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import { useLayoutStore } from '@/store/layout-store';
 import type {
   DecorObject,
@@ -140,14 +141,12 @@ export function DecorInspector() {
           )}
 
           {isPolyline && (
-            <label className="fp-inspector__field fp-inspector__field--row">
-              <span>Замкнуть</span>
-              <input
-                type="checkbox"
-                checked={(decor as PolylineDecorObject).closed}
-                onChange={(e) => patch({ closed: e.target.checked })}
-              />
-            </label>
+            <Checkbox
+              className="fp-inspector__field fp-inspector__field--row"
+              checked={(decor as PolylineDecorObject).closed}
+              onChange={(e) => patch({ closed: e.target.checked })}
+              label="Замкнуть"
+            />
           )}
         </>
       )}

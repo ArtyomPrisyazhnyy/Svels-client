@@ -13,6 +13,7 @@ import {
 import { useAuthStore } from '../../../store/auth.store';
 import { fetchOrderSettings, updateOrderSettings } from '../api/order-settings.api';
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import '../styles/order-settings-admin.scss';
 
 type SettingsKey = keyof UpdateRestaurantOrderSettingsPayload;
@@ -31,19 +32,18 @@ function SettingsToggle({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="order-settings-admin__option">
-      <span className="order-settings-admin__option-copy">
-        <strong>{title}</strong>
-        <span>{description}</span>
-      </span>
-      <input
-        type="checkbox"
-        className="order-settings-admin__toggle"
-        checked={checked}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.checked)}
-      />
-    </label>
+    <Checkbox
+      className="order-settings-admin__option"
+      checked={checked}
+      disabled={disabled}
+      onChange={(e) => onChange(e.target.checked)}
+      label={
+        <span className="order-settings-admin__option-copy">
+          <strong>{title}</strong>
+          <span>{description}</span>
+        </span>
+      }
+    />
   );
 }
 
@@ -88,6 +88,7 @@ export default function OrderSettingsAdminPage() {
   }, [restaurantId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadSettings();
   }, [loadSettings]);
 

@@ -7,6 +7,7 @@ import { MenuCategoryNav } from '@/features/restaurants/components/MenuCategoryN
 import { MenuProductCard } from '@/features/restaurants/components/MenuProductCard';
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
 import { ApiError } from '@/shared/api/api-client';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import type { FulfillmentKey, RestaurantOrderSettings } from '@/shared/types/order-settings';
 import type { MenuItem } from '@/shared/types/menu';
 import {
@@ -432,22 +433,21 @@ export default function StylingAdminPage() {
                 Горизонтальные кнопки над меню для быстрого перехода к разделам — как на сайтах
                 доставки еды.
               </p>
-              <label className="styling-admin__toggle-option">
-                <span className="styling-admin__toggle-copy">
-                  <strong>Показывать кнопки категорий</strong>
-                  <span>
-                    Гости смогут нажимать «Бургеры», «Роллы» и т.д. и прокручиваться к нужному
-                    разделу меню.
+              <Checkbox
+                className="styling-admin__toggle-option"
+                checked={Boolean(draft.menuCategoryNavEnabled)}
+                disabled={saving}
+                onChange={(e) => updateDraft({ menuCategoryNavEnabled: e.target.checked })}
+                label={
+                  <span className="styling-admin__toggle-copy">
+                    <strong>Показывать кнопки категорий</strong>
+                    <span>
+                      Гости смогут нажимать «Бургеры», «Роллы» и т.д. и прокручиваться к нужному
+                      разделу меню.
+                    </span>
                   </span>
-                </span>
-                <input
-                  type="checkbox"
-                  className="styling-admin__toggle"
-                  checked={Boolean(draft.menuCategoryNavEnabled)}
-                  disabled={saving}
-                  onChange={(e) => updateDraft({ menuCategoryNavEnabled: e.target.checked })}
-                />
-              </label>
+                }
+              />
             </section>
 
             <section className="styling-admin__panel">
@@ -457,21 +457,20 @@ export default function StylingAdminPage() {
                 приложении. После выключения нужна пересборка white-label приложения, чтобы
                 экран избранного не попал в бандл.
               </p>
-              <label className="styling-admin__toggle-option">
-                <span className="styling-admin__toggle-copy">
-                  <strong>Показывать избранное</strong>
-                  <span>
-                    Гости смогут сохранять позиции без входа и видеть их во вкладке «Избранное».
+              <Checkbox
+                className="styling-admin__toggle-option"
+                checked={draft.favoritesEnabled !== false}
+                disabled={saving}
+                onChange={(e) => updateDraft({ favoritesEnabled: e.target.checked })}
+                label={
+                  <span className="styling-admin__toggle-copy">
+                    <strong>Показывать избранное</strong>
+                    <span>
+                      Гости смогут сохранять позиции без входа и видеть их во вкладке «Избранное».
+                    </span>
                   </span>
-                </span>
-                <input
-                  type="checkbox"
-                  className="styling-admin__toggle"
-                  checked={draft.favoritesEnabled !== false}
-                  disabled={saving}
-                  onChange={(e) => updateDraft({ favoritesEnabled: e.target.checked })}
-                />
-              </label>
+                }
+              />
             </section>
 
             <section className="styling-admin__panel">

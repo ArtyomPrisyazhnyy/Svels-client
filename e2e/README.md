@@ -42,7 +42,24 @@ E2E_SKIP_WEBSERVER=1 npm run test:e2e
 
 ## CI
 
-На каждый PR в `main` workflow **e2e** поднимает Postgres 16, Redis, собирает и запускает [Svels-backend](https://github.com/ArtyomPrisyazhnyy/Svels-backend) `main`, собирает клиент и гоняет **все** спеки Playwright. При падении сохраняются HTML-отчёт и traces (`playwright-e2e-artifacts`).
+На каждый PR в `main` workflow **e2e** поднимает Postgres 16, Redis, собирает и запускает [Svels-backend](https://github.com/ArtyomPrisyazhnyy/Svels-backend) `main`, собирает клиент и гоняет **все** спеки Playwright **внутри** `mcr.microsoft.com/playwright:v1.62.0-noble` (Chromium и шрифты совпадают с закоммиченными visual baselines). Backend и Redis/Postgres в job подключаются по hostname сервисов (`postgres`, `redis`), не `localhost`. При падении сохраняются HTML-отчёт и traces (`playwright-e2e-artifacts`).
+
+## Visual snapshots (Docker)
+
+Чтобы `--update-snapshots` не расходился с CI, обновляйте скриншоты в том же образе, что и job **e2e** (версия Playwright = `@playwright/test` в `package.json`):
+
+```bash
+# из корня Svels-client; backend + Postgres + Redis должны быть доступны как при локальном e2e
+docker run --rm -it \
+  -v "$PWD:/work" -w /work \
+  -e E2E_SKIP_WEBSERVER=1 \
+  -e E2E_API_URL=http://host.docker.internal:3000 \
+  -e E2E_BASE_URL=http://host.docker.internal:3001 \
+  mcr.microsoft.com/playwright:v1.62.0-noble \
+  bash -lc 'npm ci && npx playwright test e2e/visual --update-snapshots'
+```
+
+На Linux без `host.docker.internal` передайте IP хоста (`ip route …`) или пробросьте порты и укажите URL явно. В CI baselines уже снимаются в этом образе — менять PNG только если diff воспроизводится **внутри** `v1.62.0-noble`.
 
 ## Покрытие
 

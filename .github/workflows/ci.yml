@@ -56,6 +56,9 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
+    # Same image as local visual baseline updates — fonts/layout match committed snapshots.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
     env:
       CI: true
       E2E_API_URL: http://127.0.0.1:3000
@@ -63,7 +66,8 @@ jobs:
       REVALIDATE_SECRET: ci-revalidate-secret
       E2E_SUPER_ADMIN_EMAIL: e2e-super@svels.test
       E2E_SUPER_ADMIN_PASSWORD: E2eSuperAdminPass123!
-      E2E_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/svels
+      # Service hostnames (job runs in a container; localhost is not the postgres/redis service).
+      E2E_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/svels?sslmode=disable
     services:
       postgres:
         image: postgres:16
@@ -118,12 +122,13 @@ jobs:
           ENABLE_DEV_ENDPOINTS=true
           CORS_ALLOWED_ORIGINS=http://localhost:3001,http://127.0.0.1:3001
           PORT=3000
-          DB_HOST=localhost
+          DB_HOST=postgres
           DB_PORT=5432
           DB_USERNAME=postgres
           DB_PASSWORD=postgres
           DB_NAME=svels
-          REDIS_HOST=localhost
+          DB_SSL=false
+          REDIS_HOST=redis
           REDIS_PORT=6379
           JWT_SECRET=ci-e2e-jwt-secret-change-me-32chars
           JWT_EXPIRES_IN=7d
@@ -183,9 +188,6 @@ jobs:
         env:
           NEXT_PUBLIC_ENABLE_UI_PLAYGROUND: '1'
         run: npm run build
-
-      - name: Install Playwright (Chromium)
-        run: npx playwright install --with-deps chromium
 
       - name: Run Playwright E2E
         run: npm run test:e2e

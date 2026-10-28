@@ -57,7 +57,7 @@ async function seedCart(page: import('@playwright/test').Page, restaurantId: str
               [rid]: {
                 fulfillment: 'fulfillmentDelivery',
                 customerName: 'Тест',
-                phone: '+375290000001',
+                phone: '+375290000002',
                 deliveryAddress: {
                   street: 'Ленина',
                   house: '1',
@@ -243,7 +243,9 @@ test.describe('Addresses visual', () => {
             await page.goto(`/restaurants/${seed.restaurantId}`);
             await openDeliveryCheckout(page);
             if (scenario === 'delivery-saved') {
-              await expect(page.getByTestId('checkout-address-row')).toContainText('Короткая');
+              const addressRow = page.getByTestId('checkout-address-row');
+              await expect(addressRow).toBeVisible({ timeout: 30_000 });
+              await expect(addressRow).toContainText('Короткая');
             }
             if (scenario === 'delivery-saved-skeleton') {
               await expect(page.locator('.guest-address-checkout-row__skeleton')).toBeVisible();

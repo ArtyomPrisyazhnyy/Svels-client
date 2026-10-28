@@ -5,6 +5,7 @@ import type { RequestedAtMode } from '@/shared/types/cart';
 import { SegmentedControl } from '@/shared/ui';
 import { Field } from '@/shared/ui/Field/Field';
 import { Select } from '@/shared/ui/Select/Select';
+import { CART_CHECKOUT_SEGMENTED_PROPS } from '../constants/cart-segmented-control';
 import { buildRequestedTimeSlots } from '../utils/requested-time.util';
 import '../styles/requested-time-picker.scss';
 
@@ -48,9 +49,7 @@ export function RequestedTimePicker({
           }
         }}
         ariaLabel="Время доставки"
-        fullWidth
-        legacyFulfillmentClasses
-        compact
+        {...CART_CHECKOUT_SEGMENTED_PROPS}
         testId="cart-requested-time-segmented"
       />
 

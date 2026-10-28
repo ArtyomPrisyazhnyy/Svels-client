@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useModalPresence } from '@/hooks/useModalPresence';
 import { ApiError } from '@/shared/api/api-client';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import { submitLead, type LeadPayload } from './landing-api';
 import './contact-modal.scss';
 
@@ -206,23 +207,21 @@ export function ContactModal({ onClose }: ContactModalProps) {
                   </div>
                 </div>
 
-                <label className="contact-modal__consent">
-                  <input
-                    type="checkbox"
-                    className="contact-modal__consent-input"
-                    checked={privacyAccepted}
-                    onChange={(event) => setPrivacyAccepted(event.target.checked)}
-                    disabled={status === 'submitting'}
-                    data-testid="contact-modal-privacy-consent"
-                  />
-                  <span className="contact-modal__consent-box" aria-hidden="true" />
-                  <span className="contact-modal__consent-text">
-                    Я согласен с условиями{' '}
-                    <Link className="contact-modal__consent-link" href="/privacypolicy" target="_blank">
-                      политики конфиденциальности
-                    </Link>
-                  </span>
-                </label>
+                <Checkbox
+                  className="contact-modal__consent"
+                  checked={privacyAccepted}
+                  onChange={(event) => setPrivacyAccepted(event.target.checked)}
+                  disabled={status === 'submitting'}
+                  testId="contact-modal-privacy-consent"
+                  label={
+                    <span>
+                      Я согласен с условиями{' '}
+                      <Link className="contact-modal__consent-link" href="/privacypolicy" target="_blank">
+                        политики конфиденциальности
+                      </Link>
+                    </span>
+                  }
+                />
 
                 {status === 'error' && errorMessage && (
                   <p className="contact-modal__error" role="alert">

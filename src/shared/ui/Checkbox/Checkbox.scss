@@ -12,14 +12,16 @@
 
 .ui-checkbox__input {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
+  left: 0;
+  top: 50%;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  margin: 0;
   padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  transform: translateY(-50%);
+  opacity: 0;
+  cursor: pointer;
 }
 
 .ui-checkbox__box {
@@ -47,13 +49,20 @@
 .ui-checkbox__input:checked + .ui-checkbox__box::after {
   content: '';
   position: absolute;
-  left: 6px;
-  top: 2px;
+  left: 50%;
+  top: 50%;
   width: 5px;
   height: 10px;
+  margin-left: -3px;
+  margin-top: -6px;
   border: solid var(--rs-on-accent);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
+}
+
+.ui-checkbox--invalid .ui-checkbox__box {
+  outline: 2px solid var(--rs-danger);
+  outline-offset: 2px;
 }
 
 .ui-checkbox__label {

@@ -12,6 +12,7 @@ import {
   fetchPaymentSettings,
   updatePaymentSettings,
 } from '../api/payment-settings.api';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import '../styles/order-settings-admin.scss';
 
 interface DraftState {
@@ -78,6 +79,7 @@ export default function PaymentSettingsAdminPage() {
   }, [restaurantId, accessToken]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount
     void loadSettings();
   }, [loadSettings]);
 
@@ -179,18 +181,17 @@ export default function PaymentSettingsAdminPage() {
             <h3>Подключение</h3>
 
             <div className="order-settings-admin__options">
-              <label className="order-settings-admin__option">
-                <span className="order-settings-admin__option-copy">
-                  <strong>Включить онлайн-оплату bePaid</strong>
-                  <span>Гости смогут оплачивать предзаказ картой через bePaid.</span>
-                </span>
-                <input
-                  type="checkbox"
-                  className="order-settings-admin__toggle"
-                  checked={draft.enabled}
-                  onChange={(e) => updateDraft({ enabled: e.target.checked })}
-                />
-              </label>
+              <Checkbox
+                className="order-settings-admin__option"
+                checked={draft.enabled}
+                onChange={(e) => updateDraft({ enabled: e.target.checked })}
+                label={
+                  <span className="order-settings-admin__option-copy">
+                    <strong>Включить онлайн-оплату bePaid</strong>
+                    <span>Гости смогут оплачивать предзаказ картой через bePaid.</span>
+                  </span>
+                }
+              />
             </div>
 
             <label className="order-settings-admin__field">
@@ -225,23 +226,22 @@ export default function PaymentSettingsAdminPage() {
 
             {settings.secretKeyConfigured && (
               <div className="order-settings-admin__options">
-                <label className="order-settings-admin__option">
-                  <span className="order-settings-admin__option-copy">
-                    <strong>Удалить сохранённый Secret Key</strong>
-                    <span>Ключ будет стёрт из настроек после сохранения.</span>
-                  </span>
-                  <input
-                    type="checkbox"
-                    className="order-settings-admin__toggle"
-                    checked={draft.clearSecretKey}
-                    onChange={(e) =>
-                      updateDraft({
-                        clearSecretKey: e.target.checked,
-                        secretKey: e.target.checked ? '' : draft.secretKey,
-                      })
-                    }
-                  />
-                </label>
+                <Checkbox
+                  className="order-settings-admin__option"
+                  checked={draft.clearSecretKey}
+                  onChange={(e) =>
+                    updateDraft({
+                      clearSecretKey: e.target.checked,
+                      secretKey: e.target.checked ? '' : draft.secretKey,
+                    })
+                  }
+                  label={
+                    <span className="order-settings-admin__option-copy">
+                      <strong>Удалить сохранённый Secret Key</strong>
+                      <span>Ключ будет стёрт из настроек после сохранения.</span>
+                    </span>
+                  }
+                />
               </div>
             )}
           </section>
@@ -250,18 +250,17 @@ export default function PaymentSettingsAdminPage() {
             <h3>Режим списания</h3>
 
             <div className="order-settings-admin__options">
-              <label className="order-settings-admin__option">
-                <span className="order-settings-admin__option-copy">
-                  <strong>Тестовый режим</strong>
-                  <span>Песочница bePaid — без реальных денег.</span>
-                </span>
-                <input
-                  type="checkbox"
-                  className="order-settings-admin__toggle"
-                  checked={draft.testMode}
-                  onChange={(e) => updateDraft({ testMode: e.target.checked })}
-                />
-              </label>
+              <Checkbox
+                className="order-settings-admin__option"
+                checked={draft.testMode}
+                onChange={(e) => updateDraft({ testMode: e.target.checked })}
+                label={
+                  <span className="order-settings-admin__option-copy">
+                    <strong>Тестовый режим</strong>
+                    <span>Песочница bePaid — без реальных денег.</span>
+                  </span>
+                }
+              />
             </div>
 
             <label className="order-settings-admin__field">
@@ -280,19 +279,18 @@ export default function PaymentSettingsAdminPage() {
             </label>
 
             <div className="order-settings-admin__options">
-              <label className="order-settings-admin__option">
-                <span className="order-settings-admin__option-copy">
-                  <strong>Авто-списание после холда</strong>
-                  <span>Обычно выключено для бара/кухни: сначала холд, списание после проверки заказа.</span>
-                </span>
-                <input
-                  type="checkbox"
-                  className="order-settings-admin__toggle"
-                  checked={draft.autoCapture}
-                  onChange={(e) => updateDraft({ autoCapture: e.target.checked })}
-                  disabled={draft.checkoutTransactionType !== 'authorization'}
-                />
-              </label>
+              <Checkbox
+                className="order-settings-admin__option"
+                checked={draft.autoCapture}
+                onChange={(e) => updateDraft({ autoCapture: e.target.checked })}
+                disabled={draft.checkoutTransactionType !== 'authorization'}
+                label={
+                  <span className="order-settings-admin__option-copy">
+                    <strong>Авто-списание после холда</strong>
+                    <span>Обычно выключено для бара/кухни: сначала холд, списание после проверки заказа.</span>
+                  </span>
+                }
+              />
             </div>
 
             <label className="order-settings-admin__field">

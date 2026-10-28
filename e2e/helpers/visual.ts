@@ -3,8 +3,10 @@ import type { Page } from '@playwright/test';
 export const VIEWPORTS = {
   m360: { width: 360, height: 780 },
   m390: { width: 390, height: 844 },
+  m390Landscape: { width: 844, height: 390 },
   t768: { width: 768, height: 1024 },
   d1280: { width: 1280, height: 800 },
+  d1280Short: { width: 1280, height: 500 },
 } as const;
 
 export type VisualViewportKey = keyof typeof VIEWPORTS;

@@ -117,10 +117,7 @@ test.describe('Cart modal behavior', () => {
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await page.getByTestId('cart-button').click();
     await page.getByTestId('cart-go-to-checkout').click();
-    const timeRow = page.getByTestId('cart-time-row');
-    await timeRow.getByRole('button').click();
     await expect(page.getByTestId('cart-requested-time-segmented')).toBeVisible();
-    await page.getByTestId('cart-payment-row').getByRole('button').click();
     const timeSeg = page.getByTestId('cart-requested-time-segmented');
     const paySeg = page.getByTestId('cart-payment-segmented');
     await expect(timeSeg).toHaveClass(/ui-segmented/);
@@ -155,14 +152,6 @@ test.describe('Cart modal behavior', () => {
     expect(payBox).not.toBeNull();
     expect(Math.abs(timeBox!.width - payBox!.width)).toBeLessThanOrEqual(1);
     expect(Math.abs(timeBox!.height - payBox!.height)).toBeLessThanOrEqual(1);
-
-    const chevronBox = await timeRow.locator('.cart-detail-row__chevron').boundingBox();
-    const triggerBox = await timeRow.locator('.cart-detail-row__trigger').boundingBox();
-    expect(chevronBox).not.toBeNull();
-    expect(triggerBox).not.toBeNull();
-    const rightGap = triggerBox!.x + triggerBox!.width - (chevronBox!.x + chevronBox!.width);
-    expect(rightGap).toBeGreaterThanOrEqual(8);
-    expect(rightGap).toBeLessThanOrEqual(24);
   });
 
   test('получение — сегмент в корзине, без вложенной модалки', async ({ page, seed, asGuest }) => {

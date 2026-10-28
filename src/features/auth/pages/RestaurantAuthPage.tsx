@@ -10,6 +10,7 @@ import { getPostAuthPath } from '../../../shared/routing/get-post-auth-path';
 import { useAuthStore } from '../../../store/auth.store';
 import { ApiError } from '../../../shared/api/api-client';
 import { PasswordInput } from '../components/PasswordInput';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import '../styles/auth.scss';
 import '../styles/restaurant-auth.scss';
 import '../styles/restaurant-auth-form.scss';
@@ -248,14 +249,12 @@ export function RestaurantAuthPage() {
                   onChange={(e) => setUnp(e.target.value.replace(/\D/g, '').slice(0, 9))}
                 />
               </div>
-              <label className="restaurant-auth__checkbox">
-                <input
-                  type="checkbox"
-                  checked={isChain}
-                  onChange={(e) => setIsChain(e.target.checked)}
-                />
-                Это сеть — несколько точек под одним брендом
-              </label>
+              <Checkbox
+                className="restaurant-auth__checkbox"
+                checked={isChain}
+                onChange={(e) => setIsChain(e.target.checked)}
+                label="Это сеть — несколько точек под одним брендом"
+              />
               <div className="auth-field">
                 <label htmlFor="rest-desc">Описание (необязательно)</label>
                 <textarea

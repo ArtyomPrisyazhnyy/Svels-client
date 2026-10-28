@@ -525,6 +525,25 @@
 
   .menu-product-modal__media {
     background: color-mix(in srgb, var(--rs-border) 30%, var(--rs-bg));
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+
+    picture,
+    .menu-product-modal__photo,
+    img {
+      border: none;
+      border-radius: 0;
+      outline: none;
+      box-shadow: none;
+    }
+
+    .menu-product-modal__carousel,
+    .menu-product-modal__carousel .carousel__viewport {
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
   }
 
   .menu-product-modal__close {
@@ -568,7 +587,7 @@
     color: var(--rs-text);
   }
 
-  .menu-product-modal__body {
+  .menu-product-modal__panel.ui-overlay-panel .ui-overlay-panel__body {
     scrollbar-color: var(--rs-text-soft) var(--rs-bg);
 
     &::-webkit-scrollbar-track {
@@ -777,14 +796,6 @@
       outline: none;
       border-color: var(--rs-focus-border);
       box-shadow: 0 0 0 3px var(--rs-focus-ring);
-    }
-  }
-
-  .restaurant-cart-modal__checkbox {
-    color: var(--rs-text);
-
-    input {
-      accent-color: var(--rs-accent);
     }
   }
 

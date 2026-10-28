@@ -6,6 +6,7 @@ import {
   type RestaurantOrderSettings,
 } from '@/shared/types/order-settings';
 import { SegmentedControl } from '@/shared/ui';
+import { CART_CHECKOUT_SEGMENTED_PROPS } from '../constants/cart-segmented-control';
 
 interface FulfillmentSelectorProps {
   settings: RestaurantOrderSettings;
@@ -26,9 +27,7 @@ export function FulfillmentSelector({ settings, value, onChange }: FulfillmentSe
       value={value}
       onChange={onChange}
       ariaLabel="Способ получения заказа"
-      legacyFulfillmentClasses
-      compact
-      fullWidth
+      {...CART_CHECKOUT_SEGMENTED_PROPS}
       testId="cart-fulfillment-segmented"
     />
   );

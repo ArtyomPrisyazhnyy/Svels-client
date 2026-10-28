@@ -21,7 +21,6 @@ import {
 import { CartBasketBody, CartCheckoutBar } from './CartBasket';
 import { CartLocationPicker } from './CartLocationPicker';
 import { PaymentSelector } from './PaymentSelector';
-import { DeliveryAddressFields } from './DeliveryAddressFields';
 import {
   CartCheckoutDeliveryAddressInline,
   CartCheckoutGuestAddressLoader,
@@ -35,6 +34,9 @@ import { useGuestAddressesStore } from '@/store/guest-addresses.store';
 import { RequestedTimePicker } from './RequestedTimePicker';
 import { OrderSuccessView } from './OrderSuccessView';
 import { CartDetailRow } from './CartDetailRow';
+import { CartCheckoutSection } from './CartCheckoutSection';
+import { CartCheckoutFieldSection } from './CartCheckoutFieldSection';
+import '../styles/cart-checkout-section.scss';
 import type { CartCheckoutDraft, CartLineItem } from '@/shared/types/cart';
 import {
   getDefaultFulfillment,
@@ -55,7 +57,6 @@ import {
   buildCreatePreOrderPayload,
 } from '../utils/checkout-payload.util';
 import { getPreOrderErrorMessage, isItemUnavailableError } from '../utils/pre-order-error.util';
-import { buildRequestedTimeSlots } from '../utils/requested-time.util';
 import {
   getStep2Title,
   validateCartCheckout,
@@ -181,16 +182,6 @@ export function RestaurantCartModal({
     () => locations.find((row) => row.id === locationId) ?? null,
     [locations, locationId],
   );
-
-  const timeSlots = useMemo(() => buildRequestedTimeSlots(), []);
-
-  const timeSummary = useMemo(() => {
-    if (draft.requestedAtMode === 'asap') {
-      return 'Как можно скорее';
-    }
-    const slot = timeSlots.find((s) => s.id === draft.requestedAtSlotIso);
-    return slot?.label ?? 'Ко времени';
-  }, [draft.requestedAtMode, draft.requestedAtSlotIso, timeSlots]);
 
   const paymentSummary = useMemo(() => {
     const key = payment ?? enabledPayments[0]?.key;
@@ -409,9 +400,6 @@ export function RestaurantCartModal({
         isGuestOfRestaurant &&
         selectCheckoutUsesSavedAddresses(restaurantId);
 
-      const inlineLabel =
-        draft.deliveryAddressLabel.trim() || draft.deliveryAddress.street.trim();
-
       const payload = buildCreatePreOrderPayload({
         fulfillment,
         payment,
@@ -431,7 +419,6 @@ export function RestaurantCartModal({
           fulfillment === 'fulfillmentDelivery' &&
           !usesSavedAddresses &&
           draft.saveDeliveryAddress,
-        addressLabel: inlineLabel || undefined,
         requestedAtIso,
         orderForSomeoneElse: draft.orderForSomeoneElse,
         recipientName: draft.recipientName,
@@ -584,7 +571,7 @@ export function RestaurantCartModal({
                 />
               ) : step2 ? (
                 <Stack gap={4} className="restaurant-cart-modal__checkout" testId="cart-checkout-step">
-                  <Stack gap={3} as="section" className="cart-checkout-section" testId="cart-contacts-section">
+                  <CartCheckoutSection testId="cart-contacts-section">
                     <Field label="Имя" htmlFor="cart-customer-name" required>
                       <Input
                         autoComplete="name"
@@ -608,7 +595,7 @@ export function RestaurantCartModal({
                         {fieldErrors.contacts}
                       </p>
                     )}
-                  </Stack>
+                  </CartCheckoutSection>
 
                   {fulfillment === 'fulfillmentDelivery' &&
                     (isGuestOfRestaurant && accessToken ? (
@@ -630,41 +617,15 @@ export function RestaurantCartModal({
                         )}
                       </>
                     ) : (
-                      <Stack
-                        gap={3}
-                        as="section"
-                        className="cart-checkout-section cart-checkout-section--address"
-                        testId="cart-address-section"
-                      >
-                        <DeliveryAddressFields
-                          value={draft.deliveryAddress}
-                          onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
-                          variant="required"
-                        />
-                        {fieldErrors.address && (
-                          <p className="restaurant-cart-modal__inline-error" role="alert">
-                            {fieldErrors.address}
-                          </p>
-                        )}
-                        <div className="cart-checkout-rows cart-checkout-rows--inset">
-                          <CartDetailRow
-                            label="Уточнить адрес"
-                            value=""
-                            grouped
-                            expanded={Boolean(expandedRows.addressExtra)}
-                            onToggle={() =>
-                              setExpandedRows((prev) => toggleRowKey(prev, 'addressExtra'))
-                            }
-                            testId="cart-address-extra-row"
-                          >
-                            <DeliveryAddressFields
-                              value={draft.deliveryAddress}
-                              onChange={(deliveryAddress) => syncDraft({ deliveryAddress })}
-                              variant="extended"
-                            />
-                          </CartDetailRow>
-                        </div>
-                      </Stack>
+                      <CartCheckoutDeliveryAddressInline
+                        draft={draft}
+                        onDraftChange={syncDraft}
+                        addressError={fieldErrors.address}
+                        addressExtraExpanded={Boolean(expandedRows.addressExtra)}
+                        onToggleAddressExtra={() =>
+                          setExpandedRows((prev) => toggleRowKey(prev, 'addressExtra'))
+                        }
+                      />
                     ))}
 
                   <div className="cart-checkout-rows" data-testid="cart-checkout-rows">
@@ -708,12 +669,8 @@ export function RestaurantCartModal({
                       </CartDetailRow>
                     )}
 
-                    <CartDetailRow
-                      label="Время"
-                      grouped
-                      value={timeSummary}
-                      expanded={Boolean(expandedRows.time)}
-                      onToggle={() => setExpandedRows((prev) => toggleRowKey(prev, 'time'))}
+                    <CartCheckoutFieldSection
+                      title="Время"
                       error={fieldErrors.time}
                       testId="cart-time-row"
                     >
@@ -723,28 +680,20 @@ export function RestaurantCartModal({
                         onModeChange={(mode) => syncDraft({ requestedAtMode: mode })}
                         onSlotChange={(iso) => syncDraft({ requestedAtSlotIso: iso })}
                       />
-                    </CartDetailRow>
+                    </CartCheckoutFieldSection>
 
                     {enabledPayments.length > 1 ? (
-                      <CartDetailRow
-                        label="Оплата"
-                        grouped
-                        value={paymentSummary}
-                        expanded={Boolean(expandedRows.payment)}
-                        onToggle={() => setExpandedRows((prev) => toggleRowKey(prev, 'payment'))}
-                        testId="cart-payment-row"
-                      >
+                      <CartCheckoutFieldSection title="Оплата" testId="cart-payment-row">
                         <PaymentSelector
                           settings={orderSettings}
                           value={payment ?? enabledPayments[0].key}
                           onChange={setPayment}
                         />
-                      </CartDetailRow>
+                      </CartCheckoutFieldSection>
                     ) : (
-                      <div className="cart-detail-row cart-detail-row--static cart-detail-row--grouped">
-                        <span className="cart-detail-row__label">Оплата</span>
-                        <span className="cart-detail-row__value">{paymentSummary}</span>
-                      </div>
+                      <CartCheckoutFieldSection title="Оплата" testId="cart-payment-row">
+                        <p className="cart-checkout-field-section__summary">{paymentSummary}</p>
+                      </CartCheckoutFieldSection>
                     )}
 
                     <CartDetailRow
@@ -773,12 +722,8 @@ export function RestaurantCartModal({
                   </CartDetailRow>
 
                   {showSomeoneElseOption && (
-                    <CartDetailRow
-                      label="Другому человеку"
-                      grouped
-                      value={draft.orderForSomeoneElse ? 'Да' : 'Нет'}
-                      expanded={Boolean(expandedRows.recipient)}
-                      onToggle={() => setExpandedRows((prev) => toggleRowKey(prev, 'recipient'))}
+                    <CartCheckoutFieldSection
+                      title="Другому человеку"
                       error={fieldErrors.recipient}
                       testId="cart-recipient-row"
                     >
@@ -795,6 +740,7 @@ export function RestaurantCartModal({
                                 : { recipientName: '', recipientPhone: '' }),
                             });
                           }}
+                          testId="cart-recipient-checkbox"
                         />
                         {draft.orderForSomeoneElse && (
                           <Stack gap={3}>
@@ -817,7 +763,7 @@ export function RestaurantCartModal({
                           </Stack>
                         )}
                       </Stack>
-                    </CartDetailRow>
+                    </CartCheckoutFieldSection>
                   )}
                   </div>
 
