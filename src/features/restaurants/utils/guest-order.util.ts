@@ -51,3 +51,19 @@ export function fulfillmentKeyLabel(key: FulfillmentKey): string {
 export function isTerminalOrderStatus(status: PreOrderStatus): boolean {
   return status === 'completed' || status === 'cancelled';
 }
+
+/** Internal cancel reasons stored by backend integrations (not for guests). */
+const GUEST_SYSTEM_CANCEL_REASONS = new Set<string>(['Отклонено в Telegram']);
+
+export function isGuestSystemCancelReason(reason: string): boolean {
+  return GUEST_SYSTEM_CANCEL_REASONS.has(reason.trim());
+}
+
+/** Guest-facing cancel copy; map channel/system reasons to neutral venue wording. */
+export function formatGuestCancelMessage(reason: string): string {
+  const base = 'Заведение отклонило заказ';
+  if (isGuestSystemCancelReason(reason)) {
+    return base;
+  }
+  return `${base}: ${reason.trim()}`;
+}

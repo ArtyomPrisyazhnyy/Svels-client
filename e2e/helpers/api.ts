@@ -3,7 +3,9 @@ import type { AuthResponse, AuthUser, UserRole } from '../../src/shared/types/au
 import type { CreateMenuItemPayload, MenuCategory } from '../../src/shared/types/menu';
 import type {
   CreatePreOrderPayload,
+  OrderDto,
   PreOrderResponse,
+  PreOrderStatus,
 } from '../../src/shared/types/pre-order';
 import type {
   CreateGuestAddressPayload,
@@ -316,6 +318,19 @@ export const apiClient = {
       token,
       body: payload,
     });
+  },
+
+  changePreOrderStatus(
+    restaurantId: string,
+    orderId: string,
+    token: string,
+    body: { status: PreOrderStatus; cancelReason?: string },
+  ): Promise<OrderDto> {
+    return api<OrderDto>(
+      'PATCH',
+      `/restaurants/${restaurantId}/pre-orders/${orderId}/status`,
+      { token, body },
+    );
   },
 
   setOrderSettings(
