@@ -3,16 +3,17 @@
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
   type ChangeEvent,
   type FormEvent,
 } from 'react';
 import { ApiError } from '../../../shared/api/api-client';
-import { ResponsiveImage } from '../../../shared/components/ResponsiveImage';
 import {
   PROMO_BANNER_ASPECT_RATIO_LABELS,
   PROMO_BANNER_FREQUENCY_LABELS,
   PROMO_BANNER_TYPE_LABELS,
+  normalizePromoBannerAspectRatio,
   type PromoBanner,
   type PromoBannerAspectRatio,
   type PromoBannerDisplayFrequency,
@@ -20,6 +21,7 @@ import {
 } from '../../../shared/types/promo-banner';
 import { useAuthStore } from '../../../store/auth.store';
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
+import { PromoBannerAspectMedia } from '@/features/restaurants/components/PromoBannerAspectMedia';
 import {
   createPromoBanner,
   deletePromoBanner,
@@ -27,6 +29,16 @@ import {
   updatePromoBanner,
   uploadPromoBannerImage,
 } from '../api/promo-banners.api';
+import { PromoBannerImageCropper } from '../components/PromoBannerImageCropper';
+import {
+  exportCroppedImageFile,
+  type CropTransform,
+} from '../utils/promo-banner-crop.util';
+import {
+  DRAFT_ORIGINAL_KEY,
+  loadPromoBannerOriginal,
+  savePromoBannerOriginal,
+} from '../utils/promo-banner-original.storage';
 import '../styles/promo-banners-admin.scss';
 
 interface BannerFormState {
@@ -39,6 +51,12 @@ interface BannerFormState {
   aspectRatio: PromoBannerAspectRatio;
   imageUrl: string;
   imageWebpUrl: string | null;
+}
+
+interface CropSessionState {
+  objectUrl: string;
+  fileName: string;
+  originalFile: File;
 }
 
 const EMPTY_FORM: BannerFormState = {
@@ -65,6 +83,15 @@ export default function PromoBannersAdminPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cropSession, setCropSession] = useState<CropSessionState | null>(null);
+  const [storedOriginalAvailable, setStoredOriginalAvailable] = useState(false);
+  const pendingOriginalRef = useRef<File | null>(null);
+
+  const revokeCropObjectUrl = useCallback((session: CropSessionState | null) => {
+    if (session?.objectUrl) {
+      URL.revokeObjectURL(session.objectUrl);
+    }
+  }, []);
 
   const loadBanners = useCallback(async () => {
     if (!restaurantId) {
@@ -89,13 +116,40 @@ export default function PromoBannersAdminPage() {
     void loadBanners();
   }, [loadBanners]);
 
+  useEffect(() => {
+    return () => {
+      revokeCropObjectUrl(cropSession);
+    };
+  }, [cropSession, revokeCropObjectUrl]);
+
+  function clearCropSession() {
+    setCropSession((prev) => {
+      revokeCropObjectUrl(prev);
+      return null;
+    });
+  }
+
   function resetForm() {
+    clearCropSession();
+    pendingOriginalRef.current = null;
+    setStoredOriginalAvailable(false);
     setForm(EMPTY_FORM);
     setEditingBanner(null);
     setError(null);
   }
 
+  async function refreshStoredOriginalAvailability(bannerId: string) {
+    if (!restaurantId) {
+      setStoredOriginalAvailable(false);
+      return;
+    }
+    const blob = await loadPromoBannerOriginal(restaurantId, bannerId);
+    setStoredOriginalAvailable(Boolean(blob));
+  }
+
   function handleEdit(banner: PromoBanner) {
+    clearCropSession();
+    pendingOriginalRef.current = null;
     setEditingBanner(banner);
     setForm({
       type: banner.type,
@@ -104,17 +158,56 @@ export default function PromoBannersAdminPage() {
       isActive: banner.isActive,
       sortOrder: String(banner.sortOrder),
       displayFrequency: banner.displayFrequency,
-      aspectRatio: banner.aspectRatio === '16_9' ? '16_9' : '4_1',
+      aspectRatio: normalizePromoBannerAspectRatio(banner.aspectRatio),
       imageUrl: banner.imageUrl,
       imageWebpUrl: banner.imageWebpUrl,
     });
     setError(null);
+    void refreshStoredOriginalAvailability(banner.id);
   }
 
-  async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+  function openCropSession(file: File) {
+    clearCropSession();
+    const objectUrl = URL.createObjectURL(file);
+    setCropSession({
+      objectUrl,
+      fileName: file.name,
+      originalFile: file,
+    });
+  }
+
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = '';
-    if (!file || !restaurantId || !accessToken) {
+    if (!file) {
+      return;
+    }
+    pendingOriginalRef.current = file;
+    openCropSession(file);
+  }
+
+  async function handleRecropFromStoredOriginal() {
+    if (!restaurantId || !editingBanner) {
+      return;
+    }
+    const blob = await loadPromoBannerOriginal(restaurantId, editingBanner.id);
+    if (!blob) {
+      setStoredOriginalAvailable(false);
+      setError('Исходное изображение недоступно — загрузите файл заново.');
+      return;
+    }
+    const file = new File([blob], `${editingBanner.id}-original`, {
+      type: blob.type || 'image/jpeg',
+    });
+    pendingOriginalRef.current = file;
+    openCropSession(file);
+  }
+
+  async function handleCropConfirm(
+    transform: CropTransform,
+    viewport: { width: number; height: number },
+  ) {
+    if (!cropSession || !restaurantId || !accessToken) {
       return;
     }
 
@@ -122,12 +215,25 @@ export default function PromoBannersAdminPage() {
     setError(null);
 
     try {
-      const uploaded = await uploadPromoBannerImage(restaurantId, accessToken, file);
+      const croppedFile = await exportCroppedImageFile(
+        cropSession.objectUrl,
+        viewport,
+        transform,
+        cropSession.fileName,
+      );
+      const uploaded = await uploadPromoBannerImage(restaurantId, accessToken, croppedFile);
+      pendingOriginalRef.current = cropSession.originalFile;
+      const originalKey = editingBanner?.id ?? DRAFT_ORIGINAL_KEY;
+      await savePromoBannerOriginal(restaurantId, originalKey, cropSession.originalFile);
+      if (editingBanner) {
+        setStoredOriginalAvailable(true);
+      }
       setForm((prev) => ({
         ...prev,
         imageUrl: uploaded.imageUrl,
         imageWebpUrl: uploaded.imageWebpUrl,
       }));
+      clearCropSession();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Не удалось загрузить изображение');
     } finally {
@@ -135,9 +241,24 @@ export default function PromoBannersAdminPage() {
     }
   }
 
+  async function persistOriginalForBanner(bannerId: string) {
+    if (!restaurantId || !pendingOriginalRef.current) {
+      return;
+    }
+    await savePromoBannerOriginal(restaurantId, bannerId, pendingOriginalRef.current);
+    if (editingBanner?.id === bannerId) {
+      setStoredOriginalAvailable(true);
+    }
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!restaurantId || !accessToken) {
+      return;
+    }
+
+    if (cropSession) {
+      setError('Сначала примените обрезку или отмените её.');
       return;
     }
 
@@ -171,11 +292,17 @@ export default function PromoBannersAdminPage() {
     try {
       if (editingBanner) {
         await updatePromoBanner(restaurantId, accessToken, editingBanner.id, payload);
+        await persistOriginalForBanner(editingBanner.id);
       } else {
-        await createPromoBanner(restaurantId, accessToken, {
+        const created = await createPromoBanner(restaurantId, accessToken, {
           ...payload,
           title: payload.title ?? undefined,
         });
+        const draftOriginal = await loadPromoBannerOriginal(restaurantId, DRAFT_ORIGINAL_KEY);
+        const original = pendingOriginalRef.current ?? draftOriginal;
+        if (original) {
+          await savePromoBannerOriginal(restaurantId, created.id, original);
+        }
       }
 
       resetForm();
@@ -216,6 +343,27 @@ export default function PromoBannersAdminPage() {
     }
   }
 
+  const cropLockAspect =
+    form.type === 'strip' ? form.aspectRatio : ('modal' as const);
+
+  const previewBanner: PromoBanner | null = form.imageUrl
+    ? {
+        id: 'preview',
+        restaurantId: restaurantId ?? '',
+        type: form.type,
+        title: form.title || null,
+        imageUrl: form.imageUrl,
+        imageWebpUrl: form.imageWebpUrl,
+        linkUrl: form.linkUrl || null,
+        isActive: true,
+        sortOrder: 0,
+        displayFrequency: form.displayFrequency,
+        aspectRatio: form.aspectRatio,
+        createdAt: '',
+        updatedAt: '',
+      }
+    : null;
+
   if (!restaurantId) {
     return (
       <p className="promo-banners-admin__notice">
@@ -225,7 +373,7 @@ export default function PromoBannersAdminPage() {
   }
 
   return (
-    <div className="promo-banners-admin">
+    <div className="promo-banners-admin" data-testid="promo-banners-admin">
       <section className="promo-banners-admin__panel">
         <h2>{editingBanner ? 'Редактирование баннера' : 'Новый баннер'}</h2>
         <p className="promo-banners-admin__hint">
@@ -245,6 +393,7 @@ export default function PromoBannersAdminPage() {
                   <input
                     type="radio"
                     name="banner-type"
+                    value={type}
                     checked={form.type === type}
                     onChange={() => setForm((prev) => ({ ...prev, type }))}
                   />
@@ -263,6 +412,7 @@ export default function PromoBannersAdminPage() {
                     <input
                       type="radio"
                       name="banner-freq"
+                      value={freq}
                       checked={form.displayFrequency === freq}
                       onChange={() =>
                         setForm((prev) => ({ ...prev, displayFrequency: freq }))
@@ -284,6 +434,7 @@ export default function PromoBannersAdminPage() {
                     <input
                       type="radio"
                       name="banner-aspect"
+                      value={ratio}
                       checked={form.aspectRatio === ratio}
                       onChange={() =>
                         setForm((prev) => ({ ...prev, aspectRatio: ratio }))
@@ -355,32 +506,57 @@ export default function PromoBannersAdminPage() {
               type="file"
               accept="image/jpeg,image/png,image/webp"
               disabled={uploading || saving}
-              onChange={(e) => void handleImageChange(e)}
+              data-testid="promo-banner-file-input"
+              onChange={handleImageChange}
             />
             <p className="promo-banners-admin__file-hint">
-              JPG, PNG или WebP, до 5 МБ.
-              {form.type === 'strip'
-                ? form.aspectRatio === '16_9'
-                  ? ' Для 16∶9 лучше Full HD (1920×1080) или похожее.'
-                  : ' Для 4∶1 лучше широкое изображение (примерно 1200×300).'
-                : ' Для модалки — вертикальное или квадратное.'}
+              JPG, PNG или WebP, до 5 МБ. После выбора файла откроется обрезка под выбранный
+              формат.
             </p>
+            {editingBanner && (
+              <p
+                className="promo-banners-admin__file-hint"
+                data-testid="promo-banner-recrop-hint"
+              >
+                {storedOriginalAvailable
+                  ? 'Исходник сохранён в этом браузере — можно перекадрировать без повторной загрузки.'
+                  : 'Исходник недоступен (другой браузер или баннер создан до обрезки) — для новой обрезки загрузите файл заново.'}
+              </p>
+            )}
+            {editingBanner && storedOriginalAvailable && !cropSession && (
+              <button
+                type="button"
+                className="promo-banners-admin__recrop"
+                data-testid="promo-banner-recrop-button"
+                disabled={uploading || saving}
+                onClick={() => void handleRecropFromStoredOriginal()}
+              >
+                Перекадрировать
+              </button>
+            )}
           </div>
 
-          {form.imageUrl && (
-            <div
-              className={`promo-banners-admin__preview${
-                form.type === 'strip'
-                  ? form.aspectRatio === '16_9'
-                    ? ' promo-banners-admin__preview--16-9'
-                    : ' promo-banners-admin__preview--4-1'
-                  : ''
-              }`}
-            >
-              <ResponsiveImage
-                src={form.imageUrl}
-                webpSrc={form.imageWebpUrl}
-                alt="Превью баннера"
+          {cropSession && (
+            <PromoBannerImageCropper
+              key={`${cropLockAspect}-${cropSession.objectUrl}`}
+              imageUrl={cropSession.objectUrl}
+              sourceFileName={cropSession.fileName}
+              lockedAspectRatio={cropLockAspect}
+              confirming={uploading}
+              onCancel={clearCropSession}
+              onConfirm={(transform, viewport) => void handleCropConfirm(transform, viewport)}
+            />
+          )}
+
+          {previewBanner && !cropSession && (
+            <div className="promo-banners-admin__preview" data-testid="promo-banner-admin-preview">
+              <span className="promo-banners-admin__preview-label">Превью на странице</span>
+              <PromoBannerAspectMedia
+                banner={previewBanner}
+                aspectRatioOverride={
+                  previewBanner.type === 'strip' ? form.aspectRatio : undefined
+                }
+                frameTestId="promo-banner-admin-preview-frame"
               />
             </div>
           )}
@@ -389,7 +565,8 @@ export default function PromoBannersAdminPage() {
             <button
               className="promo-banners-admin__submit"
               type="submit"
-              disabled={saving || uploading || !form.imageUrl}
+              data-testid="promo-banner-submit"
+              disabled={saving || uploading || !form.imageUrl || Boolean(cropSession)}
             >
               {saving ? 'Сохранение…' : editingBanner ? 'Сохранить' : 'Добавить'}
             </button>
@@ -423,12 +600,21 @@ export default function PromoBannersAdminPage() {
                   editingBanner?.id === banner.id ? ' promo-banners-admin__item--editing' : ''
                 }${!banner.isActive ? ' promo-banners-admin__item--inactive' : ''}`}
               >
-                <ResponsiveImage
-                  className="promo-banners-admin__thumb"
-                  src={banner.imageUrl}
-                  webpSrc={banner.imageWebpUrl}
-                  alt=""
-                />
+                <div
+                  className={`promo-banners-admin__thumb-wrap${
+                    banner.type === 'strip'
+                      ? banner.aspectRatio === '16_9'
+                        ? ' promo-banners-admin__thumb-wrap--16-9'
+                        : ' promo-banners-admin__thumb-wrap--4-1'
+                      : ''
+                  }`}
+                >
+                  <PromoBannerAspectMedia
+                    banner={banner}
+                    frameClassName="promo-banners-admin__thumb-frame"
+                    imageClassName="promo-banners-admin__thumb"
+                  />
+                </div>
                 <div className="promo-banners-admin__item-body">
                   <strong>{banner.title?.trim() || 'Без заголовка'}</strong>
                   <span>
@@ -437,7 +623,7 @@ export default function PromoBannersAdminPage() {
                       ? ` · ${PROMO_BANNER_FREQUENCY_LABELS[banner.displayFrequency]}`
                       : ''}
                     {banner.type === 'strip'
-                      ? ` · ${banner.aspectRatio === '16_9' ? '16∶9' : '4∶1'}`
+                      ? ` · ${normalizePromoBannerAspectRatio(banner.aspectRatio) === '16_9' ? '16∶9' : '4∶1'}`
                       : ''}
                     {!banner.isActive ? ' · выключен' : ''}
                   </span>
