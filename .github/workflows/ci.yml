@@ -67,7 +67,7 @@ jobs:
       E2E_SUPER_ADMIN_EMAIL: e2e-super@svels.test
       E2E_SUPER_ADMIN_PASSWORD: E2eSuperAdminPass123!
       # Service hostnames (job runs in a container; localhost is not the postgres/redis service).
-      E2E_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/svels
+      E2E_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/svels?sslmode=disable
     services:
       postgres:
         image: postgres:16
@@ -127,6 +127,7 @@ jobs:
           DB_USERNAME=postgres
           DB_PASSWORD=postgres
           DB_NAME=svels
+          DB_SSL=false
           REDIS_HOST=redis
           REDIS_PORT=6379
           JWT_SECRET=ci-e2e-jwt-secret-change-me-32chars
