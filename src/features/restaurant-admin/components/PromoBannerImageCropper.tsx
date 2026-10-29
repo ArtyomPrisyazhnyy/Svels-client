@@ -54,13 +54,6 @@ export function PromoBannerImageCropper({
       ? PROMO_BANNER_MODAL_CROP_ASPECT
       : promoBannerAspectRatioToNumber(lockedAspectRatio);
 
-  const resetTransform = useCallback(
-    (width: number, height: number, viewport: { width: number; height: number }) => {
-      setTransform(createInitialCropTransform(width, height, viewport));
-    },
-    [],
-  );
-
   useEffect(() => {
     const image = new Image();
     image.onload = () => {
@@ -97,15 +90,9 @@ export function PromoBannerImageCropper({
     ) {
       return;
     }
-    resetTransform(imageSize.width, imageSize.height, viewportSize);
-  }, [
-    imageSize.width,
-    imageSize.height,
-    viewportSize.width,
-    viewportSize.height,
-    lockedAspectRatio,
-    resetTransform,
-  ]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset crop when image or viewport dimensions change
+    setTransform(createInitialCropTransform(imageSize.width, imageSize.height, viewportSize));
+  }, [imageSize.width, imageSize.height, viewportSize, lockedAspectRatio]);
 
   const applyTransform = useCallback(
     (next: CropTransform) => {
