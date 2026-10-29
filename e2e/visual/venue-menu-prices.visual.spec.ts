@@ -4,6 +4,10 @@ import { VIEWPORTS, prepareForScreenshot } from '../helpers/visual';
 import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
 
 import type { CartLineItem } from '../../src/shared/types/cart';
+import path from 'node:path';
+
+const ARTIFACT_SCREENSHOTS =
+  process.env.VENUE_PRICE_ARTIFACTS_DIR ?? '/opt/cursor/artifacts/screenshots';
 
 const THEMES = ['classic', 'midnight'] as const;
 const VIEWPORT_KEYS = ['m390', 'd1280'] as const;
@@ -31,6 +35,10 @@ async function applyTheme(
 
 async function snapFullViewport(page: import('@playwright/test').Page, name: string) {
   await prepareForScreenshot(page);
+  await page.screenshot({
+    path: path.join(ARTIFACT_SCREENSHOTS, `${name}.png`),
+    fullPage: false,
+  });
   await expect(page).toHaveScreenshot(`${name}.png`, {
     fullPage: false,
     maxDiffPixelRatio: 0.01,

@@ -1,3 +1,5 @@
+@use 'venue-byn-price';
+
 .menu-product-modal__panel.ui-overlay-panel {
   .ui-overlay-panel__body {
     display: flex;
@@ -209,6 +211,10 @@
 
   .menu-item-price__old {
     font-size: 0.65em;
+  }
+
+  .byn-price {
+    @include venue-byn-price.venue-public-byn-price;
   }
 }
 

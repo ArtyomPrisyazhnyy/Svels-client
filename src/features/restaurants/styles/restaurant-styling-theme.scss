@@ -1,6 +1,6 @@
-.restaurant-styled {
-  @import 'venue-byn-price';
+@use 'venue-byn-price';
 
+.restaurant-styled {
   --rs-btn-radius: 0.625rem;
   /* Цены на публичном сайте: на ступень крупнее прежних md/lg/xl. */
   --rs-venue-price-size: var(--text-lg);
@@ -29,7 +29,7 @@
   .cart-receipt__price .byn-price,
   .guest-orders-list .byn-price,
   .cart-dock__cta-amount .byn-price {
-    @include venue-public-byn-price;
+    @include venue-byn-price.venue-public-byn-price;
   }
 
   .phone-input {
