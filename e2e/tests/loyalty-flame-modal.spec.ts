@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { readSeed } from '../helpers/env';
+import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
 
 test.describe('Loyalty flame info modal', () => {
   test('clicking flame opens info modal instead of account', async ({ page, request }) => {
@@ -39,6 +40,8 @@ test.describe('Loyalty flame info modal', () => {
         },
       },
     );
+
+    await revalidateRestaurantPublicPage(restaurantId);
 
     await page.goto(`/restaurants/${restaurantId}`);
     await expect(page.getByTestId('loyalty-flame-button')).toBeVisible();
