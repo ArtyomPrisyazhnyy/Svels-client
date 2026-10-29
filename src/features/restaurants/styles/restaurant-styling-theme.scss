@@ -443,6 +443,38 @@
     color: var(--rs-accent);
   }
 
+  .loyalty-flame-button {
+    background: var(--rs-primary-soft);
+
+    @media (hover: hover) {
+      &:hover {
+        background: color-mix(in srgb, var(--rs-accent) 14%, var(--rs-surface));
+      }
+    }
+
+    &--lit {
+      background: color-mix(in srgb, var(--rs-accent) 20%, var(--rs-surface));
+    }
+  }
+
+  .loyalty-flame-info-modal__level--current {
+    background: var(--rs-primary-soft);
+  }
+
+  &[data-rs-theme='midnight'] {
+    .loyalty-flame-button {
+      background: color-mix(in srgb, var(--rs-accent) 10%, var(--rs-surface));
+
+      &--lit {
+        background: color-mix(in srgb, var(--rs-accent) 22%, var(--rs-surface));
+      }
+    }
+
+    .loyalty-flame-info-modal__level--current {
+      background: color-mix(in srgb, var(--rs-accent) 12%, var(--rs-surface));
+    }
+  }
+
   .glass-header--tenant,
   .venue-header--tenant {
     border-bottom-color: color-mix(in srgb, var(--rs-border) 80%, transparent);
