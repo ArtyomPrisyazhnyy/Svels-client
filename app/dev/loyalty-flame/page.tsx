@@ -127,6 +127,12 @@ const ALL_COLOR_THEMES = RESTAURANT_COLOR_THEME_OPTIONS.map((option) => option.v
 
 const HEADER_STYLES: RestaurantHeaderStyle[] = ['glass', 'solid', 'bordered'];
 
+const MATRIX_THEME_PARTS: RestaurantColorTheme[][] = [
+  ['classic', 'ocean', 'forest', 'warm', 'berry', 'lavender'],
+  ['sand', 'citrus', 'graphite', 'monochrome', 'monochromeDark', 'midnight'],
+  ['ember', 'obsidian', 'moss', 'wine', 'neon'],
+];
+
 type CaptureView = 'default' | 'states' | 'matrix' | 'header-bar';
 
 function parseTheme(value: string | null): RestaurantColorTheme {
@@ -145,6 +151,16 @@ function parseView(value: string | null): CaptureView {
     return value;
   }
   return 'default';
+}
+
+function parseMatrixPart(value: string | null): 1 | 2 | 3 {
+  if (value === '2') {
+    return 2;
+  }
+  if (value === '3') {
+    return 3;
+  }
+  return 1;
 }
 
 function FlameStatesOnHeader({ testIdPrefix }: { testIdPrefix?: string }) {
@@ -230,6 +246,7 @@ export default function DevLoyaltyFlameCapturePage() {
   const theme = parseTheme(searchParams.get('theme'));
   const guestState = parseGuestState(searchParams.get('state'));
   const view = parseView(searchParams.get('view'));
+  const matrixPart = parseMatrixPart(searchParams.get('part'));
   const [flameOpen, setFlameOpen] = useState(false);
 
   const balance = guestState === 'idle' ? IDLE_BALANCE : ACTIVE_BALANCE;
@@ -248,17 +265,21 @@ export default function DevLoyaltyFlameCapturePage() {
   );
 
   if (view === 'matrix') {
+    const themesForPart = MATRIX_THEME_PARTS[matrixPart - 1] ?? MATRIX_THEME_PARTS[0];
+
     return (
       <div className="dev-loyalty-flame-capture dev-loyalty-flame-capture--matrix-root">
         <div className="dev-loyalty-flame-capture__matrix-legend" data-testid="loyalty-flame-contrast-matrix">
-          <h1 className="dev-loyalty-flame-capture__title">Огонёк — контраст на шапке</h1>
+          <h1 className="dev-loyalty-flame-capture__title">
+            Огонёк — контраст на шапке (часть {matrixPart}/3)
+          </h1>
           <ul className="dev-loyalty-flame-capture__matrix-columns">
             {HEADER_STATE_SAMPLES.map((sample) => (
               <li key={sample.label}>{sample.label}</li>
             ))}
           </ul>
         </div>
-        {ALL_COLOR_THEMES.map((colorTheme) =>
+        {themesForPart.map((colorTheme) =>
           HEADER_STYLES.map((headerStyle) => (
             <MatrixRow key={`${colorTheme}-${headerStyle}`} colorTheme={colorTheme} headerStyle={headerStyle} />
           )),

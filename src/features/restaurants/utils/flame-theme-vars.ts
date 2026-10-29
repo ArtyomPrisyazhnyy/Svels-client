@@ -22,7 +22,7 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   classic: {
     base: '#d97706',
     baseSoft: 'color-mix(in srgb, #f59e0b 42%, transparent)',
-    tier1: '#a16207',
+    tier1: '#ea580c',
     tier1Inner: '#fde047',
     tier2: '#ea580c',
     tier2Inner: '#fdba74',
@@ -37,7 +37,7 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   ocean: {
     base: '#c2410c',
     baseSoft: 'color-mix(in srgb, #ea580c 40%, transparent)',
-    tier1: '#b45309',
+    tier1: '#ea580c',
     tier1Inner: '#fcd34d',
     tier2: '#c2410c',
     tier2Inner: '#fdba74',
@@ -52,7 +52,7 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   forest: {
     base: '#b45309',
     baseSoft: 'color-mix(in srgb, #d97706 38%, transparent)',
-    tier1: '#a16207',
+    tier1: '#ea580c',
     tier1Inner: '#fde047',
     tier2: '#c2410c',
     tier2Inner: '#fdba74',
@@ -67,7 +67,7 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   warm: {
     base: '#9a3412',
     baseSoft: 'color-mix(in srgb, #c2410c 36%, transparent)',
-    tier1: '#92400e',
+    tier1: '#ea580c',
     tier1Inner: '#fbbf24',
     tier2: '#c2410c',
     tier2Inner: '#fed7aa',
@@ -82,7 +82,7 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   berry: {
     base: '#c2410c',
     baseSoft: 'color-mix(in srgb, #ea580c 38%, transparent)',
-    tier1: '#b45309',
+    tier1: '#ea580c',
     tier1Inner: '#fde047',
     tier2: '#ea580c',
     tier2Inner: '#fdba74',
@@ -97,7 +97,7 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   lavender: {
     base: '#c2410c',
     baseSoft: 'color-mix(in srgb, #ea580c 36%, transparent)',
-    tier1: '#a16207',
+    tier1: '#ea580c',
     tier1Inner: '#fde047',
     tier2: '#c2410c',
     tier2Inner: '#fdba74',
@@ -112,7 +112,7 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   sand: {
     base: '#b45309',
     baseSoft: 'color-mix(in srgb, #d97706 40%, transparent)',
-    tier1: '#92400e',
+    tier1: '#ea580c',
     tier1Inner: '#fcd34d',
     tier2: '#c2410c',
     tier2Inner: '#fdba74',
@@ -127,7 +127,7 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   citrus: {
     base: '#b45309',
     baseSoft: 'color-mix(in srgb, #d97706 34%, transparent)',
-    tier1: '#92400e',
+    tier1: '#ea580c',
     tier1Inner: '#fef08a',
     tier2: '#c2410c',
     tier2Inner: '#fdba74',
@@ -142,7 +142,7 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   graphite: {
     base: '#b45309',
     baseSoft: 'color-mix(in srgb, #d97706 40%, transparent)',
-    tier1: '#a16207',
+    tier1: '#ea580c',
     tier1Inner: '#fde047',
     tier2: '#c2410c',
     tier2Inner: '#fdba74',

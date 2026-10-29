@@ -5,24 +5,61 @@ import path from 'node:path';
 const BASE = process.env.E2E_BASE_URL ?? 'http://127.0.0.1:3001';
 const OUT_DIR = '/opt/cursor/artifacts/screenshots';
 
-const headerCaptures = [
-  { name: 'loyalty-flame-header-states-390-classic.png', theme: 'classic', view: 'states' },
-  { name: 'loyalty-flame-header-states-390-midnight.png', theme: 'midnight', view: 'states' },
+const captures = [
+  {
+    name: 'loyalty-flame-header-states-390-classic.png',
+    url: `${BASE}/dev/loyalty-flame?theme=classic&view=states`,
+    testId: 'loyalty-flame-states-showcase',
+    viewport: { width: 390, height: 900 },
+    deviceScaleFactor: 3,
+    fullPage: false,
+  },
+  {
+    name: 'loyalty-flame-header-states-390-midnight.png',
+    url: `${BASE}/dev/loyalty-flame?theme=midnight&view=states`,
+    testId: 'loyalty-flame-states-showcase',
+    viewport: { width: 390, height: 900 },
+    deviceScaleFactor: 3,
+    fullPage: false,
+  },
   {
     name: 'loyalty-flame-header-bar-390-classic.png',
-    theme: 'classic',
-    view: 'header-bar',
+    url: `${BASE}/dev/loyalty-flame?theme=classic&view=header-bar`,
+    testId: 'loyalty-flame-capture-page',
+    viewport: { width: 390, height: 900 },
+    deviceScaleFactor: 3,
+    fullPage: false,
   },
   {
     name: 'loyalty-flame-header-bar-390-midnight.png',
-    theme: 'midnight',
-    view: 'header-bar',
+    url: `${BASE}/dev/loyalty-flame?theme=midnight&view=header-bar`,
+    testId: 'loyalty-flame-capture-page',
+    viewport: { width: 390, height: 900 },
+    deviceScaleFactor: 3,
+    fullPage: false,
   },
   {
-    name: 'loyalty-flame-contrast-matrix-full.png',
-    theme: null,
-    view: 'matrix',
-    viewport: { width: 1200, height: 900 },
+    name: 'loyalty-flame-contrast-matrix-part1.png',
+    url: `${BASE}/dev/loyalty-flame?view=matrix&part=1`,
+    testId: 'loyalty-flame-contrast-matrix',
+    viewport: { width: 1280, height: 1400 },
+    deviceScaleFactor: 2,
+    fullPage: true,
+  },
+  {
+    name: 'loyalty-flame-contrast-matrix-part2.png',
+    url: `${BASE}/dev/loyalty-flame?view=matrix&part=2`,
+    testId: 'loyalty-flame-contrast-matrix',
+    viewport: { width: 1280, height: 1400 },
+    deviceScaleFactor: 2,
+    fullPage: true,
+  },
+  {
+    name: 'loyalty-flame-contrast-matrix-part3.png',
+    url: `${BASE}/dev/loyalty-flame?view=matrix&part=3`,
+    testId: 'loyalty-flame-contrast-matrix',
+    viewport: { width: 1280, height: 1200 },
+    deviceScaleFactor: 2,
     fullPage: true,
   },
 ];
@@ -30,29 +67,21 @@ const headerCaptures = [
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const browser = await chromium.launch();
-const page = await browser.newPage();
 
-for (const capture of headerCaptures) {
-  const viewport = capture.viewport ?? { width: 390, height: 900 };
-  await page.setViewportSize(viewport);
-  const themeQuery = capture.theme ? `theme=${capture.theme}&` : '';
-  await page.goto(`${BASE}/dev/loyalty-flame?${themeQuery}view=${capture.view}`, {
-    waitUntil: 'networkidle',
+for (const capture of captures) {
+  const context = await browser.newContext({
+    deviceScaleFactor: capture.deviceScaleFactor,
   });
-
-  const readyTestId =
-    capture.view === 'matrix' ? 'loyalty-flame-contrast-matrix' : 'loyalty-flame-capture-page';
-  await page.getByTestId(readyTestId).waitFor({ state: 'visible' });
-
-  if (capture.view === 'header-bar') {
-    await page.getByTestId('venue-header').waitFor({ state: 'visible' });
-  }
-
+  const page = await context.newPage();
+  await page.setViewportSize(capture.viewport);
+  await page.goto(capture.url, { waitUntil: 'networkidle' });
+  await page.getByTestId(capture.testId).waitFor({ state: 'visible' });
   await page.screenshot({
     path: path.join(OUT_DIR, capture.name),
-    fullPage: Boolean(capture.fullPage),
+    fullPage: capture.fullPage,
   });
   console.log('saved', capture.name);
+  await context.close();
 }
 
 await browser.close();

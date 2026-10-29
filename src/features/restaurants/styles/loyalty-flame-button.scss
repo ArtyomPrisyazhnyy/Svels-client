@@ -21,55 +21,43 @@
 }
 
 .loyalty-flame-icon {
-  width: 1.35rem;
-  height: 1.35rem;
+  display: block;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
   overflow: visible;
 }
 
-.loyalty-flame-icon__outer,
-.loyalty-flame-icon__inner {
+.loyalty-flame-icon__shape {
   vector-effect: non-scaling-stroke;
-}
-
-.loyalty-flame-icon__outer {
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 .loyalty-flame-icon--off {
   color: inherit;
 
-  .loyalty-flame-icon__outer {
+  .loyalty-flame-icon__shape {
     fill: none;
     stroke: currentColor;
-    stroke-width: 1.75;
   }
 }
 
 .loyalty-flame-icon--base {
   color: var(--flame-base);
 
-  .loyalty-flame-icon__outer {
+  .loyalty-flame-icon__shape {
     fill: var(--flame-base-soft);
     stroke: var(--flame-base);
-    stroke-width: 1.75;
   }
 }
 
 @mixin loyalty-flame-filled-tier($tier) {
   color: var(--flame-tier-#{$tier});
 
-  .loyalty-flame-icon__outer {
+  .loyalty-flame-icon__shape {
     fill: var(--flame-tier-#{$tier});
     stroke: var(--flame-edge);
     stroke-width: 0.85;
     paint-order: stroke fill;
-  }
-
-  .loyalty-flame-icon__inner {
-    fill: var(--flame-tier-#{$tier}-inner);
-    stroke: none;
   }
 }
 
@@ -94,6 +82,6 @@
 }
 
 .loyalty-flame-icon--inline {
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 18px;
+  height: 18px;
 }

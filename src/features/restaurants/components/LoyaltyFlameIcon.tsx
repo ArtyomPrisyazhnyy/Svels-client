@@ -1,10 +1,7 @@
 'use client';
 
 import type { LoyaltyFlameTier } from '../utils/loyalty-flame-info.util';
-import {
-  LOYALTY_FLAME_INNER_PATH,
-  LOYALTY_FLAME_OUTER_PATH,
-} from './loyalty-flame-icon-paths';
+import { LUCIDE_FLAME_PATH } from './loyalty-flame-icon-paths';
 
 export type LoyaltyFlameIconVariant = 'off' | 'base' | LoyaltyFlameTier;
 
@@ -29,19 +26,20 @@ export function LoyaltyFlameIcon({
   className = '',
   size = 'header',
 }: LoyaltyFlameIconProps) {
-  const showInnerTongue = typeof variant === 'number' && variant >= 1;
-
   return (
     <svg
       className={`loyalty-flame-icon loyalty-flame-icon--${size} ${variantClassName(variant)}${className ? ` ${className}` : ''}`}
       viewBox="0 0 24 24"
+      width="20"
+      height="20"
       fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden
     >
-      <path className="loyalty-flame-icon__outer" d={LOYALTY_FLAME_OUTER_PATH} />
-      {showInnerTongue ? (
-        <path className="loyalty-flame-icon__inner" d={LOYALTY_FLAME_INNER_PATH} />
-      ) : null}
+      <path className="loyalty-flame-icon__shape" d={LUCIDE_FLAME_PATH} />
     </svg>
   );
 }
