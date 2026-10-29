@@ -1,5 +1,16 @@
+@use 'venue-byn-price';
+
 .restaurant-styled {
   --rs-btn-radius: 0.625rem;
+  /* Цены на публичном сайте: на ступень крупнее прежних md/lg/xl. */
+  --rs-venue-price-size: var(--text-lg);
+  --rs-venue-price-size-emphasis: var(--text-xl);
+
+  @media (min-width: 768px) {
+    --rs-venue-price-size: var(--text-xl);
+    --rs-venue-price-size-emphasis: var(--text-2xl);
+  }
+
   /* Скругление фото в карточках — отдельно от формы кнопок (капсула не влияет). */
   --rs-media-radius: 0.875rem;
   /* Единый фокус для input / phone-input / textarea. */
@@ -9,6 +20,17 @@
   font-family: var(--rs-font);
   color: var(--rs-text);
   background: var(--rs-bg);
+
+  .menu-product-card__price .byn-price,
+  .menu-product-modal__footer .menu-product-modal__price .byn-price,
+  .restaurant-cart-modal__item-price .byn-price,
+  .restaurant-cart-modal__panel .restaurant-cart-modal__total-amount .byn-price,
+  .restaurant-cart-modal__panel .restaurant-cart-modal__total .byn-price,
+  .cart-receipt__price .byn-price,
+  .guest-orders-list .byn-price,
+  .cart-dock__cta-amount .byn-price {
+    @include venue-byn-price.venue-public-byn-price;
+  }
 
   .phone-input {
     --phone-input-autofill-bg: var(--rs-bg);
@@ -77,6 +99,35 @@
   .restaurant-cart-modal__item-price,
   .restaurant-cart-modal__fulfillment-single {
     color: var(--rs-accent);
+  }
+
+  .menu-product-card__price,
+  .menu-product-modal__price {
+    font-size: var(--rs-venue-price-size-emphasis);
+  }
+
+  .restaurant-cart-modal__item-price,
+  .cart-receipt__price {
+    font-size: var(--rs-venue-price-size);
+  }
+
+  .restaurant-cart-modal__panel .restaurant-cart-modal__total-amount {
+    font-size: var(--rs-venue-price-size-emphasis);
+  }
+
+  .guest-orders-list__item-head .byn-price,
+  .guest-orders-list__detail-row .byn-price,
+  .guest-orders-list__lines .byn-price {
+    font-size: var(--rs-venue-price-size);
+  }
+
+  .guest-orders-list__total {
+    font-size: var(--rs-venue-price-size-emphasis);
+    font-weight: 700;
+  }
+
+  .cart-dock__cta-amount {
+    font-size: var(--rs-venue-price-size-emphasis);
   }
 
   .menu-item-price__old {
@@ -1082,7 +1133,6 @@
 
     .menu-product-card__price {
       margin-top: 0.375rem;
-      font-size: 1.25rem;
     }
 
     /* Текст слева, фото справа (как сейчас). */
@@ -1123,10 +1173,6 @@
 
       .menu-product-card__title {
         font-size: 1rem;
-      }
-
-      .menu-product-card__price {
-        font-size: 1.125rem;
       }
     }
   }

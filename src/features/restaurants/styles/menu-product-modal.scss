@@ -1,3 +1,5 @@
+@use 'venue-byn-price';
+
 .menu-product-modal__panel.ui-overlay-panel {
   .ui-overlay-panel__body {
     display: flex;
@@ -193,13 +195,26 @@
 
 .menu-product-modal__price {
   margin: 0;
-  font-size: 1.75rem;
+  display: inline-flex;
+  align-items: baseline;
+  column-gap: var(--space-2);
+  flex: 0 1 auto;
+  min-width: 0;
   font-weight: 700;
   color: #0f766e;
   line-height: 1;
 
+  .menu-item-price,
+  .menu-item-price__current {
+    display: contents;
+  }
+
   .menu-item-price__old {
     font-size: 0.65em;
+  }
+
+  .byn-price {
+    @include venue-byn-price.venue-public-byn-price;
   }
 }
 
@@ -324,7 +339,6 @@
   .menu-product-modal__price {
     flex: 0 1 auto;
     min-width: 0;
-    font-size: 1.125rem;
   }
 
   .menu-product-modal__actions {

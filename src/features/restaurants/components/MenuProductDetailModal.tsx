@@ -143,13 +143,13 @@ export function MenuProductDetailModal({
       wrap={(node) => <RestaurantStylingPortalRoot>{node}</RestaurantStylingPortalRoot>}
       footer={
         <div className="menu-product-modal__footer">
-          <p className="menu-product-modal__price">
+          <div className="menu-product-modal__price">
             <MenuItemPriceDisplay
               price={unitPrice}
               oldPrice={oldUnitPrice}
               quantity={quantity}
             />
-          </p>
+          </div>
           <div className="menu-product-modal__actions">
             <div className="menu-product-modal__counter" aria-label="Количество">
               <button

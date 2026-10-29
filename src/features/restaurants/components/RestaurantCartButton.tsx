@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useCartStore } from '@/store/cart.store';
+import { useCartHydrated } from '@/hooks/useCartHydrated';
 import { formatCartItemsCount, sumCartQuantity } from '../utils/cart-items-label.util';
 import { preloadRestaurantCartModal } from './lazy-venue-modals';
 import '../styles/restaurant-cart-button.scss';
@@ -31,34 +33,14 @@ function CartIcon() {
 }
 
 export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartButtonProps) {
-  const [hydrated, setHydrated] = useState(false);
-  const [itemCount, setItemCount] = useState(0);
+  const hydrated = useCartHydrated();
+  const itemCount = useCartStore((s) => {
+    const items = s.restaurantId === restaurantId ? s.items : [];
+    return sumCartQuantity(items);
+  });
 
   useEffect(() => {
     preloadRestaurantCartModal();
-    let unsubscribe = () => {};
-    let cancelled = false;
-
-    void import('@/store/cart.store').then(({ useCartStore, rehydrateCartStore }) => {
-      if (cancelled) {
-        return;
-      }
-      const { persist } = useCartStore;
-      const sync = () => {
-        const state = useCartStore.getState();
-        const items = state.restaurantId === restaurantId ? state.items : [];
-        setItemCount(sumCartQuantity(items));
-        setHydrated(!persist?.hasHydrated || persist.hasHydrated());
-      };
-      void rehydrateCartStore().finally(sync);
-      sync();
-      unsubscribe = useCartStore.subscribe(sync);
-    });
-
-    return () => {
-      cancelled = true;
-      unsubscribe();
-    };
   }, [restaurantId]);
 
   const hasItems = hydrated && itemCount > 0;

@@ -1,0 +1,34 @@
+/** Shared BYN row styling for public venue surfaces (inside `.restaurant-styled`). */
+
+@mixin venue-public-byn-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--byn-price-gap);
+  flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 1;
+
+  .byn-price__amount {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1;
+  }
+
+  .nbrb-icon,
+  .byn-sign {
+    display: inline-block;
+    flex: 0 0 auto;
+    font-size: calc(1em * var(--byn-sign-scale));
+    font-weight: inherit;
+    line-height: 1;
+    vertical-align: baseline;
+    transform: translateY(0.04em);
+  }
+
+  .currency-text {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 1;
+  }
+}

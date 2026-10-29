@@ -10,11 +10,11 @@ interface CurrencySignProps {
 function renderCurrencyText(display: RestaurantCurrencyDisplay): string {
   switch (display) {
     case 'byn':
-      return ' BYN';
+      return 'BYN';
     case 'r':
-      return ' р';
+      return 'р';
     case 'rub':
-      return ' руб';
+      return 'руб';
     default:
       return 'BYN';
   }

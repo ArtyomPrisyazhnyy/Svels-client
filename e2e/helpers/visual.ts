@@ -15,6 +15,11 @@ const FREEZE_MOTION_CSS = `
   animation: none !important;
   caret-color: transparent !important;
 }
+nextjs-portal,
+[data-nextjs-dialog-overlay],
+[data-nextjs-toast] {
+  display: none !important;
+}
 `;
 
 async function stylesheetsAccessible(page: Page): Promise<void> {
