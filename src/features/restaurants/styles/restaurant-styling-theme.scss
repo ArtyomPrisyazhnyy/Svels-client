@@ -6,13 +6,6 @@
   --rs-focus-border: var(--rs-accent);
   --rs-focus-ring: color-mix(in srgb, var(--rs-accent) 15%, transparent);
 
-  --flame-base: #f59e0b;
-  --flame-tier-1: #eab308;
-  --flame-tier-2: #f97316;
-  --flame-tier-3: #ef4444;
-  --flame-tier-4: #c026d3;
-  --flame-tier-5: #6366f1;
-
   font-family: var(--rs-font);
   color: var(--rs-text);
   background: var(--rs-bg);
@@ -466,13 +459,6 @@
   }
 
   &[data-rs-theme='midnight'] {
-    --flame-base: #fb923c;
-    --flame-tier-1: #facc15;
-    --flame-tier-2: #fb923c;
-    --flame-tier-3: #f87171;
-    --flame-tier-4: #e879f9;
-    --flame-tier-5: #818cf8;
-
     .loyalty-flame-info-modal__level--current {
       background: color-mix(in srgb, var(--rs-accent) 12%, var(--rs-surface));
     }

@@ -5,6 +5,7 @@ import {
   type RestaurantFontFamily,
   type RestaurantStyling,
 } from '@/shared/types/restaurant-styling';
+import { FLAME_THEME_VARS, flameVarsToCssProperties } from './flame-theme-vars';
 
 const FONT_STACKS: Record<RestaurantFontFamily, string> = {
   system: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
@@ -274,6 +275,7 @@ export function buildRestaurantStylingVars(
   const colorTheme = resolveColorTheme(styling.colorTheme);
   const buttonShape = styling.buttonShape ?? DEFAULT_RESTAURANT_STYLING.buttonShape;
   const theme = COLOR_THEMES[colorTheme];
+  const flameVars = flameVarsToCssProperties(FLAME_THEME_VARS[colorTheme]);
 
   return {
     ['--rs-font' as string]: FONT_STACKS[fontFamily],
@@ -290,6 +292,7 @@ export function buildRestaurantStylingVars(
     ['--rs-surface' as string]: theme.surface,
     ['--rs-on-primary' as string]: theme.onPrimary ?? '#ffffff',
     ['--rs-on-accent' as string]: theme.onAccent ?? '#ffffff',
+    ...flameVars,
   };
 }
 

@@ -5,17 +5,23 @@ import { useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { LoyaltyFlameInfoModal } from '@/features/restaurants/components/LoyaltyFlameInfoModal';
 import { LoyaltyFlameHeaderButton } from '@/features/restaurants/components/LoyaltyFlameHeaderButton';
+import { RestaurantCartButton } from '@/features/restaurants/components/RestaurantCartButton';
+import { RestaurantFavoritesHeaderButton } from '@/features/restaurants/components/RestaurantFavoritesHeaderButton';
+import { RestaurantGuestProfileButton } from '@/features/restaurants/components/RestaurantGuestProfileButton';
 import { RestaurantStylingShell } from '@/features/restaurants/context/RestaurantStylingContext';
 import type { LoyaltyBalance } from '@/shared/types/loyalty-balance';
 import type { LoyaltySettings } from '@/shared/types/loyalty-settings';
 import {
   DEFAULT_RESTAURANT_STYLING,
+  RESTAURANT_COLOR_THEME_OPTIONS,
   type RestaurantColorTheme,
+  type RestaurantHeaderStyle,
 } from '@/shared/types/restaurant-styling';
 import type { LoyaltyFlameHeaderVisual } from '@/features/restaurants/utils/loyalty-flame-info.util';
 import '@/features/restaurants/styles/venue-layout.scss';
 import '@/features/restaurants/styles/dev-loyalty-flame-capture.scss';
 import '@/shared/ui/VenueHeader/VenueHeader.scss';
+import '@/shared/styles/glass-header.scss';
 
 const CAPTURE_SETTINGS: LoyaltySettings = {
   restaurantId: '00000000-0000-4000-8000-000000000001',
@@ -117,9 +123,15 @@ const HEADER_STATE_SAMPLES: { label: string; visual: LoyaltyFlameHeaderVisual }[
   { label: 'tier 5', visual: 5 },
 ];
 
+const ALL_COLOR_THEMES = RESTAURANT_COLOR_THEME_OPTIONS.map((option) => option.value);
+
+const HEADER_STYLES: RestaurantHeaderStyle[] = ['glass', 'solid', 'bordered'];
+
+type CaptureView = 'default' | 'states' | 'matrix' | 'header-bar';
+
 function parseTheme(value: string | null): RestaurantColorTheme {
-  if (value === 'midnight') {
-    return 'midnight';
+  if (value && ALL_COLOR_THEMES.includes(value as RestaurantColorTheme)) {
+    return value as RestaurantColorTheme;
   }
   return 'classic';
 }
@@ -128,8 +140,85 @@ function parseGuestState(value: string | null): 'active' | 'idle' {
   return value === 'idle' ? 'idle' : 'active';
 }
 
-function parseView(value: string | null): 'default' | 'states' {
-  return value === 'states' ? 'states' : 'default';
+function parseView(value: string | null): CaptureView {
+  if (value === 'states' || value === 'matrix' || value === 'header-bar') {
+    return value;
+  }
+  return 'default';
+}
+
+function FlameStatesOnHeader({ testIdPrefix }: { testIdPrefix?: string }) {
+  return (
+    <header
+      className="venue-header venue-header--tenant glass-header glass-header--tenant dev-loyalty-flame-capture__matrix-header"
+      data-testid={testIdPrefix ? `${testIdPrefix}-header` : undefined}
+    >
+      <div className="dev-loyalty-flame-capture__matrix-states">
+        {HEADER_STATE_SAMPLES.map((sample) => (
+          <div key={sample.label} className="dev-loyalty-flame-capture__matrix-state">
+            <LoyaltyFlameHeaderButton visual={sample.visual} onClick={() => {}} />
+          </div>
+        ))}
+      </div>
+    </header>
+  );
+}
+
+function MatrixRow({
+  colorTheme,
+  headerStyle,
+}: {
+  colorTheme: RestaurantColorTheme;
+  headerStyle: RestaurantHeaderStyle;
+}) {
+  const styling = useMemo(
+    () => ({
+      ...DEFAULT_RESTAURANT_STYLING,
+      restaurantId: CAPTURE_SETTINGS.restaurantId,
+      updatedAt: CAPTURE_SETTINGS.updatedAt,
+      colorTheme,
+      headerStyle,
+    }),
+    [colorTheme, headerStyle],
+  );
+
+  const themeLabel =
+    RESTAURANT_COLOR_THEME_OPTIONS.find((option) => option.value === colorTheme)?.label ??
+    colorTheme;
+
+  return (
+    <RestaurantStylingShell styling={styling} className="dev-loyalty-flame-capture__matrix-shell">
+      <div
+        className="dev-loyalty-flame-capture__matrix-row"
+        data-testid={`loyalty-flame-matrix-row-${colorTheme}-${headerStyle}`}
+      >
+        <div className="dev-loyalty-flame-capture__matrix-label">
+          <span>{themeLabel}</span>
+          <span className="dev-loyalty-flame-capture__matrix-label-meta">{headerStyle}</span>
+        </div>
+        <FlameStatesOnHeader />
+      </div>
+    </RestaurantStylingShell>
+  );
+}
+
+function VenueHeaderActionsDemo({ flameVisual }: { flameVisual: LoyaltyFlameHeaderVisual }) {
+  return (
+    <div className="venue-header__actions" data-testid="venue-header-actions">
+      <div className="venue-header__action-slot">
+        <LoyaltyFlameHeaderButton visual={flameVisual} onClick={() => {}} />
+      </div>
+      <div className="venue-header__action-slot">
+        <RestaurantFavoritesHeaderButton href="#" />
+      </div>
+      <div className="venue-header__action-slot">
+        <RestaurantGuestProfileButton authenticated onClick={() => {}} />
+      </div>
+      <div className="venue-header__action-slot">
+        <RestaurantCartButton restaurantId={CAPTURE_SETTINGS.restaurantId} onOpen={() => {}} />
+      </div>
+    </div>
+  );
 }
 
 export default function DevLoyaltyFlameCapturePage() {
@@ -143,12 +232,7 @@ export default function DevLoyaltyFlameCapturePage() {
   const view = parseView(searchParams.get('view'));
   const [flameOpen, setFlameOpen] = useState(false);
 
-  const balance =
-    guestState === 'idle'
-      ? IDLE_BALANCE
-      : guestState === 'active'
-        ? ACTIVE_BALANCE
-        : ACTIVE_BALANCE;
+  const balance = guestState === 'idle' ? IDLE_BALANCE : ACTIVE_BALANCE;
 
   const headerVisual: LoyaltyFlameHeaderVisual =
     balance.visits <= 0 ? 'off' : balance.currentLevel ? 1 : 'base';
@@ -163,6 +247,26 @@ export default function DevLoyaltyFlameCapturePage() {
     [theme],
   );
 
+  if (view === 'matrix') {
+    return (
+      <div className="dev-loyalty-flame-capture dev-loyalty-flame-capture--matrix-root">
+        <div className="dev-loyalty-flame-capture__matrix-legend" data-testid="loyalty-flame-contrast-matrix">
+          <h1 className="dev-loyalty-flame-capture__title">Огонёк — контраст на шапке</h1>
+          <ul className="dev-loyalty-flame-capture__matrix-columns">
+            {HEADER_STATE_SAMPLES.map((sample) => (
+              <li key={sample.label}>{sample.label}</li>
+            ))}
+          </ul>
+        </div>
+        {ALL_COLOR_THEMES.map((colorTheme) =>
+          HEADER_STYLES.map((headerStyle) => (
+            <MatrixRow key={`${colorTheme}-${headerStyle}`} colorTheme={colorTheme} headerStyle={headerStyle} />
+          )),
+        )}
+      </div>
+    );
+  }
+
   return (
     <RestaurantStylingShell styling={styling} className="dev-loyalty-flame-capture">
       <div className="venue-layout" data-testid="loyalty-flame-capture-page">
@@ -171,14 +275,18 @@ export default function DevLoyaltyFlameCapturePage() {
           data-testid="venue-header"
         >
           <span className="glass-header__brand-name">E2E Cafe</span>
-          <div className="venue-header__actions" data-testid="venue-header-actions">
-            <div className="venue-header__action-slot">
-              <LoyaltyFlameHeaderButton
-                visual={view === 'states' ? 'off' : headerVisual}
-                onClick={() => setFlameOpen(true)}
-              />
+          {view === 'header-bar' ? (
+            <VenueHeaderActionsDemo flameVisual={headerVisual} />
+          ) : (
+            <div className="venue-header__actions" data-testid="venue-header-actions">
+              <div className="venue-header__action-slot">
+                <LoyaltyFlameHeaderButton
+                  visual={view === 'states' ? 'off' : headerVisual}
+                  onClick={() => setFlameOpen(true)}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </header>
         <div className="venue-layout__content">
           <main className="dev-loyalty-flame-capture__main">
