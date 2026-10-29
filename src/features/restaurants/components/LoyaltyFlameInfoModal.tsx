@@ -77,6 +77,9 @@ export function LoyaltyFlameInfoModal({
                   }
                   data-testid={`loyalty-flame-level-${row.levelId}`}
                 >
+                  {row.isCurrent ? (
+                    <span className="loyalty-flame-info-modal__level-badge">Ваш уровень</span>
+                  ) : null}
                   <span className="loyalty-flame-info-modal__level-label">{row.label}</span>
                   {row.perks ? (
                     <span className="loyalty-flame-info-modal__level-perks">{row.perks}</span>

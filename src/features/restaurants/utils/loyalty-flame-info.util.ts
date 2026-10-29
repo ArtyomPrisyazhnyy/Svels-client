@@ -35,7 +35,8 @@ function pluralDays(count: number): string {
   return `${count} дней`;
 }
 
-function pluralVisits(count: number): string {
+/** Именительный: «4 визита подряд». */
+export function pluralVisits(count: number): string {
   const mod10 = count % 10;
   const mod100 = count % 100;
   if (mod10 === 1 && mod100 !== 11) {
@@ -45,6 +46,26 @@ function pluralVisits(count: number): string {
     return `${count} визита`;
   }
   return `${count} визитов`;
+}
+
+/** После «от» / «после»: «от 3 визитов», «после 1 визита». */
+export function visitsAfterPreposition(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) {
+    return `${count} визита`;
+  }
+  return `${count} визитов`;
+}
+
+function pluralLevelsTotal(count: number): string {
+  if (count === 1) {
+    return '1 уровень';
+  }
+  if (count >= 2 && count <= 4) {
+    return `${count} уровня`;
+  }
+  return `${count} уровней`;
 }
 
 export function formatLoyaltyRewardSummary(reward: LoyaltyReward): string {
@@ -88,21 +109,22 @@ export function buildLoyaltyFlameInfoModel(
 ): LoyaltyFlameInfoModel {
   const levels = sortedLevels(settings);
   const expireDays = settings.flameExpireDays;
+  const expirePhrase = pluralDays(expireDays);
 
   const sections: LoyaltyFlameInfoSection[] = [
     {
       title: 'Что это',
       body:
-        'Огонёк показывает вашу серию визитов в это заведение. Визит засчитывается, когда предзаказ переходит в статус «завершён».',
+        'Огонёк — серия ваших визитов в заведение. Визит засчитывается, когда заказ выдан.',
     },
     {
       title: 'Когда загорается',
       body:
-        'После первого завершённого заказа серия начинается с 1 визита. Каждый следующий завершённый заказ, пока серия активна, добавляет +1 к счётчику подряд.',
+        'После первого выданного заказа серия начинается. Каждый следующий выданный заказ, пока огонёк горит, добавляет +1 к серии.',
     },
     {
       title: 'Когда гаснет',
-      body: `Если с последнего визита прошло больше ${pluralDays(expireDays)}, серия сбрасывается — в интерфейсе это 0 визитов подряд. Ровно на ${pluralDays(expireDays)} после визита серия ещё действует.`,
+      body: `Огонёк гаснет, если не заходить больше ${expirePhrase}.`,
     },
   ];
 
@@ -115,19 +137,20 @@ export function buildLoyaltyFlameInfoModel(
       body: 'Заведение пока не настроило уровни огонька.',
     });
   } else {
-    const total = levels.length;
+    const totalPhrase = pluralLevelsTotal(levels.length);
+    const firstThreshold = levels[0]?.requiredVisits ?? 1;
     let currentBody: string;
 
     if (!isGuestOfRestaurant) {
-      currentBody = `Всего ${total} ${total === 1 ? 'уровень' : total < 5 ? 'уровня' : 'уровней'}. Войдите в личный кабинет, чтобы увидеть свой уровень.`;
+      currentBody = `Всего ${totalPhrase}. Войдите, чтобы увидеть свой уровень.`;
     } else if (!balance) {
-      currentBody = `Всего ${total} ${total === 1 ? 'уровень' : total < 5 ? 'уровня' : 'уровней'}. Загружаем ваш статус…`;
+      currentBody = `Всего ${totalPhrase}. Загружаем ваш статус…`;
     } else if (balance.visits === 0) {
-      currentBody = `Всего ${total} ${total === 1 ? 'уровень' : total < 5 ? 'уровня' : 'уровней'}. Сейчас серия не идёт (0 визитов подряд). Уровень откроется после ${pluralVisits(levels[0]?.requiredVisits ?? 1)} подряд, пока огонёк активен.`;
+      currentBody = `Всего ${totalPhrase}. Серия сейчас не идёт. Уровень откроется после ${visitsAfterPreposition(firstThreshold)} подряд.`;
     } else if (balance.currentLevel) {
-      currentBody = `Всего ${total} ${total === 1 ? 'уровень' : total < 5 ? 'уровня' : 'уровней'}. Ваш уровень: «${balance.currentLevel.name}» (${pluralVisits(balance.visits)} подряд).`;
+      currentBody = `Всего ${totalPhrase}. Сейчас ${pluralVisits(balance.visits)} подряд, ваш уровень — «${balance.currentLevel.name}».`;
     } else {
-      currentBody = `Всего ${total} ${total === 1 ? 'уровень' : total < 5 ? 'уровня' : 'уровней'}. Сейчас ${pluralVisits(balance.visits)} подряд, базовый уровень ещё не достигнут.`;
+      currentBody = `Всего ${totalPhrase}. Сейчас ${pluralVisits(balance.visits)} подряд, базовый уровень ещё не открыт.`;
     }
 
     sections.push({
@@ -142,7 +165,7 @@ export function buildLoyaltyFlameInfoModel(
 
     levelRows = levels.map((level) => ({
       levelId: level.id,
-      label: `«${level.name}» — от ${pluralVisits(level.requiredVisits)} подряд`,
+      label: `«${level.name}» — от ${visitsAfterPreposition(level.requiredVisits)} подряд`,
       perks: formatLevelPerks(level, settings.flameRewardsEnabled),
       isCurrent: balance?.currentLevel?.id === level.id,
     }));

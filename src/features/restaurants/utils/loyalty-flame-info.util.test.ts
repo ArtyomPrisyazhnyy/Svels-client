@@ -6,6 +6,7 @@ import {
   buildLoyaltyFlameInfoModel,
   formatLoyaltyRewardSummary,
   isLoyaltyFlameLit,
+  visitsAfterPreposition,
 } from './loyalty-flame-info.util.ts';
 
 const baseSettings: LoyaltySettings = {
@@ -69,11 +70,26 @@ describe('isLoyaltyFlameLit', () => {
   });
 });
 
+describe('visitsAfterPreposition', () => {
+  it('uses genitive plural after от/после except 1', () => {
+    assert.equal(visitsAfterPreposition(1), '1 визита');
+    assert.equal(visitsAfterPreposition(3), '3 визитов');
+    assert.equal(visitsAfterPreposition(7), '7 визитов');
+    assert.equal(visitsAfterPreposition(21), '21 визита');
+  });
+});
+
 describe('buildLoyaltyFlameInfoModel', () => {
   it('mentions expire window from settings', () => {
     const model = buildLoyaltyFlameInfoModel(baseSettings, null, false);
     const expire = model.sections.find((s) => s.title === 'Когда гаснет');
     assert.ok(expire?.body.includes('14 дней'));
+    assert.ok(expire?.body.includes('не заходить'));
+  });
+
+  it('uses visitsAfterPreposition in level labels', () => {
+    const model = buildLoyaltyFlameInfoModel(baseSettings, null, true);
+    assert.equal(model.levelRows?.[0]?.label, '«Искра» — от 3 визитов подряд');
   });
 
   it('lists levels with perks when rewards enabled', () => {
