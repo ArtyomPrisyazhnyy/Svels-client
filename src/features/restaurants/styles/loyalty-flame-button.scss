@@ -7,17 +7,56 @@
   height: 2.5rem;
   padding: 0;
   border: none;
-  border-radius: 999px;
-  background: var(--rs-primary-soft, #eff6ff);
-  color: var(--rs-accent, var(--accent));
-  font-size: 1.15rem;
-  line-height: 1;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--rs-text-muted, #475569);
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease;
+  flex-shrink: 0;
 
   @media (hover: hover) {
     &:hover {
-      transform: translateY(-1px);
+      background: rgba(241, 245, 249, 0.75);
     }
   }
+}
+
+.loyalty-flame-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex-shrink: 0;
+}
+
+.loyalty-flame-icon--off {
+  color: var(--rs-accent, var(--accent));
+}
+
+.loyalty-flame-icon--base {
+  color: var(--flame-base, var(--flame-tier-1));
+}
+
+.loyalty-flame-icon--tier-1 {
+  color: var(--flame-tier-1);
+}
+
+.loyalty-flame-icon--tier-2 {
+  color: var(--flame-tier-2);
+}
+
+.loyalty-flame-icon--tier-3 {
+  color: var(--flame-tier-3);
+}
+
+.loyalty-flame-icon--tier-4 {
+  color: var(--flame-tier-4);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--flame-tier-4) 45%, transparent));
+}
+
+.loyalty-flame-icon--tier-5 {
+  color: var(--flame-tier-5);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--flame-tier-5) 50%, transparent));
+}
+
+.loyalty-flame-icon--inline {
+  width: 1.125rem;
+  height: 1.125rem;
 }

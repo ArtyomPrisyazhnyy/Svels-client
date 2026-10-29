@@ -7,8 +7,8 @@ import { useAuthStore } from '@/store/auth.store';
 import { useVenueOverlayOptional } from '@/features/restaurants/context/VenueOverlayContext';
 import { RestaurantCartButton } from '@/features/restaurants/components/RestaurantCartButton';
 import { RestaurantFavoritesHeaderButton } from '@/features/restaurants/components/RestaurantFavoritesHeaderButton';
-import { RestaurantGuestProfileButton } from '@/features/restaurants/components/RestaurantGuestProfileButton';
 import { LoyaltyFlameHeaderButton } from '@/features/restaurants/components/LoyaltyFlameHeaderButton';
+import { RestaurantGuestProfileButton } from '@/features/restaurants/components/RestaurantGuestProfileButton';
 
 interface VenueHeaderActionsProps {
   restaurantId: string;
@@ -44,13 +44,13 @@ export function VenueHeaderActions({
     overlay?.openFlameInfo();
   }
 
-  const flameLit = overlay?.loyaltyFlameLit ?? false;
+  const flameVisual = overlay?.loyaltyFlameVisual ?? 'off';
 
   return (
     <div className="venue-header__actions" data-testid="venue-header-actions">
       {flameDisplayEnabled ? (
         <div className="venue-header__action-slot">
-          <LoyaltyFlameHeaderButton lit={flameLit} onClick={handleFlameClick} />
+          <LoyaltyFlameHeaderButton visual={flameVisual} onClick={handleFlameClick} />
         </div>
       ) : null}
       {favoritesEnabled ? (

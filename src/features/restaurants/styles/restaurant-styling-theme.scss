@@ -6,6 +6,13 @@
   --rs-focus-border: var(--rs-accent);
   --rs-focus-ring: color-mix(in srgb, var(--rs-accent) 15%, transparent);
 
+  --flame-base: #f59e0b;
+  --flame-tier-1: #eab308;
+  --flame-tier-2: #f97316;
+  --flame-tier-3: #ef4444;
+  --flame-tier-4: #c026d3;
+  --flame-tier-5: #6366f1;
+
   font-family: var(--rs-font);
   color: var(--rs-text);
   background: var(--rs-bg);
@@ -444,16 +451,13 @@
   }
 
   .loyalty-flame-button {
-    background: var(--rs-primary-soft);
+    color: var(--rs-text-muted);
 
     @media (hover: hover) {
       &:hover {
-        background: color-mix(in srgb, var(--rs-accent) 14%, var(--rs-surface));
+        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+        color: var(--rs-text);
       }
-    }
-
-    &--lit {
-      background: color-mix(in srgb, var(--rs-accent) 20%, var(--rs-surface));
     }
   }
 
@@ -462,13 +466,12 @@
   }
 
   &[data-rs-theme='midnight'] {
-    .loyalty-flame-button {
-      background: color-mix(in srgb, var(--rs-accent) 10%, var(--rs-surface));
-
-      &--lit {
-        background: color-mix(in srgb, var(--rs-accent) 22%, var(--rs-surface));
-      }
-    }
+    --flame-base: #fb923c;
+    --flame-tier-1: #facc15;
+    --flame-tier-2: #fb923c;
+    --flame-tier-3: #f87171;
+    --flame-tier-4: #e879f9;
+    --flame-tier-5: #818cf8;
 
     .loyalty-flame-info-modal__level--current {
       background: color-mix(in srgb, var(--rs-accent) 12%, var(--rs-surface));

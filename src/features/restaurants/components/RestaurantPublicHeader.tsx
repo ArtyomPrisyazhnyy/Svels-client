@@ -13,7 +13,10 @@ import { RestaurantCartButton } from './RestaurantCartButton';
 import { RestaurantFavoritesHeaderButton } from './RestaurantFavoritesHeaderButton';
 import { RestaurantGuestProfileButton } from './RestaurantGuestProfileButton';
 import { useGuestLoyaltyBalance } from '../hooks/useGuestLoyaltyBalance';
-import { isLoyaltyFlameLit } from '../utils/loyalty-flame-info.util';
+import {
+  resolveLoyaltyFlameHeaderVisual,
+  type LoyaltyFlameHeaderVisual,
+} from '../utils/loyalty-flame-info.util';
 
 interface RestaurantPublicHeaderProps {
   restaurantId: string;
@@ -23,7 +26,8 @@ interface RestaurantPublicHeaderProps {
   onOpenCart?: () => void;
   onOpenAuth?: () => void;
   onOpenFlameInfo?: () => void;
-  loyaltyFlameLit?: boolean;
+  loyaltyFlameVisual?: LoyaltyFlameHeaderVisual;
+  loyaltySettings?: LoyaltySettings;
   /** Показывать огонёк лояльности рядом с кабинетом. */
   flameDisplayEnabled?: boolean;
   /** Показывать кнопку избранного слева от профиля. */
@@ -39,7 +43,8 @@ export function RestaurantPublicHeader({
   onOpenCart,
   onOpenAuth,
   onOpenFlameInfo,
-  loyaltyFlameLit: loyaltyFlameLitProp,
+  loyaltyFlameVisual: loyaltyFlameVisualProp,
+  loyaltySettings,
   flameDisplayEnabled = false,
   favoritesEnabled = false,
   useLocalLoyaltyFlameState = false,
@@ -62,11 +67,13 @@ export function RestaurantPublicHeader({
     enabled: useLocalLoyaltyFlameState && flameDisplayEnabled && isGuestOfRestaurant,
   });
 
-  const localFlameLit =
-    flameDisplayEnabled && isLoyaltyFlameLit(balance, isGuestOfRestaurant);
-  const flameLit = useLocalLoyaltyFlameState
-    ? localFlameLit
-    : (loyaltyFlameLitProp ?? false);
+  const localFlameVisual =
+    flameDisplayEnabled && loyaltySettings
+      ? resolveLoyaltyFlameHeaderVisual(balance, loyaltySettings, isGuestOfRestaurant)
+      : 'off';
+  const flameVisual = useLocalLoyaltyFlameState
+    ? localFlameVisual
+    : (loyaltyFlameVisualProp ?? 'off');
 
   function handleProfileClick() {
     if (isGuestOfRestaurant) {
@@ -107,7 +114,7 @@ export function RestaurantPublicHeader({
 
       <div className="glass-header__actions">
         {flameDisplayEnabled && (
-          <LoyaltyFlameHeaderButton lit={flameLit} onClick={handleFlameClick} />
+          <LoyaltyFlameHeaderButton visual={flameVisual} onClick={handleFlameClick} />
         )}
         {favoritesEnabled && (
           <RestaurantFavoritesHeaderButton href={paths.favorites} />

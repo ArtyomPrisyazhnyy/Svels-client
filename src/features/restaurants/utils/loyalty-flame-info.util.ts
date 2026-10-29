@@ -10,11 +10,16 @@ export interface LoyaltyFlameInfoSection {
   body: string;
 }
 
+export type LoyaltyFlameTier = 1 | 2 | 3 | 4 | 5;
+
+export type LoyaltyFlameHeaderVisual = 'off' | 'base' | LoyaltyFlameTier;
+
 export interface LoyaltyFlameLevelRow {
   levelId: string;
   label: string;
   perks: string | null;
   isCurrent: boolean;
+  tier: LoyaltyFlameTier;
 }
 
 export interface LoyaltyFlameInfoModel {
@@ -92,6 +97,47 @@ function sortedLevels(settings: LoyaltySettings): FlameLevel[] {
   return [...settings.flameLevels].sort((a, b) => a.requiredVisits - b.requiredVisits);
 }
 
+/**
+ * Порядковый номер уровня в настройках (1-based). 0 — уровень ещё не достигнут.
+ */
+export function resolveGuestFlameLevelOrdinal(
+  balance: LoyaltyBalance | null,
+  settings: LoyaltySettings,
+): number {
+  if (!balance?.currentLevel) {
+    return 0;
+  }
+  const levels = sortedLevels(settings);
+  const index = levels.findIndex((level) => level.id === balance.currentLevel?.id);
+  return index >= 0 ? index + 1 : 0;
+}
+
+/** Визуальный tier для стилей --flame-tier-N: 0 до первого уровня, 1..5, 6+ → 5. */
+export function resolveLoyaltyFlameTier(levelOrdinal: number): 0 | LoyaltyFlameTier {
+  if (levelOrdinal < 1) {
+    return 0;
+  }
+  if (levelOrdinal > 5) {
+    return 5;
+  }
+  return levelOrdinal as LoyaltyFlameTier;
+}
+
+export function resolveLoyaltyFlameHeaderVisual(
+  balance: LoyaltyBalance | null,
+  settings: LoyaltySettings,
+  isGuestOfRestaurant: boolean,
+): LoyaltyFlameHeaderVisual {
+  if (!isGuestOfRestaurant || (balance?.visits ?? 0) <= 0) {
+    return 'off';
+  }
+  const tier = resolveLoyaltyFlameTier(resolveGuestFlameLevelOrdinal(balance, settings));
+  if (tier === 0) {
+    return 'base';
+  }
+  return tier;
+}
+
 function formatLevelPerks(level: FlameLevel, rewardsEnabled: boolean): string | null {
   if (!rewardsEnabled) {
     return null;
@@ -163,11 +209,12 @@ export function buildLoyaltyFlameInfoModel(
         'Автоматические награды за уровни отключены — огонёк показывает только статус серии.';
     }
 
-    levelRows = levels.map((level) => ({
+    levelRows = levels.map((level, index) => ({
       levelId: level.id,
       label: `«${level.name}» — от ${visitsAfterPreposition(level.requiredVisits)} подряд`,
       perks: formatLevelPerks(level, settings.flameRewardsEnabled),
       isCurrent: balance?.currentLevel?.id === level.id,
+      tier: resolveLoyaltyFlameTier(index + 1) as LoyaltyFlameTier,
     }));
   }
 

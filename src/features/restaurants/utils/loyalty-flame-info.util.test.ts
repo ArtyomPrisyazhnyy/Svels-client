@@ -6,6 +6,9 @@ import {
   buildLoyaltyFlameInfoModel,
   formatLoyaltyRewardSummary,
   isLoyaltyFlameLit,
+  resolveLoyaltyFlameTier,
+  resolveLoyaltyFlameHeaderVisual,
+  resolveGuestFlameLevelOrdinal,
   visitsAfterPreposition,
 } from './loyalty-flame-info.util.ts';
 
@@ -58,6 +61,47 @@ describe('formatLoyaltyRewardSummary', () => {
       }),
       'Кофе в подарок',
     );
+  });
+});
+
+describe('resolveLoyaltyFlameTier', () => {
+  it('maps level ordinals including cap at 5', () => {
+    assert.equal(resolveLoyaltyFlameTier(0), 0);
+    assert.equal(resolveLoyaltyFlameTier(1), 1);
+    assert.equal(resolveLoyaltyFlameTier(2), 2);
+    assert.equal(resolveLoyaltyFlameTier(3), 3);
+    assert.equal(resolveLoyaltyFlameTier(4), 4);
+    assert.equal(resolveLoyaltyFlameTier(5), 5);
+    assert.equal(resolveLoyaltyFlameTier(7), 5);
+  });
+});
+
+describe('resolveLoyaltyFlameHeaderVisual', () => {
+  it('returns off, base, and level tiers from balance', () => {
+    assert.equal(resolveLoyaltyFlameHeaderVisual(null, baseSettings, false), 'off');
+    assert.equal(
+      resolveLoyaltyFlameHeaderVisual({ visits: 0 } as LoyaltyBalance, baseSettings, true),
+      'off',
+    );
+    assert.equal(
+      resolveLoyaltyFlameHeaderVisual({ visits: 2 } as LoyaltyBalance, baseSettings, true),
+      'base',
+    );
+    const balance: LoyaltyBalance = {
+      restaurantId: 'r1',
+      userId: 'u1',
+      enabled: true,
+      rewardsEnabled: true,
+      visits: 4,
+      totalVisits: 4,
+      lastVisitAt: null,
+      expiresAt: null,
+      currentLevel: { id: 'l1', name: 'Искра', requiredVisits: 3 },
+      nextLevel: null,
+      availableRewards: [],
+    };
+    assert.equal(resolveLoyaltyFlameHeaderVisual(balance, baseSettings, true), 1);
+    assert.equal(resolveGuestFlameLevelOrdinal(balance, baseSettings), 1);
   });
 });
 

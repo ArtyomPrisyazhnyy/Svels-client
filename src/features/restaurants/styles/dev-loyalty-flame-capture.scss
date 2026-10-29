@@ -21,3 +21,24 @@
   font-size: var(--text-sm);
   color: var(--rs-text-muted);
 }
+
+.dev-loyalty-flame-capture__states-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dev-loyalty-flame-capture__states-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--rs-text-muted);
+  background: color-mix(in srgb, var(--rs-text) 4%, var(--rs-surface));
+  border-radius: var(--rs-btn-radius);
+}

@@ -6,6 +6,7 @@ import type { LoyaltyBalance } from '@/shared/types/loyalty-balance';
 import type { LoyaltySettings } from '@/shared/types/loyalty-settings';
 import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
 import { buildLoyaltyFlameInfoModel } from '../utils/loyalty-flame-info.util';
+import { LoyaltyFlameIcon } from './LoyaltyFlameIcon';
 import '../styles/loyalty-flame-info-modal.scss';
 
 interface LoyaltyFlameInfoModalProps {
@@ -80,7 +81,10 @@ export function LoyaltyFlameInfoModal({
                   {row.isCurrent ? (
                     <span className="loyalty-flame-info-modal__level-badge">Ваш уровень</span>
                   ) : null}
-                  <span className="loyalty-flame-info-modal__level-label">{row.label}</span>
+                  <div className="loyalty-flame-info-modal__level-heading">
+                    <LoyaltyFlameIcon variant={row.tier} size="inline" />
+                    <span className="loyalty-flame-info-modal__level-label">{row.label}</span>
+                  </div>
                   {row.perks ? (
                     <span className="loyalty-flame-info-modal__level-perks">{row.perks}</span>
                   ) : null}
