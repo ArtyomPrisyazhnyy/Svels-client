@@ -7,7 +7,7 @@ test.describe('Loyalty flame info modal', () => {
     const seed = readSeed();
     const { restaurantId, restaurantAdmin } = seed;
 
-    await request.patch(
+    const patchResponse = await request.patch(
       `${process.env.E2E_API_URL ?? 'http://127.0.0.1:3000'}/restaurants/${restaurantId}/loyalty-settings`,
       {
         headers: {
@@ -40,6 +40,7 @@ test.describe('Loyalty flame info modal', () => {
         },
       },
     );
+    expect(patchResponse.ok(), `PATCH loyalty-settings → ${patchResponse.status()}`).toBeTruthy();
 
     await revalidateRestaurantPublicPage(restaurantId);
 
