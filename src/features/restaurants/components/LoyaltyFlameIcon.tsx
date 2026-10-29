@@ -25,8 +25,7 @@ export function LoyaltyFlameIcon({
   className = '',
   size = 'header',
 }: LoyaltyFlameIconProps) {
-  const filled =
-    variant === 'base' || (typeof variant === 'number' && variant !== 'off' && variant >= 2);
+  const filled = variant === 'base' || (typeof variant === 'number' && variant >= 2);
 
   return (
     <svg

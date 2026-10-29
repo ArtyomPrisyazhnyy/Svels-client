@@ -107,12 +107,6 @@ const IDLE_BALANCE: LoyaltyBalance = {
   availableRewards: [],
 };
 
-const BASE_BALANCE: LoyaltyBalance = {
-  ...IDLE_BALANCE,
-  visits: 2,
-  totalVisits: 7,
-};
-
 const HEADER_STATE_SAMPLES: { label: string; visual: LoyaltyFlameHeaderVisual }[] = [
   { label: 'off', visual: 'off' },
   { label: 'base', visual: 'base' },
