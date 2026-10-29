@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { Carousel } from '@/shared/components/Carousel';
-import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { Modal } from '@/shared/ui/Modal/Modal';
 import {
   resolvePromoBannerAspectRatio,
@@ -13,46 +12,13 @@ import {
   hasSeenPromoBanner,
   markPromoBannerSeen,
 } from '../utils/promo-banner-seen.util';
+import { PromoBannerAspectMedia } from './PromoBannerAspectMedia';
 import '../styles/promo-banner-modal.scss';
 
 interface PromoBannersHostProps {
   banners: PromoBanner[];
   /** В превью админки не пишем «уже видел» в localStorage. */
   persistSeen?: boolean;
-}
-
-function BannerMedia({
-  banner,
-  imageClassName,
-  linkClassName,
-}: {
-  banner: PromoBanner;
-  imageClassName: string;
-  linkClassName: string;
-}) {
-  const image = (
-    <ResponsiveImage
-      className={imageClassName}
-      src={banner.imageUrl}
-      webpSrc={banner.imageWebpUrl}
-      alt={banner.title?.trim() || 'Акция'}
-    />
-  );
-
-  if (!banner.linkUrl) {
-    return image;
-  }
-
-  return (
-    <a
-      href={banner.linkUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={linkClassName}
-    >
-      {image}
-    </a>
-  );
 }
 
 function PromoBannerModal({
@@ -76,8 +42,10 @@ function PromoBannerModal({
       size="sm"
       wrap={(node) => <RestaurantStylingPortalRoot>{node}</RestaurantStylingPortalRoot>}
     >
-      <BannerMedia
+      <PromoBannerAspectMedia
         banner={banner}
+        frameClassName="promo-banner-modal__frame"
+        frameTestId="promo-banner-modal-aspect-frame"
         imageClassName="promo-banner-modal__image"
         linkClassName="promo-banner-modal__link"
       />
@@ -92,16 +60,14 @@ function PromoBannerStrip({ banners }: { banners: PromoBanner[] }) {
 
   const slides = banners.map((banner) => {
     const ratio = resolvePromoBannerAspectRatio(banner);
-    const ratioClass =
-      ratio === '16_9'
-        ? 'promo-banner-strip__image--16-9'
-        : 'promo-banner-strip__image--4-1';
 
     return (
       <div key={banner.id} className="promo-banner-strip__slide">
-        <BannerMedia
+        <PromoBannerAspectMedia
           banner={banner}
-          imageClassName={`promo-banner-strip__image ${ratioClass}`}
+          frameClassName="promo-banner-strip__frame"
+          frameTestId={`promo-banner-strip-frame-${ratio}`}
+          imageClassName="promo-banner-strip__image"
           linkClassName="promo-banner-strip__link"
         />
       </div>
@@ -109,7 +75,7 @@ function PromoBannerStrip({ banners }: { banners: PromoBanner[] }) {
   });
 
   return (
-    <section className="promo-banner-strip" aria-label="Акции">
+    <section className="promo-banner-strip" aria-label="Акции" data-testid="promo-banner-strip">
       {banners.length === 1 ? (
         slides[0]
       ) : (

@@ -1,3 +1,31 @@
+.promo-banner-aspect-frame {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  background: var(--rs-surface-muted, #f1f5f9);
+
+  &--4-1 {
+    aspect-ratio: 4 / 1;
+  }
+
+  &--16-9 {
+    aspect-ratio: 16 / 9;
+  }
+
+  picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.promo-banner-aspect-frame__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .promo-banner-modal__panel.ui-overlay-panel {
   .ui-overlay-panel__body {
     padding: 0;
@@ -8,36 +36,48 @@
   display: block;
 }
 
-.promo-banner-modal__image {
+.promo-banner-modal__media {
   display: block;
+  width: 100%;
+  max-height: min(70vh, 560px);
+  overflow: hidden;
+}
+
+.promo-banner-modal__frame {
+  max-height: min(70vh, 560px);
+}
+
+.promo-banner-modal__image {
   width: 100%;
   height: auto;
   max-height: min(70vh, 560px);
-  object-fit: cover;
-}
-
-.promo-banner-modal__title {
-  margin: 0;
-  padding: 0.85rem 1rem 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #0f172a;
-  text-align: center;
+  object-fit: contain;
 }
 
 .promo-banner-strip {
   width: 100%;
   max-width: 100%;
-  margin: 0 0 1.5rem;
+  margin: 0 0 var(--space-6);
   padding: 0;
   overflow: hidden;
-  border-radius: 16px;
-  background: var(--rs-surface, #ffffff);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  box-shadow: none;
 
   @media (max-width: 640px) {
-    margin-bottom: 1.25rem;
-    border-radius: 12px;
+    margin-bottom: var(--space-5);
+    border-radius: var(--radius-md);
+  }
+
+  .promo-banner-aspect-frame {
+    background: transparent;
+  }
+
+  .promo-banner-aspect-frame__image {
+    border: 0;
+    outline: none;
+    vertical-align: top;
+    object-fit: cover;
   }
 }
 
@@ -47,19 +87,8 @@
   width: 100%;
 }
 
-.promo-banner-strip__image {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-
-  &--4-1 {
-    aspect-ratio: 4 / 1;
-  }
-
-  &--16-9 {
-    aspect-ratio: 16 / 9;
-  }
+.promo-banner-strip__frame {
+  border-radius: inherit;
 }
 
 .promo-banner-strip__carousel {
@@ -83,9 +112,9 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0.65rem;
+    bottom: var(--space-3);
     margin: 0;
-    z-index: 1;
+    z-index: var(--z-base);
   }
 
   .carousel__dot {
