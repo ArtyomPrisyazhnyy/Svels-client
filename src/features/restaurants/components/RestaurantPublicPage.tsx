@@ -3,12 +3,16 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { useAuthHydrated } from '@/hooks/useAuthHydrated';
+import { useAuthStore } from '@/store/auth.store';
+import { useGuestLoyaltyBalance } from '../hooks/useGuestLoyaltyBalance';
 import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
 import type { MenuResponse } from '@/shared/types/menu';
 import type { RestaurantOrderSettings } from '@/shared/types/order-settings';
 import type { RestaurantStyling } from '@/shared/types/restaurant-styling';
 import type { BookingSettings } from '@/shared/types/booking-settings';
 import type { LoyaltySettings } from '@/shared/types/loyalty-settings';
+import { DEFAULT_LOYALTY_SETTINGS } from '@/shared/types/loyalty-settings';
 import type { PromoBanner } from '@/shared/types/promo-banner';
 import type { SocialLink } from '@/shared/types/social-link';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
@@ -21,6 +25,7 @@ import {
 } from '../utils/menu-catalog.util';
 import { PromoBannersHost } from './promo-banners.lazy';
 import {
+  LoyaltyFlameInfoModal,
   RestaurantCartModal,
   RestaurantGuestAuthModal,
 } from './lazy-venue-modals';
@@ -64,13 +69,39 @@ function RestaurantPublicPageBody({
 }: RestaurantPublicPageProps & { categoryNavEnabled: boolean }) {
   const paths = useRestaurantGuestPaths(restaurant.id, embedded);
   const venueOverlay = useVenueOverlayOptional();
+  const hydrated = useAuthHydrated();
+  const user = useAuthStore((s) => s.user);
+  const isGuestOfRestaurant =
+    hydrated && user?.role === 'user' && user.restaurantId === restaurant.id;
+  const resolvedLoyaltySettings = loyaltySettings ?? {
+    ...DEFAULT_LOYALTY_SETTINGS,
+    restaurantId: restaurant.id,
+    updatedAt: '',
+  };
+  const flameEnabled = resolvedLoyaltySettings.flameDisplayEnabled;
   const [cartOpen, setCartOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [flameOpen, setFlameOpen] = useState(false);
   const bookingEnabled = bookingSettings?.bookingEnabled ?? false;
   const favoritesEnabled = styling.favoritesEnabled !== false;
 
+  const { balance, loading, error, refresh } = useGuestLoyaltyBalance(restaurant.id, {
+    enabled:
+      flameEnabled &&
+      isGuestOfRestaurant &&
+      (embedded || flameOpen),
+  });
+
   const openCart = embedded ? () => setCartOpen(true) : () => venueOverlay?.openCart();
   const openAuth = embedded ? () => setAuthOpen(true) : () => venueOverlay?.openAuth();
+  const openFlameInfo = embedded
+    ? () => {
+        setFlameOpen(true);
+        if (isGuestOfRestaurant) {
+          void refresh();
+        }
+      }
+    : () => venueOverlay?.openFlameInfo();
 
   const headerProps = {
     restaurantId: restaurant.id,
@@ -79,7 +110,10 @@ function RestaurantPublicPageBody({
     logoWebpUrl: restaurant.logoWebpUrl,
     onOpenCart: embedded ? () => setCartOpen(true) : openCart,
     onOpenAuth: embedded ? () => setAuthOpen(true) : openAuth,
-    flameDisplayEnabled: loyaltySettings?.flameDisplayEnabled ?? false,
+    onOpenFlameInfo: flameEnabled ? openFlameInfo : undefined,
+    loyaltyFlameLit: embedded ? undefined : venueOverlay?.loyaltyFlameLit,
+    useLocalLoyaltyFlameState: embedded,
+    flameDisplayEnabled: flameEnabled,
     favoritesEnabled: embedded ? false : favoritesEnabled,
   };
 
@@ -128,6 +162,18 @@ function RestaurantPublicPageBody({
         bookingEnabled={bookingEnabled}
         favoritesEnabled={favoritesEnabled}
       />
+
+      {embedded && flameOpen && flameEnabled ? (
+        <LoyaltyFlameInfoModal
+          open
+          onClose={() => setFlameOpen(false)}
+          loyaltySettings={resolvedLoyaltySettings}
+          balance={balance}
+          balanceLoading={loading}
+          balanceError={error}
+          isGuestOfRestaurant={isGuestOfRestaurant}
+        />
+      ) : null}
 
       {embedded && authOpen && (
         <RestaurantGuestAuthModal

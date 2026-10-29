@@ -5,12 +5,15 @@ import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { useAuthStore } from '@/store/auth.store';
+import type { LoyaltySettings } from '@/shared/types/loyalty-settings';
 import { useMenuCategoryNavOptional } from '../context/MenuCategoryNavContext';
+import { LoyaltyFlameHeaderButton } from './LoyaltyFlameHeaderButton';
 import { MenuCategoryNav } from './MenuCategoryNav';
 import { RestaurantCartButton } from './RestaurantCartButton';
 import { RestaurantFavoritesHeaderButton } from './RestaurantFavoritesHeaderButton';
 import { RestaurantGuestProfileButton } from './RestaurantGuestProfileButton';
-import '../styles/loyalty-flame-button.scss';
+import { useGuestLoyaltyBalance } from '../hooks/useGuestLoyaltyBalance';
+import { isLoyaltyFlameLit } from '../utils/loyalty-flame-info.util';
 
 interface RestaurantPublicHeaderProps {
   restaurantId: string;
@@ -19,10 +22,13 @@ interface RestaurantPublicHeaderProps {
   logoWebpUrl?: string | null;
   onOpenCart?: () => void;
   onOpenAuth?: () => void;
+  onOpenFlameInfo?: () => void;
+  loyaltyFlameLit?: boolean;
   /** Показывать огонёк лояльности рядом с кабинетом. */
   flameDisplayEnabled?: boolean;
   /** Показывать кнопку избранного слева от профиля. */
   favoritesEnabled?: boolean;
+  useLocalLoyaltyFlameState?: boolean;
 }
 
 export function RestaurantPublicHeader({
@@ -32,8 +38,11 @@ export function RestaurantPublicHeader({
   logoWebpUrl,
   onOpenCart,
   onOpenAuth,
+  onOpenFlameInfo,
+  loyaltyFlameLit: loyaltyFlameLitProp,
   flameDisplayEnabled = false,
   favoritesEnabled = false,
+  useLocalLoyaltyFlameState = false,
 }: RestaurantPublicHeaderProps) {
   const router = useRouter();
   const hydrated = useAuthHydrated();
@@ -49,6 +58,16 @@ export function RestaurantPublicHeader({
   const isGuestOfRestaurant =
     hydrated && user?.role === 'user' && user.restaurantId === restaurantId;
 
+  const { balance } = useGuestLoyaltyBalance(restaurantId, {
+    enabled: useLocalLoyaltyFlameState && flameDisplayEnabled && isGuestOfRestaurant,
+  });
+
+  const localFlameLit =
+    flameDisplayEnabled && isLoyaltyFlameLit(balance, isGuestOfRestaurant);
+  const flameLit = useLocalLoyaltyFlameState
+    ? localFlameLit
+    : (loyaltyFlameLitProp ?? false);
+
   function handleProfileClick() {
     if (isGuestOfRestaurant) {
       router.push(paths.account);
@@ -59,7 +78,7 @@ export function RestaurantPublicHeader({
   }
 
   function handleFlameClick() {
-    handleProfileClick();
+    onOpenFlameInfo?.();
   }
 
   return (
@@ -88,23 +107,7 @@ export function RestaurantPublicHeader({
 
       <div className="glass-header__actions">
         {flameDisplayEnabled && (
-          <button
-            type="button"
-            className={`loyalty-flame-button${
-              isGuestOfRestaurant ? ' loyalty-flame-button--lit' : ''
-            }`}
-            onClick={handleFlameClick}
-            aria-label="Огонёк лояльности"
-            title="Огонёк лояльности"
-            data-testid="loyalty-flame-button"
-          >
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
-              <path
-                fill="currentColor"
-                d="M12 2c1.5 3.2-.2 5.2-1.5 6.6C9 10.2 8 11.5 8 14a4 4 0 0 0 8 0c0-2.2-1-4.1-2.2-5.6-.7-.9-1.4-1.8-1.4-3.2 0-.8.2-1.7.6-2.7.3 1.2 1.1 2.1 2.2 2.9C17.1 6.7 19 9.2 19 13a7 7 0 1 1-14 0c0-2.6 1.1-4.7 2.6-6.4C9.2 4.8 10.6 3.4 12 2z"
-              />
-            </svg>
-          </button>
+          <LoyaltyFlameHeaderButton lit={flameLit} onClick={handleFlameClick} />
         )}
         {favoritesEnabled && (
           <RestaurantFavoritesHeaderButton href={paths.favorites} />

@@ -48,6 +48,7 @@ export default async function RestaurantVenueLayout({
         restaurantName={restaurant.name}
         orderSettings={orderSettings}
         bookingEnabled={bookingEnabled}
+        loyaltySettings={loyaltySettings}
       >
         <div className="venue-layout" data-testid="venue-layout">
           <VenueHeader
