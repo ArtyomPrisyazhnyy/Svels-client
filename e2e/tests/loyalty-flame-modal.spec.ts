@@ -16,25 +16,11 @@ test.describe('Loyalty flame info modal', () => {
         },
         data: {
           flameDisplayEnabled: true,
-          flameRewardsEnabled: true,
-          flameExpireDays: 14,
           flameLevels: [
             {
-              id: 'e2e-level-1',
               name: 'Искра',
               requiredVisits: 2,
-              rewards: [
-                {
-                  id: 'e2e-reward-1',
-                  type: 'percent_discount',
-                  title: 'Скидка 5% на заказ',
-                  description: null,
-                  percentOff: 5,
-                  amountOff: null,
-                  menuItemId: null,
-                  minOrderAmount: null,
-                },
-              ],
+              rewards: [{ type: 'custom', title: 'Бонус за визиты' }],
             },
           ],
         },
