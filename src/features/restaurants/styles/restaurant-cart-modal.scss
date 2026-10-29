@@ -402,7 +402,6 @@
 .restaurant-cart-modal__item-price {
   flex: 0 0 auto;
   margin: 0;
-  font-size: var(--text-md);
   font-weight: 700;
   line-height: 1.25;
   color: var(--rs-accent);
@@ -608,7 +607,6 @@
 
 .restaurant-cart-modal__panel .restaurant-cart-modal__total-amount {
   color: var(--rs-text);
-  font-size: var(--text-xl);
   font-weight: 700;
   line-height: 1.25;
   font-variant-numeric: tabular-nums;
@@ -616,17 +614,9 @@
 }
 
 .restaurant-cart-modal__panel .byn-price {
-  --byn-sign-scale: 1.18em;
-  align-items: baseline;
-  gap: calc(var(--space-1)/2);
+  align-items: center;
+  gap: calc(var(--space-1) / 2);
   line-height: 1.25;
-  overflow: visible;
-}
-
-.restaurant-cart-modal__panel .byn-price .byn-sign {
-  line-height: 1;
-  overflow: visible;
-  transform: none;
 }
 
 .restaurant-cart-modal__footer .restaurant-cart-modal__submit.ui-btn--full {
