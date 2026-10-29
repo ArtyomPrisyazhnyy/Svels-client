@@ -3,6 +3,8 @@ import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-pag
 import { VIEWPORTS, prepareForScreenshot } from '../helpers/visual';
 import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
 
+import type { CartLineItem } from '../../src/shared/types/cart';
+
 const THEMES = ['classic', 'midnight'] as const;
 const VIEWPORT_KEYS = ['m390', 'd1280'] as const;
 
@@ -32,6 +34,59 @@ async function snapFullViewport(page: import('@playwright/test').Page, name: str
   await expect(page).toHaveScreenshot(`${name}.png`, {
     fullPage: false,
     maxDiffPixelRatio: 0.01,
+  });
+}
+
+function buildCartLine(index = 1): CartLineItem {
+  return {
+    id: `venue-price-cart-${index}`,
+    lineKey: `vpc-${index}`,
+    menuItemId: `vpc-item-${index}`,
+    name: 'Блюдо для проверки цены',
+    variantLabel: 'Стандарт',
+    quantity: 2,
+    unitPrice: 9.9,
+    imageUrl: '',
+    imageWebpUrl: null,
+    modifiers: [],
+    modifierSelections: {},
+  };
+}
+
+async function seedCart(page: import('@playwright/test').Page, restaurantId: string) {
+  await page.addInitScript(
+    ({ rid, cartItems }) => {
+      window.localStorage.setItem(
+        'svels-cart',
+        JSON.stringify({
+          state: {
+            version: 2,
+            restaurantId: rid,
+            items: cartItems,
+            checkoutByRestaurant: {},
+          },
+          version: 2,
+        }),
+      );
+    },
+    { rid: restaurantId, cartItems: [buildCartLine()] },
+  );
+}
+
+async function readBynPriceMetrics(locator: import('@playwright/test').Locator) {
+  return locator.first().evaluate((el) => {
+    const sign = el.querySelector('.byn-sign');
+    const amt = el.querySelector('.byn-price__amount');
+    const cs = (n: Element | null) => (n ? getComputedStyle(n) : null);
+    const r = (n: Element | null) => (n ? n.getBoundingClientRect() : null);
+    const amountBox = r(amt);
+    const signBox = r(sign);
+    return {
+      gap: cs(el)?.gap ?? '',
+      signFontSize: cs(sign)?.fontSize ?? '',
+      signScale: cs(el)?.getPropertyValue('--byn-sign-scale') ?? '',
+      gapPx: amountBox && signBox ? signBox.left - amountBox.right : null,
+    };
   });
 }
 
@@ -70,12 +125,25 @@ for (const theme of THEMES) {
   }
 }
 
+test('cart modal classic @m390', async ({ page, seed, asGuest }) => {
+  void asGuest;
+  await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, 'classic');
+  await seedCart(page, seed.restaurantId);
+  await page.setViewportSize(VIEWPORTS.m390);
+  await page.goto(`/restaurants/${seed.restaurantId}`);
+  await page.getByTestId('cart-button').click();
+  await expect(page.getByTestId('cart-modal-panel')).toBeVisible();
+  await snapFullViewport(page, 'venue-cart-modal-classic-m390');
+});
+
 test('product modal footer fits on one row @390', async ({ page, seed, asGuest }) => {
   void asGuest;
   await applyTheme(seed.restaurantId, seed.restaurantAdmin.auth.accessToken, 'classic');
   await page.setViewportSize(VIEWPORTS.m390);
   await page.goto(`/restaurants/${seed.restaurantId}`);
   const opener = page.locator('[data-testid^="menu-item-"]').first();
+  await expect(opener).toBeVisible();
+  const cardMetrics = await readBynPriceMetrics(page.locator('.menu-product-card__price .byn-price'));
   await opener.click();
   const footer = page.locator('.menu-product-modal__footer');
   await expect(footer).toBeVisible();
@@ -93,4 +161,10 @@ test('product modal footer fits on one row @390', async ({ page, seed, asGuest }
   if (priceBox && actionsBox) {
     expect(actionsBox.x).toBeGreaterThanOrEqual(priceBox.x + priceBox.width - 1);
   }
+
+  const modalMetrics = await readBynPriceMetrics(footer.locator('.byn-price'));
+  expect(modalMetrics.gap).toBe(cardMetrics.gap);
+  expect(modalMetrics.signFontSize).toBe(cardMetrics.signFontSize);
+  expect(modalMetrics.signScale).toBe(cardMetrics.signScale);
+  expect(modalMetrics.gapPx ?? 0).toBeGreaterThan(2);
 });

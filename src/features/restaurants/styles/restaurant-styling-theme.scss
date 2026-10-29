@@ -1,4 +1,6 @@
 .restaurant-styled {
+  @import 'venue-byn-price';
+
   --rs-btn-radius: 0.625rem;
   /* Цены на публичном сайте: на ступень крупнее прежних md/lg/xl. */
   --rs-venue-price-size: var(--text-lg);
@@ -18,6 +20,17 @@
   font-family: var(--rs-font);
   color: var(--rs-text);
   background: var(--rs-bg);
+
+  .menu-product-card__price .byn-price,
+  .menu-product-modal__footer .menu-product-modal__price .byn-price,
+  .restaurant-cart-modal__item-price .byn-price,
+  .restaurant-cart-modal__panel .restaurant-cart-modal__total-amount .byn-price,
+  .restaurant-cart-modal__panel .restaurant-cart-modal__total .byn-price,
+  .cart-receipt__price .byn-price,
+  .guest-orders-list .byn-price,
+  .cart-dock__cta-amount .byn-price {
+    @include venue-public-byn-price;
+  }
 
   .phone-input {
     --phone-input-autofill-bg: var(--rs-bg);
@@ -102,7 +115,9 @@
     font-size: var(--rs-venue-price-size-emphasis);
   }
 
-  .guest-orders-list .byn-price {
+  .guest-orders-list__item-head .byn-price,
+  .guest-orders-list__detail-row .byn-price,
+  .guest-orders-list__lines .byn-price {
     font-size: var(--rs-venue-price-size);
   }
 
@@ -111,7 +126,7 @@
     font-weight: 700;
   }
 
-  .cart-dock__cta-amount .byn-price {
+  .cart-dock__cta-amount {
     font-size: var(--rs-venue-price-size-emphasis);
   }
 

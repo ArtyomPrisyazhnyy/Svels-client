@@ -613,12 +613,6 @@
   white-space: nowrap;
 }
 
-.restaurant-cart-modal__panel .byn-price {
-  align-items: baseline;
-  gap: var(--byn-price-gap);
-  line-height: 1.25;
-}
-
 .restaurant-cart-modal__footer .restaurant-cart-modal__submit.ui-btn--full {
   @media (min-width: 768px) {
     width: auto;

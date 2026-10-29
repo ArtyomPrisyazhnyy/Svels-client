@@ -193,9 +193,19 @@
 
 .menu-product-modal__price {
   margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  column-gap: var(--space-2);
+  flex: 0 1 auto;
+  min-width: 0;
   font-weight: 700;
   color: #0f766e;
   line-height: 1;
+
+  .menu-item-price,
+  .menu-item-price__current {
+    display: contents;
+  }
 
   .menu-item-price__old {
     font-size: 0.65em;
