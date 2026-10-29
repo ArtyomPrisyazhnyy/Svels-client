@@ -56,6 +56,11 @@ $z-scale: (
   --text-xl: 20px;
   --text-2xl: 24px;
 
+  /* NBRB ligature sits on x-height; scale to match digit cap height in .byn-price */
+  --byn-sign-scale: 1.36;
+  /* Thin word space between amount and currency sign */
+  --byn-price-gap: 0.2em;
+
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);

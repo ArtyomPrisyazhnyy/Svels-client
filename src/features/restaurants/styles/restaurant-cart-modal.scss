@@ -614,8 +614,8 @@
 }
 
 .restaurant-cart-modal__panel .byn-price {
-  align-items: center;
-  gap: calc(var(--space-1) / 2);
+  align-items: baseline;
+  gap: var(--byn-price-gap);
   line-height: 1.25;
 }
 

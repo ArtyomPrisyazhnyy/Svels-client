@@ -2,8 +2,7 @@
  * Официальный иконочный шрифт графического знака белорусского рубля (Нацбанк РБ).
  * @see https://www.nbrb.by/coinsbanknotes/byn-ico/nbrb-font
  *
- * Глиф nbrb в em-квадрате оптически чуть мельче цифр UI.
- * Масштаб подобран под паритет с жирными цифрами (не 1em и не 1.4em).
+ * Глиф nbrb в em-квадрате ниже cap height цифр UI — масштаб через --byn-sign-scale.
  */
 
 @font-face {
@@ -41,8 +40,8 @@
 
 .byn-price {
   display: inline-flex;
-  align-items: center;
-  gap: 0.08em;
+  align-items: baseline;
+  gap: var(--byn-price-gap);
   white-space: nowrap;
   line-height: 1;
 }
@@ -56,12 +55,13 @@
 
 .byn-price .nbrb-icon,
 .byn-price .byn-sign {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: inherit;
+  display: inline-block;
+  flex: 0 0 auto;
+  font-size: calc(1em * var(--byn-sign-scale));
   font-weight: inherit;
   line-height: 1;
+  vertical-align: baseline;
+  transform: translateY(0.04em);
 }
 
 .currency-text {

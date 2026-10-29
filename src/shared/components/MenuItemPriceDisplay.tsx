@@ -38,8 +38,10 @@ export function MenuItemPriceDisplay({
           className={oldClassName}
         />
       )}
-      {showFromPrefix && <span className="menu-item-price__from">от </span>}
-      <CurrencyAmount amount={current} fractionDigits={fractionDigits} />
+      <span className="menu-item-price__current">
+        {showFromPrefix && <span className="menu-item-price__from">от </span>}
+        <CurrencyAmount amount={current} fractionDigits={fractionDigits} />
+      </span>
     </span>
   );
 }
