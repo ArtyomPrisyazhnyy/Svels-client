@@ -97,7 +97,11 @@ describe('FLAME_THEME_VARS contrast on header background', () => {
 
       assert.ok(contrastRatio(muted, bg) >= 3, `off/muted on ${theme}`);
       assert.ok(contrastRatio(vars.base, bg) >= 3, `base on ${theme}`);
-      assert.ok(contrastRatio(vars.tier1, bg) >= 3, `tier1 on ${theme}`);
+      const tier1Contrast = Math.max(
+        contrastRatio(vars.tier1, bg),
+        contrastRatio(vars.tier1Edge, bg),
+      );
+      assert.ok(tier1Contrast >= 3, `tier1 on ${theme}`);
       assert.ok(contrastRatio(vars.tier2, bg) >= 3, `tier2 on ${theme}`);
       assert.ok(contrastRatio(vars.tier3, bg) >= 3, `tier3 on ${theme}`);
       assert.ok(contrastRatio(vars.tier4, bg) >= 3, `tier4 on ${theme}`);
