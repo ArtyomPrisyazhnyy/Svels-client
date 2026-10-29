@@ -3,6 +3,7 @@
 import type { OrderDto } from '@/shared/types/pre-order';
 import type { UserRole } from '@/shared/types/auth';
 import type { RestaurantLocation } from '@/shared/types/restaurant-location';
+import { OrderLineItem } from '@/shared/components/OrderLineItem';
 import { formatRestaurantLocationLine } from '@/shared/types/restaurant-location';
 import { formatDateTimeMinsk, formatTimeMinsk } from './dateMinsk';
 import {
@@ -121,24 +122,12 @@ export function OrderCard({
 
       <ul className="orders-admin__items">
         {order.items.map((item) => (
-          <li key={item.id} className="orders-admin__item">
-            <div className="orders-admin__item-head">
-              <span>
-                {item.name} × {item.quantity}
-              </span>
-              <span>{formatMoney(item.lineTotal)}</span>
-            </div>
-            {item.modifiers.length > 0 && (
-              <ul className="orders-admin__modifiers">
-                {item.modifiers.map((mod, idx) => (
-                  <li key={`${item.id}-${idx}`}>
-                    {mod.groupName}: {mod.optionName}
-                    {mod.priceDelta !== 0 ? ` (+${mod.priceDelta.toFixed(2)})` : ''}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
+          <OrderLineItem
+            key={item.id}
+            item={item}
+            className="orders-admin__item"
+            showModifierPriceDelta
+          />
         ))}
       </ul>
 

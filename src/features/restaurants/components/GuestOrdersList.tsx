@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
+import { OrderLineItem } from '@/shared/components/OrderLineItem';
 import type { OrderDto } from '@/shared/types/pre-order';
 import { useAuthStore } from '@/store/auth.store';
 import { fetchMyOrder, fetchMyOrders } from '../api/pre-orders.api';
@@ -9,10 +10,15 @@ import { useGuestDataStore } from '@/store/guest-data.store';
 import { GuestOrdersListSkeleton } from './guest-page-skeletons/GuestPageSkeletons';
 import { useGuestOrders } from '../hooks/useGuestOrders';
 import {
+  formatGuestCancelMessage,
   fulfillmentTypeLabel,
   isTerminalOrderStatus,
   ORDER_PAYMENT_STATUS_LABELS,
 } from '../utils/guest-order.util';
+import {
+  formatVenueOrderDateTime,
+  formatVenueRequestedAt,
+} from '@/shared/utils/venue-datetime.util';
 import { GuestOrderStatusBadge } from './GuestOrderStatusBadge';
 import '../styles/guest-orders-list.scss';
 
@@ -20,19 +26,6 @@ const POLL_MS = 20_000;
 
 interface GuestOrdersListProps {
   restaurantId: string;
-}
-
-function formatRequestedAt(iso: string | null): string {
-  if (!iso) {
-    return 'Как можно скорее';
-  }
-  const date = new Date(iso);
-  return date.toLocaleString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }
 
 export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
@@ -147,7 +140,7 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
                 <CurrencyAmount amount={order.totalAmount} />
               </p>
               <p className="guest-orders-list__item-date">
-                {new Date(order.createdAt).toLocaleString('ru-RU')}
+                {formatVenueOrderDateTime(order.createdAt)}
               </p>
             </button>
           </li>
@@ -172,7 +165,7 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
           </p>
           <p className="guest-orders-list__detail-row">
             <span>Время</span>
-            {formatRequestedAt(detail.requestedAt)}
+            {formatVenueRequestedAt(detail.requestedAt)}
           </p>
           {detail.deliveryAddress && (
             <p className="guest-orders-list__detail-row">
@@ -188,19 +181,16 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
           )}
           <ul className="guest-orders-list__lines">
             {detail.items.map((item) => (
-              <li key={item.id}>
-                <span>
-                  {item.name} × {item.quantity}
-                </span>
-                <CurrencyAmount amount={item.lineTotal} />
-              </li>
+              <OrderLineItem key={item.id} item={item} className="guest-orders-list__line" />
             ))}
           </ul>
           <p className="guest-orders-list__total">
             Итого: <CurrencyAmount amount={detail.totalAmount} />
           </p>
           {detail.cancelReason && (
-            <p className="guest-orders-list__cancel">Причина отмены: {detail.cancelReason}</p>
+            <p className="guest-orders-list__cancel" data-testid="guest-order-cancel-reason">
+              {formatGuestCancelMessage(detail.cancelReason)}
+            </p>
           )}
         </article>
       )}
