@@ -15,6 +15,14 @@ export const RestaurantGuestAuthModal = dynamic(
   { ssr: false, loading: () => null },
 );
 
+export const LoyaltyFlameInfoModal = dynamic(
+  () =>
+    import('./LoyaltyFlameInfoModal').then((module) => ({
+      default: module.LoyaltyFlameInfoModal,
+    })),
+  { ssr: false, loading: () => null },
+);
+
 export function preloadRestaurantCartModal(): void {
   void import('./RestaurantCartModal');
 }

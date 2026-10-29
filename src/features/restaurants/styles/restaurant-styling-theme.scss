@@ -445,6 +445,27 @@
     color: var(--rs-accent);
   }
 
+  .loyalty-flame-button {
+    color: var(--rs-text-muted);
+
+    @media (hover: hover) {
+      &:hover {
+        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+        color: var(--rs-text);
+      }
+    }
+  }
+
+  .loyalty-flame-info-modal__level--current {
+    background: var(--rs-primary-soft);
+  }
+
+  &[data-rs-theme='midnight'] {
+    .loyalty-flame-info-modal__level--current {
+      background: color-mix(in srgb, var(--rs-accent) 12%, var(--rs-surface));
+    }
+  }
+
   .glass-header--tenant,
   .venue-header--tenant {
     border-bottom-color: color-mix(in srgb, var(--rs-border) 80%, transparent);

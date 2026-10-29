@@ -328,6 +328,8 @@ test.describe('Addresses visual', () => {
         await page.goto(`/restaurants/${seed.restaurantId}/account`);
         const section = page.getByTestId('account-addresses');
         await expect(section).toBeVisible();
+        await expect(page.getByTestId('guest-address-list')).toBeVisible();
+        await expect(page.locator('[data-testid^="address-option-"]')).toHaveCount(3);
         await prepareForScreenshot(page);
         await expect(section).toHaveScreenshot(
           `addresses-profile-list-${theme}-${viewportKey}.png`,
