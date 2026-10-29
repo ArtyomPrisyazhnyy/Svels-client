@@ -59,7 +59,6 @@ async function api<T>(
   } = {},
 ): Promise<T> {
   const retries = options.retries ?? 5;
-  const throttleRetries = Math.min(retries, 2);
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
@@ -84,7 +83,7 @@ async function api<T>(
     const text = await response.text();
     const data = text ? (JSON.parse(text) as unknown) : null;
 
-    if (response.status === 429 && attempt < throttleRetries) {
+    if (response.status === 429 && attempt < retries) {
       rateLimitedUntil = Math.max(rateLimitedUntil, Date.now() + 10_000);
       await waitOutRateLimit();
       continue;
