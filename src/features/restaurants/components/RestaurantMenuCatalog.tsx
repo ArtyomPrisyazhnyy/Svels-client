@@ -2,6 +2,11 @@
 
 import dynamic from 'next/dynamic';
 import { useMemo, useState } from 'react';
+import {
+  eagerMenuImageCount,
+  menuImageFetchPriority,
+  menuImageLoading,
+} from '@/shared/images/menu-image-loading';
 import type { MenuItem, MenuResponse } from '@/shared/types/menu';
 import { useHydrateFavorites } from '@/hooks/useHydrateFavorites';
 import { useRestaurantStylingOptional } from '../context/RestaurantStylingContext';
@@ -23,11 +28,14 @@ function preloadMenuProductDetailModal() {
 interface RestaurantMenuCatalogProps {
   restaurantId: string;
   menu: MenuResponse;
+  /** Promo strip is the LCP image — keep card photos off the high-priority queue. */
+  deferImages?: boolean;
 }
 
 export function RestaurantMenuCatalog({
   restaurantId,
   menu,
+  deferImages = false,
 }: RestaurantMenuCatalogProps) {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
@@ -43,6 +51,18 @@ export function RestaurantMenuCatalog({
 
   const showStandaloneNav =
     styling.menuCategoryNavEnabled && categories.length > 1 && navContext === null;
+  const eagerCount = eagerMenuImageCount(styling.cardStyle);
+  const imageIndexByItemId = useMemo(() => {
+    const indexes = new Map<string, number>();
+    let index = 0;
+    for (const category of categories) {
+      for (const item of category.items) {
+        indexes.set(item.id, index);
+        index += 1;
+      }
+    }
+    return indexes;
+  }, [categories]);
 
   if (categories.length === 0) {
     return (
@@ -73,15 +93,20 @@ export function RestaurantMenuCatalog({
         >
           <h2 className="restaurant-menu__category-title">{category.name}</h2>
           <div className="restaurant-menu__grid">
-            {category.items.map((item) => (
-              <MenuProductCard
-                key={item.id}
-                restaurantId={restaurantId}
-                item={item}
-                onSelect={setSelectedItem}
-                onPreload={preloadMenuProductDetailModal}
-              />
-            ))}
+            {category.items.map((item) => {
+              const imageIndex = imageIndexByItemId.get(item.id) ?? 0;
+              return (
+                <MenuProductCard
+                  key={item.id}
+                  restaurantId={restaurantId}
+                  item={item}
+                  onSelect={setSelectedItem}
+                  onPreload={preloadMenuProductDetailModal}
+                  imageLoading={menuImageLoading(imageIndex, eagerCount)}
+                  imageFetchPriority={menuImageFetchPriority(imageIndex, deferImages)}
+                />
+              );
+            })}
           </div>
         </div>
       ))}

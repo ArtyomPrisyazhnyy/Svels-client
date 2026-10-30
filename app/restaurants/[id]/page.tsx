@@ -1,6 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { preload } from 'react-dom';
 import { RestaurantPublicPage } from '@/features/restaurants/components/RestaurantPublicPage';
+import { PromoBannerStrip } from '@/features/restaurants/components/PromoBannerStrip';
+import {
+  activeStripBanners,
+  promoBannerPreloadHref,
+} from '@/features/restaurants/components/PromoBannerStripMarkup';
 import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
 import { serverFetch } from '@/shared/api/server-api';
 import { devAwareStaticParams } from '@/shared/utils/dev-static-params.util';
@@ -79,6 +85,14 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
     notFound();
   }
 
+  const lcpBanner = activeStripBanners(promoBanners)[0];
+  if (lcpBanner) {
+    preload(promoBannerPreloadHref(lcpBanner), {
+      as: 'image',
+      fetchPriority: 'high',
+    });
+  }
+
   return (
     <RestaurantPublicPage
       restaurant={restaurant}
@@ -88,6 +102,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
       bookingSettings={bookingSettings}
       socialLinks={socialLinks}
       promoBanners={promoBanners}
+      promoStrip={<PromoBannerStrip banners={promoBanners} />}
       loyaltySettings={loyaltySettings}
     />
   );

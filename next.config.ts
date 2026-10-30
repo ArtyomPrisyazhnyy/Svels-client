@@ -1,5 +1,7 @@
+import path from 'node:path';
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
+import { imageRemotePatterns } from './src/shared/images/image-remote';
 
 const platformHosts = (process.env.NEXT_PUBLIC_PLATFORM_HOSTS ?? '')
   .split(',')
@@ -36,6 +38,27 @@ const nextConfig: NextConfig = {
       dynamic: 30,
       static: 180,
     },
+    // One HTML payload instead of a dozen render-blocking stylesheet round trips.
+    inlineCss: true,
+  },
+  images: {
+    formats: ['image/webp'],
+    qualities: [65, 75],
+    imageSizes: [64, 80, 96, 128, 176, 256, 288, 384, 480],
+    deviceSizes: [640, 768, 1024, 1280, 1920],
+    minimumCacheTTL: 60 * 60 * 24,
+    remotePatterns: imageRemotePatterns(),
+  },
+  webpack: (config, { isServer, webpack }) => {
+    if (!isServer) {
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /build[\\/]polyfills[\\/]polyfill-module(?:\.js)?$/,
+          path.join(process.cwd(), 'src/shared/lib/empty-polyfill.js'),
+        ),
+      );
+    }
+    return config;
   },
   // Доступ к dev-серверу с телефона/другого ПК в локальной сети
   allowedDevOrigins: [...new Set(['localhost', '127.0.0.1', ...platformHosts])],

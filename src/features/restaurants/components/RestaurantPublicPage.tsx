@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { useAuthStore } from '@/store/auth.store';
 import { useGuestLoyaltyBalance } from '../hooks/useGuestLoyaltyBalance';
@@ -23,7 +23,7 @@ import {
   getAvailableMenuCategories,
   toMenuCategoryNavItems,
 } from '../utils/menu-catalog.util';
-import { PromoBannersHost } from './promo-banners.lazy';
+import { PromoBannerModalGate, PromoBannersHost } from './promo-banners.lazy';
 import {
   LoyaltyFlameInfoModal,
   RestaurantCartModal,
@@ -51,6 +51,8 @@ interface RestaurantPublicPageProps {
   bookingSettings?: BookingSettings;
   socialLinks?: SocialLink[];
   promoBanners?: PromoBanner[];
+  /** Server-rendered strip. When set, the client host does not paint a second one. */
+  promoStrip?: ReactNode;
   loyaltySettings?: LoyaltySettings;
   embedded?: boolean;
 }
@@ -63,6 +65,7 @@ function RestaurantPublicPageBody({
   bookingSettings,
   socialLinks = [],
   promoBanners = [],
+  promoStrip,
   loyaltySettings,
   embedded = false,
   categoryNavEnabled,
@@ -133,7 +136,12 @@ function RestaurantPublicPageBody({
           <p className="restaurant-public__description">{restaurant.description}</p>
         )}
 
-        <PromoBannersHost banners={promoBanners} persistSeen={!embedded} />
+        {promoStrip ?? (
+          <PromoBannersHost banners={promoBanners} persistSeen={!embedded} />
+        )}
+        {promoStrip ? (
+          <PromoBannerModalGate banners={promoBanners} persistSeen={!embedded} />
+        ) : null}
 
         {!embedded && categoryNavEnabled ? (
           <div className="venue-home__category-nav" data-testid="venue-home-category-nav">
@@ -142,7 +150,11 @@ function RestaurantPublicPageBody({
           </div>
         ) : null}
 
-        <RestaurantMenuCatalog restaurantId={restaurant.id} menu={menu} />
+        <RestaurantMenuCatalog
+          restaurantId={restaurant.id}
+          menu={menu}
+          deferImages={promoBanners.some((banner) => banner.type === 'strip' && banner.isActive)}
+        />
 
         {bookingEnabled && (
           <div className="restaurant-public__actions">
@@ -208,6 +220,7 @@ export function RestaurantPublicPage({
   bookingSettings,
   socialLinks,
   promoBanners,
+  promoStrip,
   loyaltySettings,
   embedded,
 }: RestaurantPublicPageProps) {
@@ -231,6 +244,7 @@ export function RestaurantPublicPage({
         bookingSettings={bookingSettings}
         socialLinks={socialLinks}
         promoBanners={promoBanners}
+        promoStrip={promoStrip}
         loyaltySettings={loyaltySettings}
         embedded={embedded}
         categoryNavEnabled
@@ -245,6 +259,7 @@ export function RestaurantPublicPage({
       bookingSettings={bookingSettings}
       socialLinks={socialLinks}
       promoBanners={promoBanners}
+      promoStrip={promoStrip}
       loyaltySettings={loyaltySettings}
       embedded={embedded}
       categoryNavEnabled={false}
