@@ -1,6 +1,12 @@
 'use client';
 
-import { useRef, type InputHTMLAttributes, type MouseEvent } from 'react';
+import {
+  useLayoutEffect,
+  useRef,
+  type FormEvent,
+  type InputHTMLAttributes,
+  type MouseEvent,
+} from 'react';
 import {
   composeBelarusPhone,
   extractBelarusNational,
@@ -8,6 +14,10 @@ import {
   PHONE_INPUT_NATIONAL_PLACEHOLDER,
   PHONE_INPUT_PREFIX,
 } from '@/shared/utils/phone.util';
+import {
+  applyBelarusNationalPhoneEdit,
+  isHandledPhoneInputType,
+} from '@/shared/utils/phone-input-edit.util';
 import './PhoneInput.scss';
 
 type NativeInputProps = Omit<
@@ -29,10 +39,65 @@ export function PhoneInput({
   disabled,
   onFocus,
   onBlur,
+  onSelect,
   ...rest
 }: PhoneInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const pendingCaretRef = useRef<number | null>(null);
+  const skipNextInputRef = useRef(false);
+  const fieldStateRef = useRef({ value: '', selStart: 0, selEnd: 0 });
+
   const nationalValue = extractBelarusNational(value);
+
+  function syncFieldState() {
+    const input = inputRef.current;
+    if (!input) {
+      return;
+    }
+    fieldStateRef.current = {
+      value: nationalValue,
+      selStart: input.selectionStart ?? 0,
+      selEnd: input.selectionEnd ?? 0,
+    };
+  }
+
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (!input) {
+      return;
+    }
+    if (pendingCaretRef.current !== null) {
+      const caret = pendingCaretRef.current;
+      pendingCaretRef.current = null;
+      input.setSelectionRange(caret, caret);
+    }
+    syncFieldState();
+  }, [nationalValue]);
+
+  function commitNationalEdit(
+    formattedNational: string,
+    caret: number,
+  ) {
+    pendingCaretRef.current = caret;
+    onChange(composeBelarusPhone(formattedNational));
+  }
+
+  function applyEditFromInputType(
+    inputType: string,
+    data: string | null,
+    selectionStart: number,
+    selectionEnd: number,
+    baseFormatted: string,
+  ) {
+    const { formattedNational, caret } = applyBelarusNationalPhoneEdit(
+      baseFormatted,
+      selectionStart,
+      selectionEnd,
+      inputType,
+      data,
+    );
+    commitNationalEdit(formattedNational, caret);
+  }
 
   function handleShellMouseDown(event: MouseEvent<HTMLDivElement>) {
     if (disabled) {
@@ -66,11 +131,56 @@ export function PhoneInput({
           placeholder={PHONE_INPUT_NATIONAL_PLACEHOLDER}
           aria-label={rest['aria-label'] ?? 'Номер телефона без кода страны'}
           value={nationalValue}
-          onChange={(event) => {
-            const national = formatBelarusNationalInput(event.target.value);
+          onBeforeInput={(event) => {
+            if (disabled) {
+              return;
+            }
+            const inputType = event.nativeEvent.inputType;
+            if (!isHandledPhoneInputType(inputType)) {
+              return;
+            }
+            event.preventDefault();
+            skipNextInputRef.current = true;
+            const input = event.currentTarget;
+            applyEditFromInputType(
+              inputType,
+              event.nativeEvent.data,
+              input.selectionStart ?? 0,
+              input.selectionEnd ?? 0,
+              nationalValue,
+            );
+          }}
+          onInput={(event: FormEvent<HTMLInputElement>) => {
+            if (disabled) {
+              return;
+            }
+            if (skipNextInputRef.current) {
+              skipNextInputRef.current = false;
+              return;
+            }
+            const native = event.nativeEvent as InputEvent;
+            if (isHandledPhoneInputType(native.inputType)) {
+              const { value: prevValue, selStart, selEnd } = fieldStateRef.current;
+              applyEditFromInputType(
+                native.inputType,
+                native.data,
+                selStart,
+                selEnd,
+                prevValue,
+              );
+              return;
+            }
+            const national = formatBelarusNationalInput(event.currentTarget.value);
             onChange(composeBelarusPhone(national));
           }}
-          onFocus={onFocus}
+          onSelect={(event) => {
+            syncFieldState();
+            onSelect?.(event);
+          }}
+          onFocus={(event) => {
+            syncFieldState();
+            onFocus?.(event);
+          }}
           onBlur={onBlur}
         />
       </div>
