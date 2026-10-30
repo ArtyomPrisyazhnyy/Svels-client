@@ -950,13 +950,17 @@
     }
   }
 
+  /*
+   * Карточка «поверх фото»: плавный градиент снизу вместо сплошной подложки.
+   * Градиент идёт от текста вверх с затуханием, плюс мягкая тень текста для светлых фото.
+   */
   &[data-rs-card-style='overlay'] {
     .menu-product-card {
       position: relative;
       overflow: hidden;
       /* Скругление без обводки — border и radius на одном элементе не сочетаем. */
       border: none;
-      background: var(--rs-media-scrim);
+      background: color-mix(in srgb, var(--rs-text) 8%, var(--rs-surface));
 
       @media (hover: hover) {
         &:hover {
@@ -967,7 +971,7 @@
 
     .menu-product-card__media {
       aspect-ratio: 1;
-      background: var(--rs-media-scrim);
+      background: transparent;
     }
 
     .menu-product-card__favorite {
@@ -976,7 +980,7 @@
       height: var(--control-h-md);
       border: none;
       border-radius: var(--radius-pill);
-      background: var(--rs-media-scrim);
+      background: color-mix(in srgb, var(--rs-media-scrim) 40%, transparent);
 
       .favorite-heart-button__shape--outer {
         stroke: var(--rs-on-media);
@@ -999,18 +1003,30 @@
       margin: 0;
       padding: var(--space-4);
       color: var(--rs-on-media);
-      background: var(--rs-media-scrim);
+      text-shadow:
+        0 1px 2px color-mix(in srgb, var(--rs-media-scrim) 70%, transparent),
+        0 2px 10px color-mix(in srgb, var(--rs-media-scrim) 45%, transparent);
 
-      /* Затухание scrim над текстом: сам текст остаётся на сплошных ~78% чёрного. */
+      /* Высота подложки следует за текстом + зона плавного затухания над ним. */
       &::before {
         content: '';
         position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 100%;
-        height: var(--space-10);
+        z-index: -1;
+        inset: auto 0 0 0;
+        height: calc(100% + var(--space-10));
         pointer-events: none;
-        background: linear-gradient(to top, var(--rs-media-scrim), transparent);
+        background: linear-gradient(
+          to top,
+          color-mix(in srgb, var(--rs-media-scrim) 100%, transparent) 0%,
+          color-mix(in srgb, var(--rs-media-scrim) 94%, transparent) 20%,
+          color-mix(in srgb, var(--rs-media-scrim) 82%, transparent) 40%,
+          color-mix(in srgb, var(--rs-media-scrim) 68%, transparent) 55%,
+          color-mix(in srgb, var(--rs-media-scrim) 52%, transparent) 66%,
+          color-mix(in srgb, var(--rs-media-scrim) 34%, transparent) 76%,
+          color-mix(in srgb, var(--rs-media-scrim) 18%, transparent) 85%,
+          color-mix(in srgb, var(--rs-media-scrim) 6%, transparent) 93%,
+          transparent 100%
+        );
       }
     }
 
@@ -1370,5 +1386,17 @@
         border-color: var(--rs-accent);
       }
     }
+  }
+}
+
+.menu-product-card {
+  isolation: isolate; /* карточка не перекрывает шапку и панель категорий */
+}
+
+.menu-product-card__favorite {
+  transition: transform var(--duration-base) var(--ease-standard);
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
   }
 }
