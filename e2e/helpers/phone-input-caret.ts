@@ -24,6 +24,33 @@ export async function setCaret(phoneInput: ReturnType<Page['getByTestId']>, inde
   }, index);
 }
 
+/** Click inside the input so the caret lands at `charIndex` (measured, not a fixed % width). */
+export async function clickInputAtCharIndex(
+  phoneInput: ReturnType<Page['getByTestId']>,
+  charIndex: number,
+) {
+  const box = await phoneInput.boundingBox();
+  if (!box) {
+    throw new Error('otp-phone bounding box missing');
+  }
+  const clickX = await phoneInput.evaluate((el, idx) => {
+    const input = el as HTMLInputElement;
+    const style = window.getComputedStyle(input);
+    const mirror = document.createElement('span');
+    mirror.style.position = 'absolute';
+    mirror.style.visibility = 'hidden';
+    mirror.style.whiteSpace = 'pre';
+    mirror.style.font = style.font;
+    mirror.textContent = input.value.slice(0, idx);
+    document.body.appendChild(mirror);
+    const textWidth = mirror.getBoundingClientRect().width;
+    document.body.removeChild(mirror);
+    const paddingLeft = Number.parseFloat(style.paddingLeft) || 0;
+    return paddingLeft + textWidth + 1;
+  }, charIndex);
+  await phoneInput.click({ position: { x: clickX, y: box.height / 2 } });
+}
+
 /** Operator-code edit: backspace ×2 at caret after code, then type 29. */
 export async function expectOperatorCodeBackspaceFlow(
   phoneInput: ReturnType<Page['getByTestId']>,
@@ -119,15 +146,9 @@ export async function expectMouseCaretThenBackspace(
   await phoneInput.pressSequentially('261234567', { delay: 15 });
   await expect(phoneInput).toHaveValue('26 123-45-67');
 
-  const box = await phoneInput.boundingBox();
-  if (!box) {
-    throw new Error('otp-phone bounding box missing');
-  }
-  await phoneInput.click({ position: { x: Math.max(8, box.width * 0.22), y: box.height / 2 } });
+  await clickInputAtCharIndex(phoneInput, 2);
 
-  await expect
-    .poll(async () => phoneInput.evaluate((el) => (el as HTMLInputElement).selectionStart ?? 0))
-    .toBeLessThan(4);
+  await expectSelectionStart(phoneInput, 2);
 
   await phoneInput.press('Backspace');
   await expect(phoneInput).toHaveValue('21 234-56-7');

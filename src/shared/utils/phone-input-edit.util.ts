@@ -119,7 +119,11 @@ export function applyBelarusNationalPhoneEdit(
     }
     case 'insertText':
     case 'insertReplacementText': {
-      const insertDigits = normalizePhoneDigits(data ?? '');
+      const raw = data ?? '';
+      const insertDigits =
+        inputType === 'insertReplacementText'
+          ? normalizePastedNationalDigits(raw)
+          : normalizePhoneDigits(raw);
       if (!insertDigits) {
         break;
       }

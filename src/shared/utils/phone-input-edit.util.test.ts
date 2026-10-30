@@ -101,6 +101,19 @@ describe('applyBelarusNationalPhoneEdit', () => {
     assert.equal(result.caret, result.formattedNational.length);
   });
 
+  it('insertReplacementText from autofill/fill strips country code', () => {
+    const result = applyBelarusNationalPhoneEdit(
+      '',
+      0,
+      0,
+      'insertReplacementText',
+      '+375291234567',
+    );
+
+    assert.equal(result.formattedNational, '29 123-45-67');
+    assert.equal(result.caret, result.formattedNational.length);
+  });
+
   it('pastes 375 without plus and strips 80 prefix', () => {
     const from375 = applyBelarusNationalPhoneEdit('', 0, 0, 'insertFromPaste', '375330000002');
     assert.equal(from375.formattedNational, '33 000-00-02');
