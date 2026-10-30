@@ -125,6 +125,9 @@ export function PhoneInput({
           id={id}
           type="tel"
           inputMode="numeric"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           autoComplete={rest.autoComplete ?? 'tel-national'}
           disabled={disabled}
           className="phone-input__control"
@@ -180,6 +183,9 @@ export function PhoneInput({
           onFocus={(event) => {
             syncFieldState();
             onFocus?.(event);
+          }}
+          onClick={() => {
+            syncFieldState();
           }}
           onBlur={onBlur}
         />
