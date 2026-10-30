@@ -1,8 +1,12 @@
 'use client';
 
-import type { MouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { FillImage } from '@/shared/components/FillImage';
 import { MenuItemPriceDisplay } from '@/shared/components/MenuItemPriceDisplay';
-import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import {
+  MENU_CARD_IMAGE_SIZES,
+  MENU_MAGAZINE_IMAGE_SIZES,
+} from '@/shared/images/menu-image-loading';
 import type { MenuItem } from '@/shared/types/menu';
 import { useFavoritesStore } from '@/store/favorites.store';
 import { useRestaurantStylingOptional } from '../context/RestaurantStylingContext';
@@ -16,6 +20,7 @@ interface MenuProductCardProps {
   onSelect: (item: MenuItem) => void;
   onPreload?: () => void;
   imageLoading?: 'eager' | 'lazy';
+  imageFetchPriority?: 'high' | 'low' | 'auto';
 }
 
 export function MenuProductCard({
@@ -24,6 +29,7 @@ export function MenuProductCard({
   onSelect,
   onPreload,
   imageLoading = 'lazy',
+  imageFetchPriority = 'low',
 }: MenuProductCardProps) {
   const showFromPrice = hasPriceAffectingModifiers(item.modifierGroups);
   const { styling } = useRestaurantStylingOptional();
@@ -33,6 +39,31 @@ export function MenuProductCard({
     favoritesEnabled ? s.menuItemIds.includes(item.id) : false,
   );
   const toggle = useFavoritesStore((s) => s.toggle);
+  const mediaRef = useRef<HTMLDivElement>(null);
+  // Below-fold photos stay out of the initial HTML so they don't compete with the LCP banner.
+  const [renderImage, setRenderImage] = useState(imageLoading !== 'lazy');
+
+  useEffect(() => {
+    if (renderImage) {
+      return;
+    }
+    const node = mediaRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setRenderImage(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setRenderImage(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '240px 0px' },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [renderImage]);
 
   function handleCardClick(event: MouseEvent<HTMLDivElement>) {
     if ((event.target as HTMLElement).closest('[data-favorite-heart]')) {
@@ -76,13 +107,17 @@ export function MenuProductCard({
       }}
       data-testid={`menu-item-${item.id}`}
     >
-      <div className="menu-product-card__media">
-        <ResponsiveImage
-          src={item.imageUrl}
-          webpSrc={item.imageWebpUrl}
-          alt={item.name}
-          loading={imageLoading}
-        />
+      <div className="menu-product-card__media" ref={mediaRef}>
+        {renderImage ? (
+          <FillImage
+            src={item.imageUrl}
+            webpSrc={item.imageWebpUrl}
+            alt={item.name}
+            sizes={isMagazine ? MENU_MAGAZINE_IMAGE_SIZES : MENU_CARD_IMAGE_SIZES}
+            loading={imageLoading}
+            fetchPriority={imageFetchPriority}
+          />
+        ) : null}
         {!isMagazine ? favoriteButton : null}
       </div>
 

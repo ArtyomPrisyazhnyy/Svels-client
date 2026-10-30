@@ -15,6 +15,10 @@ interface PromoBannerAspectMediaProps {
   linkClassName?: string;
   frameClassName?: string;
   frameTestId?: string;
+  /** LCP strip: eager fetch, high priority, no lazy. */
+  priority?: boolean;
+  loading?: 'eager' | 'lazy';
+  fetchPriority?: 'high' | 'low' | 'auto';
 }
 
 function aspectFrameClass(ratio: PromoBannerAspectRatio): string {
@@ -52,9 +56,14 @@ export function PromoBannerAspectMedia({
   linkClassName = '',
   frameClassName,
   frameTestId,
+  priority = false,
+  loading,
+  fetchPriority,
 }: PromoBannerAspectMediaProps) {
   const isStrip = banner.type === 'strip';
   const ratio = aspectRatioOverride ?? resolvePromoBannerAspectRatio(banner);
+  const imageLoading = priority ? 'eager' : loading;
+  const imagePriority = priority ? 'high' : fetchPriority;
 
   const image = (
     <ResponsiveImage
@@ -62,6 +71,9 @@ export function PromoBannerAspectMedia({
       src={banner.imageUrl}
       webpSrc={banner.imageWebpUrl}
       alt={banner.title?.trim() || 'Акция'}
+      loading={imageLoading}
+      fetchPriority={imagePriority}
+      decoding="async"
     />
   );
 
