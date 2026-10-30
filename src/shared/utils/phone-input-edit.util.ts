@@ -120,10 +120,8 @@ export function applyBelarusNationalPhoneEdit(
     case 'insertText':
     case 'insertReplacementText': {
       const raw = data ?? '';
-      const insertDigits =
-        inputType === 'insertReplacementText'
-          ? normalizePastedNationalDigits(raw)
-          : normalizePhoneDigits(raw);
+      // Playwright fill() and paste may use insertText with a full +375… string; strip country code.
+      const insertDigits = normalizePastedNationalDigits(raw);
       if (!insertDigits) {
         break;
       }
