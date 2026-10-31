@@ -84,4 +84,39 @@ for (const capture of captures) {
   await context.close();
 }
 
+const zoomContext = await browser.newContext({ deviceScaleFactor: 4 });
+const zoomPage = await zoomContext.newPage();
+await zoomPage.setViewportSize({ width: 1280, height: 900 });
+
+async function captureMatrixRowScreenshot(page, theme, outName) {
+  const part = ['classic', 'ocean', 'forest', 'warm', 'berry', 'lavender'].includes(theme)
+    ? 1
+    : ['sand', 'citrus', 'graphite', 'monochrome', 'monochromeDark', 'midnight'].includes(theme)
+      ? 2
+      : 3;
+  await page.goto(`${BASE}/dev/loyalty-flame?view=matrix&part=${part}`, {
+    waitUntil: 'networkidle',
+  });
+  await page.getByTestId('loyalty-flame-contrast-matrix').waitFor({ state: 'visible' });
+  const row = page.getByTestId(`loyalty-flame-matrix-row-${theme}-glass`);
+  await row.waitFor({ state: 'visible' });
+  const flames = row.locator('.dev-loyalty-flame-capture__matrix-states');
+  await flames.screenshot({
+    path: path.join(OUT_DIR, outName),
+  });
+  console.log('saved', outName);
+}
+
+await captureMatrixRowScreenshot(
+  zoomPage,
+  'classic',
+  'loyalty-flame-matrix-zoom-classic-glass.png',
+);
+await captureMatrixRowScreenshot(
+  zoomPage,
+  'midnight',
+  'loyalty-flame-matrix-zoom-midnight-glass.png',
+);
+
+await zoomContext.close();
 await browser.close();
