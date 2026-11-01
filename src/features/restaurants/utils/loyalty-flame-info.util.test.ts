@@ -6,9 +6,16 @@ import {
   buildLoyaltyFlameInfoModel,
   formatLoyaltyRewardSummary,
   isLoyaltyFlameLit,
+  loyaltyFlameButtonAriaLabel,
+  pluralStreakDays,
   resolveLoyaltyFlameTier,
   resolveLoyaltyFlameHeaderVisual,
   resolveGuestFlameLevelOrdinal,
+  resolveLoyaltyStreakDays,
+  resolveLoyaltyStreakStatus,
+  completedOrdersAfterPreposition,
+  formatStreakDaysInRow,
+  streakDaysUnitInRow,
   visitsAfterPreposition,
 } from './loyalty-flame-info.util.ts';
 
@@ -80,11 +87,15 @@ describe('resolveLoyaltyFlameHeaderVisual', () => {
   it('returns off, base, and level tiers from balance', () => {
     assert.equal(resolveLoyaltyFlameHeaderVisual(null, baseSettings, false), 'off');
     assert.equal(
-      resolveLoyaltyFlameHeaderVisual({ visits: 0 } as LoyaltyBalance, baseSettings, true),
+      resolveLoyaltyFlameHeaderVisual(
+        { visits: 0, status: 'none', streakDays: 0 } as LoyaltyBalance,
+        baseSettings,
+        true,
+      ),
       'off',
     );
     assert.equal(
-      resolveLoyaltyFlameHeaderVisual({ visits: 2 } as LoyaltyBalance, baseSettings, true),
+      resolveLoyaltyFlameHeaderVisual({ visits: 2, status: 'active', streakDays: 2 } as LoyaltyBalance, baseSettings, true),
       'base',
     );
     const balance: LoyaltyBalance = {
@@ -99,27 +110,56 @@ describe('resolveLoyaltyFlameHeaderVisual', () => {
       currentLevel: { id: 'l1', name: 'Искра', requiredVisits: 3 },
       nextLevel: null,
       availableRewards: [],
+      streakDays: 4,
+      status: 'active',
     };
     assert.equal(resolveLoyaltyFlameHeaderVisual(balance, baseSettings, true), 1);
     assert.equal(resolveGuestFlameLevelOrdinal(balance, baseSettings), 1);
+  });
+
+  it('prefers streak status when present', () => {
+    assert.equal(
+      resolveLoyaltyStreakStatus({ status: 'expiring', streakDays: 3 } as LoyaltyBalance),
+      'expiring',
+    );
+    assert.equal(resolveLoyaltyStreakDays({ streakDays: 7 } as LoyaltyBalance), 7);
+  });
+});
+
+describe('loyaltyFlameButtonAriaLabel', () => {
+  it('uses Russian plural for streak days', () => {
+    assert.equal(loyaltyFlameButtonAriaLabel(0), 'Огонёк лояльности');
+    assert.equal(loyaltyFlameButtonAriaLabel(1), 'Огонёк, серия 1 день');
+    assert.equal(loyaltyFlameButtonAriaLabel(3), 'Огонёк, серия 3 дня');
+    assert.equal(pluralStreakDays(5), '5 дней');
   });
 });
 
 describe('isLoyaltyFlameLit', () => {
   it('is lit only for guest with active series', () => {
-    const balance = { visits: 2 } as LoyaltyBalance;
+    const balance = { visits: 2, status: 'active', streakDays: 2 } as LoyaltyBalance;
     assert.equal(isLoyaltyFlameLit(balance, true), true);
     assert.equal(isLoyaltyFlameLit(balance, false), false);
-    assert.equal(isLoyaltyFlameLit({ visits: 0 } as LoyaltyBalance, true), false);
+    assert.equal(
+      isLoyaltyFlameLit({ visits: 0, status: 'none', streakDays: 0 } as LoyaltyBalance, true),
+      false,
+    );
   });
 });
 
-describe('visitsAfterPreposition', () => {
-  it('uses genitive plural after от/после except 1', () => {
-    assert.equal(visitsAfterPreposition(1), '1 визита');
-    assert.equal(visitsAfterPreposition(3), '3 визитов');
-    assert.equal(visitsAfterPreposition(7), '7 визитов');
-    assert.equal(visitsAfterPreposition(21), '21 визита');
+describe('completedOrdersAfterPreposition', () => {
+  it('uses genitive for level thresholds', () => {
+    assert.equal(completedOrdersAfterPreposition(1), '1 выданного заказа');
+    assert.equal(completedOrdersAfterPreposition(3), '3 выданных заказов');
+    assert.equal(completedOrdersAfterPreposition(7), '7 выданных заказов');
+  });
+});
+
+describe('streakDaysUnitInRow', () => {
+  it('pluralizes day unit in row', () => {
+    assert.equal(streakDaysUnitInRow(1), 'день подряд');
+    assert.equal(streakDaysUnitInRow(4), 'дня подряд');
+    assert.equal(formatStreakDaysInRow(4), '4 дня подряд');
   });
 });
 
@@ -128,12 +168,12 @@ describe('buildLoyaltyFlameInfoModel', () => {
     const model = buildLoyaltyFlameInfoModel(baseSettings, null, false);
     const expire = model.sections.find((s) => s.title === 'Когда гаснет');
     assert.ok(expire?.body.includes('14 дней'));
-    assert.ok(expire?.body.includes('не заходить'));
+    assert.ok(expire?.body.includes('выданным заказом'));
   });
 
-  it('uses visitsAfterPreposition in level labels', () => {
+  it('uses completedOrdersAfterPreposition in level labels', () => {
     const model = buildLoyaltyFlameInfoModel(baseSettings, null, true);
-    assert.equal(model.levelRows?.[0]?.label, '«Искра» — от 3 визитов подряд');
+    assert.equal(model.levelRows?.[0]?.label, '«Искра» — от 3 выданных заказов');
   });
 
   it('lists levels with perks when rewards enabled', () => {
@@ -145,7 +185,11 @@ describe('buildLoyaltyFlameInfoModel', () => {
       visits: 4,
       totalVisits: 4,
       lastVisitAt: null,
-      expiresAt: null,
+      expiresAt: '2026-11-15T12:00:00.000Z',
+      streakStartedAt: '2026-10-01T08:00:00.000Z',
+      streakDays: 4,
+      longestStreak: 9,
+      status: 'active',
       currentLevel: { id: 'l1', name: 'Искра', requiredVisits: 3 },
       nextLevel: {
         id: 'l2',
@@ -159,5 +203,12 @@ describe('buildLoyaltyFlameInfoModel', () => {
     assert.equal(model.levelRows?.length, 2);
     assert.equal(model.levelRows?.[0]?.isCurrent, true);
     assert.equal(model.levelRows?.[1]?.perks, 'Без наград');
+    assert.ok(model.streakHero);
+    assert.equal(model.streakHero?.streakDays, 4);
+    assert.equal(model.streakHero?.streakUnit, 'дня подряд');
+    assert.equal(model.streakHero?.visual, 1);
+    assert.equal(model.streakHero?.startedLabel, 'Серия с 01.10');
+    assert.equal(model.streakHero?.expiresLabel, 'Сгорит 15.11');
+    assert.equal(model.streakHero?.nextLevelLabel, 'До «Пламя» — ещё 3 выданных заказов');
   });
 });

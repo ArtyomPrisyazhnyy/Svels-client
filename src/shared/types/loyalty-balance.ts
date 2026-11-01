@@ -1,5 +1,7 @@
 import type { LoyaltyReward } from './loyalty-settings';
 
+export type LoyaltyStreakStatus = 'none' | 'active' | 'expiring';
+
 export interface LoyaltyLevelSnapshot {
   id: string;
   name: string;
@@ -22,4 +24,10 @@ export interface LoyaltyBalance {
   currentLevel: LoyaltyLevelSnapshot | null;
   nextLevel: LoyaltyNextLevelSnapshot | null;
   availableRewards: LoyaltyReward[];
+  /** ISO; начало текущей серии (опционально для совместимости). */
+  streakStartedAt?: string | null;
+  /** Дней в текущей серии; 0 если серии нет. */
+  streakDays?: number;
+  longestStreak?: number;
+  status?: LoyaltyStreakStatus;
 }

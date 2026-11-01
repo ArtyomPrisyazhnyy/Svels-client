@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
 import { PageTitle } from '@/shared/ui/PageTitle/PageTitle';
 import { Stack } from '@/shared/ui/Stack/Stack';
 import { GuestOrdersList } from '@/features/restaurants/components/GuestOrdersList';
+import { requestGuestLoyaltyBalanceRefresh } from '@/features/restaurants/utils/guest-loyalty-balance-refresh';
 import '@/features/restaurants/styles/guest-orders-page.scss';
 
 interface RestaurantGuestPreOrderPageProps {
@@ -13,6 +15,10 @@ interface RestaurantGuestPreOrderPageProps {
 export function RestaurantGuestPreOrderPage({
   restaurantId,
 }: RestaurantGuestPreOrderPageProps) {
+  useEffect(() => {
+    requestGuestLoyaltyBalanceRefresh();
+  }, [restaurantId]);
+
   return (
     <div className="venue-subpage guest-orders-page" data-testid="preorder-page">
       <main className="venue-subpage__main guest-orders-page__main">

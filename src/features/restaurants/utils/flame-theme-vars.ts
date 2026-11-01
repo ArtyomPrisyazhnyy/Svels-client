@@ -3,6 +3,7 @@ import type { RestaurantColorTheme } from '@/shared/types/restaurant-styling';
 export interface FlameThemeVars {
   base: string;
   baseSoft: string;
+  baseInner?: string;
   tier1: string;
   tier1Edge: string;
   tier1Inner: string;
@@ -65,14 +66,16 @@ const darkTierInners = {
 export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   classic: {
     base: '#d97706',
-    baseSoft: 'color-mix(in srgb, #f59e0b 42%, transparent)',
+    baseSoft: 'color-mix(in srgb, #f59e0b 58%, transparent)',
+    baseInner: '#fde68a',
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#0f172a'),
   },
   ocean: {
     base: '#c2410c',
-    baseSoft: 'color-mix(in srgb, #ea580c 40%, transparent)',
+    baseSoft: 'color-mix(in srgb, #ea580c 56%, transparent)',
+    baseInner: '#fdba74',
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#0c4a6e'),
@@ -127,8 +130,9 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
     edge: lightEdge('#18181b'),
   },
   monochrome: {
-    base: '#737373',
-    baseSoft: 'color-mix(in srgb, #525252 28%, transparent)',
+    base: '#ea580c',
+    baseSoft: 'color-mix(in srgb, #ea580c 58%, transparent)',
+    baseInner: '#fdba74',
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#0a0a0a'),
@@ -142,7 +146,8 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   },
   midnight: {
     base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 38%, transparent)',
+    baseSoft: 'color-mix(in srgb, #fb923c 56%, transparent)',
+    baseInner: '#fed7aa',
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#020617'),

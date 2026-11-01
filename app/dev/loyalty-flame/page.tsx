@@ -92,6 +92,10 @@ const ACTIVE_BALANCE: LoyaltyBalance = {
     visitsLeft: 3,
   },
   availableRewards: CAPTURE_SETTINGS.flameLevels[0]?.rewards ?? [],
+  streakStartedAt: '2026-10-18T09:00:00.000Z',
+  streakDays: 4,
+  longestStreak: 11,
+  status: 'active',
 };
 
 const IDLE_BALANCE: LoyaltyBalance = {
@@ -111,16 +115,24 @@ const IDLE_BALANCE: LoyaltyBalance = {
     visitsLeft: 3,
   },
   availableRewards: [],
+  streakDays: 0,
+  longestStreak: 6,
+  status: 'none',
 };
 
-const HEADER_STATE_SAMPLES: { label: string; visual: LoyaltyFlameHeaderVisual }[] = [
-  { label: 'off', visual: 'off' },
-  { label: 'base', visual: 'base' },
-  { label: 'tier 1', visual: 1 },
-  { label: 'tier 2', visual: 2 },
-  { label: 'tier 3', visual: 3 },
-  { label: 'tier 4', visual: 4 },
-  { label: 'tier 5', visual: 5 },
+const HEADER_STATE_SAMPLES: {
+  label: string;
+  visual: LoyaltyFlameHeaderVisual;
+  streakDays: number;
+  expiring?: boolean;
+}[] = [
+  { label: 'off', visual: 'off', streakDays: 0 },
+  { label: 'base', visual: 'base', streakDays: 3 },
+  { label: 'tier 1', visual: 1, streakDays: 4 },
+  { label: 'tier 2', visual: 2, streakDays: 8 },
+  { label: 'tier 3', visual: 3, streakDays: 12 },
+  { label: 'tier 4', visual: 4, streakDays: 18 },
+  { label: 'tier 5', visual: 5, streakDays: 42 },
 ];
 
 const ALL_COLOR_THEMES = RESTAURANT_COLOR_THEME_OPTIONS.map((option) => option.value);
@@ -142,8 +154,14 @@ function parseTheme(value: string | null): RestaurantColorTheme {
   return 'classic';
 }
 
-function parseGuestState(value: string | null): 'active' | 'idle' {
-  return value === 'idle' ? 'idle' : 'active';
+function parseGuestState(value: string | null): 'active' | 'idle' | 'expiring' {
+  if (value === 'idle') {
+    return 'idle';
+  }
+  if (value === 'expiring') {
+    return 'expiring';
+  }
+  return 'active';
 }
 
 function parseView(value: string | null): CaptureView {
@@ -172,7 +190,12 @@ function FlameStatesOnHeader({ testIdPrefix }: { testIdPrefix?: string }) {
       <div className="dev-loyalty-flame-capture__matrix-states">
         {HEADER_STATE_SAMPLES.map((sample) => (
           <div key={sample.label} className="dev-loyalty-flame-capture__matrix-state">
-            <LoyaltyFlameHeaderButton visual={sample.visual} onClick={() => {}} />
+            <LoyaltyFlameHeaderButton
+              visual={sample.visual}
+              streakDays={sample.streakDays}
+              expiring={sample.expiring}
+              onClick={() => {}}
+            />
           </div>
         ))}
       </div>
@@ -218,11 +241,24 @@ function MatrixRow({
   );
 }
 
-function VenueHeaderActionsDemo({ flameVisual }: { flameVisual: LoyaltyFlameHeaderVisual }) {
+function VenueHeaderActionsDemo({
+  flameVisual,
+  streakDays,
+  expiring,
+}: {
+  flameVisual: LoyaltyFlameHeaderVisual;
+  streakDays: number;
+  expiring: boolean;
+}) {
   return (
     <div className="venue-header__actions" data-testid="venue-header-actions">
       <div className="venue-header__action-slot">
-        <LoyaltyFlameHeaderButton visual={flameVisual} onClick={() => {}} />
+        <LoyaltyFlameHeaderButton
+          visual={flameVisual}
+          streakDays={streakDays}
+          expiring={expiring}
+          onClick={() => {}}
+        />
       </div>
       <div className="venue-header__action-slot">
         <RestaurantFavoritesHeaderButton href="#" />
@@ -247,12 +283,22 @@ export default function DevLoyaltyFlameCapturePage() {
   const guestState = parseGuestState(searchParams.get('state'));
   const view = parseView(searchParams.get('view'));
   const matrixPart = parseMatrixPart(searchParams.get('part'));
-  const [flameOpen, setFlameOpen] = useState(false);
+  const [flameOpen, setFlameOpen] = useState(searchParams.get('openModal') === '1');
 
-  const balance = guestState === 'idle' ? IDLE_BALANCE : ACTIVE_BALANCE;
+  const balance = useMemo(() => {
+    if (guestState === 'idle') {
+      return IDLE_BALANCE;
+    }
+    if (guestState === 'expiring') {
+      return { ...ACTIVE_BALANCE, status: 'expiring' as const };
+    }
+    return ACTIVE_BALANCE;
+  }, [guestState]);
 
   const headerVisual: LoyaltyFlameHeaderVisual =
     balance.visits <= 0 ? 'off' : balance.currentLevel ? 1 : 'base';
+  const headerStreakDays = balance.streakDays ?? 0;
+  const headerExpiring = balance.status === 'expiring';
 
   const styling = useMemo(
     () => ({
@@ -297,12 +343,18 @@ export default function DevLoyaltyFlameCapturePage() {
         >
           <span className="glass-header__brand-name">E2E Cafe</span>
           {view === 'header-bar' ? (
-            <VenueHeaderActionsDemo flameVisual={headerVisual} />
+            <VenueHeaderActionsDemo
+              flameVisual={headerVisual}
+              streakDays={headerStreakDays}
+              expiring={headerExpiring}
+            />
           ) : (
             <div className="venue-header__actions" data-testid="venue-header-actions">
               <div className="venue-header__action-slot">
                 <LoyaltyFlameHeaderButton
                   visual={view === 'states' ? 'off' : headerVisual}
+                  streakDays={view === 'states' ? 0 : headerStreakDays}
+                  expiring={headerExpiring}
                   onClick={() => setFlameOpen(true)}
                 />
               </div>
@@ -319,8 +371,17 @@ export default function DevLoyaltyFlameCapturePage() {
                 <h1 className="dev-loyalty-flame-capture__title">Огонёк — все состояния</h1>
                 <ul className="dev-loyalty-flame-capture__states-grid">
                   {HEADER_STATE_SAMPLES.map((sample) => (
-                    <li key={sample.label} className="dev-loyalty-flame-capture__states-item">
-                      <LoyaltyFlameHeaderButton visual={sample.visual} onClick={() => {}} />
+                    <li
+                      key={sample.label}
+                      className="dev-loyalty-flame-capture__states-item"
+                      data-testid={`loyalty-flame-state-${sample.label.replace(/\s+/g, '-')}`}
+                    >
+                      <LoyaltyFlameHeaderButton
+                        visual={sample.visual}
+                        streakDays={sample.streakDays}
+                        expiring={sample.expiring}
+                        onClick={() => {}}
+                      />
                       <span>{sample.label}</span>
                     </li>
                   ))}
