@@ -45,6 +45,34 @@ export function LoyaltyFlameInfoModal({
       wrap={(node) => <RestaurantStylingPortalRoot>{node}</RestaurantStylingPortalRoot>}
     >
       <Stack gap={4} className="loyalty-flame-info-modal">
+        {model.streakHero ? (
+          <section
+            className={`loyalty-flame-info-modal__streak${
+              model.streakHero.expiring ? ' loyalty-flame-info-modal__streak--expiring' : ''
+            }`}
+            data-testid="loyalty-flame-streak-hero"
+          >
+            <p className="loyalty-flame-info-modal__streak-value">{model.streakHero.streakDays}</p>
+            <div className="loyalty-flame-info-modal__streak-meta">
+              {model.streakHero.startedLabel ? (
+                <p data-testid="loyalty-flame-streak-started">{model.streakHero.startedLabel}</p>
+              ) : null}
+              {model.streakHero.expiresLabel ? (
+                <p data-testid="loyalty-flame-streak-expires">{model.streakHero.expiresLabel}</p>
+              ) : null}
+              {model.streakHero.nextLevelLabel ? (
+                <p data-testid="loyalty-flame-streak-next">{model.streakHero.nextLevelLabel}</p>
+              ) : null}
+              <p data-testid="loyalty-flame-streak-record">{model.streakHero.recordLabel}</p>
+            </div>
+            {model.streakHero.expiring ? (
+              <p className="loyalty-flame-info-modal__streak-hint" data-testid="loyalty-flame-streak-expiring-hint">
+                Скоро погаснет — успейте сделать заказ
+              </p>
+            ) : null}
+          </section>
+        ) : null}
+
         {model.sections.map((section) => (
           <section key={section.title} className="loyalty-flame-info-modal__section">
             <h3 className="loyalty-flame-info-modal__section-title">{section.title}</h3>

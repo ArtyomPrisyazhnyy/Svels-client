@@ -2,6 +2,49 @@
   color: var(--rs-text, var(--text-primary));
 }
 
+.loyalty-flame-info-modal__streak {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--rs-primary-soft, color-mix(in srgb, var(--rs-accent) 10%, transparent));
+}
+
+.loyalty-flame-info-modal__streak--expiring {
+  background: color-mix(in srgb, var(--rs-warning, #ca8a04) 12%, var(--rs-surface, transparent));
+}
+
+.loyalty-flame-info-modal__streak-value {
+  margin: 0;
+  font-size: var(--text-2xl, 1.5rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--rs-text, var(--text-primary));
+}
+
+.loyalty-flame-info-modal__streak-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+
+  p {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--rs-text-muted, var(--text-secondary));
+  }
+}
+
+.loyalty-flame-info-modal__streak-hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--rs-warning, var(--rs-text-muted));
+}
+
 .loyalty-flame-info-modal__section-title {
   margin: 0;
   font-size: var(--text-sm);

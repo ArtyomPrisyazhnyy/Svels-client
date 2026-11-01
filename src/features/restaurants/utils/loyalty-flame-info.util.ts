@@ -1,9 +1,10 @@
-import type { LoyaltyBalance } from '../../../shared/types/loyalty-balance.ts';
+import type { LoyaltyBalance, LoyaltyStreakStatus } from '../../../shared/types/loyalty-balance.ts';
 import {
   type FlameLevel,
   type LoyaltyReward,
   type LoyaltySettings,
 } from '../../../shared/types/loyalty-settings.ts';
+import { formatShortDateMinsk } from '../../../shared/utils/dateMinsk.ts';
 
 export interface LoyaltyFlameInfoSection {
   title: string;
@@ -26,6 +27,16 @@ export interface LoyaltyFlameInfoModel {
   sections: LoyaltyFlameInfoSection[];
   levelRows: LoyaltyFlameLevelRow[] | null;
   levelsFooter: string | null;
+  streakHero: LoyaltyFlameStreakHero | null;
+}
+
+export interface LoyaltyFlameStreakHero {
+  streakDays: number;
+  startedLabel: string | null;
+  expiresLabel: string | null;
+  recordLabel: string;
+  nextLevelLabel: string | null;
+  expiring: boolean;
 }
 
 function pluralDays(count: number): string {
@@ -38,6 +49,59 @@ function pluralDays(count: number): string {
     return `${count} дня`;
   }
   return `${count} дней`;
+}
+
+/** После «серия»: «1 день», «2 дня», «5 дней». */
+export function pluralStreakDays(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) {
+    return `${count} день`;
+  }
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return `${count} дня`;
+  }
+  return `${count} дней`;
+}
+
+export function loyaltyFlameButtonAriaLabel(streakDays: number): string {
+  if (streakDays < 1) {
+    return 'Огонёк лояльности';
+  }
+  return `Огонёк, серия ${pluralStreakDays(streakDays)}`;
+}
+
+export function resolveLoyaltyStreakStatus(balance: LoyaltyBalance | null): LoyaltyStreakStatus {
+  if (balance?.status) {
+    return balance.status;
+  }
+  if (!balance || balance.visits <= 0) {
+    return 'none';
+  }
+  return 'active';
+}
+
+export function resolveLoyaltyStreakDays(balance: LoyaltyBalance | null): number {
+  if (balance?.streakDays != null) {
+    return balance.streakDays;
+  }
+  const status = resolveLoyaltyStreakStatus(balance);
+  if (status === 'none') {
+    return 0;
+  }
+  return balance?.visits ?? 0;
+}
+
+export function resolveLoyaltyLongestStreak(balance: LoyaltyBalance | null): number {
+  if (balance?.longestStreak != null) {
+    return balance.longestStreak;
+  }
+  return resolveLoyaltyStreakDays(balance);
+}
+
+function balanceHasActiveStreak(balance: LoyaltyBalance | null): boolean {
+  const status = resolveLoyaltyStreakStatus(balance);
+  return status === 'active' || status === 'expiring';
 }
 
 /** Именительный: «4 визита подряд». */
@@ -128,7 +192,7 @@ export function resolveLoyaltyFlameHeaderVisual(
   settings: LoyaltySettings,
   isGuestOfRestaurant: boolean,
 ): LoyaltyFlameHeaderVisual {
-  if (!isGuestOfRestaurant || (balance?.visits ?? 0) <= 0) {
+  if (!isGuestOfRestaurant || !balanceHasActiveStreak(balance)) {
     return 'off';
   }
   const tier = resolveLoyaltyFlameTier(resolveGuestFlameLevelOrdinal(balance, settings));
@@ -146,6 +210,50 @@ function formatLevelPerks(level: FlameLevel, rewardsEnabled: boolean): string | 
     return 'Без наград';
   }
   return level.rewards.map(formatLoyaltyRewardSummary).join('; ');
+}
+
+function buildStreakHero(
+  balance: LoyaltyBalance | null,
+  isGuestOfRestaurant: boolean,
+): LoyaltyFlameStreakHero | null {
+  if (!isGuestOfRestaurant || !balance) {
+    return null;
+  }
+  const streakDays = resolveLoyaltyStreakDays(balance);
+  const status = resolveLoyaltyStreakStatus(balance);
+  if (status === 'none' || streakDays < 1) {
+    return null;
+  }
+
+  const startedLabel = balance.streakStartedAt
+    ? `серия с ${formatShortDateMinsk(balance.streakStartedAt)}`
+    : null;
+  const expiresLabel = balance.expiresAt
+    ? `сгорит ${formatShortDateMinsk(balance.expiresAt)}`
+    : null;
+
+  const record = resolveLoyaltyLongestStreak(balance);
+  const recordLabel =
+    record > streakDays
+      ? `Рекорд — ${pluralStreakDays(record)}`
+      : record === streakDays && record > 0
+        ? `Рекорд — ${pluralStreakDays(record)}`
+        : `Рекорд — ${pluralStreakDays(Math.max(record, streakDays))}`;
+
+  let nextLevelLabel: string | null = null;
+  if (balance.nextLevel) {
+    const left = balance.nextLevel.visitsLeft;
+    nextLevelLabel = `До «${balance.nextLevel.name}» — ${visitsAfterPreposition(left)} подряд`;
+  }
+
+  return {
+    streakDays,
+    startedLabel,
+    expiresLabel,
+    recordLabel,
+    nextLevelLabel,
+    expiring: status === 'expiring',
+  };
 }
 
 export function buildLoyaltyFlameInfoModel(
@@ -191,7 +299,7 @@ export function buildLoyaltyFlameInfoModel(
       currentBody = `Всего ${totalPhrase}. Войдите, чтобы увидеть свой уровень.`;
     } else if (!balance) {
       currentBody = `Всего ${totalPhrase}. Загружаем ваш статус…`;
-    } else if (balance.visits === 0) {
+    } else if (balance.visits === 0 && resolveLoyaltyStreakStatus(balance) === 'none') {
       currentBody = `Всего ${totalPhrase}. Серия сейчас не идёт. Уровень откроется после ${visitsAfterPreposition(firstThreshold)} подряд.`;
     } else if (balance.currentLevel) {
       currentBody = `Всего ${totalPhrase}. Сейчас ${pluralVisits(balance.visits)} подряд, ваш уровень — «${balance.currentLevel.name}».`;
@@ -218,12 +326,12 @@ export function buildLoyaltyFlameInfoModel(
     }));
   }
 
-  return { sections, levelRows, levelsFooter };
+  return { sections, levelRows, levelsFooter, streakHero: buildStreakHero(balance, isGuestOfRestaurant) };
 }
 
 export function isLoyaltyFlameLit(
   balance: LoyaltyBalance | null,
   isGuestOfRestaurant: boolean,
 ): boolean {
-  return isGuestOfRestaurant && (balance?.visits ?? 0) > 0;
+  return isGuestOfRestaurant && balanceHasActiveStreak(balance);
 }

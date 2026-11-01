@@ -17,6 +17,7 @@ import type {
   RestaurantStyling,
   UpdateRestaurantStylingPayload,
 } from '../../src/shared/types/restaurant-styling';
+import { nextE2eGuestPhone } from './e2e-guest-phone';
 import { getApiUrl } from './env';
 
 export interface PublicRestaurant {
@@ -229,10 +230,7 @@ export const apiClient = {
   },
 
   async createGuest(restaurantId: string, firstName = 'E2E', lastName = 'Guest') {
-    const phone = `+37529${String(Date.now()).slice(-7)}${Math.floor(Math.random() * 10)}`.slice(
-      0,
-      13,
-    );
+    const phone = nextE2eGuestPhone();
     await this.sendGuestOtp(restaurantId, phone);
     await sleep(200);
     const otp = await this.getLastDevOtp(phone);

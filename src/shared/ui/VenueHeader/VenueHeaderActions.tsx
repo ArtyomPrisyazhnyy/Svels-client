@@ -45,12 +45,19 @@ export function VenueHeaderActions({
   }
 
   const flameVisual = overlay?.loyaltyFlameVisual ?? 'off';
+  const flameStreakDays = overlay?.loyaltyFlameStreakDays ?? 0;
+  const flameExpiring = overlay?.loyaltyFlameExpiring ?? false;
 
   return (
     <div className="venue-header__actions" data-testid="venue-header-actions">
       {flameDisplayEnabled ? (
         <div className="venue-header__action-slot">
-          <LoyaltyFlameHeaderButton visual={flameVisual} onClick={handleFlameClick} />
+          <LoyaltyFlameHeaderButton
+            visual={flameVisual}
+            streakDays={flameStreakDays}
+            expiring={flameExpiring}
+            onClick={handleFlameClick}
+          />
         </div>
       ) : null}
       {favoritesEnabled ? (

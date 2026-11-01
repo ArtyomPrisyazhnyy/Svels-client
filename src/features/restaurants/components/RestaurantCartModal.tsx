@@ -61,6 +61,7 @@ import {
   validateCartCheckout,
   type CartDetailRowKey,
 } from '../utils/cart-checkout-validation.util';
+import { requestGuestLoyaltyBalanceRefresh } from '../utils/guest-loyalty-balance-refresh';
 import '../styles/restaurant-cart-modal.scss';
 
 const COMMENT_MAX = 1000;
@@ -451,6 +452,7 @@ export function RestaurantCartModal({
       }
 
       setSuccessOrderNumber(order.orderNumber);
+      requestGuestLoyaltyBalanceRefresh();
       if (accessToken && fulfillment === 'fulfillmentDelivery') {
         void useGuestAddressesStore.getState().loadAddresses(restaurantId, accessToken);
       }

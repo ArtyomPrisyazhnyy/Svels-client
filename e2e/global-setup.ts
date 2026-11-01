@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { apiClient } from './helpers/api';
+import { nextE2eGuestPhone } from './helpers/e2e-guest-phone';
 import { getSuperAdminCredentials, writeSeed, type E2eSeed } from './helpers/env';
 import { ensureRestaurantProductionStaff } from './helpers/staff-seed';
 
