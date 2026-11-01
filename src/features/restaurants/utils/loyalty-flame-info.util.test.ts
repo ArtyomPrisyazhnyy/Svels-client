@@ -13,6 +13,9 @@ import {
   resolveGuestFlameLevelOrdinal,
   resolveLoyaltyStreakDays,
   resolveLoyaltyStreakStatus,
+  completedOrdersAfterPreposition,
+  formatStreakDaysInRow,
+  streakDaysUnitInRow,
   visitsAfterPreposition,
 } from './loyalty-flame-info.util.ts';
 
@@ -144,12 +147,19 @@ describe('isLoyaltyFlameLit', () => {
   });
 });
 
-describe('visitsAfterPreposition', () => {
-  it('uses genitive plural after от/после except 1', () => {
-    assert.equal(visitsAfterPreposition(1), '1 визита');
-    assert.equal(visitsAfterPreposition(3), '3 визитов');
-    assert.equal(visitsAfterPreposition(7), '7 визитов');
-    assert.equal(visitsAfterPreposition(21), '21 визита');
+describe('completedOrdersAfterPreposition', () => {
+  it('uses genitive for level thresholds', () => {
+    assert.equal(completedOrdersAfterPreposition(1), '1 выданного заказа');
+    assert.equal(completedOrdersAfterPreposition(3), '3 выданных заказов');
+    assert.equal(completedOrdersAfterPreposition(7), '7 выданных заказов');
+  });
+});
+
+describe('streakDaysUnitInRow', () => {
+  it('pluralizes day unit in row', () => {
+    assert.equal(streakDaysUnitInRow(1), 'день подряд');
+    assert.equal(streakDaysUnitInRow(4), 'дня подряд');
+    assert.equal(formatStreakDaysInRow(4), '4 дня подряд');
   });
 });
 
@@ -158,12 +168,12 @@ describe('buildLoyaltyFlameInfoModel', () => {
     const model = buildLoyaltyFlameInfoModel(baseSettings, null, false);
     const expire = model.sections.find((s) => s.title === 'Когда гаснет');
     assert.ok(expire?.body.includes('14 дней'));
-    assert.ok(expire?.body.includes('не заходить'));
+    assert.ok(expire?.body.includes('выданным заказом'));
   });
 
-  it('uses visitsAfterPreposition in level labels', () => {
+  it('uses completedOrdersAfterPreposition in level labels', () => {
     const model = buildLoyaltyFlameInfoModel(baseSettings, null, true);
-    assert.equal(model.levelRows?.[0]?.label, '«Искра» — от 3 визитов подряд');
+    assert.equal(model.levelRows?.[0]?.label, '«Искра» — от 3 выданных заказов');
   });
 
   it('lists levels with perks when rewards enabled', () => {
@@ -195,7 +205,10 @@ describe('buildLoyaltyFlameInfoModel', () => {
     assert.equal(model.levelRows?.[1]?.perks, 'Без наград');
     assert.ok(model.streakHero);
     assert.equal(model.streakHero?.streakDays, 4);
-    assert.ok(model.streakHero?.startedLabel?.includes('серия с'));
-    assert.ok(model.streakHero?.expiresLabel?.includes('сгорит'));
+    assert.equal(model.streakHero?.streakUnit, 'дня подряд');
+    assert.equal(model.streakHero?.visual, 1);
+    assert.equal(model.streakHero?.startedLabel, 'Серия с 01.10');
+    assert.equal(model.streakHero?.expiresLabel, 'Сгорит 15.11');
+    assert.equal(model.streakHero?.nextLevelLabel, 'До «Пламя» — ещё 3 выданных заказов');
   });
 });

@@ -52,7 +52,13 @@ export function LoyaltyFlameInfoModal({
             }`}
             data-testid="loyalty-flame-streak-hero"
           >
-            <p className="loyalty-flame-info-modal__streak-value">{model.streakHero.streakDays}</p>
+            <div className="loyalty-flame-info-modal__streak-head">
+              <LoyaltyFlameIcon variant={model.streakHero.visual} size="header" />
+              <div className="loyalty-flame-info-modal__streak-count">
+                <span className="loyalty-flame-info-modal__streak-value">{model.streakHero.streakDays}</span>
+                <span className="loyalty-flame-info-modal__streak-unit">{model.streakHero.streakUnit}</span>
+              </div>
+            </div>
             <div className="loyalty-flame-info-modal__streak-meta">
               {model.streakHero.startedLabel ? (
                 <p data-testid="loyalty-flame-streak-started">{model.streakHero.startedLabel}</p>
