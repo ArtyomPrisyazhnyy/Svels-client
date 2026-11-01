@@ -49,7 +49,7 @@ test.describe('Guest OAuth in venue auth modal', () => {
     await expect(page.getByTestId('guest-oauth-apple')).toBeVisible();
     await expect(page.getByTestId('guest-oauth-google')).toBeVisible();
 
-    await page.getByTestId('guest-otp-privacy-consent').check();
+    await page.getByTestId('guest-otp-privacy-consent').setChecked(true, { force: true });
 
     const googleRequest = page.waitForRequest(
       (req) =>
