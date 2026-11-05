@@ -38,8 +38,8 @@ export function resolveFlamePaint(
       stroke: vars.base,
       strokeWidth: 1.75,
       scale: 1.04,
-      innerFill: null,
-      innerScale: 0,
+      innerFill: vars.baseInner ?? null,
+      innerScale: vars.baseInner ? 0.38 : 0,
     };
   }
 

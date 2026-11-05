@@ -7,6 +7,7 @@ import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path'
 import { useAuthStore } from '@/store/auth.store';
 import type { LoyaltySettings } from '@/shared/types/loyalty-settings';
 import { useMenuCategoryNavOptional } from '../context/MenuCategoryNavContext';
+import { useVenueOverlayOptional } from '../context/VenueOverlayContext';
 import { LoyaltyFlameHeaderButton } from './LoyaltyFlameHeaderButton';
 import { MenuCategoryNav } from './MenuCategoryNav';
 import { RestaurantCartButton } from './RestaurantCartButton';
@@ -15,6 +16,8 @@ import { RestaurantGuestProfileButton } from './RestaurantGuestProfileButton';
 import { useGuestLoyaltyBalance } from '../hooks/useGuestLoyaltyBalance';
 import {
   resolveLoyaltyFlameHeaderVisual,
+  resolveLoyaltyStreakDays,
+  resolveLoyaltyStreakStatus,
   type LoyaltyFlameHeaderVisual,
 } from '../utils/loyalty-flame-info.util';
 
@@ -54,6 +57,7 @@ export function RestaurantPublicHeader({
   const user = useAuthStore((s) => s.user);
   const paths = useRestaurantGuestPaths(restaurantId);
   const navContext = useMenuCategoryNavOptional();
+  const venueOverlay = useVenueOverlayOptional();
 
   const showHeaderCategoryNav =
     navContext !== null &&
@@ -74,6 +78,12 @@ export function RestaurantPublicHeader({
   const flameVisual = useLocalLoyaltyFlameState
     ? localFlameVisual
     : (loyaltyFlameVisualProp ?? 'off');
+  const flameStreakDays = useLocalLoyaltyFlameState
+    ? resolveLoyaltyStreakDays(balance)
+    : (venueOverlay?.loyaltyFlameStreakDays ?? 0);
+  const flameExpiring = useLocalLoyaltyFlameState
+    ? resolveLoyaltyStreakStatus(balance) === 'expiring'
+    : (venueOverlay?.loyaltyFlameExpiring ?? false);
 
   function handleProfileClick() {
     if (isGuestOfRestaurant) {
@@ -114,7 +124,12 @@ export function RestaurantPublicHeader({
 
       <div className="glass-header__actions">
         {flameDisplayEnabled && (
-          <LoyaltyFlameHeaderButton visual={flameVisual} onClick={handleFlameClick} />
+          <LoyaltyFlameHeaderButton
+            visual={flameVisual}
+            streakDays={flameStreakDays}
+            expiring={flameExpiring}
+            onClick={handleFlameClick}
+          />
         )}
         {favoritesEnabled && (
           <RestaurantFavoritesHeaderButton href={paths.favorites} />

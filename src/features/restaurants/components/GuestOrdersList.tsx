@@ -13,6 +13,7 @@ import {
   isTerminalOrderStatus,
   ORDER_PAYMENT_STATUS_LABELS,
 } from '../utils/guest-order.util';
+import { formatDateTimeMinsk } from '@/shared/utils/dateMinsk';
 import { GuestOrderStatusBadge } from './GuestOrderStatusBadge';
 import '../styles/guest-orders-list.scss';
 
@@ -26,13 +27,7 @@ function formatRequestedAt(iso: string | null): string {
   if (!iso) {
     return 'Как можно скорее';
   }
-  const date = new Date(iso);
-  return date.toLocaleString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatDateTimeMinsk(iso);
 }
 
 export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
@@ -147,7 +142,7 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
                 <CurrencyAmount amount={order.totalAmount} />
               </p>
               <p className="guest-orders-list__item-date">
-                {new Date(order.createdAt).toLocaleString('ru-RU')}
+                {formatDateTimeMinsk(order.createdAt)}
               </p>
             </button>
           </li>

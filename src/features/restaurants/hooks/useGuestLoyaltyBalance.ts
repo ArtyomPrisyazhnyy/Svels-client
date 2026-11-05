@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ApiError } from '@/shared/api/api-client';
 import type { LoyaltyBalance } from '@/shared/types/loyalty-balance';
 import { fetchGuestLoyaltyBalance } from '../api/loyalty-balance.api';
+import { subscribeGuestLoyaltyBalanceRefresh } from '../utils/guest-loyalty-balance-refresh';
 
 interface UseGuestLoyaltyBalanceOptions {
   enabled: boolean;
@@ -21,6 +22,37 @@ export function useGuestLoyaltyBalance(
   const refresh = useCallback(() => {
     setReloadToken((value) => value + 1);
   }, []);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+    return subscribeGuestLoyaltyBalanceRefresh(refresh);
+  }, [enabled, refresh]);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    const onFocus = () => {
+      refresh();
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refresh();
+      }
+    };
+
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [enabled, refresh]);
 
   useEffect(() => {
     if (!enabled) {

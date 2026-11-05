@@ -1,4 +1,5 @@
 import { test, expect, apiClient } from '../fixtures/test';
+import { nextE2eGuestPhone } from '../helpers/e2e-guest-phone';
 
 test.describe('Guest OTP auth', () => {
   test('страница гостевой авторизации рендерится', async ({ page, seed }) => {
@@ -8,7 +9,7 @@ test.describe('Guest OTP auth', () => {
   });
 
   test('полный OTP-флоу: телефон → код → регистрация', async ({ page, seed }) => {
-    const phone = `+37529${String(Date.now()).slice(-7)}`;
+    const phone = nextE2eGuestPhone();
 
     await page.goto(`/restaurants/${seed.restaurantId}/auth`);
     await page.getByTestId('otp-phone').fill(phone);
