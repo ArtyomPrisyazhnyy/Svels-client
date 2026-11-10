@@ -15,8 +15,13 @@ import { RestaurantGuestProfileButton } from './RestaurantGuestProfileButton';
 import { useGuestLoyaltyBalance } from '../hooks/useGuestLoyaltyBalance';
 import {
   resolveLoyaltyFlameHeaderVisual,
+  resolveLoyaltyFlameStreakDays,
   type LoyaltyFlameHeaderVisual,
 } from '../utils/loyalty-flame-info.util';
+import {
+  resolveVenueHeaderActionOrder,
+  type VenueHeaderActionId,
+} from '../utils/venue-header-actions.order';
 
 interface RestaurantPublicHeaderProps {
   restaurantId: string;
@@ -27,10 +32,11 @@ interface RestaurantPublicHeaderProps {
   onOpenAuth?: () => void;
   onOpenFlameInfo?: () => void;
   loyaltyFlameVisual?: LoyaltyFlameHeaderVisual;
+  loyaltyFlameStreakDays?: number;
   loyaltySettings?: LoyaltySettings;
   /** Показывать огонёк лояльности рядом с кабинетом. */
   flameDisplayEnabled?: boolean;
-  /** Показывать кнопку избранного слева от профиля. */
+  /** Показывать кнопку избранного слева от корзины. */
   favoritesEnabled?: boolean;
   useLocalLoyaltyFlameState?: boolean;
 }
@@ -44,6 +50,7 @@ export function RestaurantPublicHeader({
   onOpenAuth,
   onOpenFlameInfo,
   loyaltyFlameVisual: loyaltyFlameVisualProp,
+  loyaltyFlameStreakDays: loyaltyFlameStreakDaysProp,
   loyaltySettings,
   flameDisplayEnabled = false,
   favoritesEnabled = false,
@@ -74,6 +81,17 @@ export function RestaurantPublicHeader({
   const flameVisual = useLocalLoyaltyFlameState
     ? localFlameVisual
     : (loyaltyFlameVisualProp ?? 'off');
+  const localStreakDays =
+    flameDisplayEnabled && isGuestOfRestaurant ? resolveLoyaltyFlameStreakDays(balance) : 0;
+  const streakDays = useLocalLoyaltyFlameState
+    ? localStreakDays
+    : (loyaltyFlameStreakDaysProp ?? 0);
+
+  const actionOrder = resolveVenueHeaderActionOrder({
+    flame: flameDisplayEnabled,
+    favorites: favoritesEnabled,
+    cart: Boolean(onOpenCart),
+  });
 
   function handleProfileClick() {
     if (isGuestOfRestaurant) {
@@ -86,6 +104,34 @@ export function RestaurantPublicHeader({
 
   function handleFlameClick() {
     onOpenFlameInfo?.();
+  }
+
+  function renderHeaderAction(action: VenueHeaderActionId) {
+    if (action === 'flame') {
+      return (
+        <LoyaltyFlameHeaderButton
+          key="flame"
+          visual={flameVisual}
+          streakDays={streakDays}
+          onClick={handleFlameClick}
+        />
+      );
+    }
+    if (action === 'favorites') {
+      return <RestaurantFavoritesHeaderButton key="favorites" href={paths.favorites} />;
+    }
+    if (action === 'cart' && onOpenCart) {
+      return (
+        <RestaurantCartButton key="cart" restaurantId={restaurantId} onOpen={onOpenCart} />
+      );
+    }
+    return (
+      <RestaurantGuestProfileButton
+        key="profile"
+        authenticated={isGuestOfRestaurant}
+        onClick={handleProfileClick}
+      />
+    );
   }
 
   return (
@@ -113,19 +159,7 @@ export function RestaurantPublicHeader({
       )}
 
       <div className="glass-header__actions">
-        {flameDisplayEnabled && (
-          <LoyaltyFlameHeaderButton visual={flameVisual} onClick={handleFlameClick} />
-        )}
-        {favoritesEnabled && (
-          <RestaurantFavoritesHeaderButton href={paths.favorites} />
-        )}
-        <RestaurantGuestProfileButton
-          authenticated={isGuestOfRestaurant}
-          onClick={handleProfileClick}
-        />
-        {onOpenCart && (
-          <RestaurantCartButton restaurantId={restaurantId} onOpen={onOpenCart} />
-        )}
+        {actionOrder.map((action) => renderHeaderAction(action))}
       </div>
     </header>
   );

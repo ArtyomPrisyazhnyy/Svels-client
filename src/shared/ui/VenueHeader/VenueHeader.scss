@@ -87,3 +87,8 @@ a.venue-header__brand {
   place-items: center;
   flex-shrink: 0;
 }
+
+.venue-header__action-slot--flame {
+  width: auto;
+  min-width: var(--control-h-md);
+}

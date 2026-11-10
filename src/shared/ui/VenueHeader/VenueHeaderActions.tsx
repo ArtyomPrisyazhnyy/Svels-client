@@ -9,6 +9,10 @@ import { RestaurantCartButton } from '@/features/restaurants/components/Restaura
 import { RestaurantFavoritesHeaderButton } from '@/features/restaurants/components/RestaurantFavoritesHeaderButton';
 import { LoyaltyFlameHeaderButton } from '@/features/restaurants/components/LoyaltyFlameHeaderButton';
 import { RestaurantGuestProfileButton } from '@/features/restaurants/components/RestaurantGuestProfileButton';
+import {
+  resolveVenueHeaderActionOrder,
+  type VenueHeaderActionId,
+} from '@/features/restaurants/utils/venue-header-actions.order';
 
 interface VenueHeaderActionsProps {
   restaurantId: string;
@@ -45,30 +49,53 @@ export function VenueHeaderActions({
   }
 
   const flameVisual = overlay?.loyaltyFlameVisual ?? 'off';
+  const streakDays = overlay?.loyaltyFlameStreakDays ?? 0;
+  const showCart = enableCart && overlay !== null;
+  const actionOrder = resolveVenueHeaderActionOrder({
+    flame: flameDisplayEnabled,
+    favorites: favoritesEnabled,
+    cart: showCart,
+  });
 
-  return (
-    <div className="venue-header__actions" data-testid="venue-header-actions">
-      {flameDisplayEnabled ? (
-        <div className="venue-header__action-slot">
-          <LoyaltyFlameHeaderButton visual={flameVisual} onClick={handleFlameClick} />
+  function renderAction(action: VenueHeaderActionId) {
+    if (action === 'flame') {
+      return (
+        <div key="flame" className="venue-header__action-slot venue-header__action-slot--flame">
+          <LoyaltyFlameHeaderButton
+            visual={flameVisual}
+            streakDays={streakDays}
+            onClick={handleFlameClick}
+          />
         </div>
-      ) : null}
-      {favoritesEnabled ? (
-        <div className="venue-header__action-slot" data-testid="venue-header-favorites">
+      );
+    }
+    if (action === 'favorites') {
+      return (
+        <div key="favorites" className="venue-header__action-slot" data-testid="venue-header-favorites">
           <RestaurantFavoritesHeaderButton href={paths.favorites} />
         </div>
-      ) : null}
-      <div className="venue-header__action-slot" data-testid="venue-header-profile">
+      );
+    }
+    if (action === 'cart' && overlay) {
+      return (
+        <div key="cart" className="venue-header__action-slot" data-testid="venue-header-cart">
+          <RestaurantCartButton restaurantId={restaurantId} onOpen={overlay.openCart} />
+        </div>
+      );
+    }
+    return (
+      <div key="profile" className="venue-header__action-slot" data-testid="venue-header-profile">
         <RestaurantGuestProfileButton
           authenticated={isGuestOfRestaurant}
           onClick={handleProfileClick}
         />
       </div>
-      {enableCart && overlay ? (
-        <div className="venue-header__action-slot" data-testid="venue-header-cart">
-          <RestaurantCartButton restaurantId={restaurantId} onOpen={overlay.openCart} />
-        </div>
-      ) : null}
+    );
+  }
+
+  return (
+    <div className="venue-header__actions" data-testid="venue-header-actions">
+      {actionOrder.map(renderAction)}
     </div>
   );
 }

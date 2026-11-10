@@ -17,7 +17,10 @@ import {
   type RestaurantColorTheme,
   type RestaurantHeaderStyle,
 } from '@/shared/types/restaurant-styling';
-import type { LoyaltyFlameHeaderVisual } from '@/features/restaurants/utils/loyalty-flame-info.util';
+import {
+  resolveLoyaltyFlameStreakDays,
+  type LoyaltyFlameHeaderVisual,
+} from '@/features/restaurants/utils/loyalty-flame-info.util';
 import '@/features/restaurants/styles/venue-layout.scss';
 import '@/features/restaurants/styles/dev-loyalty-flame-capture.scss';
 import '@/shared/ui/VenueHeader/VenueHeader.scss';
@@ -218,20 +221,30 @@ function MatrixRow({
   );
 }
 
-function VenueHeaderActionsDemo({ flameVisual }: { flameVisual: LoyaltyFlameHeaderVisual }) {
+function VenueHeaderActionsDemo({
+  flameVisual,
+  streakDays,
+}: {
+  flameVisual: LoyaltyFlameHeaderVisual;
+  streakDays: number;
+}) {
   return (
     <div className="venue-header__actions" data-testid="venue-header-actions">
-      <div className="venue-header__action-slot">
-        <LoyaltyFlameHeaderButton visual={flameVisual} onClick={() => {}} />
+      <div className="venue-header__action-slot venue-header__action-slot--flame">
+        <LoyaltyFlameHeaderButton
+          visual={flameVisual}
+          streakDays={streakDays}
+          onClick={() => {}}
+        />
       </div>
-      <div className="venue-header__action-slot">
+      <div className="venue-header__action-slot" data-testid="venue-header-favorites">
         <RestaurantFavoritesHeaderButton href="#" />
       </div>
-      <div className="venue-header__action-slot">
-        <RestaurantGuestProfileButton authenticated onClick={() => {}} />
-      </div>
-      <div className="venue-header__action-slot">
+      <div className="venue-header__action-slot" data-testid="venue-header-cart">
         <RestaurantCartButton restaurantId={CAPTURE_SETTINGS.restaurantId} onOpen={() => {}} />
+      </div>
+      <div className="venue-header__action-slot" data-testid="venue-header-profile">
+        <RestaurantGuestProfileButton authenticated onClick={() => {}} />
       </div>
     </div>
   );
@@ -253,6 +266,7 @@ export default function DevLoyaltyFlameCapturePage() {
 
   const headerVisual: LoyaltyFlameHeaderVisual =
     balance.visits <= 0 ? 'off' : balance.currentLevel ? 1 : 'base';
+  const headerStreakDays = resolveLoyaltyFlameStreakDays(balance);
 
   const styling = useMemo(
     () => ({
@@ -297,12 +311,13 @@ export default function DevLoyaltyFlameCapturePage() {
         >
           <span className="glass-header__brand-name">E2E Cafe</span>
           {view === 'header-bar' ? (
-            <VenueHeaderActionsDemo flameVisual={headerVisual} />
+            <VenueHeaderActionsDemo flameVisual={headerVisual} streakDays={headerStreakDays} />
           ) : (
             <div className="venue-header__actions" data-testid="venue-header-actions">
-              <div className="venue-header__action-slot">
+              <div className="venue-header__action-slot venue-header__action-slot--flame">
                 <LoyaltyFlameHeaderButton
                   visual={view === 'states' ? 'off' : headerVisual}
+                  streakDays={view === 'states' ? 0 : headerStreakDays}
                   onClick={() => setFlameOpen(true)}
                 />
               </div>
