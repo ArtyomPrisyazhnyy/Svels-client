@@ -29,6 +29,10 @@ export interface SheetProps {
   stacked?: boolean;
   /** Wraps the portaled tree so venue tokens apply outside the page shell. */
   wrap?: (node: ReactNode) => ReactNode;
+  /** Hide the icon button. Backdrop, Escape and swipe still close the sheet. */
+  showClose?: boolean;
+  /** Keep the phone bottom sheet (grab handle) above the tablet breakpoint. */
+  presentation?: 'adaptive' | 'bottom';
   children: ReactNode;
 }
 
@@ -45,6 +49,8 @@ function SheetInner({
   testId,
   stacked = false,
   wrap,
+  showClose = true,
+  presentation = 'adaptive',
   children,
 }: Omit<SheetProps, 'open'>) {
   const { mounted, isActive, handleClose } = useModalPresence(onClose, SHEET_ANIMATION_MS);
@@ -63,7 +69,11 @@ function SheetInner({
     stacked && 'ui-sheet__backdrop--stacked',
     isActive && 'ui-sheet__backdrop--active',
   );
-  const sheetClass = cn('ui-sheet', stacked && 'ui-sheet--stacked');
+  const sheetClass = cn(
+    'ui-sheet',
+    stacked && 'ui-sheet--stacked',
+    presentation === 'bottom' && 'ui-sheet--bottom',
+  );
 
   const tree = (
     <>
@@ -89,6 +99,8 @@ function SheetInner({
           onRequestClose={handleClose}
           active={isActive}
           testId={testId}
+          showClose={showClose}
+          swipeToClose={presentation === 'bottom'}
         >
           {children}
         </ModalPanel>

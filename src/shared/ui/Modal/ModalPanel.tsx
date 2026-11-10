@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, forwardRef, useId } from 'react';
+import { type CSSProperties, type PointerEvent, type ReactNode, forwardRef, useId, useRef, useState } from 'react';
 import { IconClose } from '@/shared/ui/icons/icons';
 import { IconButton } from '@/shared/ui/IconButton/IconButton';
 import { cn } from '@/shared/ui/utils/cn';
@@ -25,6 +25,9 @@ export interface ModalPanelProps {
   panelClassName?: string;
   headerTestId?: string;
   titleTestId?: string;
+  showClose?: boolean;
+  /** Drag the top grab zone downward to close. Used by bottom sheets. */
+  swipeToClose?: boolean;
   children: ReactNode;
 }
 
@@ -46,6 +49,8 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(function M
     panelClassName,
     headerTestId,
     titleTestId,
+    showClose = true,
+    swipeToClose = false,
     children,
   },
   ref,
@@ -53,10 +58,49 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(function M
   const autoId = useId();
   const titleId = titleIdProp ?? (title ? `modal-title-${autoId}` : undefined);
   const activeClass = active ? ' ui-overlay-panel--active' : '';
+  const dragOrigin = useRef(0);
+  const dragging = useRef(false);
+  const dragYRef = useRef(0);
+  const [dragY, setDragY] = useState(0);
+
+  function onGrabPointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (!swipeToClose || event.button !== 0) {
+      return;
+    }
+    dragging.current = true;
+    dragOrigin.current = event.clientY;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function onGrabPointerMove(event: PointerEvent<HTMLDivElement>) {
+    if (!dragging.current) {
+      return;
+    }
+    const next = Math.max(0, event.clientY - dragOrigin.current);
+    dragYRef.current = next;
+    setDragY(next);
+  }
+
+  function onGrabPointerEnd() {
+    if (!dragging.current) {
+      return;
+    }
+    dragging.current = false;
+    const distance = dragYRef.current;
+    dragYRef.current = 0;
+    setDragY(0);
+    if (distance > 72) {
+      onRequestClose?.();
+    }
+  }
+
+  const panelStyle: CSSProperties | undefined =
+    dragY > 0 ? { transform: `translateY(${dragY}px)`, transition: 'none' } : undefined;
 
   return (
     <div
       ref={ref}
+      style={panelStyle}
       className={cn(
         'ui-overlay-panel',
         `ui-overlay-panel--${variant}`,
@@ -72,6 +116,15 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(function M
       tabIndex={-1}
     >
       {variant === 'sheet' ? <div className="ui-overlay-panel__handle" aria-hidden /> : null}
+      {swipeToClose ? (
+        <div
+          className="ui-overlay-panel__grab"
+          onPointerDown={onGrabPointerDown}
+          onPointerMove={onGrabPointerMove}
+          onPointerUp={onGrabPointerEnd}
+          onPointerCancel={onGrabPointerEnd}
+        />
+      ) : null}
       <header className="ui-overlay-panel__header" data-testid={headerTestId}>
         <div className="ui-overlay-panel__header-start">{headerStart}</div>
         {title ? (
@@ -83,7 +136,7 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(function M
         )}
         <div className="ui-overlay-panel__header-end">
           {headerEnd}
-          {onRequestClose ? (
+          {onRequestClose && showClose ? (
             <IconButton
               label={closeLabel}
               size="md"

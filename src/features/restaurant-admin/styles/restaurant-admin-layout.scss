@@ -1,46 +1,121 @@
 .restaurant-admin__body {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 0;
-  min-height: calc(100vh - 65px);
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--header-h));
+  min-width: 0;
 }
 
 .restaurant-admin__nav {
-  padding: 1rem;
-  background: #ffffff;
-  border-right: 1px solid #e2e8f0;
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  background: var(--rs-surface);
+  mask-image: linear-gradient(90deg, black calc(100% - var(--space-6)), transparent);
+  border-bottom: 1px solid var(--rs-border);
+  position: sticky;
+  top: var(--header-h);
+  z-index: var(--z-sticky);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Extra scroll space so the active chip can sit fully at the start
+     instead of leaving a sliced label on the left. */
+  &::after {
+    content: '';
+    flex: 0 0 100%;
+  }
 }
 
 .restaurant-admin__nav-link {
-  padding: 0.625rem 0.875rem;
-  border-radius: 8px;
-  text-decoration: none;
-  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: var(--control-h-md);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--rs-text-muted);
+  font-size: var(--text-sm);
   font-weight: 600;
-  font-size: 0.9rem;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
 
-  &:hover {
-    background: #f1f5f9;
+  @media (hover: hover) {
+    &:hover {
+      background: color-mix(in srgb, var(--rs-text) 6%, var(--rs-surface));
+      color: var(--rs-text);
+    }
   }
 
   &--active {
-    background: #ecfdf5;
-    color: #0f766e;
+    background: color-mix(in srgb, var(--rs-accent) 14%, var(--rs-surface));
+    color: var(--rs-accent);
   }
 }
 
 .restaurant-admin__content {
-  padding: 1.5rem;
+  min-width: 0;
+  padding: var(--space-4);
+
+  > * {
+    min-width: 0;
+  }
+
+  h2,
+  h3 {
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+
+  [class$='__header'] {
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
 }
 
-.restaurant-admin__welcome {
-  margin: 0 0 1.25rem;
-  color: #64748b;
+@media (min-width: 1024px) {
+  .restaurant-admin__body {
+    display: grid;
+    grid-template-columns: 232px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .restaurant-admin__nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-1);
+    align-self: start;
+    position: sticky;
+    top: var(--header-h);
+    max-height: calc(100dvh - var(--header-h));
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: var(--space-3);
+    mask-image: none;
+
+    &::after {
+      content: none;
+    }
+
+    border-bottom: none;
+    border-right: 1px solid var(--rs-border);
+  }
+
+  .restaurant-admin__nav-link {
+    white-space: normal;
+  }
+}
+
+@media (min-width: 1280px) {
+  .restaurant-admin__content {
+    padding: var(--space-6);
+  }
 }

@@ -328,6 +328,10 @@ export const apiClient = {
     });
   },
 
+  getStyling(restaurantId: string): Promise<RestaurantStyling> {
+    return api<RestaurantStyling>('GET', `/restaurants/${restaurantId}/styling`);
+  },
+
   patchStyling(
     restaurantId: string,
     token: string,
