@@ -33,9 +33,24 @@ test.describe('Loyalty flame info modal', () => {
     await page.goto(`/restaurants/${restaurantId}`);
     await expect(page.getByTestId('loyalty-flame-button')).toBeVisible();
 
-    await page.getByTestId('loyalty-flame-button').click();
-    await expect(page.getByTestId('loyalty-flame-info-modal')).toBeVisible();
-    await expect(page.getByTestId('loyalty-flame-info-title')).toHaveText('Огонёк лояльности');
-    await expect(page).not.toHaveURL(new RegExp(`/restaurants/${restaurantId}/account`));
+    try {
+      await page.getByTestId('loyalty-flame-button').click();
+      await expect(page.getByTestId('loyalty-flame-info-modal')).toBeVisible();
+      await expect(page.getByTestId('loyalty-flame-info-title')).toHaveText('Огонёк лояльности');
+      await expect(page).not.toHaveURL(new RegExp(`/restaurants/${restaurantId}/account`));
+    } finally {
+      const restore = await request.patch(
+        `${process.env.E2E_API_URL ?? 'http://127.0.0.1:3000'}/restaurants/${restaurantId}/loyalty-settings`,
+        {
+          headers: {
+            Authorization: `Bearer ${restaurantAdmin.auth.accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          data: { flameDisplayEnabled: false },
+        },
+      );
+      expect(restore.ok(), `restore loyalty-settings → ${restore.status()}`).toBeTruthy();
+      await revalidateRestaurantPublicPage(restaurantId);
+    }
   });
 });
