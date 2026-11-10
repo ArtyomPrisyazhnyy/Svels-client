@@ -8,6 +8,7 @@ import {
   isLoyaltyFlameLit,
   resolveLoyaltyFlameTier,
   resolveLoyaltyFlameHeaderVisual,
+  resolveLoyaltyFlameStreakDays,
   resolveGuestFlameLevelOrdinal,
   visitsAfterPreposition,
 } from './loyalty-flame-info.util.ts';
@@ -102,6 +103,18 @@ describe('resolveLoyaltyFlameHeaderVisual', () => {
     };
     assert.equal(resolveLoyaltyFlameHeaderVisual(balance, baseSettings, true), 1);
     assert.equal(resolveGuestFlameLevelOrdinal(balance, baseSettings), 1);
+  });
+});
+
+describe('resolveLoyaltyFlameStreakDays', () => {
+  it('uses streakDays when it is set, otherwise visits', () => {
+    assert.equal(resolveLoyaltyFlameStreakDays(null), 0);
+    assert.equal(resolveLoyaltyFlameStreakDays(undefined), 0);
+    assert.equal(resolveLoyaltyFlameStreakDays({ visits: 0 }), 0);
+    assert.equal(resolveLoyaltyFlameStreakDays({ visits: 3 }), 3);
+    assert.equal(resolveLoyaltyFlameStreakDays({ visits: 1, streakDays: 4 }), 4);
+    assert.equal(resolveLoyaltyFlameStreakDays({ visits: 5, streakDays: null }), 5);
+    assert.equal(resolveLoyaltyFlameStreakDays({ visits: 5, streakDays: 0 }), 0);
   });
 });
 

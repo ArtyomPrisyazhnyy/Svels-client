@@ -6,6 +6,8 @@ import '../styles/loyalty-flame-button.scss';
 
 interface LoyaltyFlameHeaderButtonProps {
   visual: LoyaltyFlameHeaderVisual;
+  /** Серия визитов. Число рисуется только при значении >= 1. */
+  streakDays?: number;
   onClick: () => void;
 }
 
@@ -29,17 +31,31 @@ function iconVariant(visual: LoyaltyFlameHeaderVisual): 'off' | 'base' | 1 | 2 |
   return visual;
 }
 
-export function LoyaltyFlameHeaderButton({ visual, onClick }: LoyaltyFlameHeaderButtonProps) {
+export function LoyaltyFlameHeaderButton({
+  visual,
+  streakDays = 0,
+  onClick,
+}: LoyaltyFlameHeaderButtonProps) {
+  const showStreak = streakDays >= 1;
+  const label = showStreak ? `Огонёк лояльности, серия ${streakDays}` : 'Огонёк лояльности';
+
   return (
     <button
       type="button"
-      className={`loyalty-flame-button ${visualClassName(visual)}`}
+      className={`loyalty-flame-button ${visualClassName(visual)}${
+        showStreak ? ' loyalty-flame-button--with-count' : ''
+      }`}
       onClick={onClick}
-      aria-label="Огонёк лояльности"
-      title="Огонёк лояльности"
+      aria-label={label}
+      title={label}
       data-testid="loyalty-flame-button"
     >
       <LoyaltyFlameIcon variant={iconVariant(visual)} size="header" />
+      {showStreak ? (
+        <span className="loyalty-flame-button__count" data-testid="loyalty-flame-streak">
+          {streakDays}
+        </span>
+      ) : null}
     </button>
   );
 }

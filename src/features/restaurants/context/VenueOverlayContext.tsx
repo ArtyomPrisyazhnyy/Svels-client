@@ -13,6 +13,7 @@ import {
 import { useGuestLoyaltyBalance } from '../hooks/useGuestLoyaltyBalance';
 import {
   resolveLoyaltyFlameHeaderVisual,
+  resolveLoyaltyFlameStreakDays,
   type LoyaltyFlameHeaderVisual,
 } from '../utils/loyalty-flame-info.util';
 
@@ -21,6 +22,7 @@ interface VenueOverlayContextValue {
   openAuth: () => void;
   openFlameInfo: () => void;
   loyaltyFlameVisual: LoyaltyFlameHeaderVisual;
+  loyaltyFlameStreakDays: number;
 }
 
 const VenueOverlayContext = createContext<VenueOverlayContextValue | null>(null);
@@ -59,6 +61,8 @@ export function VenueOverlayProvider({
   const loyaltyFlameVisual = flameEnabled
     ? resolveLoyaltyFlameHeaderVisual(balance, loyaltySettings, isGuestOfRestaurant)
     : 'off';
+  const loyaltyFlameStreakDays =
+    flameEnabled && isGuestOfRestaurant ? resolveLoyaltyFlameStreakDays(balance) : 0;
 
   const openCart = useCallback(() => setCartOpen(true), []);
   const openAuth = useCallback(() => setAuthOpen(true), []);
@@ -75,8 +79,9 @@ export function VenueOverlayProvider({
       openAuth,
       openFlameInfo,
       loyaltyFlameVisual,
+      loyaltyFlameStreakDays,
     }),
-    [openCart, openAuth, openFlameInfo, loyaltyFlameVisual],
+    [openCart, openAuth, openFlameInfo, loyaltyFlameVisual, loyaltyFlameStreakDays],
   );
 
   return (

@@ -115,6 +115,7 @@ function RestaurantPublicPageBody({
     onOpenAuth: embedded ? () => setAuthOpen(true) : openAuth,
     onOpenFlameInfo: flameEnabled ? openFlameInfo : undefined,
     loyaltyFlameVisual: embedded ? undefined : venueOverlay?.loyaltyFlameVisual,
+    loyaltyFlameStreakDays: embedded ? undefined : venueOverlay?.loyaltyFlameStreakDays,
     loyaltySettings: resolvedLoyaltySettings,
     useLocalLoyaltyFlameState: embedded,
     flameDisplayEnabled: flameEnabled,

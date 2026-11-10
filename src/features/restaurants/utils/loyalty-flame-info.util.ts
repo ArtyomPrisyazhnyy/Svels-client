@@ -227,3 +227,25 @@ export function isLoyaltyFlameLit(
 ): boolean {
   return isGuestOfRestaurant && (balance?.visits ?? 0) > 0;
 }
+
+type LoyaltyFlameStreakSource = {
+  visits: number;
+  streakDays?: number | null;
+};
+
+/**
+ * Число на огоньке в шапке. Как в мобильном клиенте: `streakDays ?? visits`.
+ * 0 и пустой баланс не показываются.
+ */
+export function resolveLoyaltyFlameStreakDays(
+  balance: LoyaltyFlameStreakSource | null | undefined,
+): number {
+  if (!balance) {
+    return 0;
+  }
+  const value = balance.streakDays ?? balance.visits;
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 1) {
+    return 0;
+  }
+  return Math.trunc(value);
+}
