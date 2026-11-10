@@ -26,12 +26,12 @@ test.describe('Platform redirects', () => {
     await expect(page).toHaveURL(/\/$/);
   });
 
-  test('/restaurant-admin → /restaurant-admin/menu (после auth)', async ({
+  test('/restaurant-admin → /restaurant-admin/launch (после auth)', async ({
     page,
     asRestaurantAdmin,
   }) => {
     void asRestaurantAdmin;
     await page.goto('/restaurant-admin');
-    await expect(page).toHaveURL(/\/restaurant-admin\/menu$/);
+    await expect(page).toHaveURL(/\/restaurant-admin\/launch$/);
   });
 });

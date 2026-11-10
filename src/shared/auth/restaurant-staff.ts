@@ -68,12 +68,14 @@ export const RESTAURANT_ADMIN_NAV: Array<{
   label: string;
   permission: RestaurantPermission | null;
 }> = [
+  { to: '/restaurant-admin/launch', label: 'Запуск', permission: 'manage_menu' },
   { to: '/restaurant-admin/preview', label: 'Страница заведения', permission: 'manage_menu' },
   { to: '/restaurant-admin/branding', label: 'Брендинг', permission: 'manage_branding' },
   { to: '/restaurant-admin/banners', label: 'Баннеры', permission: 'manage_marketing' },
   { to: '/restaurant-admin/styling', label: 'Стилизация', permission: 'manage_branding' },
   { to: '/restaurant-admin/menu', label: 'Меню', permission: 'manage_menu' },
   { to: '/restaurant-admin/locations', label: 'Точки и адреса', permission: 'manage_restaurant' },
+  { to: '/restaurant-admin/hours', label: 'Часы работы', permission: 'manage_schedule' },
   { to: '/restaurant-admin/legal', label: 'Реквизиты', permission: 'manage_restaurant' },
   { to: '/restaurant-admin/order-settings', label: 'Условия заказа', permission: 'manage_order_settings' },
   { to: '/restaurant-admin/payment-settings', label: 'Оплата / bePaid', permission: 'manage_payments' },
@@ -107,6 +109,9 @@ export function getRestaurantAdminHomePath(role: UserRole | undefined): string {
       return '/restaurant-admin/bookings';
     case 'restaurant_production':
       return '/restaurant-admin/orders';
+    case 'restaurant_admin':
+    case 'restaurant_manager':
+      return '/restaurant-admin/launch';
     default:
       return '/restaurant-admin/menu';
   }

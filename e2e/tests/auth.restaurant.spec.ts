@@ -5,7 +5,7 @@ test.describe('Restaurant auth UI', () => {
     await page.goto('/auth/restaurant');
 
     await expect(page.getByTestId('restaurant-auth-page')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Для заведений' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Запуск заведения' })).toBeVisible();
     await expect(page.getByTestId('auth-tab-register')).toBeVisible();
     await expect(page.getByTestId('auth-tab-login')).toBeVisible();
     await expect(page.getByLabel('Название заведения / сети')).toBeVisible();
@@ -44,7 +44,7 @@ test.describe('Restaurant auth UI', () => {
     await page.getByTestId('login-email').fill(seed.restaurantAdmin.email);
     await page.getByTestId('login-password').fill(seed.restaurantAdmin.password);
     await page.getByTestId('login-submit').click();
-    await expect(page).toHaveURL(/\/restaurant-admin\/menu$/);
+    await expect(page).toHaveURL(/\/restaurant-admin\/launch$/);
     await expect(page.getByTestId('restaurant-admin-layout')).toBeVisible();
   });
 
@@ -79,7 +79,8 @@ test.describe('Restaurant auth UI', () => {
     ]);
     expect(response.ok()).toBeTruthy();
 
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByTestId('owner-application-status')).toBeVisible();
+    await expect(page.getByTestId('owner-application-status')).toHaveAttribute('data-status', 'pending');
 
     const pending = await apiClient.getPendingRegistrations(seed.superAdmin.auth.accessToken);
     expect(pending.some((item) => item.name.includes(businessName))).toBeTruthy();

@@ -9,7 +9,13 @@ export function fetchRestaurant(restaurantId: string): Promise<PublicRestaurant>
 export function updateRestaurant(
   restaurantId: string,
   token: string,
-  payload: { logoUrl?: string | null; logoWebpUrl?: string | null },
+  payload: {
+    name?: string;
+    description?: string | null;
+    customDomain?: string | null;
+    logoUrl?: string | null;
+    logoWebpUrl?: string | null;
+  },
 ): Promise<PublicRestaurant> {
   return apiRequest<PublicRestaurant>(`/restaurants/${restaurantId}`, {
     method: 'PATCH',

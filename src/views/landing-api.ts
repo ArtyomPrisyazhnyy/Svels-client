@@ -6,6 +6,7 @@ export interface LeadPayload {
   contactTelegram: boolean;
   contactWhatsapp: boolean;
   contactViber: boolean;
+  note?: string;
 }
 
 export async function submitLead(payload: LeadPayload): Promise<void> {
