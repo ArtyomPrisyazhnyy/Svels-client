@@ -5,7 +5,8 @@ import { ApiError } from '../../../shared/api/api-client';
 import type { MenuCategory, MenuItem } from '../../../shared/types/menu';
 import { PriceDelta } from '../../../shared/components/CurrencyAmount';
 import { MenuItemPriceDisplay } from '../../../shared/components/MenuItemPriceDisplay';
-import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import { ProductPhoto } from '@/shared/components/ProductPhoto';
+import { MENU_ADMIN_THUMB_IMAGE_SIZES } from '@/shared/images/menu-image-loading';
 import { useAuthStore } from '../../../store/auth.store';
 import {
   createCategory,
@@ -252,10 +253,12 @@ export default function MenuAdminPage() {
                         key={item.id}
                         className={`menu-admin__item${editingItem?.id === item.id ? ' menu-admin__item--editing' : ''}`}
                       >
-                        <ResponsiveImage
+                        <ProductPhoto
                           src={item.imageUrl}
                           webpSrc={item.imageWebpUrl}
+                          imageVariants={item.imageVariants}
                           alt={item.name}
+                          sizes={MENU_ADMIN_THUMB_IMAGE_SIZES}
                         />
                         <div className="menu-admin__item-body">
                           <strong>

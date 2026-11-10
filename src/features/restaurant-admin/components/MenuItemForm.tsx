@@ -8,7 +8,12 @@ import type {
 } from '../../../shared/types/menu';
 import { MAX_MENU_ITEM_GALLERY_IMAGES } from '../../../shared/types/menu';
 import { CurrencySign } from '../../../shared/components/CurrencySign';
-import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import { ProductPhoto } from '@/shared/components/ProductPhoto';
+import {
+  MENU_FORM_COVER_IMAGE_SIZES,
+  MENU_FORM_GALLERY_IMAGE_SIZES,
+} from '@/shared/images/menu-image-loading';
+import type { ImageVariants } from '@/shared/types/image-variants';
 import {
   createMenuItem,
   updateMenuItem,
@@ -95,6 +100,7 @@ export function MenuItemForm({
   const [modifierGroups, setModifierGroups] = useState<MenuModifierGroup[]>([]);
   const [imageUrl, setImageUrl] = useState('');
   const [imageWebpUrl, setImageWebpUrl] = useState<string | null>(null);
+  const [imageVariants, setImageVariants] = useState<ImageVariants | null>(null);
   const [imagePreview, setImagePreview] = useState('');
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [galleryWebpUrls, setGalleryWebpUrls] = useState<string[]>([]);
@@ -116,6 +122,7 @@ export function MenuItemForm({
     setModifierGroups([]);
     setImageUrl('');
     setImageWebpUrl(null);
+    setImageVariants(null);
     setImagePreview('');
     setGalleryUrls([]);
     setGalleryWebpUrls([]);
@@ -127,6 +134,8 @@ export function MenuItemForm({
       return;
     }
 
+    // Форма повторяет позицию с сервера; эффект был и до пресетов картинок.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- зеркалим editingItem в поля формы
     setCategoryId(editingItem.categoryId);
     setName(editingItem.name);
     setVariantLabel(editingItem.variantLabel ?? '');
@@ -142,6 +151,7 @@ export function MenuItemForm({
     setModifierGroups(editingItem.modifierGroups ?? []);
     setImageUrl(editingItem.imageUrl);
     setImageWebpUrl(editingItem.imageWebpUrl ?? null);
+    setImageVariants(editingItem.imageVariants ?? null);
     setImagePreview('');
     setGalleryUrls(editingItem.galleryUrls ?? []);
     setGalleryWebpUrls(editingItem.galleryWebpUrls ?? []);
@@ -150,6 +160,7 @@ export function MenuItemForm({
 
   useEffect(() => {
     if (!isEditing && !categoryId && categories[0]?.id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- выбираем первую категорию, когда список уже пришёл
       setCategoryId(categories[0].id);
     }
   }, [categories, categoryId, isEditing]);
@@ -165,10 +176,12 @@ export function MenuItemForm({
       const result = await uploadMenuImage(restaurantId, token, file);
       setImageUrl(result.imageUrl);
       setImageWebpUrl(result.imageWebpUrl);
+      setImageVariants(null);
     } catch (err) {
       setImagePreview('');
       setImageUrl('');
       setImageWebpUrl(null);
+      setImageVariants(null);
       setError(err instanceof Error ? err.message : 'Не удалось загрузить фото');
     } finally {
       setUploading(false);
@@ -228,6 +241,7 @@ export function MenuItemForm({
     });
     setImageUrl(newCover);
     setImageWebpUrl(newCoverWebp);
+    setImageVariants(null);
     setImagePreview('');
   }
 
@@ -361,11 +375,13 @@ export function MenuItemForm({
           />
         ) : (
           imageUrl && (
-            <ResponsiveImage
+            <ProductPhoto
               className="menu-item-form__preview menu-item-form__preview--cover"
               src={imageUrl}
               webpSrc={imageWebpUrl}
+              imageVariants={imageVariants}
               alt="Превью обложки"
+              sizes={MENU_FORM_COVER_IMAGE_SIZES}
             />
           )
         )}
@@ -390,10 +406,11 @@ export function MenuItemForm({
           <div className="menu-item-form__gallery">
             {galleryUrls.map((url, index) => (
               <div className="menu-item-form__gallery-item" key={`${url}-${index}`}>
-                <ResponsiveImage
+                <ProductPhoto
                   src={url}
                   webpSrc={galleryWebpUrls[index]}
                   alt={`Доп. фото ${index + 1}`}
+                  sizes={MENU_FORM_GALLERY_IMAGE_SIZES}
                 />
                 <div className="menu-item-form__gallery-actions">
                   <button

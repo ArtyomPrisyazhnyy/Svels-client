@@ -1,4 +1,5 @@
 import type { ModifierSelections } from '@/features/restaurants/utils/menu-modifiers.util';
+import type { ImageVariants } from '@/shared/types/image-variants';
 import type { DeliveryAddress } from '@/shared/types/pre-order';
 
 export interface CartModifierLine {
@@ -15,6 +16,7 @@ export interface CartLineItem {
   variantLabel: string | null;
   imageUrl: string;
   imageWebpUrl?: string | null;
+  imageVariants?: ImageVariants | null;
   quantity: number;
   unitPrice: number;
   modifiers: CartModifierLine[];

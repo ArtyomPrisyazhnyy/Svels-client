@@ -1,3 +1,7 @@
+import type { ImageVariants } from '@/shared/types/image-variants';
+
+export type { ImageVariants, ImageVariantSource } from '@/shared/types/image-variants';
+
 export type ModifierSelectionType = 'single' | 'multiple';
 
 export interface MenuModifierOption {
@@ -35,6 +39,8 @@ export interface MenuItem {
   isAvailable: boolean;
   imageUrl: string;
   imageWebpUrl?: string | null;
+  /** Пресеты обложки. null или пустой объект — показывать imageUrl как раньше. */
+  imageVariants?: ImageVariants | null;
   galleryUrls: string[];
   galleryWebpUrls?: string[];
   modifierGroups: MenuModifierGroup[];
@@ -86,6 +92,8 @@ export interface UpdateMenuItemPayload {
 export interface MenuImageSource {
   url: string;
   webpUrl?: string | null;
+  /** Только у обложки. У кадров галереи пресетов нет. */
+  imageVariants?: ImageVariants | null;
 }
 
 /** Максимум дополнительных фото галереи (обложка imageUrl не в счёт). */
@@ -93,12 +101,19 @@ export const MAX_MENU_ITEM_GALLERY_IMAGES = 9;
 
 /** Все изображения позиции в порядке показа: обложка + галерея. */
 export function getMenuItemImages(
-  item: Pick<MenuItem, 'imageUrl' | 'imageWebpUrl' | 'galleryUrls' | 'galleryWebpUrls'>,
+  item: Pick<
+    MenuItem,
+    'imageUrl' | 'imageWebpUrl' | 'galleryUrls' | 'galleryWebpUrls' | 'imageVariants'
+  >,
 ): MenuImageSource[] {
   const gallery = item.galleryUrls ?? [];
   const galleryWebp = item.galleryWebpUrls ?? [];
   const images: MenuImageSource[] = [
-    { url: item.imageUrl, webpUrl: item.imageWebpUrl },
+    {
+      url: item.imageUrl,
+      webpUrl: item.imageWebpUrl,
+      imageVariants: item.imageVariants ?? null,
+    },
     ...gallery.map((url, index) => ({
       url,
       webpUrl: galleryWebp[index] || null,

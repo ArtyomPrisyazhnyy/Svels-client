@@ -95,7 +95,13 @@ export const useCartStore = create<CartState>()(
         if (existingIndex >= 0) {
           const nextItems = currentItems.map((item, index) =>
             index === existingIndex
-              ? { ...item, quantity: item.quantity + line.quantity }
+              ? {
+                  ...item,
+                  quantity: item.quantity + line.quantity,
+                  imageUrl: line.imageUrl,
+                  imageWebpUrl: line.imageWebpUrl,
+                  imageVariants: line.imageVariants,
+                }
               : item,
           );
 
