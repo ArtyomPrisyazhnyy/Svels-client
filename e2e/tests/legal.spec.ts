@@ -28,7 +28,7 @@ test.describe('Guest OTP privacy consent', () => {
     const submit = page.getByTestId('otp-send-submit');
     await expect(submit).toBeDisabled();
 
-    await page.getByTestId('guest-otp-privacy-consent').check();
+    await page.getByTestId('guest-otp-privacy-consent').setChecked(true, { force: true });
     await expect(submit).toBeEnabled();
     await expect(page.getByRole('link', { name: 'политикой конфиденциальности' })).toHaveAttribute(
       'href',
