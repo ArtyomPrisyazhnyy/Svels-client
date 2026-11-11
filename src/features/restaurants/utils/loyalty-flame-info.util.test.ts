@@ -151,6 +151,31 @@ describe('resolveLoyaltyFlameStreakDays', () => {
     assert.equal(resolveLoyaltyFlameStreakDays({ visits: 1, streakDays: 4 }), 4);
     assert.equal(resolveLoyaltyFlameStreakDays({ visits: 5, streakDays: null }), 5);
     assert.equal(resolveLoyaltyFlameStreakDays({ visits: 5, streakDays: 0 }), 0);
+    assert.equal(
+      resolveLoyaltyFlameStreakDays({ visits: 5, status: 'none' } as LoyaltyBalance),
+      5,
+    );
+    assert.equal(resolveLoyaltyFlameStreakDays({ visits: 3.2 }), 3.2);
+  });
+});
+
+describe('resolveLoyaltyFlameHeaderVisual / status', () => {
+  it('treats missing status as lit when visits > 0', () => {
+    assert.equal(
+      resolveLoyaltyFlameHeaderVisual({ visits: 2 } as LoyaltyBalance, baseSettings, true),
+      'base',
+    );
+  });
+
+  it('shows off when status is none even if visits remain', () => {
+    assert.equal(
+      resolveLoyaltyFlameHeaderVisual(
+        { visits: 3, status: 'none' } as LoyaltyBalance,
+        baseSettings,
+        true,
+      ),
+      'off',
+    );
   });
 });
 

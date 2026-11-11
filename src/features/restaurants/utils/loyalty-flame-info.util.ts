@@ -133,9 +133,15 @@ export function resolveLoyaltyStreakStatus(balance: LoyaltyBalance | null | unde
   return 'active';
 }
 
+/** Как в mobile: горит, если status !== 'none'; без поля status — по visits > 0. */
 function balanceHasActiveStreak(balance: LoyaltyBalance | null | undefined): boolean {
-  const status = resolveLoyaltyStreakStatus(balance);
-  return status === 'active' || status === 'expiring';
+  if (!balance) {
+    return false;
+  }
+  if (balance.status !== undefined && balance.status !== null) {
+    return balance.status !== 'none';
+  }
+  return balance.visits > 0;
 }
 
 export function resolveLoyaltyFlameHeaderVisual(
@@ -258,8 +264,7 @@ type LoyaltyFlameStreakSource = {
 };
 
 /**
- * Число на огоньке в шапке. Как в мобильном клиенте: `streakDays ?? visits`.
- * 0 и пустой баланс не показываются.
+ * Число на огоньке в шапке. Как в mobile: streakDays, иначе visits (в т.ч. при status none).
  */
 export function resolveLoyaltyFlameStreakDays(
   balance: LoyaltyFlameStreakSource | null | undefined,
@@ -268,22 +273,14 @@ export function resolveLoyaltyFlameStreakDays(
     return 0;
   }
   if (balance.streakDays != null) {
-    const streak = Math.trunc(balance.streakDays);
-    if (streak >= 1) {
-      return streak;
+    if (balance.streakDays >= 1) {
+      return balance.streakDays;
     }
-    return 0;
-  }
-  if ('status' in balance && resolveLoyaltyStreakStatus(balance as LoyaltyBalance) === 'none') {
     return 0;
   }
   const value = balance.visits;
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 1) {
     return 0;
   }
-  return Math.trunc(value);
-}
-
-export function resolveLoyaltyFlameExpiring(balance: LoyaltyBalance | null | undefined): boolean {
-  return resolveLoyaltyStreakStatus(balance) === 'expiring';
+  return value;
 }

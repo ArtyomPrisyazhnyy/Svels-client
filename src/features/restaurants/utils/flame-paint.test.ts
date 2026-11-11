@@ -6,6 +6,7 @@ import {
   FLAME_HEADER_STREAK_FONT_SIZE_PX,
   FLAME_HEADER_STREAK_FONT_WEIGHT,
   FLAME_HEADER_STREAK_GAP_PX,
+  FLAME_HEADER_STREAK_LINE_HEIGHT_PX,
   FLAME_OFF_PAINT,
 } from './flame-geometry.ts';
 import { FLAME_THEME_VARS } from './flame-theme-vars.ts';
@@ -35,14 +36,16 @@ describe('resolveFlamePaint', () => {
     assert.equal(resolveFlamePaint(5, vars, '#94a3b8').innerScale, 0.62);
   });
 
-  it('matches mobile base paint: core, glow, stroke 1.85', () => {
+  it('matches mobile base paint: base fill/core/glow, stroke 1.85', () => {
     const paint = resolveFlamePaint('base', FLAME_THEME_VARS.monochrome, '#404040');
+    assert.equal(paint.fill, '#c2410c');
+    assert.equal(paint.fillOpacity, FLAME_BASE_PAINT.fillOpacity);
     assert.equal(paint.strokeWidth, FLAME_BASE_PAINT.strokeWidth);
     assert.equal(paint.innerScale, FLAME_BASE_PAINT.coreScale);
     assert.equal(paint.innerOpacity, FLAME_BASE_PAINT.coreOpacity);
+    assert.equal(paint.innerFill, '#c2410c');
     assert.equal(paint.glowScale, FLAME_BASE_PAINT.glowScale);
     assert.equal(paint.glowOpacity, FLAME_BASE_PAINT.glowOpacity);
-    assert.equal(paint.innerFill, '#fdba74');
     assert.equal(paint.glowFill, '#c2410c');
   });
 
@@ -58,6 +61,7 @@ describe('flame header geometry (mobile parity)', () => {
     assert.equal(FLAME_HEADER_ICON_SIZE_PX, 22);
     assert.equal(FLAME_HEADER_STREAK_FONT_SIZE_PX, 15);
     assert.equal(FLAME_HEADER_STREAK_FONT_WEIGHT, 700);
-    assert.equal(FLAME_HEADER_STREAK_GAP_PX, 4);
+    assert.equal(FLAME_HEADER_STREAK_GAP_PX, 3);
+    assert.equal(FLAME_HEADER_STREAK_LINE_HEIGHT_PX, 18);
   });
 });

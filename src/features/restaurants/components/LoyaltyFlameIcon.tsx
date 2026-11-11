@@ -56,10 +56,14 @@ export function LoyaltyFlameIcon({
           strokeWidth={paint.strokeWidth}
           strokeLinecap="round"
           strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
         />
         {showFill ? (
-          <path d={LUCIDE_FLAME_PATH} fill={paint.fill} stroke="none" />
+          <path
+            d={LUCIDE_FLAME_PATH}
+            fill={paint.fill}
+            fillOpacity={paint.fillOpacity}
+            stroke="none"
+          />
         ) : null}
         {paint.innerFill ? (
           <g transform={loyaltyFlameTransformAroundCenter(paint.innerScale)}>

@@ -50,7 +50,6 @@ export function VenueHeaderActions({
 
   const flameVisual = overlay?.loyaltyFlameVisual ?? 'off';
   const streakDays = overlay?.loyaltyFlameStreakDays ?? 0;
-  const flameExpiring = overlay?.loyaltyFlameExpiring ?? false;
   const showCart = enableCart && overlay !== null;
   const actionOrder = resolveVenueHeaderActionOrder({
     flame: flameDisplayEnabled,
@@ -65,7 +64,6 @@ export function VenueHeaderActions({
           <LoyaltyFlameHeaderButton
             visual={flameVisual}
             streakDays={streakDays}
-            expiring={flameExpiring}
             onClick={handleFlameClick}
           />
         </div>

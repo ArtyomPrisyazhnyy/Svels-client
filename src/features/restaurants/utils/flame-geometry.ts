@@ -5,12 +5,11 @@
  */
 
 export const FLAME_HEADER_ICON_SIZE_PX = 22;
-export const FLAME_HEADER_STREAK_GAP_PX = 4;
+export const FLAME_HEADER_STREAK_GAP_PX = 3;
 export const FLAME_HEADER_STREAK_FONT_SIZE_PX = 15;
 export const FLAME_HEADER_STREAK_FONT_WEIGHT = 700;
-
-export const FLAME_BASE_SOFT_MIX_PERCENT = 58;
-export const FLAME_DARK_BASE_SOFT_MIX_PERCENT = 56;
+export const FLAME_HEADER_STREAK_LINE_HEIGHT_PX = 18;
+export const FLAME_HEADER_BUTTON_PADDING_X_PX = 6;
 
 /** Состояние off — только контур, вся иконка @0.5. */
 export const FLAME_OFF_PAINT = {
@@ -19,8 +18,9 @@ export const FLAME_OFF_PAINT = {
   iconOpacity: 0.5,
 } as const;
 
-/** Базовый уровень (серия без tier): заливка + ядро + glow. */
+/** Базовый уровень (серия без tier): заливка + ядро + glow (цвет base). */
 export const FLAME_BASE_PAINT = {
+  fillOpacity: 0.58,
   strokeWidth: 1.85,
   scale: 1.04,
   coreOpacity: 0.82,

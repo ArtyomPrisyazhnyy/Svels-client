@@ -12,6 +12,7 @@ import {
 
 export type FlamePaint = {
   fill: string;
+  fillOpacity: number;
   stroke: string;
   strokeWidth: number;
   scale: number;
@@ -40,6 +41,7 @@ export function resolveFlamePaint(
   if (variant === 'off') {
     return {
       fill: 'none',
+      fillOpacity: 0,
       stroke: mutedColor,
       strokeWidth: FLAME_OFF_PAINT.strokeWidth,
       scale: FLAME_OFF_PAINT.scale,
@@ -55,7 +57,8 @@ export function resolveFlamePaint(
 
   if (variant === 'base') {
     return {
-      fill: vars.baseSoft,
+      fill: vars.base,
+      fillOpacity: FLAME_BASE_PAINT.fillOpacity,
       stroke: vars.base,
       strokeWidth: FLAME_BASE_PAINT.strokeWidth,
       scale: FLAME_BASE_PAINT.scale,
@@ -63,7 +66,7 @@ export function resolveFlamePaint(
       glowFill: vars.base,
       glowOpacity: FLAME_BASE_PAINT.glowOpacity,
       glowScale: FLAME_BASE_PAINT.glowScale,
-      innerFill: vars.baseInner,
+      innerFill: vars.base,
       innerOpacity: FLAME_BASE_PAINT.coreOpacity,
       innerScale: FLAME_BASE_PAINT.coreScale,
     };
@@ -72,6 +75,7 @@ export function resolveFlamePaint(
   if (variant === 1) {
     return {
       fill: vars.tier1,
+      fillOpacity: 1,
       stroke: vars.tier1Edge,
       strokeWidth: FLAME_TIER1_PAINT.strokeWidth,
       scale: FLAME_TIER1_PAINT.scale,
@@ -88,6 +92,7 @@ export function resolveFlamePaint(
   if (variant === 2) {
     return {
       fill: vars.tier2,
+      fillOpacity: 1,
       stroke: vars.edge,
       strokeWidth: FLAME_TIER2_PAINT.strokeWidth,
       scale: FLAME_TIER2_PAINT.scale,
@@ -104,6 +109,7 @@ export function resolveFlamePaint(
   if (variant === 3) {
     return {
       fill: vars.tier3,
+      fillOpacity: 1,
       stroke: vars.edge,
       strokeWidth: FLAME_TIER3_PAINT.strokeWidth,
       scale: FLAME_TIER3_PAINT.scale,
@@ -120,6 +126,7 @@ export function resolveFlamePaint(
   if (variant === 4) {
     return {
       fill: vars.tier4,
+      fillOpacity: 1,
       stroke: vars.edge,
       strokeWidth: FLAME_TIER4_PAINT.strokeWidth,
       scale: FLAME_TIER4_PAINT.scale,
@@ -135,6 +142,7 @@ export function resolveFlamePaint(
 
   return {
     fill: vars.tier5,
+    fillOpacity: 1,
     stroke: vars.edge,
     strokeWidth: FLAME_TIER5_PAINT.strokeWidth,
     scale: FLAME_TIER5_PAINT.scale,
