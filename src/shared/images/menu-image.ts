@@ -6,6 +6,7 @@ export {
   MENU_CARD_IMAGE_SIZES,
   MENU_MAGAZINE_IMAGE_SIZES,
   eagerMenuImageCount,
+  menuCardImageSizes,
   menuImageFetchPriority,
   menuImageLoading,
 } from '@/shared/images/menu-image-loading';
