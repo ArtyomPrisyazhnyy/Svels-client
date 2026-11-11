@@ -23,6 +23,14 @@ const captures = [
     fullPage: false,
   },
   {
+    name: 'loyalty-flame-header-states-390-monochrome.png',
+    url: `${BASE}/dev/loyalty-flame?theme=monochrome&view=states`,
+    testId: 'loyalty-flame-states-showcase',
+    viewport: { width: 390, height: 900 },
+    deviceScaleFactor: 3,
+    fullPage: false,
+  },
+  {
     name: 'loyalty-flame-header-bar-390-classic.png',
     url: `${BASE}/dev/loyalty-flame?theme=classic&view=header-bar`,
     testId: 'loyalty-flame-capture-page',
@@ -118,5 +126,45 @@ await captureMatrixRowScreenshot(
   'loyalty-flame-matrix-zoom-midnight-glass.png',
 );
 
+const stateCaptures = [
+  { theme: 'classic', state: 'off', testId: 'loyalty-flame-state-off' },
+  { theme: 'classic', state: 'base', testId: 'loyalty-flame-state-base' },
+  { theme: 'classic', state: 'tier-1', testId: 'loyalty-flame-state-tier-1' },
+  { theme: 'classic', state: 'tier-2', testId: 'loyalty-flame-state-tier-2' },
+  { theme: 'classic', state: 'tier-5', testId: 'loyalty-flame-state-tier-5' },
+  { theme: 'monochrome', state: 'off', testId: 'loyalty-flame-state-off' },
+  { theme: 'monochrome', state: 'base', testId: 'loyalty-flame-state-base' },
+  { theme: 'monochrome', state: 'tier-1', testId: 'loyalty-flame-state-tier-1' },
+  { theme: 'monochrome', state: 'tier-2', testId: 'loyalty-flame-state-tier-2' },
+  { theme: 'monochrome', state: 'tier-5', testId: 'loyalty-flame-state-tier-5' },
+];
+
+const tileContext = await browser.newContext({ deviceScaleFactor: 3 });
+const tilePage = await tileContext.newPage();
+await tilePage.setViewportSize({ width: 390, height: 900 });
+
+for (const item of stateCaptures) {
+  await tilePage.goto(`${BASE}/dev/loyalty-flame?theme=${item.theme}&view=states`, {
+    waitUntil: 'networkidle',
+  });
+  const tile = tilePage.getByTestId(item.testId);
+  await tile.waitFor({ state: 'visible' });
+  const fileName = `loyalty-flame-header-${item.state}-${item.theme}-390.png`;
+  await tile.screenshot({ path: path.join(OUT_DIR, fileName) });
+  console.log('saved', fileName);
+}
+
+for (const theme of ['classic', 'monochrome']) {
+  await tilePage.goto(`${BASE}/dev/loyalty-flame?theme=${theme}&view=states`, {
+    waitUntil: 'networkidle',
+  });
+  const sheet = tilePage.getByTestId('loyalty-flame-states-showcase');
+  await sheet.waitFor({ state: 'visible' });
+  const fileName = `loyalty-flame-header-combined-sheet-${theme}-390.png`;
+  await sheet.screenshot({ path: path.join(OUT_DIR, fileName) });
+  console.log('saved', fileName);
+}
+
+await tileContext.close();
 await zoomContext.close();
 await browser.close();

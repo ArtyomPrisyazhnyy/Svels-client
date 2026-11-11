@@ -1,8 +1,13 @@
 import type { RestaurantColorTheme } from '@/shared/types/restaurant-styling';
+import {
+  FLAME_BASE_SOFT_MIX_PERCENT,
+  FLAME_DARK_BASE_SOFT_MIX_PERCENT,
+} from './flame-geometry.ts';
 
 export interface FlameThemeVars {
   base: string;
   baseSoft: string;
+  baseInner: string;
   tier1: string;
   tier1Edge: string;
   tier1Inner: string;
@@ -61,123 +66,122 @@ const darkTierInners = {
   tier5Inner: '#dbeafe',
 };
 
+function lightBase(base: string, softHex: string, baseInner: string): Pick<FlameThemeVars, 'base' | 'baseSoft' | 'baseInner'> {
+  return {
+    base,
+    baseSoft: `color-mix(in srgb, ${softHex} ${FLAME_BASE_SOFT_MIX_PERCENT}%, transparent)`,
+    baseInner,
+  };
+}
+
+function darkBase(base: string, softHex: string, baseInner: string): Pick<FlameThemeVars, 'base' | 'baseSoft' | 'baseInner'> {
+  return {
+    base,
+    baseSoft: `color-mix(in srgb, ${softHex} ${FLAME_DARK_BASE_SOFT_MIX_PERCENT}%, transparent)`,
+    baseInner,
+  };
+}
+
 /** Палитры огонька под фон страницы/шапки (`--rs-bg`). */
 export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   classic: {
-    base: '#d97706',
-    baseSoft: 'color-mix(in srgb, #f59e0b 42%, transparent)',
+    ...lightBase('#d97706', '#f59e0b', '#fde68a'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#0f172a'),
   },
   ocean: {
-    base: '#c2410c',
-    baseSoft: 'color-mix(in srgb, #ea580c 40%, transparent)',
+    ...lightBase('#c2410c', '#ea580c', '#fdba74'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#0c4a6e'),
   },
   forest: {
-    base: '#b45309',
-    baseSoft: 'color-mix(in srgb, #d97706 38%, transparent)',
+    ...lightBase('#b45309', '#d97706', '#fde68a'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#14532d'),
   },
   warm: {
-    base: '#9a3412',
-    baseSoft: 'color-mix(in srgb, #c2410c 36%, transparent)',
+    ...lightBase('#9a3412', '#c2410c', '#fdba74'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#7c2d12'),
   },
   berry: {
-    base: '#c2410c',
-    baseSoft: 'color-mix(in srgb, #ea580c 38%, transparent)',
+    ...lightBase('#c2410c', '#ea580c', '#fdba74'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#881337'),
   },
   lavender: {
-    base: '#c2410c',
-    baseSoft: 'color-mix(in srgb, #ea580c 36%, transparent)',
+    ...lightBase('#c2410c', '#ea580c', '#fdba74'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#581c87'),
   },
   sand: {
-    base: '#b45309',
-    baseSoft: 'color-mix(in srgb, #d97706 40%, transparent)',
+    ...lightBase('#b45309', '#d97706', '#fde68a'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#44403c'),
   },
   citrus: {
-    base: '#b45309',
-    baseSoft: 'color-mix(in srgb, #d97706 34%, transparent)',
+    ...lightBase('#b45309', '#d97706', '#fde68a'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#713f12'),
   },
   graphite: {
-    base: '#b45309',
-    baseSoft: 'color-mix(in srgb, #d97706 40%, transparent)',
+    ...lightBase('#b45309', '#d97706', '#fde68a'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#18181b'),
   },
   monochrome: {
-    base: '#737373',
-    baseSoft: 'color-mix(in srgb, #525252 28%, transparent)',
+    ...lightBase('#c2410c', '#ea580c', '#fdba74'),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#0a0a0a'),
   },
   monochromeDark: {
-    base: '#fbbf24',
-    baseSoft: 'color-mix(in srgb, #fbbf24 32%, transparent)',
+    ...darkBase('#fbbf24', '#fbbf24', '#fef9c3'),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#000000'),
   },
   midnight: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 38%, transparent)',
+    ...darkBase('#fb923c', '#fb923c', '#fed7aa'),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#020617'),
   },
   ember: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 36%, transparent)',
+    ...darkBase('#fb923c', '#fb923c', '#fed7aa'),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#0c0a09'),
   },
   obsidian: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 34%, transparent)',
+    ...darkBase('#fb923c', '#fb923c', '#fed7aa'),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#000000'),
   },
   moss: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 34%, transparent)',
+    ...darkBase('#fb923c', '#fb923c', '#fed7aa'),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#022c15'),
   },
   wine: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 34%, transparent)',
+    ...darkBase('#fb923c', '#fb923c', '#fed7aa'),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#0a0205'),
   },
   neon: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 32%, transparent)',
+    ...darkBase('#fb923c', '#fb923c', '#fed7aa'),
     tier1: DARK_TIERS.tier1,
     tier1Edge: DARK_TIERS.tier1Edge,
     tier2: '#fb923c',
@@ -195,6 +199,7 @@ export function flameVarsToCssProperties(
   return {
     '--flame-base': vars.base,
     '--flame-base-soft': vars.baseSoft,
+    '--flame-base-inner': vars.baseInner,
     '--flame-tier-1': vars.tier1,
     '--flame-tier-1-edge': vars.tier1Edge,
     '--flame-tier-1-inner': vars.tier1Inner,

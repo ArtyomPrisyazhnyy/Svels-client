@@ -10,6 +10,8 @@ import {
   resolveLoyaltyFlameHeaderVisual,
   resolveLoyaltyFlameStreakDays,
   resolveGuestFlameLevelOrdinal,
+  resolveLoyaltyStreakStatus,
+  loyaltyFlameButtonAriaLabel,
   visitsAfterPreposition,
 } from './loyalty-flame-info.util.ts';
 
@@ -81,11 +83,19 @@ describe('resolveLoyaltyFlameHeaderVisual', () => {
   it('returns off, base, and level tiers from balance', () => {
     assert.equal(resolveLoyaltyFlameHeaderVisual(null, baseSettings, false), 'off');
     assert.equal(
-      resolveLoyaltyFlameHeaderVisual({ visits: 0 } as LoyaltyBalance, baseSettings, true),
+      resolveLoyaltyFlameHeaderVisual(
+        { visits: 0, status: 'none', streakDays: 0 } as LoyaltyBalance,
+        baseSettings,
+        true,
+      ),
       'off',
     );
     assert.equal(
-      resolveLoyaltyFlameHeaderVisual({ visits: 2 } as LoyaltyBalance, baseSettings, true),
+      resolveLoyaltyFlameHeaderVisual(
+        { visits: 2, status: 'active', streakDays: 2 } as LoyaltyBalance,
+        baseSettings,
+        true,
+      ),
       'base',
     );
     const balance: LoyaltyBalance = {
@@ -104,6 +114,32 @@ describe('resolveLoyaltyFlameHeaderVisual', () => {
     assert.equal(resolveLoyaltyFlameHeaderVisual(balance, baseSettings, true), 1);
     assert.equal(resolveGuestFlameLevelOrdinal(balance, baseSettings), 1);
   });
+
+  it('respects expiring status as lit streak', () => {
+    assert.equal(
+      resolveLoyaltyFlameHeaderVisual(
+        { visits: 2, status: 'expiring', streakDays: 2, currentLevel: null } as LoyaltyBalance,
+        baseSettings,
+        true,
+      ),
+      'base',
+    );
+  });
+});
+
+describe('resolveLoyaltyStreakStatus', () => {
+  it('prefers explicit status when present', () => {
+    assert.equal(resolveLoyaltyStreakStatus({ status: 'expiring', visits: 1 } as LoyaltyBalance), 'expiring');
+    assert.equal(resolveLoyaltyStreakStatus({ visits: 3 } as LoyaltyBalance), 'active');
+    assert.equal(resolveLoyaltyStreakStatus({ visits: 0 } as LoyaltyBalance), 'none');
+  });
+});
+
+describe('loyaltyFlameButtonAriaLabel', () => {
+  it('mentions streak when counter is shown', () => {
+    assert.equal(loyaltyFlameButtonAriaLabel(0), 'Огонёк лояльности');
+    assert.equal(loyaltyFlameButtonAriaLabel(3), 'Огонёк лояльности, серия 3');
+  });
 });
 
 describe('resolveLoyaltyFlameStreakDays', () => {
@@ -120,10 +156,13 @@ describe('resolveLoyaltyFlameStreakDays', () => {
 
 describe('isLoyaltyFlameLit', () => {
   it('is lit only for guest with active series', () => {
-    const balance = { visits: 2 } as LoyaltyBalance;
+    const balance = { visits: 2, status: 'active', streakDays: 2 } as LoyaltyBalance;
     assert.equal(isLoyaltyFlameLit(balance, true), true);
     assert.equal(isLoyaltyFlameLit(balance, false), false);
-    assert.equal(isLoyaltyFlameLit({ visits: 0 } as LoyaltyBalance, true), false);
+    assert.equal(
+      isLoyaltyFlameLit({ visits: 0, status: 'none', streakDays: 0 } as LoyaltyBalance, true),
+      false,
+    );
   });
 });
 

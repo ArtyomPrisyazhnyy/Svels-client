@@ -116,14 +116,18 @@ const IDLE_BALANCE: LoyaltyBalance = {
   availableRewards: [],
 };
 
-const HEADER_STATE_SAMPLES: { label: string; visual: LoyaltyFlameHeaderVisual }[] = [
-  { label: 'off', visual: 'off' },
-  { label: 'base', visual: 'base' },
-  { label: 'tier 1', visual: 1 },
-  { label: 'tier 2', visual: 2 },
-  { label: 'tier 3', visual: 3 },
-  { label: 'tier 4', visual: 4 },
-  { label: 'tier 5', visual: 5 },
+const HEADER_STATE_SAMPLES: {
+  label: string;
+  visual: LoyaltyFlameHeaderVisual;
+  streakDays: number;
+}[] = [
+  { label: 'off', visual: 'off', streakDays: 0 },
+  { label: 'base', visual: 'base', streakDays: 3 },
+  { label: 'tier 1', visual: 1, streakDays: 4 },
+  { label: 'tier 2', visual: 2, streakDays: 8 },
+  { label: 'tier 3', visual: 3, streakDays: 12 },
+  { label: 'tier 4', visual: 4, streakDays: 18 },
+  { label: 'tier 5', visual: 5, streakDays: 42 },
 ];
 
 const ALL_COLOR_THEMES = RESTAURANT_COLOR_THEME_OPTIONS.map((option) => option.value);
@@ -175,7 +179,11 @@ function FlameStatesOnHeader({ testIdPrefix }: { testIdPrefix?: string }) {
       <div className="dev-loyalty-flame-capture__matrix-states">
         {HEADER_STATE_SAMPLES.map((sample) => (
           <div key={sample.label} className="dev-loyalty-flame-capture__matrix-state">
-            <LoyaltyFlameHeaderButton visual={sample.visual} onClick={() => {}} />
+            <LoyaltyFlameHeaderButton
+              visual={sample.visual}
+              streakDays={sample.streakDays}
+              onClick={() => {}}
+            />
           </div>
         ))}
       </div>
@@ -334,8 +342,16 @@ export default function DevLoyaltyFlameCapturePage() {
                 <h1 className="dev-loyalty-flame-capture__title">Огонёк — все состояния</h1>
                 <ul className="dev-loyalty-flame-capture__states-grid">
                   {HEADER_STATE_SAMPLES.map((sample) => (
-                    <li key={sample.label} className="dev-loyalty-flame-capture__states-item">
-                      <LoyaltyFlameHeaderButton visual={sample.visual} onClick={() => {}} />
+                    <li
+                      key={sample.label}
+                      className="dev-loyalty-flame-capture__states-item"
+                      data-testid={`loyalty-flame-state-${sample.label.replace(/\s+/g, '-')}`}
+                    >
+                      <LoyaltyFlameHeaderButton
+                        visual={sample.visual}
+                        streakDays={sample.streakDays}
+                        onClick={() => {}}
+                      />
                       <span>{sample.label}</span>
                     </li>
                   ))}

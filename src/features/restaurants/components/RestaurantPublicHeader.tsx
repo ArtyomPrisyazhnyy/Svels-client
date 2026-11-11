@@ -14,6 +14,7 @@ import { RestaurantFavoritesHeaderButton } from './RestaurantFavoritesHeaderButt
 import { RestaurantGuestProfileButton } from './RestaurantGuestProfileButton';
 import { useGuestLoyaltyBalance } from '../hooks/useGuestLoyaltyBalance';
 import {
+  resolveLoyaltyFlameExpiring,
   resolveLoyaltyFlameHeaderVisual,
   resolveLoyaltyFlameStreakDays,
   type LoyaltyFlameHeaderVisual,
@@ -86,6 +87,9 @@ export function RestaurantPublicHeader({
   const streakDays = useLocalLoyaltyFlameState
     ? localStreakDays
     : (loyaltyFlameStreakDaysProp ?? 0);
+  const flameExpiring = useLocalLoyaltyFlameState
+    ? resolveLoyaltyFlameExpiring(balance)
+    : false;
 
   const actionOrder = resolveVenueHeaderActionOrder({
     flame: flameDisplayEnabled,
@@ -113,6 +117,7 @@ export function RestaurantPublicHeader({
           key="flame"
           visual={flameVisual}
           streakDays={streakDays}
+          expiring={flameExpiring}
           onClick={handleFlameClick}
         />
       );

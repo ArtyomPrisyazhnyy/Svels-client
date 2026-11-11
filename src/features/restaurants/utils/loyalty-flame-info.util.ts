@@ -1,4 +1,4 @@
-import type { LoyaltyBalance } from '../../../shared/types/loyalty-balance.ts';
+import type { LoyaltyBalance, LoyaltyStreakStatus } from '../../../shared/types/loyalty-balance.ts';
 import {
   type FlameLevel,
   type LoyaltyReward,
@@ -123,12 +123,27 @@ export function resolveLoyaltyFlameTier(levelOrdinal: number): 0 | LoyaltyFlameT
   return levelOrdinal as LoyaltyFlameTier;
 }
 
+export function resolveLoyaltyStreakStatus(balance: LoyaltyBalance | null | undefined): LoyaltyStreakStatus {
+  if (balance?.status) {
+    return balance.status;
+  }
+  if (!balance || balance.visits <= 0) {
+    return 'none';
+  }
+  return 'active';
+}
+
+function balanceHasActiveStreak(balance: LoyaltyBalance | null | undefined): boolean {
+  const status = resolveLoyaltyStreakStatus(balance);
+  return status === 'active' || status === 'expiring';
+}
+
 export function resolveLoyaltyFlameHeaderVisual(
   balance: LoyaltyBalance | null,
   settings: LoyaltySettings,
   isGuestOfRestaurant: boolean,
 ): LoyaltyFlameHeaderVisual {
-  if (!isGuestOfRestaurant || (balance?.visits ?? 0) <= 0) {
+  if (!isGuestOfRestaurant || !balanceHasActiveStreak(balance)) {
     return 'off';
   }
   const tier = resolveLoyaltyFlameTier(resolveGuestFlameLevelOrdinal(balance, settings));
@@ -225,12 +240,21 @@ export function isLoyaltyFlameLit(
   balance: LoyaltyBalance | null,
   isGuestOfRestaurant: boolean,
 ): boolean {
-  return isGuestOfRestaurant && (balance?.visits ?? 0) > 0;
+  return isGuestOfRestaurant && balanceHasActiveStreak(balance);
+}
+
+/** Aria-label кнопки огонька в шапке. */
+export function loyaltyFlameButtonAriaLabel(streakDays: number): string {
+  if (streakDays < 1) {
+    return 'Огонёк лояльности';
+  }
+  return `Огонёк лояльности, серия ${streakDays}`;
 }
 
 type LoyaltyFlameStreakSource = {
   visits: number;
   streakDays?: number | null;
+  status?: LoyaltyStreakStatus;
 };
 
 /**
@@ -243,9 +267,23 @@ export function resolveLoyaltyFlameStreakDays(
   if (!balance) {
     return 0;
   }
-  const value = balance.streakDays ?? balance.visits;
+  if (balance.streakDays != null) {
+    const streak = Math.trunc(balance.streakDays);
+    if (streak >= 1) {
+      return streak;
+    }
+    return 0;
+  }
+  if ('status' in balance && resolveLoyaltyStreakStatus(balance as LoyaltyBalance) === 'none') {
+    return 0;
+  }
+  const value = balance.visits;
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 1) {
     return 0;
   }
   return Math.trunc(value);
+}
+
+export function resolveLoyaltyFlameExpiring(balance: LoyaltyBalance | null | undefined): boolean {
+  return resolveLoyaltyStreakStatus(balance) === 'expiring';
 }
