@@ -2,6 +2,7 @@ import type { RestaurantColorTheme } from '@/shared/types/restaurant-styling';
 
 export interface FlameThemeVars {
   base: string;
+  /** Для CSS-токенов; paint base не использует baseSoft. */
   baseSoft: string;
   tier1: string;
   tier1Edge: string;
@@ -61,123 +62,118 @@ const darkTierInners = {
   tier5Inner: '#dbeafe',
 };
 
-/** Палитры огонька под фон страницы/шапки (`--rs-bg`). */
+function baseBlock(
+  base: string,
+  softHex: string,
+  softAlpha: number,
+): Pick<FlameThemeVars, 'base' | 'baseSoft'> {
+  const percent = Math.round(softAlpha * 100);
+  return {
+    base,
+    baseSoft: `color-mix(in srgb, ${softHex} ${percent}%, transparent)`,
+  };
+}
+
+/** Палитры огонька под фон страницы/шапки (`--rs-bg`). Alphas — как в Svels-mobile. */
 export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
   classic: {
-    base: '#d97706',
-    baseSoft: 'color-mix(in srgb, #f59e0b 42%, transparent)',
+    ...baseBlock('#d97706', '#f59e0b', 0.42),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#0f172a'),
   },
   ocean: {
-    base: '#c2410c',
-    baseSoft: 'color-mix(in srgb, #ea580c 40%, transparent)',
+    ...baseBlock('#c2410c', '#ea580c', 0.4),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#0c4a6e'),
   },
   forest: {
-    base: '#b45309',
-    baseSoft: 'color-mix(in srgb, #d97706 38%, transparent)',
+    ...baseBlock('#b45309', '#d97706', 0.38),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#14532d'),
   },
   warm: {
-    base: '#9a3412',
-    baseSoft: 'color-mix(in srgb, #c2410c 36%, transparent)',
+    ...baseBlock('#9a3412', '#c2410c', 0.36),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#7c2d12'),
   },
   berry: {
-    base: '#c2410c',
-    baseSoft: 'color-mix(in srgb, #ea580c 38%, transparent)',
+    ...baseBlock('#c2410c', '#ea580c', 0.38),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#881337'),
   },
   lavender: {
-    base: '#c2410c',
-    baseSoft: 'color-mix(in srgb, #ea580c 36%, transparent)',
+    ...baseBlock('#c2410c', '#ea580c', 0.36),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#581c87'),
   },
   sand: {
-    base: '#b45309',
-    baseSoft: 'color-mix(in srgb, #d97706 40%, transparent)',
+    ...baseBlock('#b45309', '#d97706', 0.4),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#44403c'),
   },
   citrus: {
-    base: '#b45309',
-    baseSoft: 'color-mix(in srgb, #d97706 34%, transparent)',
+    ...baseBlock('#b45309', '#d97706', 0.34),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#713f12'),
   },
   graphite: {
-    base: '#b45309',
-    baseSoft: 'color-mix(in srgb, #d97706 40%, transparent)',
+    ...baseBlock('#b45309', '#d97706', 0.4),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#18181b'),
   },
   monochrome: {
-    base: '#737373',
-    baseSoft: 'color-mix(in srgb, #525252 28%, transparent)',
+    ...baseBlock('#c2410c', '#ea580c', 0.58),
     ...LIGHT_TIERS,
     ...lightTierInners,
     edge: lightEdge('#0a0a0a'),
   },
   monochromeDark: {
-    base: '#fbbf24',
-    baseSoft: 'color-mix(in srgb, #fbbf24 32%, transparent)',
+    ...baseBlock('#fbbf24', '#fbbf24', 0.32),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#000000'),
   },
   midnight: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 38%, transparent)',
+    ...baseBlock('#fb923c', '#fb923c', 0.38),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#020617'),
   },
   ember: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 36%, transparent)',
+    ...baseBlock('#fb923c', '#fb923c', 0.36),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#0c0a09'),
   },
   obsidian: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 34%, transparent)',
+    ...baseBlock('#fb923c', '#fb923c', 0.34),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#000000'),
   },
   moss: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 34%, transparent)',
+    ...baseBlock('#fb923c', '#fb923c', 0.34),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#022c15'),
   },
   wine: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 34%, transparent)',
+    ...baseBlock('#fb923c', '#fb923c', 0.34),
     ...DARK_TIERS,
     ...darkTierInners,
     edge: darkEdge('#0a0205'),
   },
   neon: {
-    base: '#fb923c',
-    baseSoft: 'color-mix(in srgb, #fb923c 32%, transparent)',
+    ...baseBlock('#fb923c', '#fb923c', 0.32),
     tier1: DARK_TIERS.tier1,
     tier1Edge: DARK_TIERS.tier1Edge,
     tier2: '#fb923c',

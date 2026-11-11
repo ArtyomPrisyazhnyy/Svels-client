@@ -88,6 +88,22 @@ function contrastRatio(foreground: string, background: string): number {
 
 const ALL_THEMES = Object.keys(FLAME_THEME_VARS) as RestaurantColorTheme[];
 
+describe('FLAME_THEME_VARS monochrome warmth', () => {
+  it('keeps monochrome base visibly warm vs muted off', () => {
+    const vars = FLAME_THEME_VARS.monochrome;
+    assert.equal(vars.base, '#c2410c');
+    assert.ok(vars.baseSoft.includes('#ea580c'));
+    assert.ok(vars.baseSoft.includes('58%'));
+    const muted = COLOR_THEMES_MUTED.monochrome;
+    const baseRgb = parseHex(vars.base);
+    const mutedRgb = parseHex(muted);
+    assert.ok(baseRgb);
+    assert.ok(mutedRgb);
+    assert.ok(baseRgb[0] > mutedRgb[0] + 80, 'base should be warmer than muted grey');
+    assert.ok(baseRgb[1] > mutedRgb[1], 'base should be more orange than muted');
+  });
+});
+
 describe('FLAME_THEME_VARS contrast on header background', () => {
   for (const theme of ALL_THEMES) {
     it(`keeps readable tiers on ${theme} (--rs-bg)`, () => {

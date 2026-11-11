@@ -1,6 +1,9 @@
 'use client';
 
-import type { LoyaltyFlameHeaderVisual } from '../utils/loyalty-flame-info.util';
+import {
+  loyaltyFlameButtonAriaLabel,
+  type LoyaltyFlameHeaderVisual,
+} from '../utils/loyalty-flame-info.util';
 import { LoyaltyFlameIcon } from './LoyaltyFlameIcon';
 import '../styles/loyalty-flame-button.scss';
 
@@ -37,7 +40,7 @@ export function LoyaltyFlameHeaderButton({
   onClick,
 }: LoyaltyFlameHeaderButtonProps) {
   const showStreak = streakDays >= 1;
-  const label = showStreak ? `Огонёк лояльности, серия ${streakDays}` : 'Огонёк лояльности';
+  const label = loyaltyFlameButtonAriaLabel(streakDays);
 
   return (
     <button

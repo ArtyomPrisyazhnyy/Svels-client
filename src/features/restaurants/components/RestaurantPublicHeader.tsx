@@ -86,7 +86,6 @@ export function RestaurantPublicHeader({
   const streakDays = useLocalLoyaltyFlameState
     ? localStreakDays
     : (loyaltyFlameStreakDaysProp ?? 0);
-
   const actionOrder = resolveVenueHeaderActionOrder({
     flame: flameDisplayEnabled,
     favorites: favoritesEnabled,

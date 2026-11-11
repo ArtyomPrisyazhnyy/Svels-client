@@ -63,7 +63,6 @@ export function VenueOverlayProvider({
     : 'off';
   const loyaltyFlameStreakDays =
     flameEnabled && isGuestOfRestaurant ? resolveLoyaltyFlameStreakDays(balance) : 0;
-
   const openCart = useCallback(() => setCartOpen(true), []);
   const openAuth = useCallback(() => setAuthOpen(true), []);
   const openFlameInfo = useCallback(() => {

@@ -36,8 +36,19 @@ export function LoyaltyFlameIcon({
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden
+      style={{ opacity: paint.iconOpacity }}
     >
       <g transform={loyaltyFlameTransformAroundCenter(paint.scale)}>
+        {paint.glowFill ? (
+          <g transform={loyaltyFlameTransformAroundCenter(paint.glowScale)}>
+            <path
+              d={LUCIDE_FLAME_PATH}
+              fill={paint.glowFill}
+              fillOpacity={paint.glowOpacity}
+              stroke="none"
+            />
+          </g>
+        ) : null}
         <path
           d={LUCIDE_FLAME_PATH}
           fill="none"
@@ -45,14 +56,23 @@ export function LoyaltyFlameIcon({
           strokeWidth={paint.strokeWidth}
           strokeLinecap="round"
           strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
         />
         {showFill ? (
-          <path d={LUCIDE_FLAME_PATH} fill={paint.fill} stroke="none" />
+          <path
+            d={LUCIDE_FLAME_PATH}
+            fill={paint.fill}
+            fillOpacity={paint.fillOpacity}
+            stroke="none"
+          />
         ) : null}
         {paint.innerFill ? (
           <g transform={loyaltyFlameTransformAroundCenter(paint.innerScale)}>
-            <path d={LUCIDE_FLAME_PATH} fill={paint.innerFill} stroke="none" />
+            <path
+              d={LUCIDE_FLAME_PATH}
+              fill={paint.innerFill}
+              fillOpacity={paint.innerOpacity}
+              stroke="none"
+            />
           </g>
         ) : null}
       </g>
