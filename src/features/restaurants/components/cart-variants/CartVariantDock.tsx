@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
-import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import { ProductPhoto } from '@/shared/components/ProductPhoto';
+import { CART_DOCK_IMAGE_SIZES } from '@/shared/images/menu-image-loading';
 import { Button, SegmentedControl, Sheet, Stack } from '@/shared/ui';
 import { IconChevron } from '@/shared/ui/icons/icons';
 import { RestaurantStylingPortalRoot } from '../../context/RestaurantStylingContext';
@@ -95,7 +96,13 @@ export function CartVariantDock({
                 <li key={line.id} className="cart-dock__item">
                   {line.imageUrl ? (
                     <div className="cart-dock__media">
-                      <ResponsiveImage src={line.imageUrl} webpSrc={line.imageWebpUrl} alt="" />
+                      <ProductPhoto
+                        src={line.imageUrl}
+                        webpSrc={line.imageWebpUrl}
+                        imageVariants={line.imageVariants}
+                        alt=""
+                        sizes={CART_DOCK_IMAGE_SIZES}
+                      />
                     </div>
                   ) : (
                     <span className="cart-dock__fallback" aria-hidden>

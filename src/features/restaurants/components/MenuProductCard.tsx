@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
-import { FillImage } from '@/shared/components/FillImage';
+import { ProductPhoto } from '@/shared/components/ProductPhoto';
 import { MenuItemPriceDisplay } from '@/shared/components/MenuItemPriceDisplay';
 import {
   MENU_CARD_IMAGE_SIZES,
@@ -109,13 +109,16 @@ export function MenuProductCard({
     >
       <div className="menu-product-card__media" ref={mediaRef}>
         {renderImage ? (
-          <FillImage
+          <ProductPhoto
             src={item.imageUrl}
             webpSrc={item.imageWebpUrl}
+            imageVariants={item.imageVariants}
             alt={item.name}
             sizes={isMagazine ? MENU_MAGAZINE_IMAGE_SIZES : MENU_CARD_IMAGE_SIZES}
             loading={imageLoading}
             fetchPriority={imageFetchPriority}
+            fill
+            optimize
           />
         ) : null}
         {!isMagazine ? favoriteButton : null}

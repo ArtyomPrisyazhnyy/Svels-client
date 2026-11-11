@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { shouldUseNextImageOptimizer } from '@/shared/images/image-remote';
 import { toOptimizerImageSrc } from '@/shared/images/menu-image';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
 
@@ -26,7 +27,8 @@ export function FillImage({
   fetchPriority = 'low',
   className,
 }: FillImageProps) {
-  const optimized = toOptimizerImageSrc(webpSrc || src);
+  const candidate = toOptimizerImageSrc(webpSrc || src);
+  const optimized = candidate && shouldUseNextImageOptimizer(candidate) ? candidate : null;
   const priority = fetchPriority === 'high';
 
   if (optimized) {

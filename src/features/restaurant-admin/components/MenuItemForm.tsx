@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useState, type FormEvent, type KeyboardEvent } from 'react';
 import { ApiError } from '../../../shared/api/api-client';
 import type {
   MenuCategory,
@@ -7,8 +7,11 @@ import type {
   MenuItemNutrition,
 } from '../../../shared/types/menu';
 import { MAX_MENU_ITEM_GALLERY_IMAGES } from '../../../shared/types/menu';
+import type { ImageVariants } from '@/shared/types/image-variants';
 import { CurrencySign } from '../../../shared/components/CurrencySign';
+import { ProductPhoto } from '@/shared/components/ProductPhoto';
 import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import { MENU_FORM_COVER_IMAGE_SIZES } from '@/shared/images/menu-image-loading';
 import {
   createMenuItem,
   updateMenuItem,
@@ -95,6 +98,9 @@ export function MenuItemForm({
   const [modifierGroups, setModifierGroups] = useState<MenuModifierGroup[]>([]);
   const [imageUrl, setImageUrl] = useState('');
   const [imageWebpUrl, setImageWebpUrl] = useState<string | null>(null);
+  const [imageVariants, setImageVariants] = useState<ImageVariants | null>(null);
+  // Поле шлём только если его вернул API. На бэкенде без пресетов лишний ключ даёт 400.
+  const [sendImageVariants, setSendImageVariants] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [galleryWebpUrls, setGalleryWebpUrls] = useState<string[]>([]);
@@ -116,43 +122,47 @@ export function MenuItemForm({
     setModifierGroups([]);
     setImageUrl('');
     setImageWebpUrl(null);
+    setImageVariants(null);
+    setSendImageVariants(false);
     setImagePreview('');
     setGalleryUrls([]);
     setGalleryWebpUrls([]);
     setError(null);
   }
 
-  useEffect(() => {
-    if (!editingItem) {
-      return;
+  // Подставляем позицию при смене editingItem до отрисовки, без эффекта.
+  const [syncedItem, setSyncedItem] = useState<MenuItem | null | undefined>(undefined);
+  const editSource = editingItem ?? null;
+  if (editSource !== syncedItem) {
+    setSyncedItem(editSource);
+    if (editSource) {
+      setCategoryId(editSource.categoryId);
+      setName(editSource.name);
+      setVariantLabel(editSource.variantLabel ?? '');
+      setDescription(editSource.description ?? '');
+      setIngredients(editSource.ingredients ?? '');
+      setPrice(String(editSource.price));
+      setOldPrice(
+        editSource.oldPrice != null && Number(editSource.oldPrice) > 0
+          ? String(editSource.oldPrice)
+          : '',
+      );
+      setNutrition(editSource.nutrition ?? emptyNutrition());
+      setModifierGroups(editSource.modifierGroups ?? []);
+      setImageUrl(editSource.imageUrl);
+      setImageWebpUrl(editSource.imageWebpUrl ?? null);
+      setImageVariants(editSource.imageVariants ?? null);
+      setSendImageVariants(editSource.imageVariants !== undefined);
+      setImagePreview('');
+      setGalleryUrls(editSource.galleryUrls ?? []);
+      setGalleryWebpUrls(editSource.galleryWebpUrls ?? []);
+      setError(null);
     }
+  }
 
-    setCategoryId(editingItem.categoryId);
-    setName(editingItem.name);
-    setVariantLabel(editingItem.variantLabel ?? '');
-    setDescription(editingItem.description ?? '');
-    setIngredients(editingItem.ingredients ?? '');
-    setPrice(String(editingItem.price));
-    setOldPrice(
-      editingItem.oldPrice != null && Number(editingItem.oldPrice) > 0
-        ? String(editingItem.oldPrice)
-        : '',
-    );
-    setNutrition(editingItem.nutrition ?? emptyNutrition());
-    setModifierGroups(editingItem.modifierGroups ?? []);
-    setImageUrl(editingItem.imageUrl);
-    setImageWebpUrl(editingItem.imageWebpUrl ?? null);
-    setImagePreview('');
-    setGalleryUrls(editingItem.galleryUrls ?? []);
-    setGalleryWebpUrls(editingItem.galleryWebpUrls ?? []);
-    setError(null);
-  }, [editingItem]);
-
-  useEffect(() => {
-    if (!isEditing && !categoryId && categories[0]?.id) {
-      setCategoryId(categories[0].id);
-    }
-  }, [categories, categoryId, isEditing]);
+  if (!isEditing && !categoryId && categories[0]?.id) {
+    setCategoryId(categories[0].id);
+  }
 
   async function handleImageChange(file: File | undefined) {
     if (!file) return;
@@ -165,10 +175,19 @@ export function MenuItemForm({
       const result = await uploadMenuImage(restaurantId, token, file);
       setImageUrl(result.imageUrl);
       setImageWebpUrl(result.imageWebpUrl);
+      if ('imageVariants' in result) {
+        setImageVariants(result.imageVariants ?? null);
+        setSendImageVariants(true);
+      } else {
+        setImageVariants(null);
+        setSendImageVariants(false);
+      }
     } catch (err) {
       setImagePreview('');
       setImageUrl('');
       setImageWebpUrl(null);
+      setImageVariants(null);
+      setSendImageVariants(false);
       setError(err instanceof Error ? err.message : 'Не удалось загрузить фото');
     } finally {
       setUploading(false);
@@ -228,6 +247,8 @@ export function MenuItemForm({
     });
     setImageUrl(newCover);
     setImageWebpUrl(newCoverWebp);
+    setImageVariants(null);
+    setSendImageVariants(false);
     setImagePreview('');
   }
 
@@ -303,6 +324,7 @@ export function MenuItemForm({
       oldPrice: parsedOldPrice,
       imageUrl,
       imageWebpUrl,
+      ...(sendImageVariants ? { imageVariants } : {}),
       galleryUrls,
       galleryWebpUrls,
       modifierGroups: modifierGroups.length ? modifierGroups : undefined,
@@ -361,11 +383,13 @@ export function MenuItemForm({
           />
         ) : (
           imageUrl && (
-            <ResponsiveImage
+            <ProductPhoto
               className="menu-item-form__preview menu-item-form__preview--cover"
               src={imageUrl}
               webpSrc={imageWebpUrl}
+              imageVariants={imageVariants}
               alt="Превью обложки"
+              sizes={MENU_FORM_COVER_IMAGE_SIZES}
             />
           )
         )}

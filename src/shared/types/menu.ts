@@ -1,3 +1,5 @@
+import type { ImageVariants } from '@/shared/types/image-variants';
+
 export type ModifierSelectionType = 'single' | 'multiple';
 
 export interface MenuModifierOption {
@@ -35,6 +37,8 @@ export interface MenuItem {
   isAvailable: boolean;
   imageUrl: string;
   imageWebpUrl?: string | null;
+  /** null — варианты ещё не считались. Объект — sm/md/lg уже лежат на storage. */
+  imageVariants?: ImageVariants | null;
   galleryUrls: string[];
   galleryWebpUrls?: string[];
   modifierGroups: MenuModifierGroup[];
@@ -62,6 +66,7 @@ export interface CreateMenuItemPayload {
   oldPrice?: number | null;
   imageUrl: string;
   imageWebpUrl?: string | null;
+  imageVariants?: ImageVariants | null;
   galleryUrls?: string[];
   galleryWebpUrls?: string[];
   modifierGroups?: MenuModifierGroup[];
@@ -78,6 +83,7 @@ export interface UpdateMenuItemPayload {
   oldPrice?: number | null;
   imageUrl?: string;
   imageWebpUrl?: string | null;
+  imageVariants?: ImageVariants | null;
   galleryUrls?: string[];
   galleryWebpUrls?: string[];
   modifierGroups?: MenuModifierGroup[];

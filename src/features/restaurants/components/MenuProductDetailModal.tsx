@@ -4,9 +4,11 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { NutritionBadges } from '@/features/restaurant-admin/components/NutritionBadges';
 import { MenuItemPriceDisplay } from '@/shared/components/MenuItemPriceDisplay';
 import { Carousel } from '@/shared/components/Carousel';
-import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import { ProductPhoto } from '@/shared/components/ProductPhoto';
+import { MENU_MODAL_IMAGE_SIZES } from '@/shared/images/menu-image-loading';
 import { Button } from '@/shared/ui/Button/Button';
 import { Modal } from '@/shared/ui/Modal/Modal';
+import type { ImageVariants } from '@/shared/types/image-variants';
 import { getMenuItemImages, type MenuItem } from '@/shared/types/menu';
 import { MenuProductModifiers } from './MenuProductModifiers';
 import {
@@ -29,19 +31,26 @@ import '../styles/menu-product-modal.scss';
 function MenuModalPhoto({
   src,
   webpSrc,
+  imageVariants,
 }: {
   src: string;
   webpSrc?: string | null;
+  imageVariants?: ImageVariants | null;
 }): ReactNode {
   const [failed, setFailed] = useState(false);
   if (!src || failed) {
     return <div className="menu-product-modal__placeholder" aria-hidden="true" />;
   }
   return (
-    <ResponsiveImage
+    <ProductPhoto
       src={src}
       webpSrc={webpSrc}
+      imageVariants={imageVariants}
       alt=""
+      sizes={MENU_MODAL_IMAGE_SIZES}
+      loading="eager"
+      fetchPriority="high"
+      fill
       onError={() => setFailed(true)}
     />
   );
@@ -198,6 +207,7 @@ export function MenuProductDetailModal({
                     key={`${image.url}-${index}`}
                     src={image.url}
                     webpSrc={image.webpUrl}
+                    imageVariants={image.url === item.imageUrl ? item.imageVariants : null}
                   />
                 ))}
                 options={{ loop: true }}
@@ -205,7 +215,11 @@ export function MenuProductDetailModal({
                 showDots
               />
             ) : (
-              <MenuModalPhoto src={images[0].url} webpSrc={images[0].webpUrl} />
+              <MenuModalPhoto
+                src={images[0].url}
+                webpSrc={images[0].webpUrl}
+                imageVariants={images[0].url === item.imageUrl ? item.imageVariants : null}
+              />
             )}
             {favoritesEnabled ? (
               <FavoriteHeartButton
