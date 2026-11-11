@@ -21,18 +21,24 @@
 
 .menu-product-modal__media {
   flex-shrink: 0;
+  align-self: stretch;
+  width: 100%;
   height: 260px;
   background: #f1f5f9;
   overflow: hidden;
-  border-radius: 20px 20px 0 0;
+  /* Прямые углы вплотную к краям панели и к разделителю шапки.
+     Внешний радиус остаётся на .ui-overlay-panel. */
+  border-radius: 0;
   position: relative;
 
+  picture,
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
     color: transparent;
+    border-radius: 0;
   }
 }
 

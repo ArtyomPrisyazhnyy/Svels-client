@@ -9,6 +9,8 @@ import { GuestFavoritesPageSkeleton } from '@/features/restaurants/components/gu
 import { getAvailableMenuCategories } from '@/features/restaurants/utils/menu-catalog.util';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { useRestaurantStylingOptional } from '@/features/restaurants/context/RestaurantStylingContext';
+import { preferredVariantUrl } from '@/shared/images/image-variants';
+import { menuCardSlotCssPx } from '@/shared/images/menu-image-loading';
 import { resolveImageUrl, type MenuItem, type MenuResponse } from '@/shared/types/menu';
 import { useAuthStore } from '@/store/auth.store';
 import { useFavoritesStore } from '@/store/favorites.store';
@@ -86,13 +88,23 @@ export function RestaurantGuestFavoritesPage({
     if (!persistReady || !listReady) {
       return null;
     }
+    const slotCssPx = menuCardSlotCssPx(
+      typeof window === 'undefined' ? 390 : window.innerWidth,
+      styling.cardStyle,
+    );
+    const pixelRatio = typeof window === 'undefined' ? 2 : window.devicePixelRatio || 1;
     return favoriteItems.flatMap((item) => {
+      const variant = preferredVariantUrl(item.imageVariants, slotCssPx, pixelRatio);
       const fallback = item.imageUrl ? resolveImageUrl(item.imageUrl) : null;
       const webp = item.imageWebpUrl ? resolveImageUrl(item.imageWebpUrl) : null;
-      const painted = webp && webp !== fallback ? webp : fallback;
+      const painted = variant
+        ? resolveImageUrl(variant)
+        : webp && webp !== fallback
+          ? webp
+          : fallback;
       return painted ? [painted] : [];
     });
-  }, [favoriteItems, listReady, persistReady]);
+  }, [favoriteItems, listReady, persistReady, styling.cardStyle]);
   const imagesReady = useImagesDecoded(imageUrls);
 
   useEffect(() => {
@@ -122,7 +134,12 @@ export function RestaurantGuestFavoritesPage({
           });
       };
       image.onerror = () => {
-        if (cancelled || attempt >= 4) {
+        if (cancelled) {
+          return;
+        }
+        if (attempt >= 4) {
+          // Не держим скелет, если storage не ответил: карточка догрузит фото сама.
+          markImageDecoded(url);
           return;
         }
         timers.push(window.setTimeout(() => load(url, attempt + 1), 200 * (attempt + 1)));

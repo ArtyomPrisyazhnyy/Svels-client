@@ -7,6 +7,14 @@ import type {
 } from '../../../shared/types/menu';
 
 import { resolveApiUrl } from '@/shared/config/env';
+import type { ImageVariants } from '@/shared/types/image-variants';
+
+export interface UploadedMenuImage {
+  imageUrl: string;
+  imageWebpUrl: string;
+  /** Есть только у бэкенда с пресетами sm/md/lg. Старый API поле не присылает. */
+  imageVariants?: ImageVariants | null;
+}
 
 export function fetchMenu(restaurantId: string): Promise<MenuResponse> {
   return apiRequest<MenuResponse>(`/restaurants/${restaurantId}/menu`);
@@ -79,7 +87,7 @@ export async function uploadMenuImage(
   restaurantId: string,
   token: string,
   file: File,
-): Promise<{ imageUrl: string; imageWebpUrl: string }> {
+): Promise<UploadedMenuImage> {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -93,7 +101,7 @@ export async function uploadMenuImage(
     await assertApiResponseOk(response, { authenticatedRequest: true });
   }
 
-  return response.json() as Promise<{ imageUrl: string; imageWebpUrl: string }>;
+  return response.json() as Promise<UploadedMenuImage>;
 }
 
 export function updateMenuItem(

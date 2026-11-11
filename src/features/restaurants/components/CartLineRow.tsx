@@ -1,6 +1,7 @@
 'use client';
 
-import { ResponsiveImage } from '@/shared/components/ResponsiveImage';
+import { ProductPhoto } from '@/shared/components/ProductPhoto';
+import { CART_LINE_IMAGE_SIZES } from '@/shared/images/menu-image-loading';
 import type { CartLineItem } from '@/shared/types/cart';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import '../styles/restaurant-cart-modal.scss';
@@ -62,7 +63,13 @@ export function CartLineRow({ line, onDecrement, onIncrement }: CartLineRowProps
     <li className="restaurant-cart-modal__item" data-testid="cart-line">
       <div className="restaurant-cart-modal__item-media">
         {line.imageUrl ? (
-          <ResponsiveImage src={line.imageUrl} webpSrc={line.imageWebpUrl} alt="" />
+          <ProductPhoto
+            src={line.imageUrl}
+            webpSrc={line.imageWebpUrl}
+            imageVariants={line.imageVariants}
+            alt=""
+            sizes={CART_LINE_IMAGE_SIZES}
+          />
         ) : null}
       </div>
 

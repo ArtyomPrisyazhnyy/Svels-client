@@ -73,6 +73,47 @@ function pathMatches(pattern: string, pathname: string): boolean {
   return pattern === pathname;
 }
 
+/**
+ * Оптимизатор Next заново скачивает файл на сервере (обрыв через 7 с) и в
+ * `next dev` отдаёт `Cache-Control: max-age=0`. Для медленного S3 это пустая
+ * картинка. Через `/_next/image` идут только локальные `/uploads` и Yandex.
+ * Хосты из `NEXT_PUBLIC_IMAGE_HOSTS` (hoster.by и т.п.) рисуются напрямую.
+ */
+export function shouldUseNextImageOptimizer(absoluteUrl: string): boolean {
+  if (!isOptimizableImageUrl(absoluteUrl)) {
+    return false;
+  }
+
+  let url: URL;
+  try {
+    url = new URL(absoluteUrl);
+  } catch {
+    return false;
+  }
+
+  const host = url.hostname;
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return true;
+  }
+  if (host === 'storage.yandexcloud.net' || host.endsWith('.storage.yandexcloud.net')) {
+    return true;
+  }
+
+  const api = process.env.NEXT_PUBLIC_API_URL;
+  if (api) {
+    try {
+      const apiUrl = api.includes('://') ? new URL(api) : new URL(`https://${api}`);
+      if (host === apiUrl.hostname && url.pathname.startsWith('/uploads/')) {
+        return true;
+      }
+    } catch {
+      // ignore invalid API origin
+    }
+  }
+
+  return false;
+}
+
 export function isOptimizableImageUrl(absoluteUrl: string): boolean {
   let url: URL;
   try {
