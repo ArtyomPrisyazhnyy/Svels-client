@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { ProductPhoto } from '@/shared/components/ProductPhoto';
 import { MenuItemPriceDisplay } from '@/shared/components/MenuItemPriceDisplay';
-import {
-  MENU_CARD_IMAGE_SIZES,
-  MENU_MAGAZINE_IMAGE_SIZES,
-} from '@/shared/images/menu-image-loading';
+import { menuCardImageSizes } from '@/shared/images/menu-image-loading';
 import type { MenuItem } from '@/shared/types/menu';
 import { useFavoritesStore } from '@/store/favorites.store';
 import { useRestaurantStylingOptional } from '../context/RestaurantStylingContext';
@@ -21,6 +18,8 @@ interface MenuProductCardProps {
   onPreload?: () => void;
   imageLoading?: 'eager' | 'lazy';
   imageFetchPriority?: 'high' | 'low' | 'auto';
+  /** Overrides the public-grid slot. The styling preview is a different column. */
+  imageSizes?: string;
 }
 
 export function MenuProductCard({
@@ -30,6 +29,7 @@ export function MenuProductCard({
   onPreload,
   imageLoading = 'lazy',
   imageFetchPriority = 'low',
+  imageSizes,
 }: MenuProductCardProps) {
   const showFromPrice = hasPriceAffectingModifiers(item.modifierGroups);
   const { styling } = useRestaurantStylingOptional();
@@ -114,7 +114,7 @@ export function MenuProductCard({
             webpSrc={item.imageWebpUrl}
             imageVariants={item.imageVariants}
             alt={item.name}
-            sizes={isMagazine ? MENU_MAGAZINE_IMAGE_SIZES : MENU_CARD_IMAGE_SIZES}
+            sizes={imageSizes ?? menuCardImageSizes(styling.cardStyle)}
             loading={imageLoading}
             fetchPriority={imageFetchPriority}
             fill

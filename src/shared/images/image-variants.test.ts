@@ -55,6 +55,19 @@ describe('image variants', () => {
     assert.equal(preferredVariantUrl(presets, 173, 2)?.endsWith('flat-white-sm.webp'), true);
   });
 
+  it('uses the width from the payload when a preset is missing', () => {
+    const smOnly = variants({ sm: 360 });
+    const srcSet = imageVariantSrcSet(smOnly, 'webp');
+    assert.equal(srcSet.endsWith('360w'), true);
+    assert.equal(srcSet.includes('400w'), false);
+    assert.equal(selectImageVariant(smOnly, 520, 2)?.width, 360);
+    const partial = variants({ sm: 400, md: 800 });
+    assert.equal(imageVariantSrcSet(partial, 'jpg').includes('1200w'), false);
+    assert.equal(selectImageVariant(partial, 390, 3)?.slot, 'md');
+    assert.equal(imageVariantFallbackSrc(null, cover), cover);
+    assert.equal(imageVariantSrcSet(null, 'webp'), '');
+  });
+
   it('grows the candidate when the slot grows from a phone to a desktop modal', () => {
     const presets = variants({ sm: 400, md: 800, lg: 1200 });
     assert.equal(selectImageVariant(presets, 390, 2)?.slot, 'md');

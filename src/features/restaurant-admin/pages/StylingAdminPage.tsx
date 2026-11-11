@@ -5,6 +5,7 @@ import { RestaurantStylingShell } from '@/features/restaurants/context/Restauran
 import { FulfillmentSelector } from '@/features/restaurants/components/FulfillmentSelector';
 import { MenuCategoryNav } from '@/features/restaurants/components/MenuCategoryNav';
 import { MenuProductCard } from '@/features/restaurants/components/MenuProductCard';
+import { stylingPreviewImageSizes } from '@/shared/images/menu-image-loading';
 import { revalidateRestaurantPublicPage } from '@/features/restaurants/actions/revalidate-restaurant-public-page.action';
 import { ApiError } from '@/shared/api/api-client';
 import type { FulfillmentKey, RestaurantOrderSettings } from '@/shared/types/order-settings';
@@ -602,7 +603,11 @@ export default function StylingAdminPage() {
                 )}
 
                 <div className="restaurant-menu__grid styling-admin__preview-grid">
-                  <MenuProductCard item={PREVIEW_MENU_ITEM} onSelect={() => {}} />
+                  <MenuProductCard
+                    item={PREVIEW_MENU_ITEM}
+                    onSelect={() => {}}
+                    imageSizes={stylingPreviewImageSizes(previewStyling.cardStyle)}
+                  />
                 </div>
 
                 <div className="styling-admin__preview-switcher">
