@@ -1,6 +1,7 @@
 'use client';
 
-import Link from 'next/link';
+import { VenueHeaderAction } from '@/shared/ui/VenueHeader/VenueHeaderAction';
+import { cn } from '@/shared/ui/utils/cn';
 import { useFavoritesStore } from '@/store/favorites.store';
 import '../styles/restaurant-favorites-header-button.scss';
 
@@ -29,15 +30,16 @@ export function RestaurantFavoritesHeaderButton({ href }: RestaurantFavoritesHea
   const hasFavorites = useFavoritesStore((s) => s.menuItemIds.length > 0);
 
   return (
-    <Link
+    <VenueHeaderAction
       href={href}
-      className={`restaurant-favorites-header-button${
-        hasFavorites ? ' restaurant-favorites-header-button--active' : ''
-      }`}
-      aria-label="Избранное"
-      data-testid="favorites-header-button"
+      className={cn(
+        'restaurant-favorites-header-button',
+        hasFavorites && 'restaurant-favorites-header-button--active',
+      )}
+      label="Избранное"
+      testId="favorites-header-button"
     >
       <HeartIcon />
-    </Link>
+    </VenueHeaderAction>
   );
 }

@@ -383,6 +383,7 @@
   .restaurant-cart-button__badge {
     background: var(--rs-accent);
     color: var(--rs-on-accent, #ffffff);
+    box-shadow: 0 0 0 2px var(--rs-bg);
   }
 
   .restaurant-cart-button__icon,
@@ -391,7 +392,7 @@
     color: var(--rs-primary);
   }
 
-  .restaurant-favorites-header-button {
+  .venue-header-action {
     color: var(--rs-text-muted);
 
     @media (hover: hover) {
@@ -399,6 +400,10 @@
         background: color-mix(in srgb, var(--rs-text) 8%, transparent);
         color: var(--rs-text);
       }
+    }
+
+    &:active {
+      background: color-mix(in srgb, var(--rs-text) 12%, transparent);
     }
   }
 
@@ -431,30 +436,8 @@
     }
   }
 
-  .restaurant-profile-button {
-    color: var(--rs-text-muted);
-
-    @media (hover: hover) {
-      &:hover {
-        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
-        color: var(--rs-text);
-      }
-    }
-  }
-
   .restaurant-profile-button__icon {
     color: var(--rs-primary);
-  }
-
-  .loyalty-flame-button {
-    color: var(--rs-text-muted);
-
-    @media (hover: hover) {
-      &:hover {
-        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
-        color: var(--rs-text);
-      }
-    }
   }
 
   .loyalty-flame-info-modal__level--current {
@@ -509,23 +492,6 @@
           }
         }
       }
-    }
-  }
-
-  .restaurant-cart-button {
-    color: var(--rs-text-muted);
-
-    @media (hover: hover) {
-      &:hover {
-        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
-        color: var(--rs-text);
-      }
-    }
-
-    &__badge {
-      background: var(--rs-accent);
-      color: var(--rs-on-accent, #ffffff);
-      box-shadow: 0 0 0 2px var(--rs-bg);
     }
   }
 

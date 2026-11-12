@@ -1,0 +1,48 @@
+.venue-header-action {
+  position: relative;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  box-sizing: border-box;
+  width: var(--control-h-md);
+  height: var(--control-h-md);
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: var(--rs-btn-radius, var(--radius-md));
+  background: transparent;
+  color: var(--rs-text-muted, #475569);
+  cursor: pointer;
+  flex-shrink: 0;
+  font: inherit;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--rs-focus-ring, color-mix(in srgb, var(--rs-accent, #3b82f6) 15%, transparent));
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: color-mix(in srgb, var(--rs-text, #0f172a) 8%, transparent);
+      color: var(--rs-text, #0f172a);
+    }
+  }
+
+  &:active {
+    background: color-mix(in srgb, var(--rs-text, #0f172a) 12%, transparent);
+  }
+
+  &--wide {
+    width: auto;
+    min-width: var(--control-h-md);
+    padding-inline: var(--space-2);
+    gap: 3px;
+  }
+}

@@ -1,5 +1,6 @@
 'use client';
 
+import { VenueHeaderAction } from '@/shared/ui/VenueHeader/VenueHeaderAction';
 import {
   loyaltyFlameButtonAriaLabel,
   type LoyaltyFlameHeaderVisual,
@@ -43,15 +44,13 @@ export function LoyaltyFlameHeaderButton({
   const label = loyaltyFlameButtonAriaLabel(streakDays);
 
   return (
-    <button
-      type="button"
-      className={`loyalty-flame-button ${visualClassName(visual)}${
-        showStreak ? ' loyalty-flame-button--with-count' : ''
-      }`}
+    <VenueHeaderAction
+      wide={showStreak}
+      className={`loyalty-flame-button ${visualClassName(visual)}`}
       onClick={onClick}
-      aria-label={label}
+      label={label}
       title={label}
-      data-testid="loyalty-flame-button"
+      testId="loyalty-flame-button"
     >
       <LoyaltyFlameIcon variant={iconVariant(visual)} size="header" />
       {showStreak ? (
@@ -59,6 +58,6 @@ export function LoyaltyFlameHeaderButton({
           {streakDays}
         </span>
       ) : null}
-    </button>
+    </VenueHeaderAction>
   );
 }

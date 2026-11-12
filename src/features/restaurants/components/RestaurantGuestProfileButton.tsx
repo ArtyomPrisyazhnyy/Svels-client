@@ -1,5 +1,7 @@
 'use client';
 
+import { VenueHeaderAction } from '@/shared/ui/VenueHeader/VenueHeaderAction';
+import { cn } from '@/shared/ui/utils/cn';
 import '../styles/restaurant-profile-button.scss';
 
 interface RestaurantGuestProfileButtonProps {
@@ -29,17 +31,19 @@ export function RestaurantGuestProfileButton({
   authenticated = false,
   onClick,
 }: RestaurantGuestProfileButtonProps) {
+  const label = authenticated ? 'Личный кабинет' : 'Войти';
+
   return (
-    <button
-      type="button"
-      className={`restaurant-profile-button${
-        authenticated ? ' restaurant-profile-button--authenticated' : ''
-      }`}
+    <VenueHeaderAction
+      className={cn(
+        'restaurant-profile-button',
+        authenticated && 'restaurant-profile-button--authenticated',
+      )}
       onClick={onClick}
-      aria-label={authenticated ? 'Личный кабинет' : 'Войти'}
-      data-testid="guest-profile-button"
+      label={label}
+      testId="guest-profile-button"
     >
       <ProfileIcon />
-    </button>
+    </VenueHeaderAction>
   );
 }
