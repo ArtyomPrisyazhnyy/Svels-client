@@ -1,0 +1,389 @@
+{
+  "venue": {
+    "name": "Чайка",
+    "slug": "chayka",
+    "tagline": "Спешелти-кофе и свежая выпечка каждое утро",
+    "description": "Уютная кофейня у Немана: обжариваем зерно небольшими партиями и печём круассаны с 7 утра.",
+    "city": "Гродно",
+    "address": "г. Гродно, ул. Набережная Чаек, 12",
+    "phone": "+375 (29) 000-00-00",
+    "email": "hello@chayka.example",
+    "hours": [
+      {
+        "days": "Пн–Пт",
+        "open": "07:30",
+        "close": "21:00"
+      },
+      {
+        "days": "Сб–Вс",
+        "open": "09:00",
+        "close": "22:00"
+      }
+    ],
+    "hoursText": "Пн–Пт 07:30–21:00, Сб–Вс 09:00–22:00",
+    "brand": {
+      "primary": "#C2603F",
+      "primaryDark": "#9E4A2F",
+      "primarySoft": "#F1DCD2",
+      "background": "#F7F1E8",
+      "surface": "#FFFDF9",
+      "text": "#2B211C",
+      "textMuted": "#7A6A60",
+      "colorName": "терракота на кремовом"
+    },
+    "font": {
+      "headings": "Unbounded (или Playfair Display для более «кафейного» вида)",
+      "body": "Manrope",
+      "note": "Обе поддерживают кириллицу, есть в Google Fonts"
+    },
+    "logo": "logo.webp",
+    "logoTransparent": "logo.png",
+    "banner": "banner.webp",
+    "bannerFallback": "banner.jpg",
+    "fictional": true
+  },
+  "categories": [
+    {
+      "id": "coffee",
+      "name": "Кофе",
+      "items": [
+        {
+          "id": "espresso",
+          "name": "Эспрессо",
+          "description": "Двойной шот, ноты шоколада и вишни",
+          "volume": "60 мл",
+          "price": 5.0,
+          "currency": "BYN",
+          "image": "espresso.webp",
+          "imageFallback": "espresso.jpg"
+        },
+        {
+          "id": "americano",
+          "name": "Американо",
+          "description": "Эспрессо с горячей водой, мягкий вкус",
+          "volume": "300 мл",
+          "price": 5.5,
+          "currency": "BYN",
+          "image": "americano.webp",
+          "imageFallback": "americano.jpg",
+          "modifiers": [
+            {
+              "id": "syrup",
+              "name": "Сироп",
+              "required": false,
+              "maxSelect": 1,
+              "options": [
+                {
+                  "id": "vanilla",
+                  "name": "Ваниль",
+                  "price": 1
+                },
+                {
+                  "id": "caramel",
+                  "name": "Солёная карамель",
+                  "price": 1
+                },
+                {
+                  "id": "hazelnut",
+                  "name": "Лесной орех",
+                  "price": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cappuccino",
+          "name": "Капучино",
+          "description": "Эспрессо и бархатная молочная пена",
+          "volume": "300 мл",
+          "price": 6.9,
+          "currency": "BYN",
+          "image": "cappuccino.webp",
+          "imageFallback": "cappuccino.jpg",
+          "modifiers": [
+            {
+              "id": "milk",
+              "name": "Молоко",
+              "required": true,
+              "options": [
+                {
+                  "id": "regular",
+                  "name": "Обычное",
+                  "price": 0,
+                  "default": true
+                },
+                {
+                  "id": "oat",
+                  "name": "Овсяное",
+                  "price": 1.5
+                }
+              ]
+            },
+            {
+              "id": "syrup",
+              "name": "Сироп",
+              "required": false,
+              "maxSelect": 1,
+              "options": [
+                {
+                  "id": "vanilla",
+                  "name": "Ваниль",
+                  "price": 1
+                },
+                {
+                  "id": "caramel",
+                  "name": "Солёная карамель",
+                  "price": 1
+                },
+                {
+                  "id": "hazelnut",
+                  "name": "Лесной орех",
+                  "price": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "flat-white",
+          "name": "Флэт уайт",
+          "description": "Двойной эспрессо, меньше молока, ярче вкус",
+          "volume": "250 мл",
+          "price": 7.2,
+          "currency": "BYN",
+          "image": "flat-white.webp",
+          "imageFallback": "flat-white.jpg",
+          "modifiers": [
+            {
+              "id": "milk",
+              "name": "Молоко",
+              "required": true,
+              "options": [
+                {
+                  "id": "regular",
+                  "name": "Обычное",
+                  "price": 0,
+                  "default": true
+                },
+                {
+                  "id": "oat",
+                  "name": "Овсяное",
+                  "price": 1.5
+                }
+              ]
+            },
+            {
+              "id": "syrup",
+              "name": "Сироп",
+              "required": false,
+              "maxSelect": 1,
+              "options": [
+                {
+                  "id": "vanilla",
+                  "name": "Ваниль",
+                  "price": 1
+                },
+                {
+                  "id": "caramel",
+                  "name": "Солёная карамель",
+                  "price": 1
+                },
+                {
+                  "id": "hazelnut",
+                  "name": "Лесной орех",
+                  "price": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "latte",
+          "name": "Латте",
+          "description": "Нежный, много молока и тонкая пенка",
+          "volume": "400 мл",
+          "price": 7.5,
+          "currency": "BYN",
+          "image": "latte.webp",
+          "imageFallback": "latte.jpg",
+          "modifiers": [
+            {
+              "id": "milk",
+              "name": "Молоко",
+              "required": true,
+              "options": [
+                {
+                  "id": "regular",
+                  "name": "Обычное",
+                  "price": 0,
+                  "default": true
+                },
+                {
+                  "id": "oat",
+                  "name": "Овсяное",
+                  "price": 1.5
+                }
+              ]
+            },
+            {
+              "id": "syrup",
+              "name": "Сироп",
+              "required": false,
+              "maxSelect": 1,
+              "options": [
+                {
+                  "id": "vanilla",
+                  "name": "Ваниль",
+                  "price": 1
+                },
+                {
+                  "id": "caramel",
+                  "name": "Солёная карамель",
+                  "price": 1
+                },
+                {
+                  "id": "hazelnut",
+                  "name": "Лесной орех",
+                  "price": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "raf-lavender",
+          "name": "Лавандовый раф",
+          "description": "Сливки, ваниль и цветки лаванды",
+          "volume": "350 мл",
+          "price": 8.9,
+          "currency": "BYN",
+          "image": "raf-lavender.webp",
+          "imageFallback": "raf-lavender.jpg",
+          "modifiers": [
+            {
+              "id": "milk",
+              "name": "Молоко",
+              "required": true,
+              "options": [
+                {
+                  "id": "regular",
+                  "name": "Обычное",
+                  "price": 0,
+                  "default": true
+                },
+                {
+                  "id": "oat",
+                  "name": "Овсяное",
+                  "price": 1.5
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bakery",
+      "name": "Выпечка",
+      "items": [
+        {
+          "id": "croissant",
+          "name": "Круассан",
+          "description": "Классический, на сливочном масле 82%",
+          "volume": "70 г",
+          "price": 4.5,
+          "currency": "BYN",
+          "image": "croissant.webp",
+          "imageFallback": "croissant.jpg"
+        },
+        {
+          "id": "almond-croissant",
+          "name": "Миндальный круассан",
+          "description": "С франжипаном и лепестками миндаля",
+          "volume": "110 г",
+          "price": 6.9,
+          "currency": "BYN",
+          "image": "almond-croissant.webp",
+          "imageFallback": "almond-croissant.jpg"
+        },
+        {
+          "id": "pain-au-chocolat",
+          "name": "Пан-о-шоколя",
+          "description": "Слоёное тесто и два бруска шоколада",
+          "volume": "80 г",
+          "price": 5.5,
+          "currency": "BYN",
+          "image": "pain-au-chocolat.webp",
+          "imageFallback": "pain-au-chocolat.jpg"
+        },
+        {
+          "id": "cinnamon-roll",
+          "name": "Синнабон с корицей",
+          "description": "Мягкая булочка, глазурь из крем-чиза",
+          "volume": "120 г",
+          "price": 5.9,
+          "currency": "BYN",
+          "image": "cinnamon-roll.webp",
+          "imageFallback": "cinnamon-roll.jpg"
+        },
+        {
+          "id": "cherry-danish",
+          "name": "Слойка с вишней",
+          "description": "Хрустящее тесто, кислая вишня",
+          "volume": "100 г",
+          "price": 5.2,
+          "currency": "BYN",
+          "image": "cherry-danish.webp",
+          "imageFallback": "cherry-danish.jpg"
+        }
+      ]
+    },
+    {
+      "id": "desserts",
+      "name": "Десерты",
+      "items": [
+        {
+          "id": "basque-cheesecake",
+          "name": "Баскский чизкейк",
+          "description": "Карамельная корочка, кремовая середина",
+          "volume": "150 г",
+          "price": 9.9,
+          "currency": "BYN",
+          "image": "basque-cheesecake.webp",
+          "imageFallback": "basque-cheesecake.jpg"
+        },
+        {
+          "id": "carrot-cake",
+          "name": "Морковный торт",
+          "description": "Грецкий орех, специи, крем-чиз",
+          "volume": "160 г",
+          "price": 8.9,
+          "currency": "BYN",
+          "image": "carrot-cake.webp",
+          "imageFallback": "carrot-cake.jpg"
+        },
+        {
+          "id": "tiramisu",
+          "name": "Тирамису",
+          "description": "Савоярди в эспрессо и маскарпоне",
+          "volume": "150 г",
+          "price": 10.5,
+          "currency": "BYN",
+          "image": "tiramisu.webp",
+          "imageFallback": "tiramisu.jpg"
+        },
+        {
+          "id": "medovik",
+          "name": "Медовик",
+          "description": "Тонкие медовые коржи и сметанный крем",
+          "volume": "140 г",
+          "price": 7.9,
+          "currency": "BYN",
+          "image": "medovik.webp",
+          "imageFallback": "medovik.jpg"
+        }
+      ]
+    }
+  ]
+}

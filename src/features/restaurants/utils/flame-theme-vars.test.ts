@@ -21,6 +21,7 @@ const COLOR_THEMES_BG: Record<RestaurantColorTheme, string> = {
   monochrome: '#ffffff',
   monochromeDark: '#000000',
   neon: '#06040a',
+  svelsGuest: '#ffffff',
 };
 
 const COLOR_THEMES_MUTED: Record<RestaurantColorTheme, string> = {
@@ -41,6 +42,7 @@ const COLOR_THEMES_MUTED: Record<RestaurantColorTheme, string> = {
   monochrome: '#404040',
   monochromeDark: '#d4d4d4',
   neon: '#f9a8d4',
+  svelsGuest: '#54635f',
 };
 
 function parseHex(hex: string): [number, number, number] | null {

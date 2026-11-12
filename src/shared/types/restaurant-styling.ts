@@ -29,7 +29,8 @@ export type RestaurantColorTheme =
   | 'graphite'
   | 'monochrome'
   | 'monochromeDark'
-  | 'neon';
+  | 'neon'
+  | 'svelsGuest';
 
 export type RestaurantCurrencyDisplay = 'byn_glyph' | 'byn' | 'r' | 'rub';
 
@@ -245,6 +246,12 @@ export const RESTAURANT_COLOR_THEME_OPTIONS: RestaurantColorThemeOption[] = [
     label: 'Неон',
     description: 'Глубокий чёрный фон с яркими неоновыми розовыми акцентами',
     swatches: ['#ff3d8b', '#ec4899', '#06040a'],
+  },
+  {
+    value: 'svelsGuest',
+    label: 'Svels гостевой',
+    description: 'Белый фон, бирюзовые кнопки и коралловые акценты',
+    swatches: ['#0f766e', '#f2795b', '#ffffff'],
   },
 ];
 

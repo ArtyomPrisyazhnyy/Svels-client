@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures/test';
+const DEMO_PATH = process.env.NEXT_PUBLIC_DEMO_RESTAURANT_URL?.trim() || '/restaurants/demo';
 
 test.describe('Landing / platform home', () => {
   test('показывает бренд, hero-заголовок и CTA на заявку', async ({ page }) => {
@@ -6,9 +7,11 @@ test.describe('Landing / platform home', () => {
 
     await expect(page.getByTestId('landing-page')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Svels' })).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: /Сайт и мобильное приложение для вашего заведения/ }),
-    ).toBeVisible();
+    const heroTitle = page.getByRole('heading', {
+      name: /Сайт и мобильное приложение/,
+    });
+    await expect(heroTitle).toBeVisible();
+    await expect(heroTitle.getByText('для вашего заведения', { exact: true })).toBeVisible();
     await expect(page.getByTestId('landing-cta-contact').first()).toBeVisible();
   });
 
@@ -49,33 +52,76 @@ test.describe('Landing / platform home', () => {
     await expect(telegram).not.toBeChecked();
   });
 
-  test('разделы возможностей, тарифов и FAQ присутствуют на странице', async ({ page }) => {
+  test('блок выгод, живой пример, тарифы и FAQ на странице', async ({ page }) => {
     await page.goto('/');
 
+    await expect(page.getByTestId('landing-benefits')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Как Svels приносит вам деньги' }),
+    ).toBeVisible();
+    await expect(page.locator('.landing__benefit-card')).toHaveCount(4);
+
     await expect(page.getByTestId('landing-features')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Как это выглядит у гостя' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Посмотрите, как это выглядит у гостя' }),
+    ).toBeVisible();
+    await expect(page.getByTestId('landing-for-whom')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Тарифы' })).toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'Часто задаваемые вопросы' }),
     ).toBeVisible();
   });
 
-  test('витрина возможностей переключает экраны по клику', async ({ page }) => {
+  test('CTA демо-заведения ведёт на настроенный URL', async ({ page }) => {
     await page.goto('/');
-    const features = page.getByTestId('landing-features');
 
-    await expect(features.getByRole('tab', { name: /Бронь стола/ })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    );
-    await expect(page.getByTestId('landing-scene-booking')).toBeVisible();
+    const demoCta = page.getByTestId('landing-demo-cta');
+    await expect(demoCta).toBeVisible();
+    await expect(demoCta).toHaveAttribute('href', DEMO_PATH);
+  });
 
-    await features.getByRole('tab', { name: /Предзаказ/ }).click();
-    await expect(page.getByTestId('landing-scene-preorder')).toBeVisible();
-    await expect(features.getByRole('tab', { name: /Предзаказ/ })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    );
+  test('на 390px герой сразу показывает телефон, шапка в одну строку, бургер открывает якоря', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+
+    const heroImg = page.locator('.landing-hero-visual__mobile img');
+    await expect(heroImg).toBeVisible();
+    await expect
+      .poll(async () => heroImg.evaluate((img: HTMLImageElement) => img.naturalWidth))
+      .toBeGreaterThan(50);
+    await expect(page.locator('.landing__hero-visual')).not.toHaveClass(/reveal/);
+    const heroOpacity = await page.locator('.landing__hero-visual').evaluate((el) => {
+      return getComputedStyle(el).opacity;
+    });
+    expect(heroOpacity).toBe('1');
+
+    await expect(page.getByTestId('landing-nav-mobile')).toHaveCount(0);
+    const headerCta = page.locator('.landing__header-cta');
+    const ctaBox = await headerCta.boundingBox();
+    expect(ctaBox).not.toBeNull();
+    expect(ctaBox!.height).toBeLessThanOrEqual(42);
+    expect(ctaBox!.height).toBeGreaterThanOrEqual(38);
+
+    await page.getByTestId('landing-menu-toggle').click();
+    const menu = page.getByTestId('landing-mobile-menu');
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Как это работает' })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Пример' })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'Тарифы' })).toBeVisible();
+    await expect(menu.getByRole('link', { name: 'FAQ' })).toBeVisible();
+  });
+
+  test('нет горизонтального скролла на 360px', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto('/');
+
+    const overflow = await page.evaluate(() => {
+      const doc = document.documentElement;
+      return doc.scrollWidth > doc.clientWidth + 1;
+    });
+    expect(overflow).toBe(false);
   });
 
   test('FAQ открывает один ответ с панелью вопроса', async ({ page }) => {
@@ -118,7 +164,9 @@ test.describe('Landing / platform home', () => {
         '.landing__header .landing__container',
         '.landing__hero',
         '.landing__section--steps .landing__container',
+        '.landing__section--benefits .landing__container',
         '.landing__section--features .landing__container',
+        '.landing__section--for-whom .landing__container',
         '.landing__section--pricing .landing__container',
         '.landing__section--faq .landing__container',
         '.landing__footer .landing__container',
@@ -136,7 +184,7 @@ test.describe('Landing / platform home', () => {
     expect(widths.every((width) => width === widths[0])).toBe(true);
   });
 
-  test('ссылки «Возможности», «Тарифы» и FAQ плавно скроллят к разделам', async ({ page }) => {
+  test('навигация ведёт к разделам benefits, пример, тарифы и FAQ', async ({ page }) => {
     await page.goto('/');
 
     const scrollBehavior = await page.evaluate(
@@ -146,7 +194,11 @@ test.describe('Landing / platform home', () => {
 
     const nav = page.getByRole('navigation', { name: 'Разделы' });
 
-    await nav.getByRole('link', { name: 'Возможности' }).click();
+    await nav.getByRole('link', { name: 'Как это работает' }).click();
+    await expect(page).toHaveURL(/#benefits$/);
+    await expect(page.locator('#benefits')).toBeInViewport();
+
+    await nav.getByRole('link', { name: 'Пример' }).click();
     await expect(page).toHaveURL(/#features$/);
     await expect(page.locator('#features')).toBeInViewport();
 
@@ -177,7 +229,7 @@ test.describe('Landing / platform home', () => {
     await page.goto('/privacypolicy');
 
     const nav = page.getByRole('navigation', { name: 'Разделы' });
-    await expect(nav.getByRole('link', { name: 'Возможности' })).toHaveAttribute('href', '/#features');
+    await expect(nav.getByRole('link', { name: 'Пример' })).toHaveAttribute('href', '/#features');
 
     await nav.getByRole('link', { name: 'Тарифы' }).click();
     await expect(page).toHaveURL(/\/#pricing$/);
@@ -212,4 +264,5 @@ test.describe('Landing / platform home', () => {
     await expect(consent).toBeChecked();
     await expect(submit).toBeEnabled();
   });
+
 });

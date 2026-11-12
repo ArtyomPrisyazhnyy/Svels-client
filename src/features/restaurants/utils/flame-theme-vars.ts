@@ -183,6 +183,12 @@ export const FLAME_THEME_VARS: Record<RestaurantColorTheme, FlameThemeVars> = {
     ...darkTierInners,
     edge: darkEdge('#000000'),
   },
+  svelsGuest: {
+    ...baseBlock('#c2410c', '#ea580c', 0.4),
+    ...LIGHT_TIERS,
+    ...lightTierInners,
+    edge: lightEdge('#0b1a18'),
+  },
 };
 
 export function flameVarsToCssProperties(
