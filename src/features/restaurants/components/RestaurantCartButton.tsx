@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { VenueHeaderAction } from '@/shared/ui/VenueHeader/VenueHeaderAction';
 import { formatCartItemsCount, sumCartQuantity } from '../utils/cart-items-label.util';
 import { preloadRestaurantCartModal } from './lazy-venue-modals';
 import '../styles/restaurant-cart-button.scss';
@@ -62,23 +63,23 @@ export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartBut
   }, [restaurantId]);
 
   const hasItems = hydrated && itemCount > 0;
+  const label = hasItems ? `Корзина, ${formatCartItemsCount(itemCount)}` : 'Корзина';
 
   return (
-    <button
-      type="button"
+    <VenueHeaderAction
       className="restaurant-cart-button"
       onClick={onOpen}
       onMouseEnter={preloadRestaurantCartModal}
       onTouchStart={preloadRestaurantCartModal}
-      aria-label={hasItems ? `Корзина, ${formatCartItemsCount(itemCount)}` : 'Корзина'}
-      data-testid="cart-button"
+      label={label}
+      testId="cart-button"
     >
       <CartIcon />
-      {hasItems && (
+      {hasItems ? (
         <span className="restaurant-cart-button__badge" data-testid="cart-button-badge">
           {itemCount}
         </span>
-      )}
-    </button>
+      ) : null}
+    </VenueHeaderAction>
   );
 }
