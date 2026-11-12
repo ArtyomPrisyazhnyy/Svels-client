@@ -1,0 +1,6 @@
+.ui-textarea {
+  min-height: calc(var(--control-h-md) * 2);
+  padding: var(--space-3);
+  border-radius: var(--rs-btn-radius, var(--radius-md));
+  resize: vertical;
+}

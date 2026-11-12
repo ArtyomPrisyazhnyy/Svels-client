@@ -67,6 +67,31 @@
   transform: translateY(0.02em);
 }
 
+/// Знак «Б» по чернильной высоте как жирные цифры (глиф nbrb мельче em).
+@mixin venue-public-byn-price {
+  --byn-sign-scale: 1.29em;
+
+  display: inline-flex;
+  align-items: baseline;
+  overflow: visible;
+  line-height: 1;
+  white-space: nowrap;
+
+  .byn-price__amount {
+    font-size: 1em;
+    font-weight: inherit;
+    line-height: 1;
+  }
+
+  .byn-sign,
+  .nbrb-icon {
+    font-size: var(--byn-sign-scale);
+    line-height: 1;
+    overflow: visible;
+    transform: none;
+  }
+}
+
 .currency-text {
   /* BYN / р / руб — системный UI, не шрифт заведения. */
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,

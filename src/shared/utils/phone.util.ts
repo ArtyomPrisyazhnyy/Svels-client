@@ -4,7 +4,7 @@ export function normalizePhoneDigits(value: string): string {
 }
 
 const BY_COUNTRY_DIGITS = '375';
-const BY_NATIONAL_LENGTH = 9;
+export const BY_NATIONAL_LENGTH = 9;
 
 /** Для API: +375291234567 */
 export function toPhoneApiValue(value: string): string {

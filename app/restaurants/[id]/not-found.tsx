@@ -1,16 +1,17 @@
-import Link from 'next/link';
+import { Button } from '@/shared/ui/Button/Button';
+import '@/features/restaurants/styles/venue-not-found.scss';
 
 export default function RestaurantNotFound() {
   return (
-    <div style={{ minHeight: '60vh', display: 'grid', placeItems: 'center', textAlign: 'center' }}>
-      <div>
-        <h1>Заведение не найдено</h1>
-        <p style={{ color: '#64748b' }}>
+    <div className="venue-not-found" data-testid="restaurant-not-found">
+      <div className="venue-not-found__inner">
+        <h1 className="venue-not-found__title">Заведение не найдено</h1>
+        <p className="venue-not-found__text">
           Возможно, страница была удалена или заведение ещё не одобрено.
         </p>
-        <Link href="/" style={{ color: '#2563eb' }}>
+        <Button href="/" variant="primary" testId="restaurant-not-found-home">
           На главную
-        </Link>
+        </Button>
       </div>
     </div>
   );

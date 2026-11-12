@@ -17,7 +17,12 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       setAuth: (accessToken, user) => set({ accessToken, user }),
       updateUser: (user) => set({ user }),
-      logout: () => set({ accessToken: null, user: null }),
+      logout: () => {
+        set({ accessToken: null, user: null });
+        void import('./guest-addresses.store').then(({ resetGuestAddressesStore }) => {
+          resetGuestAddressesStore();
+        });
+      },
     }),
     {
       name: 'svels-auth',

@@ -1,3 +1,5 @@
+@use '../../../shared/styles/byn-sign' as byn;
+
 .restaurant-styled {
   --rs-btn-radius: 0.625rem;
   /* Скругление фото в карточках — отдельно от формы кнопок (капсула не влияет). */
@@ -35,8 +37,10 @@
   .restaurant-menu__category-title,
   .glass-header--tenant .glass-header__brand-name,
   .glass-header--tenant .glass-header__title,
+  .venue-header--tenant .venue-header__brand-name,
   .menu-product-card__title,
   .menu-product-modal__title,
+  .restaurant-cart-modal__panel .ui-overlay-panel__title,
   .restaurant-cart-modal__header h2,
   .restaurant-auth-modal__header h2,
   .restaurant-cart-modal__section-title,
@@ -248,6 +252,7 @@
   }
 
   .restaurant-cart-modal__panel,
+  .restaurant-cart-modal__panel.ui-overlay-panel,
   .restaurant-cart-modal__header,
   .restaurant-cart-modal__body,
   .restaurant-cart-modal__footer {
@@ -256,17 +261,27 @@
     -webkit-backdrop-filter: none;
   }
 
-  .restaurant-cart-modal__item,
-  .restaurant-cart-modal__contacts-card,
-  .cart-detail-row,
-  .cart-detail-row--static {
+  .restaurant-cart-modal__item {
     background-color: var(--rs-cart-item-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .restaurant-cart-modal__contacts-card,
+  .cart-checkout-section,
+  .cart-checkout-rows,
+  .cart-detail-row,
+  .cart-detail-row--static,
+  .cart-detail-row--grouped,
+  .cart-detail-row--expanded {
+    background-color: var(--rs-surface);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
 
   &[data-rs-card-style='glass'] {
     .restaurant-cart-modal__panel,
+    .restaurant-cart-modal__panel.ui-overlay-panel,
     .restaurant-cart-modal__header,
     .restaurant-cart-modal__body,
     .restaurant-cart-modal__footer,
@@ -277,11 +292,18 @@
       background-color: var(--rs-cart-surface);
     }
 
-    .restaurant-cart-modal__item,
-    .restaurant-cart-modal__contacts-card,
-    .cart-detail-row,
-    .cart-detail-row--static {
+    .restaurant-cart-modal__item {
       background-color: var(--rs-cart-item-surface);
+    }
+
+    .restaurant-cart-modal__contacts-card,
+    .cart-checkout-section,
+    .cart-checkout-rows,
+    .cart-detail-row,
+    .cart-detail-row--static,
+    .cart-detail-row--grouped,
+    .cart-detail-row--expanded {
+      background-color: var(--rs-surface);
     }
   }
 
@@ -380,6 +402,18 @@
     }
   }
 
+  .venue-header {
+    a:any-link,
+    a:any-link:hover,
+    a:any-link:focus-visible {
+      text-decoration: none;
+    }
+
+    .venue-header__brand-name {
+      text-decoration: none;
+    }
+  }
+
   .restaurant-favorites-page {
     background: var(--rs-bg);
     color: var(--rs-text);
@@ -412,7 +446,29 @@
     color: var(--rs-primary);
   }
 
-  .glass-header--tenant {
+  .loyalty-flame-button {
+    color: var(--rs-text-muted);
+
+    @media (hover: hover) {
+      &:hover {
+        background: color-mix(in srgb, var(--rs-text) 8%, transparent);
+        color: var(--rs-text);
+      }
+    }
+  }
+
+  .loyalty-flame-info-modal__level--current {
+    background: var(--rs-primary-soft);
+  }
+
+  &[data-rs-theme='midnight'] {
+    .loyalty-flame-info-modal__level--current {
+      background: color-mix(in srgb, var(--rs-accent) 12%, var(--rs-surface));
+    }
+  }
+
+  .glass-header--tenant,
+  .venue-header--tenant {
     border-bottom-color: color-mix(in srgb, var(--rs-border) 80%, transparent);
 
     &::before {
@@ -422,11 +478,14 @@
     }
 
     .glass-header__brand,
-    .glass-header__title {
+    .glass-header__title,
+    .venue-header__brand,
+    .venue-header__brand-name {
       color: var(--rs-text);
     }
 
-    .glass-header__logo {
+    .glass-header__logo,
+    .venue-header__logo {
       background: color-mix(in srgb, var(--rs-surface) 60%, transparent);
     }
 
@@ -777,9 +836,10 @@
     color: #6ee7b7;
   }
 
-  .restaurant-cart-modal__icon-btn {
-    background: color-mix(in srgb, var(--rs-surface) 92%, transparent);
-    color: var(--rs-text-muted);
+  .restaurant-cart-modal__icon-btn,
+  .restaurant-cart-modal__panel .ui-icon-btn {
+    background: transparent;
+    color: var(--rs-text);
   }
 
   .restaurant-cart-modal__clear {
@@ -787,19 +847,28 @@
   }
 
   .restaurant-cart-modal__contacts-card,
+  .cart-checkout-section,
+  .cart-checkout-rows,
   .cart-detail-row,
-  .cart-detail-row--static {
-    background: color-mix(in srgb, var(--rs-text) 4%, var(--rs-bg));
+  .cart-detail-row--static,
+  .cart-detail-row--grouped,
+  .cart-detail-row--expanded {
+    background: var(--rs-surface);
     border-color: var(--rs-border);
   }
 
   .cart-detail-row__label {
-    color: var(--rs-text-muted);
+    font-size: var(--text-md);
+    font-weight: 500;
+    color: var(--rs-text);
   }
 
-  .cart-detail-row__value,
   .cart-detail-row__trigger {
     color: var(--rs-text);
+  }
+
+  .cart-detail-row__value {
+    color: var(--rs-text-muted);
   }
 
   .cart-detail-row__chevron {
@@ -882,36 +951,111 @@
     }
   }
 
+  /*
+   * Карточка «поверх фото»: плавный градиент снизу вместо сплошной подложки.
+   * Градиент идёт от текста вверх с затуханием, плюс мягкая тень текста для светлых фото.
+   */
   &[data-rs-card-style='overlay'] {
     .menu-product-card {
       position: relative;
       overflow: hidden;
+      /* Скругление без обводки — border и radius на одном элементе не сочетаем. */
+      border: none;
+      background: color-mix(in srgb, var(--rs-text) 8%, var(--rs-surface));
+
+      @media (hover: hover) {
+        &:hover {
+          border: none;
+        }
+      }
     }
 
     .menu-product-card__media {
       aspect-ratio: 1;
-      position: relative;
+      background: transparent;
+    }
 
-      &::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        pointer-events: none;
-        background: linear-gradient(
-          to top,
-          color-mix(in srgb, var(--rs-bg) 94%, transparent) 6%,
-          color-mix(in srgb, var(--rs-bg) 30%, transparent) 45%,
-          transparent 70%
-        );
+    .menu-product-card__favorite {
+      z-index: var(--z-dropdown);
+      width: var(--control-h-md);
+      height: var(--control-h-md);
+      border: none;
+      border-radius: var(--radius-pill);
+      background: color-mix(in srgb, var(--rs-media-scrim) 40%, transparent);
+
+      .favorite-heart-button__shape--outer {
+        stroke: var(--rs-on-media);
+      }
+
+      .favorite-heart-button__shape--inner:not(.favorite-heart-button__shape--inner-active) {
+        fill: var(--rs-on-media);
+        stroke: var(--rs-on-media);
       }
     }
 
     .menu-product-card__body {
       position: absolute;
       inset: auto 0 0 0;
-      padding: 1rem;
-      gap: 0.25rem;
+      z-index: var(--z-sticky);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      min-width: 0;
+      margin: 0;
+      padding: var(--space-4);
+      color: var(--rs-on-media);
+      text-shadow:
+        0 1px 2px color-mix(in srgb, var(--rs-media-scrim) 70%, transparent),
+        0 2px 10px color-mix(in srgb, var(--rs-media-scrim) 45%, transparent);
+
+      /* Высота подложки следует за текстом + зона плавного затухания над ним. */
+      &::before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        inset: auto 0 0 0;
+        height: calc(100% + var(--space-10));
+        pointer-events: none;
+        background: linear-gradient(
+          to top,
+          color-mix(in srgb, var(--rs-media-scrim) 100%, transparent) 0%,
+          color-mix(in srgb, var(--rs-media-scrim) 94%, transparent) 20%,
+          color-mix(in srgb, var(--rs-media-scrim) 82%, transparent) 40%,
+          color-mix(in srgb, var(--rs-media-scrim) 68%, transparent) 55%,
+          color-mix(in srgb, var(--rs-media-scrim) 52%, transparent) 66%,
+          color-mix(in srgb, var(--rs-media-scrim) 34%, transparent) 76%,
+          color-mix(in srgb, var(--rs-media-scrim) 18%, transparent) 85%,
+          color-mix(in srgb, var(--rs-media-scrim) 6%, transparent) 93%,
+          transparent 100%
+        );
+      }
+    }
+
+    .menu-product-card__title {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-1);
+      min-width: 0;
+      margin: 0;
+      color: var(--rs-on-media);
+      font-size: var(--text-md);
+      font-weight: 700;
+      line-height: 1.25;
+      overflow-wrap: break-word;
+    }
+
+    .menu-product-card__variant {
+      display: block;
+      margin: 0;
+      min-width: 0;
+      color: var(--rs-on-media-muted);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      line-height: 1.25;
+      white-space: normal;
+      opacity: 1;
+      overflow-wrap: break-word;
     }
 
     .menu-product-card__description {
@@ -919,7 +1063,37 @@
     }
 
     .menu-product-card__price {
-      margin-top: 0.375rem;
+      margin: 0;
+      padding: 0;
+      color: var(--rs-on-media);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      line-height: 1;
+      opacity: 1;
+
+      .menu-item-price,
+      .menu-item-price__from,
+      .byn-price,
+      .byn-price__amount,
+      .byn-sign,
+      .nbrb-icon,
+      .currency-text {
+        color: var(--rs-on-media);
+        opacity: 1;
+      }
+
+      .byn-price {
+        @include byn.venue-public-byn-price;
+      }
+
+      .menu-item-price__old,
+      .menu-item-price__old .byn-price,
+      .menu-item-price__old .byn-sign,
+      .menu-item-price__old .nbrb-icon,
+      .menu-item-price__old .currency-text {
+        color: var(--rs-on-media-muted);
+        opacity: 1;
+      }
     }
   }
 
@@ -1121,10 +1295,11 @@
 
   &[data-rs-switcher-style='segmented'] {
     .fulfillment-selector {
-      gap: 0.375rem;
-      padding: 0.375rem;
+      gap: 2px;
+      padding: 2px;
       background: var(--rs-surface);
-      border: 1px solid var(--rs-border);
+      border: 0;
+      box-shadow: inset 0 0 0 1px var(--rs-border);
       border-radius: calc(var(--rs-btn-radius) + 0.25rem);
     }
 
@@ -1137,6 +1312,7 @@
       border-radius: var(--rs-btn-radius);
       transition: color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
+      &[aria-checked='true'],
       &[aria-selected='true'] {
         color: var(--rs-on-accent, #ffffff);
       }
@@ -1158,13 +1334,14 @@
 
     .fulfillment-selector__option {
       border-radius: 0;
-      padding-inline: 0.875rem;
+      padding-inline: var(--space-3);
       border-bottom: 2px solid transparent;
       margin-bottom: -1px;
       transition:
         color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
         border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
+      &[aria-checked='true'],
       &[aria-selected='true'] {
         color: var(--rs-accent);
         border-bottom-color: var(--rs-accent);
@@ -1175,33 +1352,7 @@
 
   &[data-rs-menu-category-nav='true'] {
     .restaurant-menu__category {
-      scroll-margin-top: var(--rs-header-stack-height, 4.25rem);
-    }
-
-    .restaurant-menu__category-nav:not(.restaurant-menu__category-nav--header) {
-      position: sticky;
-      top: var(--rs-header-stack-height, 4.25rem);
-      z-index: 9;
-      margin-inline: -0.25rem;
-      padding: 0.5rem 0.25rem 0.75rem;
-      background: color-mix(in srgb, var(--rs-bg) 88%, transparent);
-      backdrop-filter: blur(10px) saturate(140%);
-      -webkit-backdrop-filter: blur(10px) saturate(140%);
-      border-bottom: 1px solid color-mix(in srgb, var(--rs-border) 70%, transparent);
-    }
-
-    .restaurant-public__header-stack ~ .restaurant-public__main {
-      .restaurant-menu__category-nav:not(.restaurant-menu__category-nav--header) {
-        position: static;
-        top: auto;
-        z-index: auto;
-        margin-inline: 0;
-        padding: 0;
-        background: transparent;
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        border-bottom: none;
-      }
+      scroll-margin-top: calc(var(--header-h) + var(--venue-nav-h, 64px) + var(--space-4));
     }
 
     .restaurant-menu__category-nav-btn {
@@ -1236,5 +1387,17 @@
         border-color: var(--rs-accent);
       }
     }
+  }
+}
+
+.menu-product-card {
+  isolation: isolate; /* карточка не перекрывает шапку и панель категорий */
+}
+
+.menu-product-card__favorite {
+  transition: transform var(--duration-base) var(--ease-standard);
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
   }
 }

@@ -1,60 +1,60 @@
 .order-success-view {
-  padding: 1rem;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--rs-accent, #10b981) 12%, var(--rs-surface, #fff));
-  border: 1px solid color-mix(in srgb, var(--rs-accent, #10b981) 28%, var(--rs-border, #e2e8f0));
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--rs-accent) 12%, var(--rs-surface));
+  border: 1px solid color-mix(in srgb, var(--rs-accent) 28%, var(--rs-border));
 }
 
 .order-success-view__title {
-  margin: 0 0 0.5rem;
-  font-size: 1.125rem;
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: var(--rs-text, #0f172a);
+  color: var(--rs-text);
 
   &::before {
     content: '✓';
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    margin-right: 0.5rem;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--rs-accent, #10b981) 22%, transparent);
-    color: var(--rs-accent, #047857);
-    font-size: 0.875rem;
+    width: var(--space-6);
+    height: var(--space-6);
+    margin-right: var(--space-2);
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--rs-accent) 22%, transparent);
+    color: var(--rs-accent);
+    font-size: var(--text-sm);
   }
 }
 
 .order-success-view__hint {
-  margin: 0 0 1rem;
-  font-size: 0.9375rem;
-  color: var(--rs-text-muted, #64748b);
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-md);
+  color: var(--rs-text-muted);
 }
 
 .order-success-view__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: var(--space-3);
   align-items: center;
 }
 
 .order-success-view__link {
   display: inline-flex;
-  padding: 0.5rem 1rem;
-  border-radius: var(--rs-btn-radius, 999px);
-  background: var(--rs-accent, #166534);
-  color: var(--rs-on-accent, #fff);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--rs-btn-radius, var(--radius-pill));
+  background: var(--rs-accent);
+  color: var(--rs-on-accent);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
 }
 
 .order-success-view__close {
   border: none;
   background: transparent;
-  color: var(--rs-accent, #166534);
-  font-size: 0.875rem;
+  color: var(--rs-accent);
+  font-size: var(--text-sm);
   cursor: pointer;
   text-decoration: underline;
 }

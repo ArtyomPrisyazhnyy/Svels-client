@@ -1,4 +1,4 @@
-export type AuthProvider = 'local' | 'google';
+export type AuthProvider = 'local' | 'google' | 'apple';
 
 export type UserRole =
   | 'user'
@@ -70,4 +70,35 @@ export interface GuestOtpRegisterPayload {
   registrationToken: string;
   firstName: string;
   lastName: string;
+}
+
+export interface GuestOAuthGoogleProvider {
+  enabled: boolean;
+  clientId: string;
+}
+
+export interface GuestOAuthAppleProvider {
+  enabled: boolean;
+  serviceId: string;
+  redirectUri: string;
+}
+
+export interface GuestOAuthProvidersResponse {
+  google: GuestOAuthGoogleProvider;
+  apple: GuestOAuthAppleProvider;
+}
+
+export interface GuestOAuthGoogleLoginPayload {
+  idToken: string;
+}
+
+export interface GuestOAuthAppleLoginPayload {
+  idToken: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface GuestOAuthLoginResponse extends AuthResponse {
+  isNew: boolean;
+  needsPhone: boolean;
 }

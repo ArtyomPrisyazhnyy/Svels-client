@@ -1,0 +1,95 @@
+.guest-oauth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.guest-oauth__divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--rs-text-muted);
+  font-size: var(--text-sm);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rs-border);
+  }
+
+  span {
+    flex-shrink: 0;
+  }
+}
+
+.guest-oauth__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.guest-oauth__icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
+
+  svg {
+    display: block;
+  }
+}
+
+.guest-oauth__icon--google svg {
+  width: 20px;
+  height: 20px;
+}
+
+.guest-oauth__icon--apple svg {
+  width: 20px;
+  height: 20px;
+}
+
+.guest-oauth__btn {
+  font-family: inherit;
+  gap: var(--space-2);
+
+  .ui-btn__icon {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+}
+
+.guest-oauth__btn--google {
+  background: var(--rs-surface);
+  color: var(--rs-text);
+  border-color: var(--rs-border);
+}
+
+.guest-oauth__btn--apple {
+  background: var(--guest-oauth-apple-bg, #000000);
+  color: var(--guest-oauth-apple-fg, #ffffff);
+  border-color: var(--guest-oauth-apple-bg, #000000);
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--guest-oauth-apple-bg, #000000) 88%, var(--rs-text));
+      border-color: color-mix(in srgb, var(--guest-oauth-apple-bg, #000000) 88%, var(--rs-text));
+    }
+  }
+}
+
+.restaurant-styled[data-rs-theme='midnight'] .guest-oauth__btn--apple {
+  --guest-oauth-apple-bg: #ffffff;
+  --guest-oauth-apple-fg: #000000;
+}

@@ -1,0 +1,64 @@
+.ui-skeleton {
+  background: color-mix(in srgb, var(--rs-surface) 88%, var(--rs-border));
+  position: relative;
+  overflow: hidden;
+}
+
+.ui-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--rs-border) 55%, transparent),
+    transparent
+  );
+  animation: ui-skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+.ui-skeleton-lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.ui-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ui-skeleton-list__row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.ui-skeleton-list__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+@keyframes ui-skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-skeleton::after {
+    animation: none;
+    display: none;
+  }
+}
+
+html[data-visual-test='true'] .ui-skeleton::after {
+  animation: none;
+  display: none;
+}

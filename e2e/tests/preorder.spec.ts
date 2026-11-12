@@ -1,4 +1,5 @@
 import { test, expect, apiClient } from '../fixtures/test';
+import { clearGuestAddresses } from '../helpers/guest-addresses';
 import { getApiUrl } from '../helpers/env';
 import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
 import type { OrderDto } from '../../src/shared/types/pre-order';
@@ -112,6 +113,7 @@ test.describe('Pre-order', () => {
   test('доставка без адреса → кнопка оформления неактивна', async ({ page, seed, asGuest }) => {
     void asGuest;
     const adminToken = seed.restaurantAdmin.auth.accessToken;
+    await clearGuestAddresses(seed.restaurantId, seed.guest.accessToken);
 
     await apiClient.setOrderSettings(seed.restaurantId, adminToken, {
       fulfillmentDelivery: true,

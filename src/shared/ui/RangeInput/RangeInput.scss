@@ -1,0 +1,21 @@
+.ui-range {
+  display: block;
+  width: 100%;
+  height: var(--control-h-sm);
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  accent-color: var(--rs-accent);
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--rs-focus-ring, color-mix(in srgb, var(--rs-accent) 35%, transparent));
+    border-radius: var(--radius-pill);
+  }
+}

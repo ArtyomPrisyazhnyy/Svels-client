@@ -5,22 +5,13 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   min-width: 0;
+  overflow: visible;
   /* Не ставить overflow-x: clip — ось Y станет auto, sticky-шапка окажется
      под системным scrollbar и padding справа «съестся». Горизонтальный clip — на html. */
 
   &--embedded {
     min-height: auto;
     display: block;
-  }
-}
-
-.restaurant-public__header-stack {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-
-  .glass-header {
-    position: static;
   }
 }
 
@@ -42,6 +33,7 @@
   margin: 0 auto;
   padding: 2rem 1.5rem;
   min-width: 0;
+  overflow: visible;
 
   h1 {
     margin: 0 0 0.5rem;
@@ -182,10 +174,18 @@
 }
 
 .restaurant-public__footer-bottom {
+  /* Matches .scroll-to-top: 3rem control, 1.25rem inset, +8px gap. */
+  --venue-scroll-clearance-inline: calc(
+    3rem + max(1.25rem, env(safe-area-inset-right, 0px)) + var(--space-2)
+  );
+  --venue-scroll-clearance-block: calc(
+    3rem + max(1.25rem, env(safe-area-inset-bottom, 0px)) + var(--space-2)
+  );
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   padding: 1rem 1.5rem;
+  padding-block-end: var(--venue-scroll-clearance-block);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -194,12 +194,51 @@
   border-top: 1px solid var(--rs-border, #e2e8f0);
   font-size: 0.8125rem;
   color: var(--rs-text-soft, #94a3b8);
+
+  > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 767px) {
+    padding-inline-end: var(--venue-scroll-clearance-inline);
+  }
 }
 
 .restaurant-public__footer-credit {
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--rs-text-soft, #94a3b8);
+}
+
+.restaurant-public__footer-credit-link {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: var(--control-h-md);
+  padding-inline: var(--space-2);
+  margin-inline: calc(-1 * var(--space-2));
+  padding-block: calc((var(--control-h-md) - 1em) / 2);
+  margin-block: calc((1em - var(--control-h-md)) / 2);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-decoration: none;
+  transition: box-shadow var(--duration-fast) var(--ease-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+    text-decoration: underline;
+    box-shadow: 0 0 0 3px var(--rs-focus-ring);
+  }
 }
 
 /* === Footer layout === */

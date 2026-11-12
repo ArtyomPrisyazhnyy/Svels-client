@@ -12,6 +12,15 @@ test.describe('Restaurant public page', () => {
     await expect(page.getByTestId('guest-profile-button')).toBeVisible();
   });
 
+  test('в подвале ссылка Svels ведёт на главную', async ({ page, seed }) => {
+    await page.goto(`/restaurants/${seed.restaurantId}`);
+
+    const link = page.getByTestId('restaurant-footer-svels-home');
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', '/');
+    await expect(link).toHaveAttribute('aria-label', 'Svels — главная');
+  });
+
   test('добавление в избранное по клику на сердечко', async ({ page, seed }) => {
     const menu = await apiClient.getMenu(seed.restaurantId);
     const firstItem = menu.categories.flatMap((c) => c.items)[0];
@@ -63,16 +72,16 @@ test.describe('Restaurant public page', () => {
     await expect(page.getByTestId('restaurant-cart-modal').getByText(firstItem.name)).toBeVisible({
       timeout: 10_000,
     });
-    const takeawayTab = page.getByRole('tab', { name: 'Самовывоз' });
-    if (await takeawayTab.isVisible()) {
-      await takeawayTab.click();
+    const fulfillment = page.getByTestId('cart-fulfillment-segmented');
+    if (await fulfillment.isVisible()) {
+      await fulfillment.getByRole('radio', { name: 'Самовывоз' }).click();
+      await expect(fulfillment.getByRole('radio', { name: 'Самовывоз' })).toBeChecked();
     }
     await page.getByTestId('cart-go-to-checkout').click();
     await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
     const locationRow = page.getByTestId('cart-location-row');
-    if (await locationRow.isVisible()) {
-      await locationRow.getByRole('button').click();
-    }
+    await expect(locationRow).toBeVisible({ timeout: 20_000 });
+    await locationRow.getByRole('button').click();
     await expect(page.getByTestId('cart-location-picker')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('cart-location-address')).toBeVisible();
     await expect(page.getByTestId('location-map')).toBeVisible();
@@ -97,11 +106,11 @@ test.describe('Restaurant public page', () => {
 
     await page.getByTestId(`menu-item-${firstItem!.id}`).click();
     await expect(page.getByTestId('menu-add-to-cart')).toBeVisible();
-    const headerStack = page.getByTestId('restaurant-public-header-stack');
-    await expect(headerStack).toBeAttached();
-    await expect(headerStack).toBeInViewport();
+    const venueHeader = page.getByTestId('venue-header');
+    await expect(venueHeader).toBeAttached();
+    await expect(venueHeader).toBeInViewport();
     await expect
-      .poll(async () => headerStack.evaluate((el) => el.getBoundingClientRect().top))
+      .poll(async () => venueHeader.evaluate((el) => el.getBoundingClientRect().top))
       .toBeGreaterThanOrEqual(-1);
   });
 
@@ -112,15 +121,27 @@ test.describe('Restaurant public page', () => {
   }) => {
     void asGuest;
     const menu = await apiClient.getMenu(seed.restaurantId);
-    const firstItem = menu.categories.flatMap((c) => c.items)[0];
-    test.skip(!firstItem, 'Need a menu item');
+    const items = menu.categories.flatMap((c) => c.items);
+    const firstItem = items[0];
+    const secondItem = items.find((item) => item.id !== firstItem?.id);
+    test.skip(!firstItem || !secondItem, 'Need two menu items');
+
+    await apiClient.addGuestFavorite(
+      seed.restaurantId,
+      seed.guest.accessToken,
+      firstItem!.id,
+    );
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     const heart = page
       .getByTestId(`menu-item-${firstItem!.id}`)
       .locator('.favorite-heart-button');
-    await heart.click();
-    await expect(heart).toHaveClass(/favorite-heart-button--active/);
+    const heart2 = page
+      .getByTestId(`menu-item-${secondItem!.id}`)
+      .locator('.favorite-heart-button');
+    await expect(heart).toHaveAttribute('aria-pressed', 'true');
+    await heart2.click();
+    await expect(heart2).toHaveAttribute('aria-pressed', 'true');
 
     await page.getByTestId(`menu-item-${firstItem!.id}`).click();
     await expect(page.getByTestId('menu-add-to-cart')).toBeVisible();
@@ -137,12 +158,17 @@ test.describe('Restaurant public page', () => {
 
     await page.goto(`/restaurants/${seed.restaurantId}`);
     await expect(page.getByTestId('cart-button')).toHaveAttribute('aria-label', 'Корзина');
-    await expect(
-      page.getByTestId(`menu-item-${firstItem!.id}`).locator('.favorite-heart-button'),
-    ).not.toHaveClass(/favorite-heart-button--active/);
+    await expect(heart).not.toHaveAttribute('aria-pressed', 'true');
+    await expect(heart2).not.toHaveAttribute('aria-pressed', 'true');
 
     await page.goto(`/restaurants/${seed.restaurantId}/favorites`);
     await expect(page.getByTestId('guest-favorites-empty')).toBeVisible();
+
+    await apiClient.removeGuestFavorite(
+      seed.restaurantId,
+      seed.guest.accessToken,
+      secondItem!.id,
+    );
   });
 
   test('авторизованный гость видит страницу аккаунта', async ({ page, seed, asGuest }) => {

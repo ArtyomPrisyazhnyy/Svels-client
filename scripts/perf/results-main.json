@@ -1,0 +1,37 @@
+{
+  "note": "account/booking/favorites ~15s is time-to-content on main with no skeleton (script waits up to 60s). preorder dataVisibleMs 105254 is a timeout: waitFor guest-orders hit the 90s cap after ~15s of page paint (CPU 4x + Fast 4G, guest auth). Not a sub-second measurement.",
+  "baseUrl": "http://127.0.0.1:3003",
+  "restaurantId": "01a12fc0-3b06-71ad-89dc-00be94548977",
+  "results": [
+    {
+      "route": "home",
+      "headerVisibleMs": 302,
+      "skeletonOrContentMs": 5308,
+      "dataVisibleMs": 5312
+    },
+    {
+      "route": "account",
+      "headerVisibleMs": 270,
+      "skeletonOrContentMs": 15275,
+      "dataVisibleMs": 15278
+    },
+    {
+      "route": "booking",
+      "headerVisibleMs": 237,
+      "skeletonOrContentMs": 15243,
+      "dataVisibleMs": 15245
+    },
+    {
+      "route": "preorder",
+      "headerVisibleMs": 243,
+      "skeletonOrContentMs": 15248,
+      "dataVisibleMs": 105254
+    },
+    {
+      "route": "favorites",
+      "headerVisibleMs": 272,
+      "skeletonOrContentMs": 15278,
+      "dataVisibleMs": 15283
+    }
+  ]
+}

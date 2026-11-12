@@ -42,6 +42,9 @@ export interface CreatePreOrderPayload {
   customerPhone: string;
   locationId?: string;
   deliveryAddress?: DeliveryAddress;
+  addressId?: string;
+  saveAddress?: boolean;
+  addressLabel?: string;
   requestedAt?: string | null;
   recipientName?: string;
   recipientPhone?: string;

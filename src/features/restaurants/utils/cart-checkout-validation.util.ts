@@ -39,6 +39,9 @@ interface ValidateCartCheckoutParams {
   multipleLocations: boolean;
   locationId: string | null;
   showSomeoneElseOption: boolean;
+  deliveryUsesSavedAddresses: boolean;
+  selectedGuestAddressId: string | null;
+  deliveryAddressesLoading: boolean;
 }
 
 export function validateCartCheckout(params: ValidateCartCheckoutParams): CartCheckoutValidation {
@@ -58,6 +61,9 @@ export function validateCartCheckout(params: ValidateCartCheckoutParams): CartCh
     multipleLocations,
     locationId,
     showSomeoneElseOption,
+    deliveryUsesSavedAddresses,
+    selectedGuestAddressId,
+    deliveryAddressesLoading,
   } = params;
 
   const rowsToExpand: CartDetailRowKey[] = [];
@@ -86,9 +92,19 @@ export function validateCartCheckout(params: ValidateCartCheckoutParams): CartCh
     }
   }
 
-  if (fulfillment === 'fulfillmentDelivery' && !isDeliveryAddressComplete(draft.deliveryAddress)) {
-    fieldErrors.address = 'Укажите улицу и дом';
-    rowsToExpand.push('address');
+  if (fulfillment === 'fulfillmentDelivery') {
+    if (deliveryAddressesLoading) {
+      fieldErrors.address = 'Укажите адрес';
+      rowsToExpand.push('address');
+    } else if (deliveryUsesSavedAddresses) {
+      if (!selectedGuestAddressId) {
+        fieldErrors.address = 'Укажите адрес';
+        rowsToExpand.push('address');
+      }
+    } else if (!isDeliveryAddressComplete(draft.deliveryAddress)) {
+      fieldErrors.address = 'Укажите улицу и дом';
+      rowsToExpand.push('address');
+    }
   }
 
   if (needsVenue && multipleLocations && !locationId) {
@@ -114,19 +130,28 @@ export function validateCartCheckout(params: ValidateCartCheckoutParams): CartCh
   }
 
   let ctaLabel = 'Оформить заказ';
-  if (fulfillment === 'fulfillmentDelivery' && !isDeliveryAddressComplete(draft.deliveryAddress)) {
-    ctaLabel = 'Укажите адрес';
-  } else if (!isCompleteBelarusPhone(draft.phone)) {
+  if (fulfillment === 'fulfillmentDelivery') {
+    if (deliveryUsesSavedAddresses && !selectedGuestAddressId) {
+      ctaLabel = 'Укажите адрес';
+    } else if (
+      !deliveryUsesSavedAddresses &&
+      !isDeliveryAddressComplete(draft.deliveryAddress)
+    ) {
+      ctaLabel = 'Укажите адрес';
+    }
+  }
+  if (ctaLabel === 'Оформить заказ' && !isCompleteBelarusPhone(draft.phone)) {
     ctaLabel = 'Укажите телефон';
-  } else if (!customerName || customerName.length > CUSTOMER_NAME_MAX) {
+  }
+  if (ctaLabel === 'Оформить заказ' && (!customerName || customerName.length > CUSTOMER_NAME_MAX)) {
     ctaLabel = 'Укажите имя';
-  } else if (needsVenue && multipleLocations && !locationId) {
+  } else if (ctaLabel === 'Оформить заказ' && needsVenue && multipleLocations && !locationId) {
     ctaLabel = 'Выберите точку';
-  } else if (draft.requestedAtMode === 'slot' && !draft.requestedAtSlotIso) {
+  } else if (ctaLabel === 'Оформить заказ' && draft.requestedAtMode === 'slot' && !draft.requestedAtSlotIso) {
     ctaLabel = 'Выберите время';
-  } else if (fieldErrors.recipient) {
+  } else if (ctaLabel === 'Оформить заказ' && fieldErrors.recipient) {
     ctaLabel = 'Укажите получателя';
-  } else if (payment === 'paymentOnline') {
+  } else if (ctaLabel === 'Оформить заказ' && payment === 'paymentOnline') {
     ctaLabel = 'Перейти к оплате';
   }
 

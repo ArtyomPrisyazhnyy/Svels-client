@@ -1,80 +1,61 @@
-import { Suspense } from 'react';
-import { notFound } from 'next/navigation';
 import { RestaurantGuestProtectedRoute } from '@/components/RestaurantGuestProtectedRoute';
+import { GuestAccountPageSkeleton } from '@/features/restaurants/components/guest-page-skeletons/GuestPageSkeletons';
+import { VenueGuestSubpageShell } from '@/features/restaurants/components/VenueGuestSubpageShell';
 import { RestaurantGuestAccountPage } from '@/views/RestaurantGuestAccountPage';
-import type { PublicRestaurant } from '@/features/restaurants/types/restaurant';
-import type { RestaurantStyling } from '@/shared/types/restaurant-styling';
-import { createDefaultRestaurantStyling } from '@/shared/types/restaurant-styling';
-import { serverFetch, type ServerFetchOptions } from '@/shared/api/server-api';
 import {
-  RESTAURANT_PUBLIC_REVALIDATE_SECONDS,
-  restaurantPublicPageTag,
-} from '@/shared/cache/restaurant-public-cache';
+  getRestaurantBookingSettings,
+  getRestaurantPublic,
+  getRestaurantSocialLinks,
+  getRestaurantStyling,
+} from '@/server/restaurant-public';
+import { restaurantVenueStaticParams } from '@/server/restaurant-venue-static-params';
+import { notFound } from 'next/navigation';
 
-/** Fallback ISR (сек). Должен быть литералом — см. publicPageFetchOptions ниже. */
+/** Fallback ISR (сек). */
 export const revalidate = 3600;
 export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  return restaurantVenueStaticParams();
+}
 
 interface RestaurantAccountPageProps {
   params: Promise<{ id: string }>;
 }
 
-function PageLoader() {
-  return (
-    <div style={{ minHeight: '40vh', display: 'grid', placeItems: 'center', color: '#64748b' }}>
-      Загрузка…
-    </div>
-  );
-}
-
-function publicPageFetchOptions(restaurantId: string): ServerFetchOptions {
-  return {
-    revalidate: RESTAURANT_PUBLIC_REVALIDATE_SECONDS,
-    tags: [restaurantPublicPageTag(restaurantId)],
-  };
-}
-
-async function fetchRestaurant(id: string): Promise<PublicRestaurant | null> {
-  try {
-    return await serverFetch<PublicRestaurant>(
-      `/restaurants/${id}`,
-      undefined,
-      publicPageFetchOptions(id),
-    );
-  } catch {
-    return null;
-  }
-}
-
-async function fetchStyling(restaurantId: string): Promise<RestaurantStyling> {
-  try {
-    return await serverFetch<RestaurantStyling>(
-      `/restaurants/${restaurantId}/styling`,
-      undefined,
-      publicPageFetchOptions(restaurantId),
-    );
-  } catch {
-    return createDefaultRestaurantStyling(restaurantId);
-  }
-}
-
 export default async function RestaurantAccountPageRoute({ params }: RestaurantAccountPageProps) {
   const { id } = await params;
-  const [restaurant, styling] = await Promise.all([fetchRestaurant(id), fetchStyling(id)]);
+  const [restaurant, socialLinks, bookingSettings, styling] = await Promise.all([
+    getRestaurantPublic(id),
+    getRestaurantSocialLinks(id),
+    getRestaurantBookingSettings(id),
+    getRestaurantStyling(id),
+  ]);
 
   if (!restaurant) {
     notFound();
   }
 
+  const favoritesEnabled = styling.favoritesEnabled !== false;
+  const bookingEnabled = bookingSettings.bookingEnabled ?? false;
+
   return (
-    <Suspense fallback={<PageLoader />}>
-      <RestaurantGuestProtectedRoute restaurantId={restaurant.id}>
+    <VenueGuestSubpageShell
+      restaurant={restaurant}
+      socialLinks={socialLinks}
+      bookingEnabled={bookingEnabled}
+      favoritesEnabled={favoritesEnabled}
+      pageClassName="restaurant-guest-account"
+    >
+      <RestaurantGuestProtectedRoute
+        restaurantId={restaurant.id}
+        fallback={<GuestAccountPageSkeleton />}
+      >
         <RestaurantGuestAccountPage
           restaurantId={restaurant.id}
           restaurantName={restaurant.name}
-          styling={styling}
         />
       </RestaurantGuestProtectedRoute>
-    </Suspense>
+    </VenueGuestSubpageShell>
   );
 }

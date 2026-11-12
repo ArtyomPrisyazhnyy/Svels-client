@@ -1,0 +1,21 @@
+.dev-ui-playground__stack {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.dev-ui-playground__stack .ui-tokens-board {
+  max-width: 100%;
+  min-width: 0;
+  min-height: auto;
+  box-sizing: border-box;
+}
+
+.dev-ui-playground__stack .ui-tokens-board__spacing-row,
+.dev-ui-playground__stack .ui-tokens-board__radii-row,
+.dev-ui-playground__stack .ui-tokens-board__controls-row {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}

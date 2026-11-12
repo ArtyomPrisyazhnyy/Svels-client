@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider, type CredentialResponse } from '@react-oauth/google';
 import { loginWithGoogle } from '../api/auth.api';
 import { useAuthStore } from '@/store/auth.store';
 import { ApiError } from '@/shared/api/api-client';
@@ -35,7 +35,7 @@ function GoogleIcon() {
   );
 }
 
-export function GoogleSignInButton({ onSuccess, onError }: GoogleSignInButtonProps) {
+function GoogleSignInButtonInner({ onSuccess, onError }: GoogleSignInButtonProps) {
   const setAuth = useAuthStore((s) => s.setAuth);
   const clientId = GOOGLE_CLIENT_ID.trim();
   const googleButtonRef = useRef<HTMLDivElement>(null);
@@ -104,5 +104,18 @@ export function GoogleSignInButton({ onSuccess, onError }: GoogleSignInButtonPro
         />
       </div>
     </div>
+  );
+}
+
+export function GoogleSignInButton({ onSuccess, onError }: GoogleSignInButtonProps) {
+  const clientId = GOOGLE_CLIENT_ID.trim();
+  if (!clientId) {
+    return <GoogleSignInButtonInner onSuccess={onSuccess} onError={onError} />;
+  }
+
+  return (
+    <GoogleOAuthProvider clientId={clientId}>
+      <GoogleSignInButtonInner onSuccess={onSuccess} onError={onError} />
+    </GoogleOAuthProvider>
   );
 }

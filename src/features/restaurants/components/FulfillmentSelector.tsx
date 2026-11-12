@@ -5,7 +5,7 @@ import {
   type FulfillmentKey,
   type RestaurantOrderSettings,
 } from '@/shared/types/order-settings';
-import { SegmentedSwitcher } from './SegmentedSwitcher';
+import { SegmentedControl } from '@/shared/ui';
 
 interface FulfillmentSelectorProps {
   settings: RestaurantOrderSettings;
@@ -21,11 +21,15 @@ export function FulfillmentSelector({ settings, value, onChange }: FulfillmentSe
   }
 
   return (
-    <SegmentedSwitcher
-      options={options}
+    <SegmentedControl
+      options={options.map((option) => ({ value: option.key, label: option.title }))}
       value={value}
       onChange={onChange}
       ariaLabel="Способ получения заказа"
+      legacyFulfillmentClasses
+      compact
+      fullWidth
+      testId="cart-fulfillment-segmented"
     />
   );
 }

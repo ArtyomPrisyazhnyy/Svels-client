@@ -1,8 +1,7 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, type ReactNode } from 'react';
-import { ClientOnly } from '@/components/ClientOnly';
+import { Suspense, useEffect, type ReactNode } from 'react';
 import { useAuthHydrated } from '@/hooks/useAuthHydrated';
 import { getPostAuthPath } from '@/shared/routing/get-post-auth-path';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
@@ -14,17 +13,7 @@ import { useAuthStore } from '@/store/auth.store';
 interface RestaurantGuestProtectedRouteProps {
   restaurantId: string;
   children: ReactNode;
-}
-
-function AuthCheckingFallback() {
-  return (
-    <div
-      suppressHydrationWarning
-      style={{ minHeight: '40vh', display: 'grid', placeItems: 'center', color: '#64748b' }}
-    >
-      Проверка доступа…
-    </div>
-  );
+  fallback: ReactNode;
 }
 
 function canAccessRestaurantGuestArea(user: AuthUser, restaurantId: string): boolean {
@@ -38,6 +27,7 @@ function canAccessRestaurantGuestArea(user: AuthUser, restaurantId: string): boo
 function RestaurantGuestProtectedRouteInner({
   restaurantId,
   children,
+  fallback,
 }: RestaurantGuestProtectedRouteProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -80,7 +70,7 @@ function RestaurantGuestProtectedRouteInner({
   }, [hydrated, user, router, pathname, searchParams, restaurantId, logout, paths]);
 
   if (!hydrated || !user || !canAccessRestaurantGuestArea(user, restaurantId)) {
-    return <AuthCheckingFallback />;
+    return fallback;
   }
 
   return children;
@@ -89,12 +79,13 @@ function RestaurantGuestProtectedRouteInner({
 export function RestaurantGuestProtectedRoute({
   restaurantId,
   children,
+  fallback,
 }: RestaurantGuestProtectedRouteProps) {
   return (
-    <ClientOnly fallback={<AuthCheckingFallback />}>
-      <RestaurantGuestProtectedRouteInner restaurantId={restaurantId}>
+    <Suspense fallback={fallback}>
+      <RestaurantGuestProtectedRouteInner restaurantId={restaurantId} fallback={fallback}>
         {children}
       </RestaurantGuestProtectedRouteInner>
-    </ClientOnly>
+    </Suspense>
   );
 }

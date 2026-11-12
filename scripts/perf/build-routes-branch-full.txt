@@ -1,0 +1,95 @@
+
+> svels-client@0.0.0 build
+> next build
+
+   ▲ Next.js 15.5.19
+   - Experiments (use with caution):
+     · staleTimes
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 3.0s
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/176) ...
+   Generating static pages (44/176) 
+   Generating static pages (88/176) 
+   Generating static pages (132/176) 
+ ✓ Generating static pages (176/176)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                           Size  First Load JS  Revalidate  Expire
+┌ ○ /                                                              4.64 kB         117 kB
+├ ○ /_not-found                                                       1 kB         105 kB
+├ ○ /account                                                         162 B         104 kB
+├ ○ /admin                                                         9.12 kB         116 kB
+├ ƒ /api/revalidate                                                  162 B         104 kB
+├ ○ /auth                                                            162 B         104 kB
+├ ○ /auth/guest                                                      162 B         104 kB
+├ ○ /auth/restaurant                                               6.99 kB         114 kB
+├ ○ /auth/set-password                                             3.66 kB         111 kB
+├ ○ /booking                                                         162 B         104 kB
+├ ○ /dev/ui                                                         7.2 kB         124 kB
+├ ○ /favorites                                                       162 B         104 kB
+├ ○ /offer                                                           208 B         112 kB
+├ ○ /pre-order                                                       162 B         104 kB
+├ ○ /privacypolicy                                                   208 B         112 kB
+├ ○ /restaurant-admin                                                162 B         104 kB
+├ ○ /restaurant-admin/account                                      3.29 kB         107 kB
+├ ○ /restaurant-admin/banners                                      6.05 kB         110 kB
+├ ○ /restaurant-admin/booking-settings                             2.51 kB         108 kB
+├ ○ /restaurant-admin/bookings                                     3.51 kB         107 kB
+├ ○ /restaurant-admin/branding                                     4.34 kB         108 kB
+├ ○ /restaurant-admin/floor-plan                                   9.05 kB         120 kB
+├ ○ /restaurant-admin/legal                                        2.37 kB         109 kB
+├ ○ /restaurant-admin/locations                                     3.9 kB         110 kB
+├ ○ /restaurant-admin/loyalty                                      5.15 kB         111 kB
+├ ○ /restaurant-admin/menu                                         9.33 kB         121 kB
+├ ○ /restaurant-admin/order-settings                                2.8 kB         109 kB
+├ ○ /restaurant-admin/orders                                       9.62 kB         120 kB
+├ ○ /restaurant-admin/payment-settings                             2.46 kB         108 kB
+├ ○ /restaurant-admin/preview                                      2.19 kB         144 kB
+├ ○ /restaurant-admin/social-links                                 6.68 kB         110 kB
+├ ○ /restaurant-admin/styling                                      15.8 kB         132 kB
+├ ● /restaurants/[id]                                                232 B         142 kB          1h      1y
+├   ├ /restaurants/01a12fbd-c824-7032-b2f1-6ed1cc393437                                            1h      1y
+├   ├ /restaurants/01a12fa0-54eb-7220-a371-3b7c724b5493                                            1h      1y
+├   ├ /restaurants/01a12fcf-91a0-770c-ac28-327c53d63aa1                                            1h      1y
+├   └ [+25 more paths]
+├ ● /restaurants/[id]/account                                       4.5 kB         115 kB          1h      1y
+├   ├ /restaurants/01a12fbd-c824-7032-b2f1-6ed1cc393437/account                                    1h      1y
+├   ├ /restaurants/01a12fa0-54eb-7220-a371-3b7c724b5493/account                                    1h      1y
+├   ├ /restaurants/01a12fcf-91a0-770c-ac28-327c53d63aa1/account                                    1h      1y
+├   └ [+25 more paths]
+├ ƒ /restaurants/[id]/auth                                          9.2 kB         122 kB
+├ ● /restaurants/[id]/booking                                      4.64 kB         129 kB          1h      1y
+├   ├ /restaurants/01a12fbd-c824-7032-b2f1-6ed1cc393437/booking                                    1h      1y
+├   ├ /restaurants/01a12fa0-54eb-7220-a371-3b7c724b5493/booking                                    1h      1y
+├   ├ /restaurants/01a12fcf-91a0-770c-ac28-327c53d63aa1/booking                                    1h      1y
+├   └ [+25 more paths]
+├ ● /restaurants/[id]/favorites                                    6.77 kB         137 kB          1h      1y
+├   ├ /restaurants/01a12fbd-c824-7032-b2f1-6ed1cc393437/favorites                                  1h      1y
+├   ├ /restaurants/01a12fa0-54eb-7220-a371-3b7c724b5493/favorites                                  1h      1y
+├   ├ /restaurants/01a12fcf-91a0-770c-ac28-327c53d63aa1/favorites                                  1h      1y
+├   └ [+25 more paths]
+├ ƒ /restaurants/[id]/legal                                          215 B         107 kB
+├ ƒ /restaurants/[id]/payment/result                               4.76 kB         112 kB
+├ ● /restaurants/[id]/pre-order                                    5.08 kB         119 kB          1h      1y
+├   ├ /restaurants/01a12fbd-c824-7032-b2f1-6ed1cc393437/pre-order                                  1h      1y
+├   ├ /restaurants/01a12fa0-54eb-7220-a371-3b7c724b5493/pre-order                                  1h      1y
+├   ├ /restaurants/01a12fcf-91a0-770c-ac28-327c53d63aa1/pre-order                                  1h      1y
+├   └ [+25 more paths]
+├ ○ /robots.txt                                                      162 B         104 kB
+├ ○ /sitemap.xml                                                     162 B         104 kB          1h      1y
+└ ƒ /uploads/[...path]                                               162 B         104 kB
++ First Load JS shared by all                                       104 kB
+  ├ chunks/1255-baf70d801e9ffeae.js                                  46 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js                            54.2 kB
+  └ other shared chunks (total)                                    3.36 kB
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

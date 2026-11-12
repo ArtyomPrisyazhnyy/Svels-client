@@ -60,11 +60,24 @@ export const PROMO_BANNER_ASPECT_RATIO_LABELS: Record<PromoBannerAspectRatio, st
   '16_9': '16∶9 — как на ТВ',
 };
 
+export function normalizePromoBannerAspectRatio(
+  value: unknown,
+): PromoBannerAspectRatio {
+  if (value === '16_9' || value === '16:9' || value === 'RATIO_16_9') {
+    return '16_9';
+  }
+  return '4_1';
+}
+
+export function promoBannerAspectRatioToCss(ratio: PromoBannerAspectRatio): string {
+  return ratio === '16_9' ? '16 / 9' : '4 / 1';
+}
+
 export function resolvePromoBannerAspectRatio(
   banner: Pick<PromoBanner, 'aspectRatio' | 'type'>,
 ): PromoBannerAspectRatio {
   if (banner.type !== 'strip') {
     return '4_1';
   }
-  return banner.aspectRatio === '16_9' ? '16_9' : '4_1';
+  return normalizePromoBannerAspectRatio(banner.aspectRatio);
 }

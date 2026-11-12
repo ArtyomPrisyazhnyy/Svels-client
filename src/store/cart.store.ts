@@ -2,8 +2,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CartCheckoutDraft, CartLineItem } from '@/shared/types/cart';
 import { createDefaultCheckoutDraft } from '@/shared/types/cart';
-import { getCartTotals } from '@/features/restaurants/utils/cart.util';
 import { normalizePhoneForPhoneInput } from '@/shared/utils/phone.util';
+import { sumCartQuantity } from '@/features/restaurants/utils/cart-items-label.util';
+import { commerceEpoch, registerCartReset } from './commerce-session';
 
 const CART_PERSIST_VERSION = 2;
 
@@ -29,10 +30,16 @@ interface CartState extends CartPersistedV1 {
 }
 
 function normalizeCheckoutDraft(draft: CartCheckoutDraft): CartCheckoutDraft {
+  const defaults = createDefaultCheckoutDraft(draft.fulfillment);
   return {
+    ...defaults,
     ...draft,
     phone: normalizePhoneForPhoneInput(draft.phone),
     recipientPhone: normalizePhoneForPhoneInput(draft.recipientPhone),
+    saveDeliveryAddress: draft.saveDeliveryAddress ?? defaults.saveDeliveryAddress,
+    deliveryAddressLabel: draft.deliveryAddressLabel ?? defaults.deliveryAddressLabel,
+    saveAddressPromptVisible:
+      draft.saveAddressPromptVisible ?? defaults.saveAddressPromptVisible,
   };
 }
 
@@ -88,7 +95,11 @@ export const useCartStore = create<CartState>()(
         if (existingIndex >= 0) {
           const nextItems = currentItems.map((item, index) =>
             index === existingIndex
-              ? { ...item, quantity: item.quantity + line.quantity }
+              ? {
+                  ...item,
+                  quantity: item.quantity + line.quantity,
+                  imageVariants: item.imageVariants ?? line.imageVariants,
+                }
               : item,
           );
 
@@ -135,7 +146,11 @@ export const useCartStore = create<CartState>()(
       },
 
       getRestaurantTotals: (restaurantId) => {
-        return getCartTotals(get().getRestaurantItems(restaurantId));
+        const items = get().getRestaurantItems(restaurantId);
+        return {
+          itemCount: sumCartQuantity(items),
+          totalAmount: items.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0),
+        };
       },
 
       getCheckoutDraft: (restaurantId, defaultFulfillment = 'fulfillmentTakeaway') => {
@@ -173,3 +188,21 @@ export const useCartStore = create<CartState>()(
     },
   ),
 );
+
+registerCartReset(() => {
+  useCartStore.getState().clearCart();
+});
+
+/** Re-read storage. A logout that lands mid-flight wins over the stale snapshot. */
+export function rehydrateCartStore(): Promise<void> {
+  const ticket = commerceEpoch();
+  return Promise.resolve(useCartStore.persist.rehydrate()).then(() => {
+    if (ticket !== commerceEpoch()) {
+      useCartStore.getState().clearCart();
+    }
+  });
+}
+
+if (typeof window !== 'undefined') {
+  void rehydrateCartStore();
+}

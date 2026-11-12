@@ -1,6 +1,10 @@
 import { apiRequest } from '@/shared/api/api-client';
 import type {
   AuthResponse,
+  GuestOAuthAppleLoginPayload,
+  GuestOAuthGoogleLoginPayload,
+  GuestOAuthLoginResponse,
+  GuestOAuthProvidersResponse,
   GuestOtpRegisterPayload,
   GuestOtpSendPayload,
   GuestOtpSendResponse,
@@ -46,4 +50,38 @@ export function registerGuestWithOtp(
     method: 'POST',
     body: JSON.stringify(payload),
   });
+}
+
+export function fetchGuestOAuthProviders(
+  restaurantId: string,
+): Promise<GuestOAuthProvidersResponse> {
+  return apiRequest<GuestOAuthProvidersResponse>(
+    `/restaurants/${restaurantId}/auth/oauth/providers`,
+  );
+}
+
+export function loginGuestWithGoogleOAuth(
+  restaurantId: string,
+  payload: GuestOAuthGoogleLoginPayload,
+): Promise<GuestOAuthLoginResponse> {
+  return apiRequest<GuestOAuthLoginResponse>(
+    `/restaurants/${restaurantId}/auth/oauth/google`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  );
+}
+
+export function loginGuestWithAppleOAuth(
+  restaurantId: string,
+  payload: GuestOAuthAppleLoginPayload,
+): Promise<GuestOAuthLoginResponse> {
+  return apiRequest<GuestOAuthLoginResponse>(
+    `/restaurants/${restaurantId}/auth/oauth/apple`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  );
 }

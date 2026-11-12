@@ -1,16 +1,14 @@
 'use client';
 
-import type { CartLineItem } from '@/shared/types/cart';
-import { useCartHydrated } from '@/hooks/useCartHydrated';
-import { useCartStore } from '@/store/cart.store';
+import { useEffect, useState } from 'react';
+import { formatCartItemsCount, sumCartQuantity } from '../utils/cart-items-label.util';
+import { preloadRestaurantCartModal } from './lazy-venue-modals';
 import '../styles/restaurant-cart-button.scss';
 
 interface RestaurantCartButtonProps {
   restaurantId: string;
   onOpen: () => void;
 }
-
-const EMPTY_CART_ITEMS: CartLineItem[] = [];
 
 function CartIcon() {
   return (
@@ -33,11 +31,36 @@ function CartIcon() {
 }
 
 export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartButtonProps) {
-  const hydrated = useCartHydrated();
-  const items = useCartStore((s) =>
-    s.restaurantId === restaurantId ? s.items : EMPTY_CART_ITEMS,
-  );
-  const itemCount = items.reduce((sum, line) => sum + line.quantity, 0);
+  const [hydrated, setHydrated] = useState(false);
+  const [itemCount, setItemCount] = useState(0);
+
+  useEffect(() => {
+    preloadRestaurantCartModal();
+    let unsubscribe = () => {};
+    let cancelled = false;
+
+    void import('@/store/cart.store').then(({ useCartStore, rehydrateCartStore }) => {
+      if (cancelled) {
+        return;
+      }
+      const { persist } = useCartStore;
+      const sync = () => {
+        const state = useCartStore.getState();
+        const items = state.restaurantId === restaurantId ? state.items : [];
+        setItemCount(sumCartQuantity(items));
+        setHydrated(!persist?.hasHydrated || persist.hasHydrated());
+      };
+      void rehydrateCartStore().finally(sync);
+      sync();
+      unsubscribe = useCartStore.subscribe(sync);
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [restaurantId]);
+
   const hasItems = hydrated && itemCount > 0;
 
   return (
@@ -45,11 +68,17 @@ export function RestaurantCartButton({ restaurantId, onOpen }: RestaurantCartBut
       type="button"
       className="restaurant-cart-button"
       onClick={onOpen}
-      aria-label={hasItems ? `Корзина, ${itemCount} поз.` : 'Корзина'}
+      onMouseEnter={preloadRestaurantCartModal}
+      onTouchStart={preloadRestaurantCartModal}
+      aria-label={hasItems ? `Корзина, ${formatCartItemsCount(itemCount)}` : 'Корзина'}
       data-testid="cart-button"
     >
       <CartIcon />
-      {hasItems && <span className="restaurant-cart-button__badge">{itemCount}</span>}
+      {hasItems && (
+        <span className="restaurant-cart-button__badge" data-testid="cart-button-badge">
+          {itemCount}
+        </span>
+      )}
     </button>
   );
 }

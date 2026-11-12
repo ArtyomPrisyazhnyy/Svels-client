@@ -17,6 +17,16 @@
 
 ## 3. Shared primitives only (`src/shared/ui`)
 Modal, Sheet, SegmentedControl, Button, IconButton, Field, Input, Select, Textarea, Checkbox, Stack, Cluster, Skeleton, PageTitle, VenueHeader.
+
+| Primitive | Import example |
+| --- | --- |
+| Modal / Sheet | `import { Modal, Sheet } from '@/shared/ui'` |
+| SegmentedControl | `import { SegmentedControl } from '@/shared/ui'` |
+| Button / IconButton | `import { Button, IconButton } from '@/shared/ui'` |
+| Field + inputs | `import { Field, Input, Textarea, Select, Checkbox } from '@/shared/ui'` |
+| Layout | `import { Stack, Cluster } from '@/shared/ui'` |
+| Loading / titles | `import { Skeleton, SkeletonList, PageTitle } from '@/shared/ui'` |
+
 - Need a variant → add a prop to the primitive; do not write a local copy or local overrides.
 - Modals: backdrop click, Escape and × close, focus trap, focus return, scroll lock — all come from Modal/Sheet.
 - A choice of 2–4 options = SegmentedControl. More than 4 = Select or chips. Two separate buttons acting as a switch are forbidden.

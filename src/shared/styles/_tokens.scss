@@ -18,6 +18,7 @@ $z-scale: (
   dropdown: 30,
   sheet: 40,
   modal: 50,
+  stacked: 55,
   toast: 60,
 ) !default;
 
@@ -74,8 +75,12 @@ $z-scale: (
   --rs-primary-soft: #eff6ff;
   --rs-surface: #ffffff;
   --rs-on-primary: #ffffff;
-  --rs-danger: #ef4444;
-  --overlay: rgba(15, 23, 42, 0.5);
+  --rs-danger: #dc2626;
+  --overlay: rgba(15, 23, 42, 0.55);
+  /* Текст и подложка на фото — одинаковые во всех темах, не зависят от --rs-text/--rs-bg. */
+  --rs-on-media: #ffffff;
+  --rs-on-media-muted: color-mix(in srgb, var(--rs-on-media) 80%, transparent);
+  --rs-media-scrim: rgb(0 0 0 / 0.78);
 }
 
 @media (min-width: 768px) {

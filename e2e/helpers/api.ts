@@ -6,6 +6,10 @@ import type {
   PreOrderResponse,
 } from '../../src/shared/types/pre-order';
 import type {
+  CreateGuestAddressPayload,
+  GuestAddress,
+} from '../../src/shared/types/guest-address';
+import type {
   RestaurantOrderSettings,
   UpdateRestaurantOrderSettingsPayload,
 } from '../../src/shared/types/order-settings';
@@ -35,6 +39,16 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/** Shared pause so a 429 does not turn into a retry storm against the 100/min limiter. */
+let rateLimitedUntil = 0;
+
+async function waitOutRateLimit(): Promise<void> {
+  const delay = rateLimitedUntil - Date.now();
+  if (delay > 0) {
+    await sleep(delay);
+  }
+}
+
 async function api<T>(
   method: string,
   pathname: string,
@@ -48,6 +62,7 @@ async function api<T>(
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
+    await waitOutRateLimit();
     const headers: Record<string, string> = {
       Accept: 'application/json',
     };
@@ -69,7 +84,8 @@ async function api<T>(
     const data = text ? (JSON.parse(text) as unknown) : null;
 
     if (response.status === 429 && attempt < retries) {
-      await sleep(1500 * (attempt + 1));
+      rateLimitedUntil = Math.max(rateLimitedUntil, Date.now() + 10_000);
+      await waitOutRateLimit();
       continue;
     }
 
@@ -157,8 +173,26 @@ export const apiClient = {
     });
   },
 
+  patchMenuCategory(restaurantId: string, token: string, categoryId: string, name: string) {
+    return api('PATCH', `/restaurants/${restaurantId}/menu/categories/${categoryId}`, {
+      token,
+      body: { name },
+    });
+  },
+
   getRestaurant(id: string) {
     return api<PublicRestaurant>('GET', `/restaurants/${id}`);
+  },
+
+  patchRestaurant(
+    restaurantId: string,
+    token: string,
+    payload: { logoUrl?: string | null; logoWebpUrl?: string | null; name?: string },
+  ) {
+    return api<PublicRestaurant>('PATCH', `/restaurants/${restaurantId}`, {
+      token,
+      body: payload,
+    });
   },
 
   sendGuestOtp(restaurantId: string, phone: string) {
@@ -224,6 +258,33 @@ export const apiClient = {
     return api<{ bookingEnabled: boolean; mode: string }>(
       'GET',
       `/restaurants/${restaurantId}/booking-settings`,
+    );
+  },
+
+  updateBookingSettings(
+    restaurantId: string,
+    token: string,
+    payload: { bookingEnabled?: boolean },
+  ) {
+    return api<{ bookingEnabled: boolean }>('PATCH', `/restaurants/${restaurantId}/booking-settings`, {
+      token,
+      body: payload,
+    });
+  },
+
+  addGuestFavorite(restaurantId: string, token: string, menuItemId: string) {
+    return api<{ menuItemIds: string[] }>(
+      'POST',
+      `/restaurants/${restaurantId}/favorites/${menuItemId}`,
+      { token },
+    );
+  },
+
+  removeGuestFavorite(restaurantId: string, token: string, menuItemId: string) {
+    return api<{ menuItemIds: string[] }>(
+      'DELETE',
+      `/restaurants/${restaurantId}/favorites/${menuItemId}`,
+      { token },
     );
   },
 
@@ -345,7 +406,7 @@ export const apiClient = {
       name: 'E2E Вода',
       price: 2,
       description: 'Playwright seed drink',
-      imageUrl: 'https://example.com/e2e-drink.jpg',
+      imageUrl: '/e2e/menu-dish.png',
     });
 
     await api('PATCH', `/restaurants/${restaurantId}/styling`, {
@@ -358,7 +419,7 @@ export const apiClient = {
       name: 'E2E Блюдо 9.90',
       price: 9.9,
       description: 'Playwright seed item',
-      imageUrl: 'https://example.com/e2e-item.jpg',
+      imageUrl: '/e2e/menu-dish.png',
     })) as { id: string };
 
     const modifierItem = (await this.createMenuItem(restaurantId, adminToken, {
@@ -366,7 +427,7 @@ export const apiClient = {
       name: 'E2E С модификатором',
       price: 12.5,
       description: 'Playwright seed item with modifiers',
-      imageUrl: 'https://example.com/e2e-item-mod.jpg',
+      imageUrl: '/e2e/menu-dish.png',
       modifierGroups: [
         {
           name: 'Добавка',
@@ -382,5 +443,48 @@ export const apiClient = {
       defaultMenuItemId: defaultItem.id,
       modifierMenuItemId: modifierItem.id,
     };
+  },
+
+  listGuestAddresses(restaurantId: string, token: string) {
+    return api<GuestAddress[]>('GET', `/restaurants/${restaurantId}/me/addresses`, {
+      token,
+    });
+  },
+
+  createGuestAddress(
+    restaurantId: string,
+    token: string,
+    payload: CreateGuestAddressPayload,
+  ) {
+    return api<GuestAddress>('POST', `/restaurants/${restaurantId}/me/addresses`, {
+      token,
+      body: payload,
+    });
+  },
+
+  deleteGuestAddress(restaurantId: string, token: string, addressId: string) {
+    return api<void>('DELETE', `/restaurants/${restaurantId}/me/addresses/${addressId}`, {
+      token,
+    });
+  },
+
+  async seedGuestAddresses(
+    restaurantId: string,
+    token: string,
+    count: number,
+  ): Promise<GuestAddress[]> {
+    const created: GuestAddress[] = [];
+    for (let index = 0; index < count; index += 1) {
+      created.push(
+        await this.createGuestAddress(restaurantId, token, {
+          label: index === 0 ? 'Дом' : `Адрес ${index + 1}`,
+          street: `Улица ${index + 1}`,
+          house: String(index + 10),
+          apartment: index % 2 === 0 ? String(index + 1) : undefined,
+          isDefault: index === 0,
+        }),
+      );
+    }
+    return created;
   },
 };

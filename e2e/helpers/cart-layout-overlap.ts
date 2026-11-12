@@ -59,6 +59,13 @@ function parseAlpha(color: string): number {
 export async function assertCartPanelBackgroundIsOpaque(page: Page): Promise<void> {
   const panel = page.getByTestId('cart-modal-panel');
   await expect(panel).toBeVisible();
+  await expect(panel).toHaveClass(/ui-overlay-panel--active/);
+  await expect
+    .poll(async () => {
+      const opacity = await panel.evaluate((el) => Number.parseFloat(getComputedStyle(el).opacity));
+      return opacity;
+    })
+    .toBeGreaterThanOrEqual(0.99);
   const colors = await panel.evaluate((el) => {
     const style = getComputedStyle(el);
     return {
@@ -112,7 +119,7 @@ export async function assertCartStep1SectionSpacing(page: Page): Promise<void> {
 export async function assertCartStep2SectionSpacing(page: Page): Promise<void> {
   const checkout = page.getByTestId('cart-checkout-step');
   await expect(checkout).toBeVisible();
-  const contacts = checkout.locator('.restaurant-cart-modal__contacts-card');
+  const contacts = checkout.getByTestId('cart-contacts-section');
   const timeRow = checkout.getByTestId('cart-time-row');
   await assertMinVerticalGap(
     contacts,
@@ -134,18 +141,23 @@ export async function assertCartMobileLayoutNoOverlap(page: Page): Promise<void>
     },
     {
       a: modal.getByTestId('cart-header-title'),
-      b: modal.getByTestId('cart-clear'),
-      label: 'title vs clear',
-    },
-    {
-      a: modal.getByTestId('cart-header-title'),
       b: modal.getByTestId('cart-back-to-step-1'),
       label: 'title vs back',
     },
     {
-      a: modal.locator('.restaurant-cart-modal__item-main').first(),
+      a: modal.locator('.restaurant-cart-modal__item-title').first(),
       b: modal.getByTestId('cart-item-counter').first(),
-      label: 'item main vs counter',
+      label: 'item title vs counter',
+    },
+    {
+      a: modal.locator('.restaurant-cart-modal__item-notes').first(),
+      b: modal.getByTestId('cart-item-counter').first(),
+      label: 'item notes vs counter',
+    },
+    {
+      a: modal.locator('.restaurant-cart-modal__item-price').first(),
+      b: modal.getByTestId('cart-item-counter').first(),
+      label: 'item price vs counter',
     },
     {
       a: modal.getByTestId('cart-modal-footer').locator('.restaurant-cart-modal__total'),

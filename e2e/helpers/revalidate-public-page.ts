@@ -3,7 +3,7 @@ import { getBaseUrl } from './env';
 export async function revalidateRestaurantPublicPage(restaurantId: string): Promise<void> {
   const secret = process.env.REVALIDATE_SECRET;
   if (!secret) {
-    return;
+    throw new Error('REVALIDATE_SECRET is required to refresh the public page cache');
   }
 
   const response = await fetch(`${getBaseUrl()}/api/revalidate`, {

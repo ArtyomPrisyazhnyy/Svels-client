@@ -13,6 +13,9 @@ export interface BuildCheckoutPayloadInput {
   customerPhone: string;
   locationId: string | null;
   deliveryAddress: DeliveryAddress | null;
+  addressId?: string | null;
+  saveAddress?: boolean;
+  addressLabel?: string | null;
   requestedAtIso: string | null;
   orderForSomeoneElse: boolean;
   recipientName: string;
@@ -42,18 +45,29 @@ export function buildCreatePreOrderPayload(
     comment: input.comment.trim() || undefined,
   };
 
-  if (input.fulfillment === 'fulfillmentDelivery' && input.deliveryAddress) {
-    const { street, house, apartment, entrance, floor, intercom, comment: addrComment } =
-      input.deliveryAddress;
-    payload.deliveryAddress = {
-      street: street.trim(),
-      house: house.trim(),
-      ...(apartment?.trim() ? { apartment: apartment.trim() } : {}),
-      ...(entrance?.trim() ? { entrance: entrance.trim() } : {}),
-      ...(floor?.trim() ? { floor: floor.trim() } : {}),
-      ...(intercom?.trim() ? { intercom: intercom.trim() } : {}),
-      ...(addrComment?.trim() ? { comment: addrComment.trim() } : {}),
-    };
+  if (input.fulfillment === 'fulfillmentDelivery') {
+    if (input.addressId) {
+      payload.addressId = input.addressId;
+    } else if (input.deliveryAddress) {
+      const { street, house, apartment, entrance, floor, intercom, comment: addrComment } =
+        input.deliveryAddress;
+      payload.deliveryAddress = {
+        street: street.trim(),
+        house: house.trim(),
+        ...(apartment?.trim() ? { apartment: apartment.trim() } : {}),
+        ...(entrance?.trim() ? { entrance: entrance.trim() } : {}),
+        ...(floor?.trim() ? { floor: floor.trim() } : {}),
+        ...(intercom?.trim() ? { intercom: intercom.trim() } : {}),
+        ...(addrComment?.trim() ? { comment: addrComment.trim() } : {}),
+      };
+      if (input.saveAddress) {
+        payload.saveAddress = true;
+        const label = input.addressLabel?.trim();
+        if (label) {
+          payload.addressLabel = label.slice(0, 40);
+        }
+      }
+    }
   }
 
   if (input.requestedAtIso) {

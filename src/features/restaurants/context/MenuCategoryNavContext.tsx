@@ -38,18 +38,6 @@ function getCategoryElementId(categoryId: string): string {
   return `menu-category-${categoryId}`;
 }
 
-function updateHeaderStackHeight(): void {
-  const stack = document.querySelector('.restaurant-public__header-stack');
-  if (!(stack instanceof HTMLElement)) {
-    return;
-  }
-
-  document.documentElement.style.setProperty(
-    '--rs-header-stack-height',
-    `${stack.getBoundingClientRect().height}px`,
-  );
-}
-
 interface MenuCategoryNavProviderProps {
   categories: MenuCategoryNavItem[];
   mode: MenuCategoryNavMode;
@@ -66,6 +54,11 @@ export function MenuCategoryNavProvider({
   const inlineAnchorRef = useRef<HTMLDivElement>(null);
   const inlineNavInnerRef = useRef<HTMLDivElement>(null);
 
+  const resolvedActiveId = categories.some((category) => category.id === activeId)
+    ? activeId
+    : (categories[0]?.id ?? '');
+  const resolvedDocked = mode === 'dock_in_header' && docked;
+
   const scrollToCategory = useCallback((categoryId: string) => {
     const element = document.getElementById(getCategoryElementId(categoryId));
     if (!element) {
@@ -75,16 +68,6 @@ export function MenuCategoryNavProvider({
     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setActiveId(categoryId);
   }, []);
-
-  useEffect(() => {
-    setActiveId((current) => {
-      if (categories.some((category) => category.id === current)) {
-        return current;
-      }
-
-      return categories[0]?.id ?? '';
-    });
-  }, [categories]);
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -110,7 +93,6 @@ export function MenuCategoryNavProvider({
 
   useEffect(() => {
     if (mode !== 'dock_in_header') {
-      setDocked(false);
       return;
     }
 
@@ -135,32 +117,11 @@ export function MenuCategoryNavProvider({
     };
   }, [mode, categories.length]);
 
-  useEffect(() => {
-    updateHeaderStackHeight();
-
-    const stack = document.querySelector('.restaurant-public__header-stack');
-    if (!(stack instanceof HTMLElement)) {
-      return;
-    }
-
-    const observer = new ResizeObserver(() => {
-      updateHeaderStackHeight();
-    });
-
-    observer.observe(stack);
-    window.addEventListener('resize', updateHeaderStackHeight);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', updateHeaderStackHeight);
-    };
-  }, [docked, categories.length, mode]);
-
   const value: MenuCategoryNavContextValue = {
     categories,
     mode,
-    activeId,
-    docked,
+    activeId: resolvedActiveId,
+    docked: resolvedDocked,
     inlineAnchorRef,
     inlineNavInnerRef,
     scrollToCategory,

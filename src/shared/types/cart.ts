@@ -1,4 +1,5 @@
 import type { ModifierSelections } from '@/features/restaurants/utils/menu-modifiers.util';
+import type { ImageVariants } from '@/shared/types/image-variants';
 import type { DeliveryAddress } from '@/shared/types/pre-order';
 
 export interface CartModifierLine {
@@ -15,6 +16,7 @@ export interface CartLineItem {
   variantLabel: string | null;
   imageUrl: string;
   imageWebpUrl?: string | null;
+  imageVariants?: ImageVariants | null;
   quantity: number;
   unitPrice: number;
   modifiers: CartModifierLine[];
@@ -37,6 +39,10 @@ export interface CartCheckoutDraft {
   recipientName: string;
   recipientPhone: string;
   comment: string;
+  saveDeliveryAddress: boolean;
+  deliveryAddressLabel: string;
+  /** When true, logged-in guest sees save-address controls on delivery checkout. */
+  saveAddressPromptVisible: boolean;
 }
 
 export const EMPTY_DELIVERY_ADDRESS: DeliveryAddress = {
@@ -64,5 +70,8 @@ export function createDefaultCheckoutDraft(
     recipientName: '',
     recipientPhone: '',
     comment: '',
+    saveDeliveryAddress: true,
+    deliveryAddressLabel: '',
+    saveAddressPromptVisible: true,
   };
 }
