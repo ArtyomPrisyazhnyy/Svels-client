@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PhoneInput } from '@/shared/components/PhoneInput';
 import { Modal, Stack } from '@/shared/ui';
 import { Button } from '@/shared/ui/Button/Button';
@@ -18,7 +18,7 @@ import {
   formatRestaurantLocationLine,
   type RestaurantLocation,
 } from '@/shared/types/restaurant-location';
-import { CartBasketBody, CartCheckoutBar } from './CartBasket';
+import { CartBasketBody, CartCheckoutBar, type CartCheckoutTotals } from './CartBasket';
 import { CartLocationPicker } from './CartLocationPicker';
 import { PaymentSelector } from './PaymentSelector';
 import { DeliveryAddressFields } from './DeliveryAddressFields';
@@ -50,6 +50,10 @@ import { useAuthStore } from '@/store/auth.store';
 import { useRestaurantGuestPaths } from '@/shared/routing/restaurant-guest-path';
 import { normalizePhoneForPhoneInput } from '@/shared/utils/phone.util';
 import { createPreOrder } from '../api/pre-orders.api';
+import { useCartQuote } from '../hooks/useCartQuote';
+import { loyaltyDiscountLabel, moneyEquals } from '@/shared/utils/order-price.util';
+import type { PreOrderResponse } from '@/shared/types/pre-order';
+import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import { RestaurantStylingPortalRoot } from '../context/RestaurantStylingContext';
 import {
   buildCreatePreOrderPayload,
@@ -65,6 +69,20 @@ import '../styles/restaurant-cart-modal.scss';
 
 const COMMENT_MAX = 1000;
 const CUSTOMER_NAME_MAX = 120;
+
+function CheckoutButtonLabel({ label, amount }: { label: string; amount: number | null }) {
+  if (amount == null) {
+    return label;
+  }
+  return (
+    <span className="restaurant-cart-modal__submit-label">
+      <span>{label}</span>
+      <span className="restaurant-cart-modal__submit-amount" data-testid="cart-submit-total">
+        <CurrencyAmount amount={amount} fractionDigits={2} />
+      </span>
+    </span>
+  );
+}
 
 type CartStep = 1 | 2;
 
@@ -128,6 +146,13 @@ export function RestaurantCartModal({
   const [showValidationHints, setShowValidationHints] = useState(false);
   const [clearPromptOpen, setClearPromptOpen] = useState(false);
   const [addressSheetOpen, setAddressSheetOpen] = useState(false);
+  const [priceNotice, setPriceNotice] = useState<{
+    key: string;
+    previous: number;
+    amount: number;
+  } | null>(null);
+  const [heldOrder, setHeldOrder] = useState<PreOrderResponse | null>(null);
+  const acceptedTotalRef = useRef<number | null>(null);
 
   const ordersPaused = orderSettings.ordersPaused === true;
 
@@ -154,10 +179,28 @@ export function RestaurantCartModal({
     guestAddressesStatus === 'ready' &&
     guestAddressesCount > 0;
 
-  const totalAmount = useMemo(
+  const clientTotal = useMemo(
     () => items.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0),
     [items],
   );
+  const { phase: quotePhase, quote, showSkeleton, quoteNow, retry: retryQuote } = useCartQuote(
+    restaurantId,
+    items,
+    accessToken,
+  );
+  const quoteItemsKey = useMemo(
+    () => items.map((line) => `${line.lineKey}:${line.quantity}`).join('|'),
+    [items],
+  );
+  const visiblePriceNotice =
+    priceNotice != null && (priceNotice.key === quoteItemsKey || heldOrder != null)
+      ? priceNotice
+      : null;
+  const priceNoticeAmount = visiblePriceNotice?.amount ?? null;
+  const priceNoticePrevious = visiblePriceNotice?.previous ?? null;
+
+  const serverQuote = quotePhase === 'ready' || (quotePhase === 'loading' && quote != null) ? quote : null;
+  const payableTotal = serverQuote?.total ?? clientTotal;
 
   const enabledFulfillment = useMemo(
     () => getEnabledFulfillmentOptions(orderSettings),
@@ -388,8 +431,30 @@ export function RestaurantCartModal({
     setShowValidationHints(false);
   }
 
+  function completeCreatedOrder(order: PreOrderResponse) {
+    setHeldOrder(null);
+    setPriceNotice(null);
+    acceptedTotalRef.current = null;
+    if (order.paymentRedirectUrl) {
+      clearCart();
+      window.location.href = order.paymentRedirectUrl;
+      return;
+    }
+    setSuccessOrderNumber(order.orderNumber);
+    if (accessToken && fulfillment === 'fulfillmentDelivery') {
+      void useGuestAddressesStore.getState().loadAddresses(restaurantId, accessToken);
+    }
+    clearCart();
+  }
+
   async function handleSubmit() {
     setError(null);
+
+    if (heldOrder) {
+      completeCreatedOrder(heldOrder);
+      return;
+    }
+
     setShowValidationHints(true);
 
     if (!canSubmit || !payment || !accessToken) {
@@ -404,6 +469,21 @@ export function RestaurantCartModal({
     setSubmitting(true);
 
     try {
+      if (priceNoticeAmount != null) {
+        acceptedTotalRef.current = priceNoticeAmount;
+      }
+      const seenTotal = serverQuote?.total ?? clientTotal;
+      const fresh = await quoteNow();
+      const pricedTotal = fresh?.total ?? seenTotal;
+      const alreadyAccepted =
+        acceptedTotalRef.current != null && moneyEquals(pricedTotal, acceptedTotalRef.current);
+      if (fresh && !moneyEquals(fresh.total, seenTotal) && !alreadyAccepted) {
+        acceptedTotalRef.current = null;
+        setPriceNotice({ key: quoteItemsKey, previous: seenTotal, amount: fresh.total });
+        setSubmitting(false);
+        return;
+      }
+
       const usesSavedAddresses =
         fulfillment === 'fulfillmentDelivery' &&
         isGuestOfRestaurant &&
@@ -444,17 +524,14 @@ export function RestaurantCartModal({
 
       const order = await createPreOrder(restaurantId, accessToken, payload);
 
-      if (order.paymentRedirectUrl) {
-        clearCart();
-        window.location.href = order.paymentRedirectUrl;
+      if (!moneyEquals(order.totalAmount, pricedTotal)) {
+        setHeldOrder(order);
+        setPriceNotice({ key: quoteItemsKey, previous: pricedTotal, amount: order.totalAmount });
+        setSubmitting(false);
         return;
       }
 
-      setSuccessOrderNumber(order.orderNumber);
-      if (accessToken && fulfillment === 'fulfillmentDelivery') {
-        void useGuestAddressesStore.getState().loadAddresses(restaurantId, accessToken);
-      }
-      clearCart();
+      completeCreatedOrder(order);
     } catch (err) {
       setError(getPreOrderErrorMessage(err));
       if (err instanceof ApiError && err.code === 'phone_required') {
@@ -491,9 +568,45 @@ export function RestaurantCartModal({
   const modalTitle = step2 ? getStep2Title(fulfillment) : 'Корзина';
   const titleId = 'restaurant-cart-modal-title';
 
+  const checkoutTotals: CartCheckoutTotals = showSkeleton
+    ? { mode: 'skeleton', total: clientTotal }
+    : serverQuote
+      ? {
+          mode: 'quote',
+          total: serverQuote.total,
+          subtotal: serverQuote.subtotal,
+          discountLabel: serverQuote.loyaltyDiscount
+            ? loyaltyDiscountLabel(serverQuote.loyaltyDiscount)
+            : null,
+          discountAmount: serverQuote.loyaltyDiscount?.amount ?? 0,
+          gifts: serverQuote.giftRewards,
+          priceNoticeAmount,
+          priceNoticePrevious,
+        }
+      : {
+          mode: 'fallback',
+          total: clientTotal,
+          onRetry: quotePhase === 'error' ? () => void retryQuote() : undefined,
+          priceNoticeAmount,
+          priceNoticePrevious,
+        };
+
+  const showServerTotalOnButton =
+    priceNoticeAmount != null ||
+    (serverQuote != null && !moneyEquals(serverQuote.total, clientTotal));
+  const buttonTotal = showServerTotalOnButton ? payableTotal : null;
+
+  const submitLabel = heldOrder
+    ? heldOrder.paymentRedirectUrl
+      ? 'Перейти к оплате'
+      : 'Продолжить'
+    : priceNoticeAmount != null
+      ? 'Подтвердить цену'
+      : checkoutValidation.ctaLabel;
+
   const footer =
     successOrderNumber === null ? (
-      <CartCheckoutBar totalAmount={totalAmount}>
+      <CartCheckoutBar totalAmount={clientTotal} totals={checkoutTotals}>
         {step2 ? (
           <Button
             type="button"
@@ -506,7 +619,11 @@ export function RestaurantCartModal({
             testId="cart-submit"
             className="restaurant-cart-modal__submit"
           >
-            {submitting ? 'Оформление…' : checkoutValidation.ctaLabel}
+            {submitting ? (
+              'Оформление…'
+            ) : (
+              <CheckoutButtonLabel label={submitLabel} amount={buttonTotal} />
+            )}
           </Button>
         ) : (
           <Button
@@ -519,7 +636,7 @@ export function RestaurantCartModal({
             testId="cart-go-to-checkout"
             className="restaurant-cart-modal__submit"
           >
-            Оформить заказ
+            <CheckoutButtonLabel label="Оформить заказ" amount={buttonTotal} />
           </Button>
         )}
       </CartCheckoutBar>

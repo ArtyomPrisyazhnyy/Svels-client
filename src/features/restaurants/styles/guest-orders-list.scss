@@ -118,6 +118,17 @@
   }
 }
 
+.guest-orders-list__prices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.guest-orders-list__prices .guest-orders-list__detail-row,
+.guest-orders-list__prices .guest-orders-list__total {
+  margin: 0;
+}
+
 .guest-orders-list__total {
   margin: 0;
   font-weight: 600;

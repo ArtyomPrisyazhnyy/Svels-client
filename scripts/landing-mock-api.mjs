@@ -13,6 +13,93 @@ const port = Number(process.env.PORT ?? 3000);
 const host = process.env.HOST ?? '127.0.0.1';
 const demo = buildLandingDemoPayload();
 const id = LANDING_DEMO_RESTAURANT_ID;
+const menuById = new Map();
+for (const category of demo.menu.categories) {
+  for (const item of category.items) {
+    menuById.set(item.id, item);
+  }
+}
+
+const QUOTE_ITEM_KEYS = new Set(['menuItemId', 'quantity', 'modifierSelections']);
+
+function roundMoney(value) {
+  return Math.round(Number(value) * 100) / 100;
+}
+
+/** Котировка без цен из тела. Демо-токен — персонал, скидки гостя нет. */
+function buildQuote(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return { status: 400, body: { message: 'Bad request' } };
+  }
+  const extraRoot = Object.keys(body).filter((key) => key !== 'items');
+  if (extraRoot.length > 0) {
+    return { status: 400, body: { message: `property ${extraRoot[0]} should not exist` } };
+  }
+  if (!Array.isArray(body.items) || body.items.length === 0) {
+    return { status: 400, body: { message: 'items required', code: 'ITEM_UNAVAILABLE' } };
+  }
+
+  const lines = [];
+  for (const item of body.items) {
+    if (!item || typeof item !== 'object') {
+      return { status: 400, body: { message: 'Bad request' } };
+    }
+    const extra = Object.keys(item).filter((key) => !QUOTE_ITEM_KEYS.has(key));
+    if (extra.length > 0) {
+      return { status: 400, body: { message: `property ${extra[0]} should not exist` } };
+    }
+    const menuItem = menuById.get(item.menuItemId);
+    if (!menuItem || menuItem.isAvailable === false) {
+      return { status: 400, body: { message: 'Позиция недоступна', code: 'ITEM_UNAVAILABLE' } };
+    }
+    let unit = Number(menuItem.price) || 0;
+    const modifiers = [];
+    const selections = item.modifierSelections ?? {};
+    if (selections != null && (typeof selections !== 'object' || Array.isArray(selections))) {
+      return { status: 400, body: { message: 'property modifierSelections should not exist' } };
+    }
+    for (const [groupId, optionIds] of Object.entries(selections)) {
+      const group = (menuItem.modifierGroups ?? []).find((row) => row.id === groupId);
+      if (!group || !Array.isArray(optionIds)) {
+        return { status: 400, body: { message: 'Некорректные модификаторы', code: 'INVALID_MODIFIERS' } };
+      }
+      for (const optionId of optionIds) {
+        const option = group.options.find((row) => row.id === optionId);
+        if (!option) {
+          return { status: 400, body: { message: 'Некорректные модификаторы', code: 'INVALID_MODIFIERS' } };
+        }
+        const priceDelta = Number(option.priceDelta) || 0;
+        unit += priceDelta;
+        modifiers.push({ groupName: group.name, optionName: option.name, priceDelta });
+      }
+    }
+    const quantity = Number(item.quantity);
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      return { status: 400, body: { message: 'quantity must be a positive integer' } };
+    }
+    const unitPrice = roundMoney(unit);
+    lines.push({
+      menuItemId: item.menuItemId,
+      name: menuItem.name,
+      quantity,
+      unitPrice,
+      modifiers,
+      lineTotal: roundMoney(unitPrice * quantity),
+    });
+  }
+
+  const subtotal = roundMoney(lines.reduce((sum, line) => sum + line.lineTotal, 0));
+  return {
+    status: 200,
+    body: {
+      lines,
+      subtotal,
+      loyaltyDiscount: null,
+      giftRewards: [],
+      total: subtotal,
+    },
+  };
+}
 
 function json(res, status, body) {
   res.writeHead(status, {
@@ -125,6 +212,17 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       json(res, 401, { message: 'Invalid credentials' });
+    } catch {
+      json(res, 400, { message: 'Bad request' });
+    }
+    return;
+  }
+
+  if (req.method === 'POST' && path === `/restaurants/${id}/pre-orders/quote`) {
+    try {
+      const body = await readBody(req);
+      const result = buildQuote(body);
+      json(res, result.status, result.body);
     } catch {
       json(res, 400, { message: 'Bad request' });
     }

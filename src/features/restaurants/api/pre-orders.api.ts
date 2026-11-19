@@ -1,10 +1,26 @@
 import { apiRequest } from '@/shared/api/api-client';
 import type {
+  CartQuoteResponse,
   CreatePreOrderPayload,
   OrderDto,
   PaymentInfo,
   PreOrderResponse,
+  QuotePreOrderPayload,
 } from '@/shared/types/pre-order';
+
+export function quotePreOrder(
+  restaurantId: string,
+  payload: QuotePreOrderPayload,
+  token?: string | null,
+  signal?: AbortSignal,
+): Promise<CartQuoteResponse> {
+  return apiRequest<CartQuoteResponse>(`/restaurants/${restaurantId}/pre-orders/quote`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    signal,
+    ...(token ? { token } : {}),
+  });
+}
 
 export function createPreOrder(
   restaurantId: string,

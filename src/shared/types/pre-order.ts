@@ -34,6 +34,45 @@ export interface CreatePreOrderItemPayload {
   modifierSelections?: Record<string, string[]>;
 }
 
+export type LoyaltyDiscountRewardType = 'percent_discount' | 'fixed_discount';
+
+/** Скидка уровня огонька, уже посчитанная сервером. */
+export interface CartLoyaltyDiscount {
+  levelId: string;
+  levelName: string;
+  rewardType: LoyaltyDiscountRewardType;
+  percentOff: number | null;
+  amountOff: number | null;
+  /** Сколько реально вычли из подытога. */
+  amount: number;
+}
+
+export interface CartGiftReward {
+  name: string;
+}
+
+export interface CartQuoteLine {
+  menuItemId: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  modifiers: OrderItemModifierDto[];
+  lineTotal: number;
+}
+
+/** Ответ POST /restaurants/:restaurantId/pre-orders/quote. */
+export interface CartQuoteResponse {
+  lines: CartQuoteLine[];
+  subtotal: number;
+  loyaltyDiscount: CartLoyaltyDiscount | null;
+  giftRewards: CartGiftReward[];
+  total: number;
+}
+
+export interface QuotePreOrderPayload {
+  items: CreatePreOrderItemPayload[];
+}
+
 export interface CreatePreOrderPayload {
   fulfillmentType: FulfillmentType;
   paymentMethod: PreOrderPaymentMethod;
@@ -85,6 +124,16 @@ export interface OrderDto {
   requestedAt: string | null;
   comment: string | null;
   cancelReason: string | null;
+  /**
+   * Поля скидки есть у заказов после серверного расчёта.
+   * Старые ответы без них остаются только с totalAmount.
+   */
+  subtotalAmount?: number;
+  loyaltyDiscountAmount?: number;
+  loyaltyLevelId?: string | null;
+  loyaltyLevelName?: string | null;
+  loyaltyDiscount?: CartLoyaltyDiscount | null;
+  giftRewards?: CartGiftReward[];
   totalAmount: number;
   items: OrderItemDto[];
   bookingId: string | null;
