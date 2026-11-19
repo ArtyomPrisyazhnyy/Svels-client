@@ -1,6 +1,7 @@
 'use client';
 
 import type { OrderDto } from '@/shared/types/pre-order';
+import { readOrderPriceBreakdown } from '@/shared/utils/order-price.util';
 import type { UserRole } from '@/shared/types/auth';
 import type { RestaurantLocation } from '@/shared/types/restaurant-location';
 import { formatRestaurantLocationLine } from '@/shared/types/restaurant-location';
@@ -39,6 +40,36 @@ function formatAddress(order: OrderDto): string {
 
 function formatMoney(amount: number): string {
   return `${amount.toFixed(2)} BYN`;
+}
+
+function OrderPriceBlock({ order }: { order: OrderDto }) {
+  const breakdown = readOrderPriceBreakdown(order);
+  if (!breakdown) {
+    return <p className="orders-admin__total">Итого: {formatMoney(order.totalAmount)}</p>;
+  }
+
+  return (
+    <div className="orders-admin__prices">
+      {breakdown.discountAmount > 0 && (
+        <p className="orders-admin__price-line" data-testid="order-subtotal">
+          <span>Подытог</span>
+          <span>{formatMoney(breakdown.subtotal)}</span>
+        </p>
+      )}
+      {breakdown.discountLabel && (
+        <p className="orders-admin__price-line" data-testid="order-loyalty-discount">
+          <span>{breakdown.discountLabel}</span>
+          <span>−{formatMoney(breakdown.discountAmount)}</span>
+        </p>
+      )}
+      {breakdown.gifts.map((gift) => (
+        <p key={gift.name} className="orders-admin__price-line" data-testid="order-gift-reward">
+          Подарок: {gift.name}
+        </p>
+      ))}
+      <p className="orders-admin__total">Итого: {formatMoney(order.totalAmount)}</p>
+    </div>
+  );
 }
 
 export function OrderCard({
@@ -142,7 +173,7 @@ export function OrderCard({
         ))}
       </ul>
 
-      <p className="orders-admin__total">Итого: {formatMoney(order.totalAmount)}</p>
+      <OrderPriceBlock order={order} />
 
       {order.comment && (
         <p className="orders-admin__comment">

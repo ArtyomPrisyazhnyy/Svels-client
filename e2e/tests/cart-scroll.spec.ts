@@ -55,6 +55,8 @@ async function openCart(page: Page, restaurantId: string) {
   await page.addStyleTag({ content: 'nextjs-portal { display: none !important; }' });
   await page.getByTestId('cart-button').click();
   await expect(page.getByTestId('restaurant-cart-modal')).toBeVisible();
+  await expect(page.getByTestId('cart-totals')).toBeVisible();
+  await expect(page.getByTestId('cart-totals-skeleton')).toHaveCount(0);
   await assertCartPanelBackgroundIsOpaque(page);
   await expect(page.getByTestId('cart-items-header')).toContainText('11 товаров');
 }

@@ -132,6 +132,8 @@ export async function assertCartStep2SectionSpacing(page: Page): Promise<void> {
 export async function assertCartMobileLayoutNoOverlap(page: Page): Promise<void> {
   const modal = page.getByTestId('restaurant-cart-modal');
   await expect(modal).toBeVisible();
+  await expect(page.getByTestId('cart-totals')).toBeVisible();
+  await expect(page.getByTestId('cart-totals-skeleton')).toHaveCount(0);
 
   const pairs: Array<{ a: Locator; b: Locator; label: string }> = [
     {

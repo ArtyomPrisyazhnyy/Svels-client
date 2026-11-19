@@ -1,6 +1,11 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { prepareForScreenshot } from './visual';
 
+export async function waitForCartTotals(page: Page): Promise<void> {
+  await expect(page.getByTestId('cart-totals')).toBeVisible();
+  await expect(page.getByTestId('cart-totals-skeleton')).toHaveCount(0);
+}
+
 export async function assertCartTitleCentered(panel: Locator): Promise<void> {
   const title = panel.getByTestId('cart-header-title');
   await expect(title).toBeVisible();

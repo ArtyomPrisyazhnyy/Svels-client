@@ -5,7 +5,9 @@ import {
   assertExpandedRowContentGap,
   snapCartCrop,
   snapCartPanel,
+  waitForCartTotals,
 } from '../helpers/cart-visual';
+import { mockPlainCartQuote } from '../helpers/cart-quote-mock';
 import { VIEWPORTS, type VisualViewportKey } from '../helpers/visual';
 import { clearGuestAddresses } from '../helpers/guest-addresses';
 import type { CartLineItem } from '../../src/shared/types/cart';
@@ -54,6 +56,8 @@ async function seedCart(
   itemCount = 1,
   saveAddressPrompt = false,
 ) {
+  const cartItems = Array.from({ length: itemCount }, (_, index) => buildLine(index + 1));
+  await mockPlainCartQuote(page, restaurantId, cartItems);
   await page.addInitScript(
     ({ rid, cartItems, fulfillmentKey, showSavePrompt }) => {
       window.localStorage.setItem(
@@ -96,7 +100,7 @@ async function seedCart(
     },
     {
       rid: restaurantId,
-      cartItems: Array.from({ length: itemCount }, (_, index) => buildLine(index + 1)),
+      cartItems,
       fulfillmentKey: fulfillment,
       showSavePrompt: saveAddressPrompt,
     },
@@ -154,6 +158,7 @@ async function openScenario(
   await page.getByTestId('cart-button').click();
   const panel = page.getByTestId('cart-modal-panel');
   await expect(panel).toBeVisible();
+  await waitForCartTotals(page);
 
   if (scenario === 'step1') {
     return panel;

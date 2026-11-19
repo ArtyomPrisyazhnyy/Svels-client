@@ -1,7 +1,8 @@
 import { test, expect, apiClient } from '../fixtures/test';
 import { revalidateRestaurantPublicPage } from '../helpers/revalidate-public-page';
 import { prepareForScreenshot, VIEWPORTS, type VisualViewportKey } from '../helpers/visual';
-import { assertCartTitleCentered, snapCartPanel, snapOverlayPanel } from '../helpers/cart-visual';
+import { assertCartTitleCentered, snapCartPanel, snapOverlayPanel, waitForCartTotals } from '../helpers/cart-visual';
+import { mockPlainCartQuote } from '../helpers/cart-quote-mock';
 import type { CartLineItem } from '../../src/shared/types/cart';
 import type { RestaurantColorTheme } from '../../src/shared/types/restaurant-styling';
 import { clearGuestAddresses } from '../helpers/guest-addresses';
@@ -44,6 +45,8 @@ function buildLine(): CartLineItem {
 }
 
 async function seedCart(page: import('@playwright/test').Page, restaurantId: string) {
+  const cartItem = buildLine();
+  await mockPlainCartQuote(page, restaurantId, [cartItem]);
   await page.addInitScript(
     ({ rid, cartItem }) => {
       window.localStorage.setItem(
@@ -84,7 +87,7 @@ async function seedCart(page: import('@playwright/test').Page, restaurantId: str
         }),
       );
     },
-    { rid: restaurantId, cartItem: buildLine() },
+    { rid: restaurantId, cartItem },
   );
 }
 
@@ -175,6 +178,7 @@ async function seedAddresses(
 
 async function openDeliveryCheckout(page: import('@playwright/test').Page) {
   await page.getByTestId('cart-button').click();
+  await waitForCartTotals(page);
   await page.getByTestId('cart-go-to-checkout').click();
   await expect(page.getByTestId('cart-checkout-step')).toBeVisible();
 }

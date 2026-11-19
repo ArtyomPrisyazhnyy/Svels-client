@@ -3,6 +3,10 @@ import { useAuthStore } from '@/store/auth.store';
 
 export const SESSION_EXPIRED_MESSAGE = 'Сессия истекла. Войдите снова.';
 
+export function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === 'AbortError';
+}
+
 export class ApiError extends Error {
   readonly status: number;
   readonly code?: string;
@@ -87,6 +91,9 @@ export async function apiRequest<T>(
       },
     });
   } catch (error) {
+    if (isAbortError(error)) {
+      throw error;
+    }
     const detail = error instanceof Error ? error.message : 'network error';
     throw new ApiError(
       0,

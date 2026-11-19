@@ -579,6 +579,116 @@
   }
 }
 
+.restaurant-cart-modal__footer--stacked {
+  flex-direction: column;
+  align-items: stretch;
+
+  @media (min-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+}
+
+.restaurant-cart-modal__footer-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.restaurant-cart-modal__totals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.restaurant-cart-modal__footer .ui-skeleton {
+  background: color-mix(in srgb, var(--rs-text) 14%, var(--rs-cart-surface, var(--rs-surface)));
+}
+
+.restaurant-cart-modal__totals--flat {
+  display: contents;
+}
+
+.restaurant-cart-modal__quote-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--rs-text-muted);
+}
+
+.restaurant-cart-modal__quote-line-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.restaurant-cart-modal__quote-line-amount {
+  color: var(--rs-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.restaurant-cart-modal__quote-line--discount .restaurant-cart-modal__quote-line-amount {
+  color: var(--rs-accent);
+}
+
+.restaurant-cart-modal__quote-retry.ui-btn {
+  min-height: var(--control-h-sm);
+  padding: 0;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--rs-text-muted);
+}
+
+.restaurant-cart-modal__price-notice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3);
+  border-radius: var(--rs-btn-radius, var(--radius-md));
+  background: color-mix(in srgb, var(--rs-accent) 12%, var(--rs-surface));
+  color: var(--rs-text);
+}
+
+.restaurant-cart-modal__price-notice-title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.restaurant-cart-modal__price-notice-text {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.restaurant-cart-modal__submit-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.restaurant-cart-modal__submit .byn-price,
+.restaurant-cart-modal__submit .byn-price__amount,
+.restaurant-cart-modal__submit .byn-sign {
+  color: inherit;
+}
+
 .restaurant-cart-modal__total {
   display: flex;
   align-items: baseline;
@@ -633,6 +743,12 @@
   @media (min-width: 768px) {
     width: auto;
     min-width: calc(var(--space-10) * 4);
+  }
+}
+
+.restaurant-cart-modal__footer--stacked .restaurant-cart-modal__submit.ui-btn--full {
+  @media (min-width: 768px) {
+    width: 100%;
   }
 }
 

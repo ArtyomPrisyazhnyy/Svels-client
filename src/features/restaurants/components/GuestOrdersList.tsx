@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CurrencyAmount } from '@/shared/components/CurrencyAmount';
 import type { OrderDto } from '@/shared/types/pre-order';
+import { readOrderPriceBreakdown } from '@/shared/utils/order-price.util';
 import { useAuthStore } from '@/store/auth.store';
 import { fetchMyOrder, fetchMyOrders } from '../api/pre-orders.api';
 import { useGuestDataStore } from '@/store/guest-data.store';
@@ -20,6 +21,44 @@ const POLL_MS = 20_000;
 
 interface GuestOrdersListProps {
   restaurantId: string;
+}
+
+function GuestOrderPrice({ detail }: { detail: OrderDto }) {
+  const breakdown = readOrderPriceBreakdown(detail);
+  if (!breakdown) {
+    return (
+      <p className="guest-orders-list__total">
+        Итого: <CurrencyAmount amount={detail.totalAmount} />
+      </p>
+    );
+  }
+
+  return (
+    <div className="guest-orders-list__prices">
+      {breakdown.discountAmount > 0 && (
+        <p className="guest-orders-list__detail-row" data-testid="order-subtotal">
+          <span>Подытог</span>
+          <CurrencyAmount amount={breakdown.subtotal} />
+        </p>
+      )}
+      {breakdown.discountLabel && (
+        <p className="guest-orders-list__detail-row" data-testid="order-loyalty-discount">
+          <span>{breakdown.discountLabel}</span>
+          <span>
+            −<CurrencyAmount amount={breakdown.discountAmount} />
+          </span>
+        </p>
+      )}
+      {breakdown.gifts.map((gift) => (
+        <p key={gift.name} className="guest-orders-list__detail-row" data-testid="order-gift-reward">
+          <span>Подарок: {gift.name}</span>
+        </p>
+      ))}
+      <p className="guest-orders-list__total">
+        Итого: <CurrencyAmount amount={detail.totalAmount} />
+      </p>
+    </div>
+  );
 }
 
 function formatRequestedAt(iso: string | null): string {
@@ -196,9 +235,7 @@ export function GuestOrdersList({ restaurantId }: GuestOrdersListProps) {
               </li>
             ))}
           </ul>
-          <p className="guest-orders-list__total">
-            Итого: <CurrencyAmount amount={detail.totalAmount} />
-          </p>
+          <GuestOrderPrice detail={detail} />
           {detail.cancelReason && (
             <p className="guest-orders-list__cancel">Причина отмены: {detail.cancelReason}</p>
           )}
