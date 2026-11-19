@@ -601,8 +601,9 @@
 .restaurant-cart-modal__totals {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
   min-width: 0;
+  width: 100%;
   flex: 1 1 auto;
 }
 
@@ -620,6 +621,7 @@
   justify-content: space-between;
   gap: var(--space-3);
   min-width: 0;
+  min-height: calc(var(--text-sm) * 1.25);
   margin: 0;
   font-size: var(--text-sm);
   font-weight: 500;
@@ -707,6 +709,15 @@
     justify-content: flex-start;
     width: auto;
   }
+}
+
+.restaurant-cart-modal__totals:not(.restaurant-cart-modal__totals--flat) .restaurant-cart-modal__total {
+  flex: none;
+  justify-content: space-between;
+  width: 100%;
+  min-height: calc(var(--text-xl) * 1.25);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rs-border);
 }
 
 .restaurant-cart-modal__panel .restaurant-cart-modal__total-label {

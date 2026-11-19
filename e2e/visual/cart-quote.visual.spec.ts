@@ -200,7 +200,8 @@ test.describe('Cart quote visual', () => {
         quoted = DISCOUNT_QUOTE;
         await page.getByTestId('cart-submit').click();
         await expect(page.getByTestId('cart-price-changed')).toContainText('Цена изменилась');
-        await expect(page.getByTestId('cart-price-changed')).toContainText('21.60');
+        await expect(page.getByTestId('cart-price-changed')).toContainText('Было 24.00');
+        await expect(page.getByTestId('cart-price-changed')).toContainText('стало 21.60');
         await snapCartPanel(
           page,
           page.getByTestId('cart-modal-panel'),

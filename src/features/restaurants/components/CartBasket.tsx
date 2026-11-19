@@ -149,6 +149,7 @@ export interface CartCheckoutTotals {
   gifts?: CartGiftReward[];
   onRetry?: () => void;
   priceNoticeAmount?: number | null;
+  priceNoticePrevious?: number | null;
 }
 
 interface CartCheckoutBarProps {
@@ -162,6 +163,23 @@ function CartTotalAmount({ amount, testId }: { amount: number; testId?: string }
     <span className="restaurant-cart-modal__total-amount" data-testid={testId}>
       <CurrencyAmount amount={amount} fractionDigits={2} />
     </span>
+  );
+}
+
+function QuoteLineSkeleton({
+  labelWidth,
+  amountWidth,
+}: {
+  labelWidth: string;
+  amountWidth?: string;
+}) {
+  return (
+    <p className="restaurant-cart-modal__quote-line">
+      <Skeleton variant="text" width={labelWidth} height="var(--text-sm)" />
+      {amountWidth ? (
+        <Skeleton variant="text" width={amountWidth} height="var(--text-sm)" />
+      ) : null}
+    </p>
   );
 }
 
@@ -238,15 +256,20 @@ function CartTotalsBlock({ totalAmount, totals }: { totalAmount: number; totals?
 
   if (totals.mode === 'skeleton') {
     return (
-      <p
-        className="restaurant-cart-modal__total"
+      <div
+        className="restaurant-cart-modal__totals"
         data-testid="cart-totals-skeleton"
         aria-busy="true"
         aria-hidden
       >
-        <Skeleton variant="text" width="5rem" height="0.875rem" />
-        <Skeleton variant="text" width="6rem" height="1.25rem" />
-      </p>
+        <QuoteLineSkeleton labelWidth="4.5rem" amountWidth="4.5rem" />
+        <QuoteLineSkeleton labelWidth="11rem" amountWidth="4.5rem" />
+        <QuoteLineSkeleton labelWidth="9rem" />
+        <p className="restaurant-cart-modal__total">
+          <Skeleton variant="text" width="3.25rem" height="var(--text-sm)" />
+          <Skeleton variant="text" width="5rem" height="var(--text-xl)" />
+        </p>
+      </div>
     );
   }
 
@@ -255,12 +278,13 @@ function CartTotalsBlock({ totalAmount, totals }: { totalAmount: number; totals?
 
 export function CartCheckoutBar({ totalAmount, totals, children }: CartCheckoutBarProps) {
   const notice = totals?.priceNoticeAmount;
-  const showNotice = notice != null;
+  const previous = totals?.priceNoticePrevious;
+  const showNotice = notice != null && previous != null;
   const hasBreakdown =
     totals?.mode === 'quote' &&
     (((totals.discountAmount ?? 0) > 0 && Boolean(totals.discountLabel)) ||
       (totals.gifts?.length ?? 0) > 0);
-  const stacked = showNotice || hasBreakdown;
+  const stacked = showNotice || hasBreakdown || totals?.mode === 'skeleton';
   const totalsBlock = <CartTotalsBlock totalAmount={totalAmount} totals={totals} />;
 
   return (
@@ -276,7 +300,8 @@ export function CartCheckoutBar({ totalAmount, totals, children }: CartCheckoutB
         <div className="restaurant-cart-modal__price-notice" data-testid="cart-price-changed" role="status">
           <p className="restaurant-cart-modal__price-notice-title">Цена изменилась</p>
           <p className="restaurant-cart-modal__price-notice-text">
-            Новая сумма <CurrencyAmount amount={notice} fractionDigits={2} />
+            Было <CurrencyAmount amount={previous ?? 0} fractionDigits={2} />, стало{' '}
+            <CurrencyAmount amount={notice ?? 0} fractionDigits={2} />
           </p>
         </div>
       )}

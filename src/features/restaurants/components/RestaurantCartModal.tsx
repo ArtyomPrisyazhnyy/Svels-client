@@ -146,7 +146,11 @@ export function RestaurantCartModal({
   const [showValidationHints, setShowValidationHints] = useState(false);
   const [clearPromptOpen, setClearPromptOpen] = useState(false);
   const [addressSheetOpen, setAddressSheetOpen] = useState(false);
-  const [priceNotice, setPriceNotice] = useState<{ key: string; amount: number } | null>(null);
+  const [priceNotice, setPriceNotice] = useState<{
+    key: string;
+    previous: number;
+    amount: number;
+  } | null>(null);
   const [heldOrder, setHeldOrder] = useState<PreOrderResponse | null>(null);
   const acceptedTotalRef = useRef<number | null>(null);
 
@@ -188,10 +192,12 @@ export function RestaurantCartModal({
     () => items.map((line) => `${line.lineKey}:${line.quantity}`).join('|'),
     [items],
   );
-  const priceNoticeAmount =
-    priceNotice && (priceNotice.key === quoteItemsKey || heldOrder != null)
-      ? priceNotice.amount
+  const visiblePriceNotice =
+    priceNotice != null && (priceNotice.key === quoteItemsKey || heldOrder != null)
+      ? priceNotice
       : null;
+  const priceNoticeAmount = visiblePriceNotice?.amount ?? null;
+  const priceNoticePrevious = visiblePriceNotice?.previous ?? null;
 
   const serverQuote = quotePhase === 'ready' || (quotePhase === 'loading' && quote != null) ? quote : null;
   const payableTotal = serverQuote?.total ?? clientTotal;
@@ -473,7 +479,7 @@ export function RestaurantCartModal({
         acceptedTotalRef.current != null && moneyEquals(pricedTotal, acceptedTotalRef.current);
       if (fresh && !moneyEquals(fresh.total, seenTotal) && !alreadyAccepted) {
         acceptedTotalRef.current = null;
-        setPriceNotice({ key: quoteItemsKey, amount: fresh.total });
+        setPriceNotice({ key: quoteItemsKey, previous: seenTotal, amount: fresh.total });
         setSubmitting(false);
         return;
       }
@@ -520,7 +526,7 @@ export function RestaurantCartModal({
 
       if (!moneyEquals(order.totalAmount, pricedTotal)) {
         setHeldOrder(order);
-        setPriceNotice({ key: quoteItemsKey, amount: order.totalAmount });
+        setPriceNotice({ key: quoteItemsKey, previous: pricedTotal, amount: order.totalAmount });
         setSubmitting(false);
         return;
       }
@@ -575,12 +581,14 @@ export function RestaurantCartModal({
           discountAmount: serverQuote.loyaltyDiscount?.amount ?? 0,
           gifts: serverQuote.giftRewards,
           priceNoticeAmount,
+          priceNoticePrevious,
         }
       : {
           mode: 'fallback',
           total: clientTotal,
           onRetry: quotePhase === 'error' ? () => void retryQuote() : undefined,
           priceNoticeAmount,
+          priceNoticePrevious,
         };
 
   const showServerTotalOnButton =
