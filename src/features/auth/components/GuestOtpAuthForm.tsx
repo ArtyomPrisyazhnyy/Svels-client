@@ -13,6 +13,7 @@ import { useFavoritesStore } from '@/store/favorites.store';
 import { ApiError } from '@/shared/api/api-client';
 import { PhoneInput } from '@/shared/components/PhoneInput';
 import { Button } from '@/shared/ui/Button/Button';
+import { Checkbox } from '@/shared/ui/Checkbox/Checkbox';
 import { Field } from '@/shared/ui/Field/Field';
 import type { OtpDeliveryChannel } from '@/shared/types/auth';
 import { toPhoneApiValue, isCompleteBelarusPhone } from '@/shared/utils/phone.util';
@@ -313,26 +314,24 @@ export function GuestOtpAuthForm({ restaurantId, onSuccess }: GuestOtpAuthFormPr
           />
         </Field>
 
-        <label
+        <Checkbox
+          id="guest-otp-privacy-consent"
+          align="start"
           className={`auth-hint guest-otp-privacy-consent-label${consentInvalid ? ' guest-otp-privacy-consent-label--invalid' : ''}`}
-          style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'flex-start' }}
-          data-testid="guest-otp-privacy-consent-label"
-        >
-          <input
-            id="guest-otp-privacy-consent"
-            type="checkbox"
-            checked={privacyConsent}
-            onChange={(e) => handlePrivacyConsentChange(e.target.checked)}
-            data-testid="guest-otp-privacy-consent"
-          />
-          <span>
-            Я согласен(на) с{' '}
-            <Link href="/privacypolicy" target="_blank" rel="noopener noreferrer">
-              политикой конфиденциальности
-            </Link>{' '}
-            и обработкой персональных данных
-          </span>
-        </label>
+          testId="guest-otp-privacy-consent-label"
+          inputTestId="guest-otp-privacy-consent"
+          checked={privacyConsent}
+          onChange={(e) => handlePrivacyConsentChange(e.target.checked)}
+          label={
+            <>
+              Я согласен(на) с{' '}
+              <Link href="/privacypolicy" target="_blank" rel="noopener noreferrer">
+                политикой конфиденциальности
+              </Link>{' '}
+              и обработкой персональных данных
+            </>
+          }
+        />
 
         <Button
           type="submit"
